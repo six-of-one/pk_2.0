@@ -29,18 +29,16 @@ void (entity e, float newskin) skinChange =
 	}
 	e.skin = newskin;
 	if (teamplay)
+	if (e.classname == "player")
 	{
-		if (e.classname == "player")
+		b = find (world,classname,"dmbot");
+		while (b)
 		{
-			b = find (world,classname,"dmbot");
-			while (b)
+			if (b.team == e.team)
 			{
-				if (b.team == e.team)
-				{
-					b.skin = e.skin;
-				}
-				b = find (b,classname,"dmbot");
+				b.skin = e.skin;
 			}
+			b = find (b,classname,"dmbot");
 		}
 	}
 };
@@ -130,116 +128,77 @@ void () botRestrictedCommand =
 	{
 		setSkinsMode ();
 	}
-	else
+	else if (self.impulse == 205)
 	{
-		if (self.impulse == 205)
+		AddAnotherBot ();
+	}
+	else if ((self.impulse > 99) && (self.impulse < 116))
+	{
+		if (teamplay)
 		{
-			AddAnotherBot ();
+			SetTeamBots (self.impulse - 100);
 		}
 		else
 		{
-			if ((self.impulse > 99) && (self.impulse < 116))
-			{
-				if (teamplay)
-				{
-					SetTeamBots (self.impulse - 100);
-				}
-				else
-				{
-					SetMaxBots (self.impulse - 100);
-				}
-			}
-			else
-			{
-				if (self.impulse == 208)
-				{
-					AddAnotherBot ();
-					AddAnotherBot ();
-					AddAnotherBot ();
-					AddAnotherBot ();
-				}
-				else
-				{
-					if (self.impulse == 211)
-					{
-						removeAllBots ();
-					}
-					else
-					{
-						if (self.impulse == 212)
-						{
-							setPeeperMode ();
-						}
-						else
-						{
-							if (self.impulse == 214)
-							{
-								setBotGravity ();
-							}
-							else
-							{
-								if (self.impulse == 215)
-								{
-									setVerboseMode ();
-								}
-								else
-								{
-									if (self.impulse == 217)
-									{
-										tmp = ftos (NUMPATHS);
-										dprint (tmp);
-										dprint (" botpaths placed\n");
-									}
-									else
-									{
-										if (self.impulse == 117)
-										{
-											tmp = ftos (NUMPATHERS);
-											dprint (tmp);
-											dprint (" botpathers\n");
-										}
-										else
-										{
-											if (self.impulse == 118)
-											{
-												tmp = ftos (NUMBOTS);
-												dprint (tmp);
-												dprint (" active bots\n");
-											}
-											else
-											{
-												if (self.impulse == 119)
-												{
-													tmp = ftos (serverflags);
-													dprint (tmp);
-													dprint (" server flags\n");
-												}
-												else
-												{
-													if (self.impulse == 218)
-													{
-														serverflags = (serverflags | RESTRICT);
-														bprint ("Restricted mode set\n");
-													}
-													else
-													{
-														if (self.impulse == 219)
-														{
-															serverflags = (serverflags | SUPERRESTRICT);
-															bprint ("Super Restricted mode set\n");
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+			SetMaxBots (self.impulse - 100);
 		}
+	}
+	else if (self.impulse == 208)
+	{
+		AddAnotherBot ();
+		AddAnotherBot ();
+		AddAnotherBot ();
+		AddAnotherBot ();
+	}
+	else if (self.impulse == 211)
+	{
+		removeAllBots ();
+	}
+	else if (self.impulse == 212)
+	{
+		setPeeperMode ();
+	}
+	else if (self.impulse == 214)
+	{
+		setBotGravity ();
+	}
+	else if (self.impulse == 215)
+	{
+		setVerboseMode ();
+	}
+	else if (self.impulse == 217)
+	{
+		tmp = ftos (NUMPATHS);
+		dprint (tmp);
+		dprint (" botpaths placed\n");
+	}
+	else if (self.impulse == 117)
+	{
+		tmp = ftos (NUMPATHERS);
+		dprint (tmp);
+		dprint (" botpathers\n");
+	}
+	else if (self.impulse == 118)
+	{
+		tmp = ftos (NUMBOTS);
+		dprint (tmp);
+		dprint (" active bots\n");
+	}
+	else if (self.impulse == 119)
+	{
+		tmp = ftos (serverflags);
+		dprint (tmp);
+		dprint (" server flags\n");
+	}
+	else if (self.impulse == 218)
+	{
+		serverflags = (serverflags | RESTRICT);
+		bprint ("Restricted mode set\n");
+	}
+	else if (self.impulse == 219)
+	{
+		serverflags = (serverflags | SUPERRESTRICT);
+		bprint ("Super Restricted mode set\n");
 	}
 };
 
@@ -249,65 +208,39 @@ void () botImpulseCommand =
 	{
 		skinChange (self,(self.skin + 1));
 	}
-	else
+	else if (self.impulse == 201)
 	{
-		if (self.impulse == 201)
-		{
-			skinChange (self,(self.skin - 1));
-		}
-		else
-		{
-			if (self.impulse == 204)
-			{
-				printIntro ();
-			}
-			else
-			{
-				if (self.impulse == 210)
-				{
-					PrintScores (MYSCORE);
-				}
-				else
-				{
-					if (self.impulse == 220)
-					{
-						PrintScores (NORMALSCORE);
-					}
-					else
-					{
-						if (self.impulse == 221)
-						{
-							UpdateTeamColors ();
-						}
-						else
-						{
-							if (self.impulse == 222)
-							{
-							PrintTopScores (0);
-							}
-							else
-							{
-								if (self.impulse == 223)
-								{
-									self.items = (self.items | IT_INVULNERABILITY);
-									self.invincible_finished = (time + 30);
-								}
-								else
-								{
-									if (!(serverflags & SUPERRESTRICT))
-									{
-										if (!(serverflags & RESTRICT) || (self.colormap == 1))
-										{
-											botRestrictedCommand ();
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+		skinChange (self,(self.skin - 1));
+	}
+	else if (self.impulse == 204)
+	{
+		printIntro ();
+	}
+	else if (self.impulse == 210)
+	{
+		PrintScores (MYSCORE);
+	}
+	else if (self.impulse == 220)
+	{
+		PrintScores (NORMALSCORE);
+	}
+	else if (self.impulse == 221)
+	{
+		UpdateTeamColors ();
+	}
+	else if (self.impulse == 222)
+	{
+		PrintTopScores (0);
+	}
+	else if (self.impulse == 223)
+	{
+		self.items = (self.items | IT_INVULNERABILITY);
+		self.invincible_finished = (time + 30);
+	}
+	else if (!(serverflags & SUPERRESTRICT))
+	{
+		if (!(serverflags & RESTRICT) || (self.colormap == 1))
+			botRestrictedCommand ();
 	}
 };
 

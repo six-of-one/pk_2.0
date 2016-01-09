@@ -591,7 +591,6 @@ void() pk_bound_ammo =
 
 float(float w, float w2) PK_RankForWeapon =
 {
-bprint("PK_RankForWeapon\n");
 	if (w == IT_AXE && w2 == PK_IT_CLIGHT)
 		return 1;
 	if (w == IT_LIGHTNING)
@@ -642,7 +641,6 @@ void(float new, float new2) PK_Deathmatch_Weapon =
 
 void() PK_BackpackTouch =
 {
-bprint("PK_BackpackTouch\n");
 	local string	bs;
 	local	float	best, new;
 	local		entity	st1;
@@ -800,7 +798,6 @@ bprint("PK_BackpackTouch\n");
 
 void() PK_DropBackpack =
 {
-bprint("PK_DropBackpack\n");
 	local entity	item;
 
 	if (!(self.ammo_shells + self.ammo_nails + self.ammo_rockets + self.ammo_cells + self.pk_explode_ammo))

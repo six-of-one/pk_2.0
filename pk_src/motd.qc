@@ -13,6 +13,8 @@ void() connectmessage =
 
 	Line3 = "Version 1.11\n";
 
+if (self.classname != "dmbot" && (!FRIKBOT ||self.ishuman))
+{
 	// The welcome message
 	if (self.msgcount == 1)
 	{
@@ -107,6 +109,7 @@ void() connectmessage =
 	{
 	  centerprint3(self, "Welcome to ÐainËeep!\n", "\nTeam Evolve\n", Line3);
 	}
+}
 
 	self.msgcount = self.msgcount + 1;
 };

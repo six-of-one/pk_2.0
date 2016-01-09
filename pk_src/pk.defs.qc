@@ -41,11 +41,11 @@ string normalsound;
 string reversesound;
 
 // PK new print prototypes...
-void(entity client, string s, string s1) centerprint2 = #73;	// sprint, but in middle
+//void(entity client, string s, string s1) centerprint2 = #73;	// sprint, but in middle
 void(entity client, string s, string s1, string s2) centerprint3 = #73;	// sprint, but in middle
-void(entity client, string s, string s1, string s2, string s3) centerprint4 = #73;	// sprint, but in middle
+//void(entity client, string s, string s1, string s2, string s3) centerprint4 = #73;	// sprint, but in middle
 void(entity client, string s, string s1, string s2, string s3, string s4) centerprint5 = #73;	// sprint, but in middle
-void(entity client, string s, string s1, string s2, string s3, string s4, string s5) centerprint6 = #73;	// sprint, but in middle
+//void(entity client, string s, string s1, string s2, string s3, string s4, string s5) centerprint6 = #73;	// sprint, but in middle
 void(entity client, string s, string s1, string s2, string s3, string s4, string s5, string s6) centerprint7 = #73;	// sprint, but in middle
 
 // auto turrets

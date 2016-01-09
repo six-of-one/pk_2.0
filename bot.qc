@@ -462,3 +462,5 @@ void(entity	client, string s) centerprint =
 		bot_centerprint(client, s);
 };
 */
+
+

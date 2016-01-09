@@ -68,6 +68,7 @@ void () PlaceItem =
 		return ;
 	}
 	if (PK) pk_placeitem(); // *pk - set item details
+	bot_item_linx(self); // *bot - item tie in
 };
 
 /*

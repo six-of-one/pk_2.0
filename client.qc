@@ -1241,9 +1241,7 @@ called when a player connects to a server
 */
 void () ClientConnect =
 {
-	local float v;
 	if (FRIKBOT) ClientInRankings ();
-	v = (random () * 5);
 	bprint (self.netname);
 	if (PK) pk_clientconnect(); // *pk - variety connect msg
 	else

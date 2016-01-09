@@ -272,7 +272,7 @@ void() hub_control_use =
 		
 		r = random() * c;
 		highest = getMap(r);
-	  if (highest == world)
+		if (highest == world)
 		{
 			bprint("hub_control_use: random map not found\n");
 			return;
@@ -315,7 +315,7 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerVote
 
 	WriteBFloat(MSG_ONE, maxplayers);
 
-	// '     Time Left:'
+	// '		 Time Left:'
 	WriteB3(MSG_ONE, 2105376);
 	WriteB3(MSG_ONE, 5513248);
 	WriteB3(MSG_ONE, 6647145);
@@ -324,8 +324,8 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerVote
 
 	if (timemins < 10)
 	{
-	  // ' 0'
-	  WriteB3(MSG_ONE, 12320);
+		// ' 0'
+		WriteB3(MSG_ONE, 12320);
 	}
 	else
 	{
@@ -337,13 +337,13 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerVote
 
 	if (timesec < 10)
 	{
-	  // ':0'
-	  WriteB3(MSG_ONE, 12346);
+		// ':0'
+		WriteB3(MSG_ONE, 12346);
 	}
 	else
 	{
-	  // ':'
-	  WriteB3(MSG_ONE, 58);
+		// ':'
+		WriteB3(MSG_ONE, 58);
 	}
 
 	WriteBFloat(MSG_ONE, timesec);
@@ -367,105 +367,111 @@ void() hub_control_status =
 
 	if (self.map == "painkeep")
 	{
-	  str1 = "pk ";
+		str1 = "pk ";
 	}
 	else
 	{
-	  str1 = self.map;
+		str1 = self.map;
 	}
 
 	if (first.cnt > 0)
 	{
-	  if (self.attack_state == 0)
-	  {
-	  	if (first.map == "painkeep")
-	    {
-	    	str2 = "pk ";
-	    }
-	    else
-	    {
-	    	str2 = first.map;
-	    }
+		if (self.attack_state == 0)
+		{
+			if (first.map == "painkeep")
+			{
+				str2 = "pk ";
+			}
+			else
+			{
+				str2 = first.map;
+			}
 
-	    if (self.map == string_null)
-	    {
-	      str3 = ftos(first.cnt);
-	      centerprint5(self, "\n\n\n\n\n\n\n\n\n\n\nPlease Vote             Lead: ", str2, " [", str3, "]");
-	    }
-	    else
-	    {
-	      str3 = ftos(first.cnt);
-	      centerprint7(self, "\n\n\n\n\n\n\n\n\n\n\nYou Voted For: ", str1, "       Lead: ", str2, " [", str3, "]");
-	    }
+			if (self.classname != "dmbot" && (!FRIKBOT ||self.ishuman))
+			{
+			if (self.map == string_null)
+			{
+				str3 = ftos(first.cnt);
+				centerprint5(self, "\n\n\n\n\n\n\n\n\n\n\nPlease Vote						 Lead: ", str2, " [", str3, "]");
+			}
+			else
+			{
+				str3 = ftos(first.cnt);
+				centerprint7(self, "\n\n\n\n\n\n\n\n\n\n\nYou Voted For: ", str1, "			 Lead: ", str2, " [", str3, "]");
+			}
+			}
 
-	    self.attack_state = 1;
-	    return;
-	  }
+			self.attack_state = 1;
+			return;
+		}
 	}
 
 	if (first != second)
 	if (second.cnt > 0)
 	{
 		if (self.attack_state == 1)
-	  {
-	  	if (second.map == "painkeep")
-	    {
-	    	str2 = "pk ";
-	    }
-	    else
-	    {
-	    	str2 = second.map;
-	    }
+		{
+			if (second.map == "painkeep")
+			{
+				str2 = "pk ";
+			}
+			else
+			{
+				str2 = second.map;
+			}
 
-	    if (self.map == string_null)
-	    {
-	      str3 = ftos(second.cnt);
-	      centerprint5(self, "\n\n\n\n\n\n\n\n\n\n\nPlease Vote            Second: ", str2, " [", str3, "]");
-	    }
-	    else
-	    {
-	      str3 = ftos(second.cnt);
-	      centerprint7(self, "\n\n\n\n\n\n\n\n\n\n\nYou Voted For: ", str1, "     Second: ", str2, " [", str3, "]");
-	    }
-	    self.attack_state = 2;
-	    return;
+			if (self.classname != "dmbot" && (!FRIKBOT ||self.ishuman))
+			{
+			if (self.map == string_null)
+			{
+				str3 = ftos(second.cnt);
+				centerprint5(self, "\n\n\n\n\n\n\n\n\n\n\nPlease Vote						Second: ", str2, " [", str3, "]");
+			}
+			else
+			{
+				str3 = ftos(second.cnt);
+				centerprint7(self, "\n\n\n\n\n\n\n\n\n\n\nYou Voted For: ", str1, "		 Second: ", str2, " [", str3, "]");
+			}
+			}
+			self.attack_state = 2;
+			return;
 		}
 	}
 
 	if (first.cnt == 0 || first == second || second.cnt == 0 || self.attack_state == 2)
 	{
-	  timemins = 0;
-	  if (hubStartTime > time)
-	  {
-	    timedef = (hubStartTime - time);
-	    timemins = timedef / 60;
-	    timemins = floor(timemins);
-	    timedef = (hubStartTime - time) - (timemins * 60);
-	  }
-	  else
-	  {
-	  	timedef = 0;
-	  }
+		timemins = 0;
+		if (hubStartTime > time)
+		{
+			timedef = (hubStartTime - time);
+			timemins = timedef / 60;
+			timemins = floor(timemins);
+			timedef = (hubStartTime - time) - (timemins * 60);
+		}
+		else
+		{
+			timedef = 0;
+		}
 
-	  // count the numbeer of votes cast
-	  pl = find(world, classname, "player");
-	  maxplayers = votecast = 0;
-	  while (pl != world)
-	  {
-	  	if (pl.disconnectPlayer == 0)
-	    {
-	      if (pl.map != "")
-	        votecast = votecast + 1;
+		// count the numbeer of votes cast
+		pl = find(world, classname, "player");
+		maxplayers = votecast = 0;
+		while (pl != world)
+		{
+			if (pl.disconnectPlayer == 0)
+			{
+				if (pl.map != "")
+					votecast = votecast + 1;
 
-	      maxplayers = maxplayers + 1;
-	    }
+				maxplayers = maxplayers + 1;
+			}
 
-	    pl = find(pl, classname, "player");
-	  }
+			pl = find(pl, classname, "player");
+		}
 
 		playerVotesTimeLeft(maxplayers, votecast, timemins, timedef);
 
-	  self.attack_state = 0;
+		self.attack_state = 0;
 	}
 };
 
@@ -539,7 +545,7 @@ void() GoBack =
 	spot = findMap(self.map);
 	// decrement his old vote
 	if (spot.cnt > 0)
-	  spot.cnt = spot.cnt - 1;
+		spot.cnt = spot.cnt - 1;
 
 	self.map = "";
 	T_Damage(self, self, self, 5000);
@@ -554,145 +560,145 @@ void(string mapName) findAndPrintMapName =
 {
 	if (mapName == "painkeep")
 	{
-	  // 'PainKeep'
-	  WriteB3(MSG_ONE, 6906192);
-	  WriteB3(MSG_ONE, 6638446);
-	  WriteB3(MSG_ONE, 28773);
+		// 'PainKeep'
+		WriteB3(MSG_ONE, 6906192);
+		WriteB3(MSG_ONE, 6638446);
+		WriteB3(MSG_ONE, 28773);
 
 	}
 	else if (mapName == "pk0")
 	{
-	  // 'pk0'
-	  WriteB3(MSG_ONE, 3173232);
+		// 'pk0'
+		WriteB3(MSG_ONE, 3173232);
 	}
 	else if (mapName == "pk1")
 	{
-	  // 'pk1'
-	  WriteB3(MSG_ONE, 3238768);
+		// 'pk1'
+		WriteB3(MSG_ONE, 3238768);
 	}
 	else if (mapName == "pk2")
 	{
-	  // 'pk2'
-	  WriteB3(MSG_ONE, 3304304);
+		// 'pk2'
+		WriteB3(MSG_ONE, 3304304);
 	}
 	else if (mapName == "pk3")
 	{
-	  // 'pk3'
-	  WriteB3(MSG_ONE, 3369840);
+		// 'pk3'
+		WriteB3(MSG_ONE, 3369840);
 	}
 	else if (mapName == "pk4")
 	{
-	  // 'pk4'
-	  WriteB3(MSG_ONE, 3435376);
+		// 'pk4'
+		WriteB3(MSG_ONE, 3435376);
 	}
 	else if (mapName == "pk5")
 	{
-	  // 'pk5'
-	  WriteB3(MSG_ONE, 3500912);
+		// 'pk5'
+		WriteB3(MSG_ONE, 3500912);
 	}
 	else if (mapName == "pk6")
 	{
-	  // 'pk6'
-	  WriteB3(MSG_ONE, 3566448);
+		// 'pk6'
+		WriteB3(MSG_ONE, 3566448);
 	}
 	else if (mapName == "pk7")
 	{
-	  // 'pk7'
-	  WriteB3(MSG_ONE, 3631984);
+		// 'pk7'
+		WriteB3(MSG_ONE, 3631984);
 	}
 	else if (mapName == "pk8")
 	{
-	  // 'pk8'
-	  WriteB3(MSG_ONE, 3697520);
+		// 'pk8'
+		WriteB3(MSG_ONE, 3697520);
 	}
 	else if (mapName == "pk9")
 	{
-	  // 'pk9'
-	  WriteB3(MSG_ONE, 3763056);
+		// 'pk9'
+		WriteB3(MSG_ONE, 3763056);
 	}
 	else if (mapName == "pk10")
 	{
-	  // 'pk10'
-	  WriteB3(MSG_ONE, 3238768);
-	  WriteB3(MSG_ONE, 48);
+		// 'pk10'
+		WriteB3(MSG_ONE, 3238768);
+		WriteB3(MSG_ONE, 48);
 	}
 	else if (mapName == "pk11")
 	{
-	  // 'pk11'
-	  WriteB3(MSG_ONE, 3238768);
-	  WriteB3(MSG_ONE, 49);
+		// 'pk11'
+		WriteB3(MSG_ONE, 3238768);
+		WriteB3(MSG_ONE, 49);
 	}
 	else if (mapName == "pk12")
 	{
-	  // 'pk12'
-	  WriteB3(MSG_ONE, 3238768);
-	  WriteB3(MSG_ONE, 50);
+		// 'pk12'
+		WriteB3(MSG_ONE, 3238768);
+		WriteB3(MSG_ONE, 50);
 	}
 	else if (mapName == "pk13")
 	{
-	  // 'pk13'
-	  WriteB3(MSG_ONE, 3238768);
-	  WriteB3(MSG_ONE, 51);
+		// 'pk13'
+		WriteB3(MSG_ONE, 3238768);
+		WriteB3(MSG_ONE, 51);
 	}
 	else if (mapName == "pk14")
 	{
-	  // 'pk14'
-	  WriteB3(MSG_ONE, 3238768);
-	  WriteB3(MSG_ONE, 52);
+		// 'pk14'
+		WriteB3(MSG_ONE, 3238768);
+		WriteB3(MSG_ONE, 52);
 	}
 	else if (mapName == "pk15")
 	{
-	  // 'pk15'
-	  WriteB3(MSG_ONE, 3238768);
-	  WriteB3(MSG_ONE, 53);
+		// 'pk15'
+		WriteB3(MSG_ONE, 3238768);
+		WriteB3(MSG_ONE, 53);
 	}
 	else if (mapName == "pk16")
 	{
-	  // 'pk16'
-	  WriteB3(MSG_ONE, 3238768);
-	  WriteB3(MSG_ONE, 54);
+		// 'pk16'
+		WriteB3(MSG_ONE, 3238768);
+		WriteB3(MSG_ONE, 54);
 	}
 	else if (mapName == "pk17")
 	{
-	  // 'pk17'
-	  WriteB3(MSG_ONE, 3238768);
-	  WriteB3(MSG_ONE, 55);
+		// 'pk17'
+		WriteB3(MSG_ONE, 3238768);
+		WriteB3(MSG_ONE, 55);
 	}
 	else if (mapName == "pk18")
 	{
-	  // 'pk18'
-	  WriteB3(MSG_ONE, 3238768);
-	  WriteB3(MSG_ONE, 56);
+		// 'pk18'
+		WriteB3(MSG_ONE, 3238768);
+		WriteB3(MSG_ONE, 56);
 	}
 	else if (mapName == "pk19")
 	{
-	  // 'pk19'
-	  WriteB3(MSG_ONE, 3238768);
-	  WriteB3(MSG_ONE, 57);
+		// 'pk19'
+		WriteB3(MSG_ONE, 3238768);
+		WriteB3(MSG_ONE, 57);
 	}
 	else if (mapName == "pk20")
 	{
-	  // 'pk20'
-	  WriteB3(MSG_ONE, 3304304);
-	  WriteB3(MSG_ONE, 48);
+		// 'pk20'
+		WriteB3(MSG_ONE, 3304304);
+		WriteB3(MSG_ONE, 48);
 	}
 	else
 	{
-	  // 'Unknown Map, Please Extend Print Routine'
-	  WriteB3(MSG_ONE, 7040597);
-	  WriteB3(MSG_ONE, 7827310);
-	  WriteB3(MSG_ONE, 5054574);
-	  WriteB3(MSG_ONE, 2912353);
-	  WriteB3(MSG_ONE, 7098400);
-	  WriteB3(MSG_ONE, 7561573);
-	  WriteB3(MSG_ONE, 4530277);
-	  WriteB3(MSG_ONE, 6648952);
-	  WriteB3(MSG_ONE, 2122862);
-	  WriteB3(MSG_ONE, 6910544);
-	  WriteB3(MSG_ONE, 2126958);
-	  WriteB3(MSG_ONE, 7696210);
-	  WriteB3(MSG_ONE, 7235956);
-	  WriteB3(MSG_ONE, 101);
+		// 'Unknown Map, Please Extend Print Routine'
+		WriteB3(MSG_ONE, 7040597);
+		WriteB3(MSG_ONE, 7827310);
+		WriteB3(MSG_ONE, 5054574);
+		WriteB3(MSG_ONE, 2912353);
+		WriteB3(MSG_ONE, 7098400);
+		WriteB3(MSG_ONE, 7561573);
+		WriteB3(MSG_ONE, 4530277);
+		WriteB3(MSG_ONE, 6648952);
+		WriteB3(MSG_ONE, 2122862);
+		WriteB3(MSG_ONE, 6910544);
+		WriteB3(MSG_ONE, 2126958);
+		WriteB3(MSG_ONE, 7696210);
+		WriteB3(MSG_ONE, 7235956);
+		WriteB3(MSG_ONE, 101);
 	}
 };
 
@@ -721,7 +727,7 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerInte
 
 	WriteBFloat(MSG_ONE, maxplayers);
 
-	// '                     '
+	// '										 '
 	WriteB3(MSG_ONE, 2105376);
 	WriteB3(MSG_ONE, 2105376);
 	WriteB3(MSG_ONE, 2105376);
@@ -746,7 +752,7 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerInte
 	votecast = maxplayers - votecast;
 	WriteBFloat(MSG_ONE, votecast);
 
-	// '                     '
+	// '										 '
 	WriteB3(MSG_ONE, 2105376);
 	WriteB3(MSG_ONE, 2105376);
 	WriteB3(MSG_ONE, 2105376);
@@ -761,64 +767,64 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerInte
 
 	if (first.cnt > 0)
 	{
-	  // '\nLeading level: '
-	  WriteB3(MSG_ONE, 6638602);
-	  WriteB3(MSG_ONE, 6906977);
-	  WriteB3(MSG_ONE, 2123630);
-	  WriteB3(MSG_ONE, 7759212);
-	  WriteB3(MSG_ONE, 3828837);
-	  WriteB3(MSG_ONE, 32);
+		// '\nLeading level: '
+		WriteB3(MSG_ONE, 6638602);
+		WriteB3(MSG_ONE, 6906977);
+		WriteB3(MSG_ONE, 2123630);
+		WriteB3(MSG_ONE, 7759212);
+		WriteB3(MSG_ONE, 3828837);
+		WriteB3(MSG_ONE, 32);
 
-	  findAndPrintMapName(first.map);
+		findAndPrintMapName(first.map);
 
 		// ', '
 		WriteB3(MSG_ONE, 8236);
 
 		WriteBFloat(MSG_ONE, first.cnt);
 
-	  // '                     '
-	  WriteB3(MSG_ONE, 2105376);
-	  WriteB3(MSG_ONE, 2105376);
-	  WriteB3(MSG_ONE, 2105376);
-	  WriteB3(MSG_ONE, 2105376);
-	  WriteB3(MSG_ONE, 2105376);
-	  WriteB3(MSG_ONE, 2105376);
-	  WriteB3(MSG_ONE, 2105376);
-	  WriteB3(MSG_ONE, 2105376);
-	  WriteB3(MSG_ONE, 2105376);
-	  WriteB3(MSG_ONE, 2105376);
-	  WriteB3(MSG_ONE, 2105376);
+		// '										 '
+		WriteB3(MSG_ONE, 2105376);
+		WriteB3(MSG_ONE, 2105376);
+		WriteB3(MSG_ONE, 2105376);
+		WriteB3(MSG_ONE, 2105376);
+		WriteB3(MSG_ONE, 2105376);
+		WriteB3(MSG_ONE, 2105376);
+		WriteB3(MSG_ONE, 2105376);
+		WriteB3(MSG_ONE, 2105376);
+		WriteB3(MSG_ONE, 2105376);
+		WriteB3(MSG_ONE, 2105376);
+		WriteB3(MSG_ONE, 2105376);
 
 		if (first != second)
 		if (second.cnt > 0)
-	  {
-	    // '\nSecond place: '
-	    WriteB3(MSG_ONE, 6640394);
-	    WriteB3(MSG_ONE, 7237475);
-	    WriteB3(MSG_ONE, 7348324);
-	    WriteB3(MSG_ONE, 6513004);
-	    WriteB3(MSG_ONE, 2112101);
+		{
+			// '\nSecond place: '
+			WriteB3(MSG_ONE, 6640394);
+			WriteB3(MSG_ONE, 7237475);
+			WriteB3(MSG_ONE, 7348324);
+			WriteB3(MSG_ONE, 6513004);
+			WriteB3(MSG_ONE, 2112101);
 
-		  findAndPrintMapName(second.map);
+			findAndPrintMapName(second.map);
 
-	    // ', '
-	    WriteB3(MSG_ONE, 8236);
+			// ', '
+			WriteB3(MSG_ONE, 8236);
 
-	    WriteBFloat(MSG_ONE, second.cnt);
+			WriteBFloat(MSG_ONE, second.cnt);
 
-	    // '                     '
-	    WriteB3(MSG_ONE, 2105376);
-	    WriteB3(MSG_ONE, 2105376);
-	    WriteB3(MSG_ONE, 2105376);
-	    WriteB3(MSG_ONE, 2105376);
-	    WriteB3(MSG_ONE, 2105376);
-	    WriteB3(MSG_ONE, 2105376);
-	    WriteB3(MSG_ONE, 2105376);
-	    WriteB3(MSG_ONE, 2105376);
-	    WriteB3(MSG_ONE, 2105376);
-	    WriteB3(MSG_ONE, 2105376);
-	    WriteB3(MSG_ONE, 2105376);
-	  }
+			// '										 '
+			WriteB3(MSG_ONE, 2105376);
+			WriteB3(MSG_ONE, 2105376);
+			WriteB3(MSG_ONE, 2105376);
+			WriteB3(MSG_ONE, 2105376);
+			WriteB3(MSG_ONE, 2105376);
+			WriteB3(MSG_ONE, 2105376);
+			WriteB3(MSG_ONE, 2105376);
+			WriteB3(MSG_ONE, 2105376);
+			WriteB3(MSG_ONE, 2105376);
+			WriteB3(MSG_ONE, 2105376);
+			WriteB3(MSG_ONE, 2105376);
+		}
 	}
 
 	// '\nTime Remaining: '
@@ -831,8 +837,8 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerInte
 
 	if (timemins < 10)
 	{
-	  // ' 0'
-	  WriteB3(MSG_ONE, 12320);
+		// ' 0'
+		WriteB3(MSG_ONE, 12320);
 	}
 	else
 	{
@@ -844,18 +850,18 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerInte
 
 	if (timesec < 10)
 	{
-	  // ':0'
-	  WriteB3(MSG_ONE, 12346);
+		// ':0'
+		WriteB3(MSG_ONE, 12346);
 	}
 	else
 	{
-	  // ':'
-	  WriteB3(MSG_ONE, 58);
+		// ':'
+		WriteB3(MSG_ONE, 58);
 	}
 
 	WriteBFloat(MSG_ONE, timesec);
 
-	// '                     '
+	// '										 '
 	WriteB3(MSG_ONE, 2105376);
 	WriteB3(MSG_ONE, 2105376);
 	WriteB3(MSG_ONE, 2105376);
@@ -909,62 +915,63 @@ void() WaitForVotesThink =
 
 	if (self.messagetimeout < time)
 	{
-	  if (self.attack_state)
-	  {
-	    if (self.laststattime < time)
-	    {
-	      self.attack_state = 0;
-	    }
+		if (self.attack_state)
+		{
+			if (self.laststattime < time)
+			{
+				self.attack_state = 0;
+			}
 
-	    centerprint3(self, "You have just voted for ", self.map, ".\n\nPlease wait here while all other \nplayers finish voting.  Once all votes \nhave been cast, the winning \nlevel will start.\n");
+			if (self.classname != "dmbot" && self.ishuman)
+			centerprint3(self, "You have just voted for ", self.map, ".\n\nPlease wait here while all other \nplayers finish voting.	Once all votes \nhave been cast, the winning \nlevel will start.\n");
 
-	    return;
-	  }
-	  else
-	  {
-	    // print some information
-	    getHighestScores();
+			return;
+		}
+		else
+		{
+			// print some information
+			getHighestScores();
 
-	    local float timemins, timedef, votecast, maxplayers;
-	    local entity pl;
+			local float timemins, timedef, votecast, maxplayers;
+			local entity pl;
 
-	    timemins = 0;
-	    if (hubStartTime > time)
-	    {
-	      timedef = (hubStartTime - time);
-	      timemins = timedef / 60;
-	      timemins = floor(timemins);
-	      timedef = (hubStartTime - time) - (timemins * 60);
-	    }
-	    else
-	    {
-	      timedef = 0;
-	    }
+			timemins = 0;
+			if (hubStartTime > time)
+			{
+				timedef = (hubStartTime - time);
+				timemins = timedef / 60;
+				timemins = floor(timemins);
+				timedef = (hubStartTime - time) - (timemins * 60);
+			}
+			else
+			{
+				timedef = 0;
+			}
 
-	    // count the numbeer of votes cast
-	    pl = find(world, classname, "player");
-	    maxplayers = votecast = 0;
-	    while (pl != world)
-	    {
-	      if (pl.disconnectPlayer == 0)
-	      {
-	        if (pl.map != "")
-	          votecast = votecast + 1;
+			// count the numbeer of votes cast
+			pl = find(world, classname, "player");
+			maxplayers = votecast = 0;
+			while (pl != world)
+			{
+				if (pl.disconnectPlayer == 0)
+				{
+					if (pl.map != "")
+						votecast = votecast + 1;
 
-	        maxplayers = maxplayers + 1;
-	      }
+					maxplayers = maxplayers + 1;
+				}
 
-	      pl = find(pl, classname, "player");
-	    }
+				pl = find(pl, classname, "player");
+			}
 
-	    playerIntermissionVotesTimeLeft(maxplayers, votecast, timemins, timedef);
-	  }
+			playerIntermissionVotesTimeLeft(maxplayers, votecast, timemins, timedef);
+		}
 
-	  self.messagetimeout = time + 1;
+		self.messagetimeout = time + 1;
 	}
 	else if (self.attack_state)
 	{
-	  return;
+		return;
 	}
 
 	if (!self.button0 && !self.button1 && !self.button2)
