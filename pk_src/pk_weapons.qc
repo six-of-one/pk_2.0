@@ -1,7 +1,7 @@
 
 // pk weapon code moved here for adaptive code 
 
-// exploding shotgun shells - brilliant really, who thought this up?  and would it really work - I think this needs to be on mythbusters
+// exploding shotgun shells - brilliant really, who thought this up?	and would it really work - I think this needs to be on mythbusters
 
 void()	es_explode1	=	[0,		es_explode2] {};
 void()	es_explode2	=	[1,		es_explode3] {};
@@ -15,14 +15,14 @@ void() BecomeShellExplosion =
 	self.velocity = '0 0 0';
 	self.touch = SUB_Null;
 
-  if(random() < 0.5)
-  {
+	if(random() < 0.5)
+	{
 		setmodel (self, "progs/x_explo1.spr");
-  }
-  else
-  {
+	}
+	else
+	{
 		setmodel (self, "progs/x_explo2.spr");
-  }
+	}
 
 	self.solid = SOLID_NOT;
 	es_explode1 ();
@@ -30,8 +30,8 @@ void() BecomeShellExplosion =
 
 void() explodeAttack =
 {
-  local float damg, i;
-  local vector dir;
+	local float damg, i;
+	local vector dir;
 
 	damg = 12 + random() * 16;
 
@@ -44,18 +44,18 @@ void() explodeAttack =
 	// was done in the impact
 	T_RadiusDamage (self, self.owner, 28, self.enemy);
 
-  sound (self, CHAN_WEAPON, "weapons/r_exp3.wav", 1, ATTN_NORM);
+	sound (self, CHAN_WEAPON, "weapons/r_exp3.wav", 1, ATTN_NORM);
 
-  i = (random() * 15) + 1;
+	i = (random() * 15) + 1;
 
-  while(i > 0)
-  {
-  	dir_x = -50 + (random() * 100);
-    dir_y = -50 + (random() * 100);
-    dir_z = -25 + (random() * 50);
+	while(i > 0)
+	{
+		dir_x = -50 + (random() * 100);
+	  dir_y = -50 + (random() * 100);
+	  dir_z = -25 + (random() * 50);
 		particle(self.origin, dir, 225, 3);
-    i = i - 1;
-  }
+	  i = i - 1;
+	}
 
 
 /*
@@ -73,31 +73,31 @@ void(float damage, vector dir) TraceExplodeAttack =
 {
 	local entity explode;
 
-  explode = spawn();
+	explode = spawn();
 
 	explode.origin = trace_endpos - dir * 4;
-  explode.owner = self;
-  explode.enemy = trace_ent;
-  explode.classname = "ExplodeShellsAttack";
-  explode.weapon = self.weapon;
-  explode.nextthink = time + 0.10 + (random() * 0.75);
-  explode.think = explodeAttack;
+	explode.owner = self;
+	explode.enemy = trace_ent;
+	explode.classname = "ExplodeShellsAttack";
+	explode.weapon = self.weapon;
+	explode.nextthink = time + 0.10 + (random() * 0.75);
+	explode.think = explodeAttack;
 };
 
 void(float shotcount, vector dir, vector spread) FireExplodeShells =
 {
 	local	vector direction;
 	local	vector	src;
-  local float damage;
+	local float damage;
 
-  if(shotcount >= 2)
-  {
-	  damage = 2;
-  }
-  else
-  {
-	  damage = 1;
-  }
+	if(shotcount >= 2)
+	{
+		damage = 2;
+	}
+	else
+	{
+		damage = 1;
+	}
 
 	makevectors(self.v_angle);
 
@@ -184,9 +184,9 @@ void() pulse_touch =
 // hit something that bleeds
 	if (other.takedamage)
 	{
-    spawn_touchblood (27);
+	  spawn_touchblood (27);
 		self.owner = self.theowner;
-    T_Damage (other, self, self.owner, 27);
+	  T_Damage (other, self, self.owner, 27);
 	}
 	else
 	{
@@ -216,7 +216,7 @@ void() pulse_touch =
 	remove(self);
 };
 
-// called from W_FireSpikes  - fire a pulse spike
+// called from W_FireSpikes	- fire a pulse spike
 
 void(float ox) W_FirePulseSpikes =
 {
@@ -1128,105 +1128,6 @@ void() PK_ChangeWeapon =
 // PAINKEEP_END
 		self.forcewchange = TRUE;
 	W_SetCurrentAmmo ();
-/*	
-
-	local float am, fl, fl2;
-
-	am = 0;
-	fl2 = 0;
-
-	if (self.impulse == 1)
-	{
-		fl = IT_AXE;
-
-		if(self.weapon == IT_AXE)
-		{ // if already selected axe.
-
-			// toggle through all the objects we have.
-			while (1)
-			{
-				if(self.pk_currentitem == PK_IT_AXE)
-					self.pk_currentitem = PK_IT_GRAVITYWELL;
-				else if(self.pk_currentitem == PK_IT_GRAVITYWELL)
-					self.pk_currentitem = PK_IT_TURRET;
-				else if(self.pk_currentitem == PK_IT_TURRET)
-					self.pk_currentitem = PK_IT_BEARTRAP;
-				else if(self.pk_currentitem == PK_IT_BEARTRAP)
-					self.pk_currentitem = PK_IT_CANPAB;
-				else if(self.pk_currentitem == PK_IT_CANPAB)
-					self.pk_currentitem = PK_IT_AXE;
-				else
-					return;	// get's here when the currentitem == a normal pk weapon
-
-				if (HasAmmo(IT_AXE, self.pk_currentitem))
-				{
-					self.pk_currentInventory = self.pk_currentitem;
-					return;
-				}
-			}
-		}
-
-		// select the current inventory item
-	 	fl2 = self.pk_currentInventory;
-	}
-	else if (self.impulse == 2)
-		fl = IT_SHOTGUN;
-	else if (self.impulse == 3)
-		fl = IT_SUPER_SHOTGUN;
-	else if (self.impulse == 4)
-		fl = IT_NAILGUN;
-	else if (self.impulse == 5)
-		fl = IT_SUPER_NAILGUN;
-	else if (self.impulse == 6)
-		fl = IT_GRENADE_LAUNCHER;
-	else if (self.impulse == 7)
-		fl = IT_ROCKET_LAUNCHER;
-	else if (self.impulse == 8)
-	{
-		fl = IT_AXE;
-		fl2 = PK_IT_CLIGHT;
-	}
-
-	am = !HasAmmo(fl, fl2);
-
-// if already have the weapon or if you don't have the weapon, try the
-// double tap impulses.
-	if(self.weapon == fl || !(self.items & fl) || (fl == IT_AXE && !(self.pk_items & fl2)) || am == 1)
-	{
-		if(self.impulse == 2)
-		{
-			fl = IT_AXE;
-			fl2 = PK_IT_AIRGUN;
-			am = !HasAmmo(fl, fl2);
-		}
-		else if(self.impulse == 8)
-		{
-			fl = IT_LIGHTNING;
-			am = !HasAmmo(fl, fl2);
-		}
-
-	}
-
-	if (!(self.items & fl) || (fl == IT_AXE && !(self.pk_items & fl2)))
-	{	// don't have the weapon or the ammo
-		sprint (self, "no weapon.\n");
-		return;
-	}
-
-	if (am)
-	{	// don't have the ammo
-		sprint (self, "not enough ammo.\n");
-		return;
-	}
-
-//
-// set weapon, set ammo
-//
-	self.weapon = fl;
-	self.pk_currentitem = fl2;
-	self.forcewchange = TRUE;
-	W_SetCurrentAmmo();
-	*/
 };
 
 // called below

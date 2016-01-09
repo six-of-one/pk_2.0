@@ -1,3 +1,15 @@
+/* ::-::
+ *
+ * dectran: decompiler translator by Cataboligne v1.3 - (3.31.8)
+ *
+ * file: pkitems.qc
+ *
+ * date: Fri Apr  4 04:31:44 UTC 2008
+ *
+ * final qc
+ *
+ */
+
 
 
 /*
@@ -20,23 +32,23 @@
 
 // New weapons
 
-void() painkeep_weapon_touch =
+void () painkeep_weapon_touch =
 // The touch func for our new items
 {
 	local	float	hadammo, best, new, oldi;
 	local	entity	stm2;
-	local	float	leave;
+	local float leave;
 
-	if (!(other.flags & FL_CLIENT))
+	if ( (other.classname != "player") )
 	{
-		grap_checkIfGrap();
-		return;
+		grap_checkIfGrap ();
+		return ;
 	}
 
 // if the player was using his best weapon, change up to the new one if better
 	stm2 = self;
 	self = other;
-	best = W_BestWeapon();
+	best = W_BestWeapon ();
 	self = stm2;
 
 	if (deathmatch == 2 || deathmatch == 3 || coop)
@@ -47,19 +59,19 @@ void() painkeep_weapon_touch =
 	if(self.pk_currentitem == PK_IT_GRAPGUN)
 	{
 		if (leave && (other.pk_items & PK_IT_GRAPGUN) )
-			return;
+			return ;
 		new = PK_IT_GRAPGUN;
 	}
 	else if(self.pk_currentitem == PK_IT_AIRGUN)
 	{
 		if (leave && (other.pk_items & PK_IT_AIRGUN) )
-			return;
-		new = PK_IT_AIRGUN;
+				return ;
+			new = PK_IT_AIRGUN;
 	}
 	else if(self.pk_currentitem == PK_IT_CLIGHT)
 	{
 		if (leave && (other.pk_items & PK_IT_CLIGHT))
-			return;
+			return ;
 
 		other.ammo_cells = other.ammo_cells + 30;
 		new = PK_IT_CLIGHT;
@@ -67,13 +79,13 @@ void() painkeep_weapon_touch =
 	else
 		objerror ("painkeep_weapon_touch: unknown classname");
 
-	sprint (other, "You got the ");
-	sprint (other, self.netname);
-	sprint (other, "\n");
+	sprint (other,"You got the ");
+	sprint (other,self.netname);
+	sprint (other,"\n");
 
 // weapon touch sound
 	sound (other, CHAN_ITEM, "weapons/pkup.wav", 1, ATTN_NORM);
-	stuffcmd (other, "bf\n");
+	stuffcmd (other,"bf\n");
 
 	bound_other_ammo ();
 
@@ -96,12 +108,12 @@ void() painkeep_weapon_touch =
 	PK_Deathmatch_Weapon (IT_AXE, new);
 // PAINKEEP_END
 
-	W_SetCurrentAmmo();
+	W_SetCurrentAmmo ();
 
 	self = stm2;
 
-	if (leave)
-		return;
+	if ( leave )
+		return ;
 
 // remove it in single player, or setup for respawning in deathmatch
 	self.model = string_null;
@@ -121,15 +133,16 @@ void() painkeep_weapon_touch =
 new QUAKED weapon_airfist (0 .5 .8) (-15 -9 25) (17 9 43)
 */
 
-void() weapon_airfist =
+void () weapon_airfist =
 {
 	precache_model ("progs/g_airgun.mdl");
-	setmodel (self, "progs/g_airgun.mdl");
+	setmodel (self,"progs/g_airgun.mdl");
 	self.pk_currentitem = PK_IT_AIRGUN;
 	self.netname = "AirFist";
 	self.touch = painkeep_weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
+	setsize (self,'-16 -16 0','16 16 56');
 	//setsize (self, '-15 -9 25', '17 9 43');
+	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -137,22 +150,23 @@ void() weapon_airfist =
 /*QUAKED weapon_rmine (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void() weapon_rmine =
+void () weapon_rmine =
 {
-	remove(self);
+	remove (self);
 };
 
 /*QUAKED weapon_chainlg (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void() weapon_chainlg =
+void () weapon_chainlg =
 {
 	precache_model ("progs/g_clight.mdl");
-	setmodel (self, "progs/g_clight.mdl");
+	setmodel (self,"progs/g_clight.mdl");
 	self.pk_currentitem = PK_IT_CLIGHT;
 	self.netname = "Chain Thunderbolt";
 	self.touch = painkeep_weapon_touch;
-	setsize (self, '-16 -16 0', '16 16 56');
+	setsize (self,'-16 -16 0','16 16 56');
+	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -161,15 +175,16 @@ void() weapon_chainlg =
 /*QUAKED weapon_grapgun (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void() weapon_grapgun =
+void () weapon_grapgun =
 {
 	self.touch = painkeep_weapon_touch;
 
 	precache_model ("progs/g_harp.mdl");
-	setmodel (self, "progs/g_harp.mdl");
+	setmodel (self,"progs/g_harp.mdl");
 	self.pk_currentitem = PK_IT_GRAPGUN;
 	self.netname = "Harpoon Gun";
-	setsize (self, '-16 -16 0', '16 16 56');
+	setsize (self,'-16 -16 0','16 16 56');
+	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -238,7 +253,7 @@ void() pk_ammo_touch =
 // change to a better weapon if appropriate
 
 	if ( other.weapon == best )
-  	if (best != IT_AXE || bestpk == other.pk_currentitem) // *pk best pk wep checks
+		if (best != IT_AXE || bestpk == other.pk_currentitem) // *pk best pk wep checks
 	{
 		sv = self;
 		self = other;
@@ -257,8 +272,8 @@ void() pk_ammo_touch =
 // remove it in single player, or setup for respawning in deathmatch
 	self.model = string_null;
 	self.solid = SOLID_NOT;
-  if (deathmatch == 1)
-    self.nextthink = time + 30;
+	if (deathmatch == 1)
+	  self.nextthink = time + 30;
 	self.think = SUB_regen;
 
 	activator = other;
@@ -392,70 +407,74 @@ void() painkeep_touch =
 
 /*QUAKED item_painkeep_gwell (0 .5 .8) (-16 -16 -24) (16 16 32)
 */
-void() item_painkeep_gwell =
+void () item_painkeep_gwell =
 {
 	self.touch = painkeep_touch;
 
 	self.noise = "items/protect.wav";
-	setmodel (self, "progs/cubsmall.mdl");
+	setmodel (self,"progs/cubsmall.mdl");
 	self.netname = "Gravity Well";
 	self.pk_items = PK_IT_GRAVITYWELL;
 	//setsize (self, '-32 -32 -32', '32 32 32');
 	setsize (self, '-16 -16 -24', '16 16 32');
+	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 /*QUAKED item_painkeep_turret (0 .5 .8) (-16 -16 -24) (16 16 32)
 */
-void() item_painkeep_turret =
+void () item_painkeep_turret =
 {
 	self.touch = painkeep_touch;
 
 	precache_model2 ("progs/tpower.mdl");
-	setmodel (self, "progs/tpower.mdl");
+	setmodel (self,"progs/tpower.mdl");
 	self.netname = "AutoSentry";
 	self.pk_items = PK_IT_TURRET;
 
-	setsize (self, '-7 -7 -7', '4 7 21');
+	setsize (self,'-7 -7 -7','4 7 21');
+	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 /*QUAKED item_painkeep_lantern (0 .5 .8) (-16 -16 -24) (16 16 32)
 */
-void() item_painkeep_lantern =
+void () item_painkeep_lantern =
 {
-	remove(self);
+	remove (self);
 };
 
 
 /*QUAKED item_painkeep_can(0 .5 .8) (-16 -16 -24) (16 16 32)
 */
-void() item_painkeep_can =
+void () item_painkeep_can =
 {
 	self.touch = painkeep_touch;
 
 	precache_model ("progs/beans.mdl");
-	setmodel (self, "progs/beans.mdl");
+	setmodel (self,"progs/beans.mdl");
 	self.netname = "Can of pork and beans";
 	self.pk_items = PK_IT_CANPAB;
 	setsize (self, '-16 -16 -24', '16 16 32');
+	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 /*QUAKED item_painkeep_beartrap(0 .5 .8) (-16 -16 -24) (16 16 32)
 */
-void() item_painkeep_beartrap =
+void () item_painkeep_beartrap =
 {
 	self.touch = painkeep_touch;
 
 	precache_model ("progs/bearpick.mdl");
-	setmodel (self, "progs/bearpick.mdl");
+	setmodel (self,"progs/bearpick.mdl");
 	self.netname = "Bear Trap";
 	self.pk_items = PK_IT_BEARTRAP;
 	setsize (self, '-16 -16 -24', '16 16 32');
+	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -465,10 +484,10 @@ void() item_painkeep_beartrap =
 /*QUAKED light_painkeep_candle (0 .5 0) (-10 -10 -20) (10 10 20)
 Currently exactly the same as a small wall torch
 */
-void() light_painkeep_candle =
+void () light_painkeep_candle =
 {
 	precache_model ("progs/candle.mdl");
-	setmodel (self, "progs/candle.mdl");
+	setmodel (self,"progs/candle.mdl");
 	FireAmbient ();
 	makestatic (self);
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
@@ -478,17 +497,18 @@ void() light_painkeep_candle =
 /*QUAKED item_painkeep_expshells (0 .5 .8) (0 0 0) (32 32 32) big
 */
 
-void() item_painkeep_expshells =
+void () item_painkeep_expshells =
 {
 	self.touch = ammo_touch;
 
 	precache_model ("maps/b_eshel0.bsp");
-	setmodel (self, "maps/b_eshel0.bsp");
+	setmodel (self,"maps/b_eshel0.bsp");
 	self.aflag = 10;
 
 	self.weapon = 5;
 	self.netname = "Exploding Shells";
 	setsize (self, '0 0 0', '32 32 56');
+	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -661,10 +681,10 @@ bprint("PK_BackpackTouch\n");
 	other.ammo_rockets = other.ammo_rockets + self.ammo_rockets;
 	other.ammo_cells = other.ammo_cells + self.ammo_cells;
 
-  other.pk_gravitywellammo = other.pk_gravitywellammo + self.pk_gravitywellammo;
-  other.pk_turretammo = other.pk_turretammo + self.pk_turretammo;
-  other.pk_canpabammo = other.pk_canpabammo + self.pk_canpabammo;
-  other.pk_beartrapammo = other.pk_beartrapammo + self.pk_beartrapammo;
+	other.pk_gravitywellammo = other.pk_gravitywellammo + self.pk_gravitywellammo;
+	other.pk_turretammo = other.pk_turretammo + self.pk_turretammo;
+	other.pk_canpabammo = other.pk_canpabammo + self.pk_canpabammo;
+	other.pk_beartrapammo = other.pk_beartrapammo + self.pk_beartrapammo;
  	other.pk_explode_ammo = other.pk_explode_ammo + self.pk_explode_ammo;
 
 	new = self.items;

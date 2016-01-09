@@ -118,32 +118,32 @@ void() pulse_idle =
 		self.weaponframe = 1;
 };
 
-void() player_pnail1   =[$nailatt1, player_pnail2]
+void() player_pnail1	 =[$nailatt1, player_pnail2]
 {
 	pulse_fire(4);
 	self.nextthink = time + 0.1;
 };
 
-void() player_pnail2   =[$nailatt2, player_pnail3]
+void() player_pnail2	 =[$nailatt2, player_pnail3]
 {
 	pulse_idle();
 	self.nextthink = time + 0.2;
 };
 
-void() player_pnail3   =[$nailatt1, player_pnail4]
+void() player_pnail3	 =[$nailatt1, player_pnail4]
 {
 	pulse_fire(-4);
 	self.nextthink = time + 0.1;
 };
 
-void() player_pnail4   =[$nailatt2, player_pnail1]
+void() player_pnail4	 =[$nailatt2, player_pnail1]
 {
 	pulse_idle();
 	self.nextthink = time + 0.2;
 };
 
 /*
-void() player_supernail1   =[$nailatt1, player_supernail2  ]
+void() player_supernail1	 =[$nailatt1, player_supernail2  ]
 {
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
@@ -158,7 +158,7 @@ void() player_supernail1   =[$nailatt1, player_supernail2  ]
 	self.attack_finished = time + 0.2;
 };
 
-void() player_supernail2   =[$nailatt2, player_supernail1  ]
+void() player_supernail2	 =[$nailatt2, player_supernail1  ]
 {
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
@@ -176,7 +176,7 @@ void() player_supernail2   =[$nailatt2, player_supernail1  ]
 
 // chain thunderbolt code & frames
 
-void() player_bolt1   =[$light1, player_bolt2  ]
+void() player_bolt1	 =[$light1, player_bolt2  ]
 {
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
@@ -190,7 +190,7 @@ void() player_bolt1   =[$light1, player_bolt2  ]
 	self.attack_finished = time + 0.2;
 };
 
-void() player_bolt2   =[$light2, player_bolt2  ]
+void() player_bolt2	 =[$light2, player_bolt2  ]
 {
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
@@ -223,24 +223,24 @@ void()	bolt_s_explode15	=	[4,		bolt_s_explode16] {};
 void()	bolt_s_explode16	=	[5,		SUB_Remove] {};
 
 // Airfist fire animation.
-//  For the external view we use the rock fire animation with the
-//  recoil part lengthened.
+//	For the external view we use the rock fire animation with the
+//	recoil part lengthened.
 
-void() player_airgun1   =[$rockatt1, player_airgun2  ] {self.weaponframe=1;};
-void() player_airgun2   =[$rockatt2, player_airgun3  ] {self.weaponframe=2;};
-void() player_airgun3   =[$rockatt3, player_airgun4  ] {self.weaponframe=3;};
-void() player_airgun4   =[$rockatt3, player_airgun5  ] {self.weaponframe=4;};
-void() player_airgun5   =[$rockatt4, player_airgun6  ] {self.weaponframe=5;};
-void() player_airgun6   =[$rockatt4, player_airgun7  ] {self.weaponframe=6;};
-void() player_airgun7   =[$rockatt5, player_airgun8  ] {self.weaponframe=7;};
-void() player_airgun8   =[$rockatt6, player_run  ] {self.weaponframe = 8;};
+void() player_airgun1	 =[$rockatt1, player_airgun2  ] {self.weaponframe=1;};
+void() player_airgun2	 =[$rockatt2, player_airgun3  ] {self.weaponframe=2;};
+void() player_airgun3	 =[$rockatt3, player_airgun4  ] {self.weaponframe=3;};
+void() player_airgun4	 =[$rockatt3, player_airgun5  ] {self.weaponframe=4;};
+void() player_airgun5	 =[$rockatt4, player_airgun6  ] {self.weaponframe=5;};
+void() player_airgun6	 =[$rockatt4, player_airgun7  ] {self.weaponframe=6;};
+void() player_airgun7	 =[$rockatt5, player_airgun8  ] {self.weaponframe=7;};
+void() player_airgun8	 =[$rockatt6, player_run  ] {self.weaponframe = 8;};
 
 // AirFist failed fire animation.
-//  For the external view we use the nail gun fire animation.
+//	For the external view we use the nail gun fire animation.
 
-void() player_failedairgun1   =[$nailatt1, player_failedairgun2  ] {self.weaponframe=6;};
-void() player_failedairgun2   =[$nailatt2, player_failedairgun3  ] {self.weaponframe=7;};
-void() player_failedairgun3   =[$nailatt2, player_run  ] {self.weaponframe=8;};
+void() player_failedairgun1	 =[$nailatt1, player_failedairgun2  ] {self.weaponframe=6;};
+void() player_failedairgun2	 =[$nailatt2, player_failedairgun3  ] {self.weaponframe=7;};
+void() player_failedairgun3	 =[$nailatt2, player_run  ] {self.weaponframe=8;};
 
 // GRAPPLING_START
 
@@ -416,33 +416,33 @@ void() PK_GibPlayer =
 	self.skin = 0;
 
 // GIBS_START
-  if (random() > 0.5)
-  {
+	if (random() > 0.5)
+	{
 		ThrowHead ("progs/h_player.mdl", self.health);
-  }
-  else
+	}
+	else
 	{
 		ThrowHead ("progs/qtgib3.mdl", self.health);
-  }
+	}
 
-  if (random() > 0.5)
-  {
+	if (random() > 0.5)
+	{
 		ThrowGib ("progs/gib1.mdl", self.health);
-  }
-  else
-  {
+	}
+	else
+	{
 		ThrowGib ("progs/qtgib1.mdl", self.health);
-  }
+	}
 
 
-  if(random() > 0.5)
-  {
+	if(random() > 0.5)
+	{
 		ThrowGib ("progs/gib2.mdl", self.health);
-  }
-  else
-  {
+	}
+	else
+	{
 		ThrowGib ("progs/qtgib2.mdl", self.health);
-  }
+	}
 
 
 	ThrowGib ("progs/gib3.mdl", self.health);
@@ -497,36 +497,36 @@ void() PK_PlayerDie =
 
 	self.weaponmodel = "";
 
-	if(self.grap_cornerchainNext)  // Grappling harpoon is out there, remove...
-  {
-  	grap_remove(self);
-  }
+	if(self.grap_cornerchainNext)	// Grappling harpoon is out there, remove...
+	{
+		grap_remove(self);
+	}
 
 	if(self.bolt_conduitTimeout > time) // it's the conduit time for this player...
-  {
-    local entity flame;
+	{
+	  local entity flame;
 
-  	setorigin(self, self.origin + '0 0 10');
+		setorigin(self, self.origin + '0 0 10');
 		setmodel (self, "progs/fryguy.mdl");
 
 		self.skin = 0;
 
-    // Go up in flames...
-    flame = spawn();
-    flame.owner = self;
-    flame.movetype = MOVETYPE_FLYMISSILE;
-    flame.velocity = '0 0 25';
-    flame.solid = SOLID_NOT;
-    flame.classname = "fire";
-    flame.origin = self.origin - '0 0 15';
-    flame.think = bolt_s_explode1;
-    flame.nextthink = time;
-    setmodel (flame, "progs/s_explod.spr");
-    setsize (flame, '0 0 0', '0 0 0');
+	  // Go up in flames...
+	  flame = spawn();
+	  flame.owner = self;
+	  flame.movetype = MOVETYPE_FLYMISSILE;
+	  flame.velocity = '0 0 25';
+	  flame.solid = SOLID_NOT;
+	  flame.classname = "fire";
+	  flame.origin = self.origin - '0 0 15';
+	  flame.think = bolt_s_explode1;
+	  flame.nextthink = time;
+	  setmodel (flame, "progs/s_explod.spr");
+	  setsize (flame, '0 0 0', '0 0 0');
 
-  	player_conduitJerk();
-  	return;
-  }
+		player_conduitJerk();
+		return;
+	}
 
 	self.solid = SOLID_NOT;
 	self.flags = self.flags - (self.flags & FL_ONGROUND);

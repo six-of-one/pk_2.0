@@ -45,70 +45,70 @@ void() func_train_2d_blocked =
 
 void() func_train_2d_use =
 {
-     if (!other.cnt)
-          objerror("func_train_2d_use: button does not specify direction in cnt");
+	   if (!other.cnt)
+	        objerror("func_train_2d_use: button does not specify direction in cnt");
 
-     if (self.think == func_train_2d_find)
-          func_train_2d_next(other.cnt);
-     else if (self.wait)
-          func_train_2d_next(other.cnt);
+	   if (self.think == func_train_2d_find)
+	        func_train_2d_next(other.cnt);
+	   else if (self.wait)
+	        func_train_2d_next(other.cnt);
 };
 
 void() func_train_2d_wait =
 {
-     self.nextthink = self.ltime + -1;
-     self.wait = -1;
-     sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
+	   self.nextthink = self.ltime + -1;
+	   self.wait = -1;
+	   sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 };
 
 void(float n) func_train_2d_next =
 {
 	local entity	targ;
 
-     // find the one we're at
-     targ = find (world, targetname, self.target);
-     if (n == 1)
-     {
-          if (targ.target1)
-               self.target = targ.target1;
-          else
-               objerror("func_train_2d_next: path_corner has no target1");
-     }
-     else if (n == 2)
-     {
-          if (targ.target2)
-               self.target = targ.target2;
-          else
-               objerror("func_train_2d_next: path_corner has no target2");
-     }
+	   // find the one we're at
+	   targ = find (world, targetname, self.target);
+	   if (n == 1)
+	   {
+	        if (targ.target1)
+	             self.target = targ.target1;
+	        else
+	             objerror("func_train_2d_next: path_corner has no target1");
+	   }
+	   else if (n == 2)
+	   {
+	        if (targ.target2)
+	             self.target = targ.target2;
+	        else
+	             objerror("func_train_2d_next: path_corner has no target2");
+	   }
 
-     // find the next one in sequence
-     targ = find (world, targetname, self.target);
+	   // find the next one in sequence
+	   targ = find (world, targetname, self.target);
 
-     if (!self.target)
-        objerror ("func_train_2d_next: no next target");
+	   if (!self.target)
+	      objerror ("func_train_2d_next: no next target");
 
-     self.wait = 0;
+	   self.wait = 0;
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
-     SUB_CalcMove (targ.origin - self.mins, self.speed,
-          func_train_2d_wait);
+	   SUB_CalcMove (targ.origin - self.mins, self.speed,
+	        func_train_2d_wait);
 };
 
 void() func_train_2d_find =
 {
 	local entity	targ;
 
-     targ = find (world, targetname, self.target);
-     //self.target = targ.target;
+	   targ = find (world, targetname, self.target);
+	   //self.target = targ.target;
 	setorigin (self, targ.origin - self.mins);
 };
 
 void() func_train_2d =
 {	
-     if (!self.speed)
+	   if (!self.speed)
 		self.speed = 100;
 	if (!self.target)
-        objerror ("func_train_2d without a target");
+	      objerror ("func_train_2d without a target");
 	if (!self.dmg)
 		self.dmg = 2;
 
@@ -131,8 +131,8 @@ void() func_train_2d =
 	self.cnt = 1;
 	self.solid = SOLID_BSP;
 	self.movetype = MOVETYPE_PUSH;
-     self.blocked = func_train_2d_blocked;
-     self.use = func_train_2d_use;
+	   self.blocked = func_train_2d_blocked;
+	   self.use = func_train_2d_use;
 	self.classname = "train";
 
 	setmodel (self, self.model);
@@ -142,5 +142,5 @@ void() func_train_2d =
 // start trains on the second frame, to make sure their targets have had
 // a chance to spawn
 	self.nextthink = self.ltime + 0.1;
-     self.think = func_train_2d_find;
+	   self.think = func_train_2d_find;
 };

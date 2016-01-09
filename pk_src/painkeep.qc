@@ -273,7 +273,7 @@ void() PK_precache =
 
 // called from many places - handles pk_mode 0 where map sets whether or not we use PK stuff
 
-void(entity e, float chan, string samp, float vol, float atten) sound = 
+void(entity e, float chan, string samp, float vol, float atten) pk_sound = 
 {
 	local string psamp;
 
@@ -286,7 +286,7 @@ void(entity e, float chan, string samp, float vol, float atten) sound =
 		if (samp == "misc/secret.wav") psamp = "alt_sounds/misc/secret.wav";
 	}
 
-	pk_sound(e, chan, psamp, vol, atten);
+	frik_sound(e, chan, psamp, vol, atten);
 };
 
 void(vector pos, string samp, float vol, float atten) ambientsound =

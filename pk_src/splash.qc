@@ -7,8 +7,8 @@ float splash_count;			// The amout of splashes around. Used to keep the number d
 .float inwater;					// The water type the entity was in at last check
 .string water_notify;		// Set to "yes" to make a splash
 .void() splash_func;		// The function to call to make the splash
-void() beartrapDie;     // So we can remove bt's when in lava
-void() turret_deathAnim;    // So we can remove turrents whon in lava
+void() beartrapDie;	   // So we can remove bt's when in lava
+void() turret_deathAnim;	  // So we can remove turrents whon in lava
 
 
 // Remove a splash entity
@@ -21,16 +21,16 @@ void() Remove_Splash =
 $frame splash1 splash2 splash3 splash4 splash5
 
 void()	do_small_splash1 = [$splash1, do_small_splash2	] {};
-void()  do_small_splash2 = [$splash1, do_small_splash3  ] {};
-void()  do_small_splash3 = [$splash2, do_small_splash4  ] {};
-void()  do_small_splash4 = [$splash2, do_small_splash5  ] {};
-void()  do_small_splash5 = [$splash3, do_small_splash1  ] {Remove_Splash();};
+void()	do_small_splash2 = [$splash1, do_small_splash3  ] {};
+void()	do_small_splash3 = [$splash2, do_small_splash4  ] {};
+void()	do_small_splash4 = [$splash2, do_small_splash5  ] {};
+void()	do_small_splash5 = [$splash3, do_small_splash1  ] {Remove_Splash();};
 
 void()	do_large_splash1 = [$splash1, do_large_splash2	] {};
 void()	do_large_splash2 = [$splash2, do_large_splash3	] {};
 void()	do_large_splash3 = [$splash3, do_large_splash4	] {};
-void()  do_large_splash4 = [$splash4, do_large_splash5  ] {};
-void()  do_large_splash5 = [$splash5, do_large_splash1  ] {Remove_Splash();};
+void()	do_large_splash4 = [$splash4, do_large_splash5  ] {};
+void()	do_large_splash5 = [$splash5, do_large_splash1  ] {Remove_Splash();};
 
 // All lava splashes are big splashes, so they can be seen easily
 
@@ -89,7 +89,7 @@ float(entity e) inWater =
 	if (!(pc == CONTENT_WATER || pc == CONTENT_SLIME || pc == CONTENT_LAVA))
 		pc = NOT_IN_WATER;
 
-  return pc;
+	return pc;
 };
 
 // Makes splashes of an entity has meved in / out of water. Called in PlayerPreThink
@@ -103,34 +103,34 @@ void() CheckWaterLevels =
 	{
 		if (inWater(e) != e.inwater)
 		{
-      if (e.classname == "drop")
-      {
-        sound(self, CHAN_AUTO, "misc/drip/drip_1.wav", 1, ATTN_NORM);
-        remove(e);
-      }
-      else
-      {
-        if (!(cvar("temp1") & PK_TP_SPARKSFLASH))
-          MakeSplash(e);
+	    if (e.classname == "drop")
+	    {
+	      sound(self, CHAN_AUTO, "misc/drip/drip_1.wav", 1, ATTN_NORM);
+	      remove(e);
+	    }
+	    else
+	    {
+	      if (!(cvar("temp1") & PK_TP_SPARKSFLASH))
+	        MakeSplash(e);
 
-        e.inwater = pc;
+	      e.inwater = pc;
 
-        // Remove turrets and beartraps if they fall into the lava
-        if (pc == CONTENT_LAVA)
-        {
-          if (e.classname == "beartrap")
-          {
-            e.think = beartrapDie;
-            e.nextthink = time + 0.1;
-          }
-          else if (e.classname == "turret")
-          {
-            e.think = turret_deathAnim;
-            e.nextthink = time + 0.1;
-          }
-        }
-      }
-        
+	      // Remove turrets and beartraps if they fall into the lava
+	      if (pc == CONTENT_LAVA)
+	      {
+	        if (e.classname == "beartrap")
+	        {
+	          e.think = beartrapDie;
+	          e.nextthink = time + 0.1;
+	        }
+	        else if (e.classname == "turret")
+	        {
+	          e.think = turret_deathAnim;
+	          e.nextthink = time + 0.1;
+	        }
+	      }
+	    }
+	      
 		}
 
 		e = find(e, water_notify, "yes");

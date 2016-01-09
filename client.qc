@@ -1,9 +1,184 @@
+/* ::-::
+ *
+ * dectran: decompiler translator by Cataboligne v1.3 - (3.31.8)
+ *
+ * file: client.qc
+ *
+ * date: Fri Apr  4 04:31:43 UTC 2008
+ *
+ * final qc
+ *
+ */
+
+
+float fClientNo;
+float fActiveClients;
+.float id;
+float MSG_UPDATENAME	 = 13;
+	float MSG_UPDATEFRAGS	 = 14;
+float MSG_UPDATECOLORS	 = 17;
+float () FindGood =
+{
+	fClientNo = (fClientNo + 1);
+	if ( !(fActiveClients & 1) )
+	{
+		fActiveClients = (fActiveClients | 1);
+		return (1);
+	}
+	else
+	{
+		if ( !(fActiveClients & WEAPON_ROCKET) )
+		{
+			fActiveClients = (fActiveClients | 2);
+			return (2);
+		}
+		else
+		{
+			if ( !(fActiveClients & WEAPON_SPIKES) )
+			{
+				fActiveClients = (fActiveClients | 4);
+				return (3);
+			}
+			else
+			{
+				if ( !(fActiveClients & WEAPON_BIG) )
+				{
+					fActiveClients = (fActiveClients | 8);
+					return (4);
+				}
+				else
+				{
+					if ( !(fActiveClients & 16) )
+					{
+						fActiveClients = (fActiveClients | 16);
+						return(TE_LIGHTNING1);
+					}
+					else
+					{
+						if ( !(fActiveClients & 32) )
+						{
+							fActiveClients = (fActiveClients | 32);
+							return (6);
+						}
+						else
+						{
+							if ( !(fActiveClients & 64) )
+							{
+								fActiveClients = (fActiveClients | 64);
+								return (7);
+							}
+							else
+							{
+								if ( !(fActiveClients & 128) )
+								{
+									fActiveClients = (fActiveClients | 128);
+									return (8);
+								}
+								else
+								{
+									if ( !(fActiveClients & 256) )
+									{
+										fActiveClients = (fActiveClients | 256);
+										return (9);
+									}
+									else
+									{
+										if ( !(fActiveClients & 512) )
+										{
+											fActiveClients = (fActiveClients | 512);
+											return (10);
+										}
+										else
+										{
+											if ( !(fActiveClients & 1024) )
+											{
+												fActiveClients = (fActiveClients | 1024);
+												return (11);
+											}
+											else
+											{
+												if ( !(fActiveClients & 2048) )
+												{
+													fActiveClients = (fActiveClients | 2048);
+													return(12);
+												}
+												else
+												{
+													if ( !(fActiveClients & 4096) )
+													{
+														fActiveClients = (fActiveClients | 4096);
+														return (13);
+													}
+													else
+													{
+														if ( !(fActiveClients & 8192) )
+														{
+															fActiveClients = (fActiveClients | 8192);
+															return(MSG_UPDATEFRAGS);
+														}
+														else
+														{
+															if ( !(fActiveClients & 16384) )
+															{
+																fActiveClients = (fActiveClients | 16384);
+																return(15);
+															}
+															else
+															{
+																if ( !(fActiveClients & INITLEVEL) )
+																{
+																	fActiveClients = (fActiveClients | INITLEVEL);
+																	return (16);
+																}
+																else
+																{
+																	return (-1);
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+
+void (float abba) MakeGood =
+{
+	local float ackbar;
+	ackbar = WEAPON_SHOTGUN;
+	abba = (abba - 1);
+	while ( (abba > NAMEBOTS) )
+	{
+		ackbar = (ackbar * 2);
+		abba = (abba - 1);
+	}
+	fClientNo = (fClientNo - 1);
+	fActiveClients = (fActiveClients - (fActiveClients & ackbar));
+};
+
+void (entity object) Update_Frags =
+{
+	WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
+	WriteByte (MSG_ALL,object.id);
+	WriteShort (MSG_ALL,object.frags);
+};
+
+void (float scoretype) PrintScores;
 
 // prototypes
 void () W_WeaponFrame;
 void() W_SetCurrentAmmo;
-void() player_pain;
-void() player_stand1;
+void () player_pain;
+void () player_stand1;
 void (vector org) spawn_tfog;
 void (vector org, entity death_owner) spawn_tdeath;
 
@@ -17,20 +192,20 @@ float	modelindex_eyes, modelindex_player;
 =============================================================================
 */
 
-float	intermission_running;
-float	intermission_exittime;
+float intermission_running;
+float intermission_exittime;
 
 /*QUAKED info_intermission (1 0.5 0.5) (-16 -16 -16) (16 16 16)
 This is the camera point for the intermission.
 Use mangle instead of angle, so you can set pitch or roll as well as yaw.  'pitch roll yaw'
 */
-void() info_intermission =
+void () info_intermission =
 {
 };
 
 
 
-void() SetChangeParms =
+void () SetChangeParms =
 {
 	if (self.health <= 0)
 	{
@@ -41,7 +216,7 @@ void() SetChangeParms =
 		}
 		else
 		SetNewParms ();
-		return;
+		return ;
 	}
 
 // remove items
@@ -66,9 +241,66 @@ void() SetChangeParms =
 	parm8 = self.weapon;
 	parm9 = self.armortype * 100;
 	if (PK) PK_ChangeParms();
+/*
+	reaper skin code - not sure to include - requiers parm mod
+
+	local float offset;
+	local float toffset;
+	local float team1;
+	local float nb;
+	local float nt;
+	local entity e;
+
+	if ( SKINSMODE )
+	{
+		parm4 = ((parm4 + (self.skin * 512)) + (16384* SKINSMODE));
+	}
+	e = find (world,classname,"dmbot");
+	offset = 1;
+	toffset = 1;
+	parm10 = 0;
+	parm11 = 0;
+	team1 = 100;
+	nb = 0;
+	nt = 0;
+	while ( e )
+	{
+		if ( (e.team == 99) )
+		{
+			nb = (nb + 1);
+			if ( (nb < 6) )
+			{
+				parm10 = (parm10 + (((offset * e.skil) * 10) & (offset * 31)));
+				offset = (offset * 32);
+			}
+		}
+		else
+		{
+			if ( (team1 == 100) )
+			{
+				team1 = e.team;
+			}
+			if ( (e.team == team1) )
+			{
+				nt = (nt + 1);
+				if ( (nt < 6) )
+				{
+					parm11 = (parm11 + (((toffset * e.skil) * 10) & (toffset * 31)));
+					toffset = (toffset * 32);
+				}
+			}
+		}
+		e = find (e,classname,"dmbot");
+	}
+*/
+	parm12 = self.pk_items;
+	parm13 = (self.pk_canpabammo + (self.pk_gravitywellammo * 256));
+	parm14 = (self.pk_beartrapammo + (self.pk_turretammo * 256));
+	parm15 = self.pk_explode_ammo;
+	parm16 = self.msgcount;
 };
 
-void() SetNewParms =
+void () SetNewParms =
 {
 	parm1 = IT_SHOTGUN | IT_AXE;
 	parm2 = 100;
@@ -82,7 +314,7 @@ void() SetNewParms =
 	if (PK) PK_SetNewParms();
 };
 
-void() DecodeLevelParms =
+void () DecodeLevelParms =
 {
 	if (!PK)
 	if (serverflags)
@@ -90,7 +322,16 @@ void() DecodeLevelParms =
 		if (world.model == "maps/start.bsp")
       SetNewParms ();   // take away all stuff on starting new episode
 	}
-
+/*
+	local float skinno;
+	if ( (parm4 > 511) )
+	{
+		SKINSMODE = ((parm4 & 49152) / 16384);
+		skinno = (parm4 & 7680);
+		parm4 = (parm4 & 511);
+		skinChange (self,skinno);
+	}
+*/
 	self.items = parm1;
 	self.health = parm2;
 	self.armorvalue = parm3;
@@ -110,42 +351,42 @@ FindIntermission
 Returns the entity to view from
 ============
 */
-entity() FindIntermission =
+entity () FindIntermission =
 {
-	local	entity spot;
-	local	float cyc;
+	local entity spot;
+	local float cyc;
 
 // look for info_intermission first
-	spot = find (world, classname, "info_intermission");
-	if (spot)
+	spot = find (world,classname,"info_intermission");
+	if ( spot )
 	{	// pick a random one
 		cyc = random() * 4;
 		while (cyc > 1)
 		{
-			spot = find (spot, classname, "info_intermission");
-			if (!spot)
-				spot = find (spot, classname, "info_intermission");
+			spot = find (spot,classname,"info_intermission");
+			if ( !spot )
+				spot = find (spot,classname,"info_intermission");
 			cyc = cyc - 1;
 		}
 		return spot;
 	}
 
 // then look for the start position
-	spot = find (world, classname, "info_player_start");
-	if (spot)
+	spot = find (world,classname,"info_player_start");
+	if ( spot )
 		return spot;
 
 // testinfo_player_start is only found in regioned levels
-	spot = find (world, classname, "testplayerstart");
-	if (!spot)
-	objerror ("FindIntermission: no spot");
+	spot = find (world,classname,"testplayerstart");
+	if (!spot )
+		objerror ("FindIntermission: no spot");
 
 	return spot;
 };
 
 
 string nextmap;
-void() GotoNextMap =
+void () GotoNextMap =
 {
 	if (PK)
 	if((cvar("temp1") & PK_TP_USERMAPON))
@@ -164,13 +405,13 @@ void() GotoNextMap =
 };
 
 
-void() ExitIntermission =
+void () ExitIntermission =
 {
 // skip any text in deathmatch
-	if (deathmatch)
+	if ( deathmatch )
 	{
 		GotoNextMap ();
-		return;
+		return ;
 	}
 
 	intermission_exittime = time + 1;
@@ -183,20 +424,20 @@ void() ExitIntermission =
 	{
 		if (world.model == "maps/e1m7.bsp")
 		{
-			WriteByte (MSG_ALL, SVC_CDTRACK);
-			WriteByte (MSG_ALL, 2);
-			WriteByte (MSG_ALL, 3);
-			if (!cvar("registered"))
+			WriteByte (MSG_ALL,SVC_CDTRACK);
+			WriteByte (MSG_ALL,2);
+			WriteByte (MSG_ALL,3);
+			if ( !cvar ("registered") )
 			{
-				WriteByte (MSG_ALL, SVC_FINALE);
+				WriteByte (MSG_ALL,SVC_FINALE);
 				WriteString (MSG_ALL, "As the corpse of the monstrous entity\nChthon sinks back into the lava whence\nit rose, you grip the Rune of Earth\nMagic tightly. Now that you have\nconquered the Dimension of the Doomed,\nrealm of Earth Magic, you are ready to\ncomplete your task in the other three\nhaunted lands of Quake. Or are you? If\nyou don't register Quake, you'll never\nknow what awaits you in the Realm of\nBlack Magic, the Netherworld, and the\nElder World!");
 			}
 			else
 			{
-				WriteByte (MSG_ALL, SVC_FINALE);
+				WriteByte (MSG_ALL,SVC_FINALE);
 				WriteString (MSG_ALL, "As the corpse of the monstrous entity\nChthon sinks back into the lava whence\nit rose, you grip the Rune of Earth\nMagic tightly. Now that you have\nconquered the Dimension of the Doomed,\nrealm of Earth Magic, you are ready to\ncomplete your task. A Rune of magic\npower lies at the end of each haunted\nland of Quake. Go forth, seek the\ntotality of the four Runes!");
 			}
-			return;
+			return ;
 		}
 		else if (world.model == "maps/e2m6.bsp")
 		{
@@ -229,27 +470,27 @@ void() ExitIntermission =
 			return;
 		}
 
-		GotoNextMap();
+		GotoNextMap ();
 	}
 
 	if (intermission_running == 3)
 	{
-		if (!cvar("registered"))
+		if ( !cvar ("registered") )
 		{	// shareware episode has been completed, go to sell screen
-			WriteByte (MSG_ALL, SVC_SELLSCREEN);
-			return;
+			WriteByte (MSG_ALL,SVC_SELLSCREEN);
+			return ;
 		}
 
 		if ( (serverflags&15) == 15)
 		{
-			WriteByte (MSG_ALL, SVC_FINALE);
+			WriteByte (MSG_ALL,SVC_FINALE);
 			WriteString (MSG_ALL, "Now, you have all four Runes. You sense\ntremendous invisible forces moving to\nunseal ancient barriers. Shub-Niggurath\nhad hoped to use the Runes Herself to\nclear off the Earth, but now instead,\nyou will use them to enter her home and\nconfront her as an avatar of avenging\nEarth-life. If you defeat her, you will\nbe remembered forever as the savior of\nthe planet. If she conquers, it will be\nas if you had never been born.");
-			return;
+			return ;
 		}
 
 	}
 
-	GotoNextMap();
+	GotoNextMap ();
 };
 
 /*
@@ -259,36 +500,36 @@ IntermissionThink
 When the player presses attack or jump, change to the next level
 ============
 */
-void() IntermissionThink =
+void () IntermissionThink =
 {
 	if (time < intermission_exittime)
-		return;
+		return ;
 
 	if (!self.button0 && !self.button1 && !self.button2)
-		return;
+		return ;
 
 	ExitIntermission ();
 };
 
-void() execute_changelevel =
+void () execute_changelevel =
 {
-	local entity	pos;
+	local entity pos;
 
 	intermission_running = 1;
 
 // enforce a wait time before allowing changelevel
-	if (deathmatch)
+	if ( deathmatch )
 		intermission_exittime = time + 5;
 	else
 		intermission_exittime = time + 2;
 
-	WriteByte (MSG_ALL, SVC_CDTRACK);
-	WriteByte (MSG_ALL, 3);
-	WriteByte (MSG_ALL, 3);
+	WriteByte (MSG_ALL,SVC_CDTRACK);
+	WriteByte (MSG_ALL,3);
+	WriteByte (MSG_ALL,3);
 
 	pos = FindIntermission ();
 
-	other = find (world, classname, "player");
+	other = find (world,classname,"player");
 	while (other != world)
 	{
 		other.view_ofs = '0 0 0';
@@ -300,25 +541,25 @@ void() execute_changelevel =
 		other.movetype = MOVETYPE_NONE;
 		other.modelindex = 0;
 		other.voteIntermission = 0; // *pk - hub ops
-		setorigin (other, pos.origin);
-		other = find (other, classname, "player");
+		setorigin (other,pos.origin);
+		other = find (other,classname,"player");
 	}
 
-	WriteByte (MSG_ALL, SVC_INTERMISSION);
+	WriteByte (MSG_ALL,SVC_INTERMISSION);
 };
 
 
-void() changelevel_touch =
+void () changelevel_touch =
 {
-	local entity	pos;
+	local entity pos;
 
 	if (other.classname != "player")
-		return;
+		return ;
 
 	if ((cvar("noexit") == 1) || ((cvar("noexit") == 2) && (mapname != "start")))
 	{
-		T_Damage (other, self, self, 50000);
-		return;
+		T_Damage (other,self,self,50000);
+		return ;
 	}
 
 	if (coop || deathmatch)
@@ -336,8 +577,8 @@ void() changelevel_touch =
 
 	if ( (self.spawnflags & 1) && (deathmatch == 0) )
 	{	// NO_INTERMISSION
-		GotoNextMap();
-		return;
+		GotoNextMap ();
+		return ;
 	}
 
 	self.touch = SUB_Null;
@@ -351,9 +592,9 @@ void() changelevel_touch =
 /*QUAKED trigger_changelevel (0.5 0.5 0.5) ? NO_INTERMISSION
 When the player touches this, he gets sent to the map listed in the "map" variable.  Unless the NO_INTERMISSION flag is set, the view will go to the info_intermission spot and display stats.
 */
-void() trigger_changelevel =
+void () trigger_changelevel =
 {
-	if (!self.map)
+	if ( !self.map )
 		objerror ("chagnelevel trigger doesn't have map");
 
 	InitTrigger ();
@@ -369,12 +610,12 @@ void() trigger_changelevel =
 =============================================================================
 */
 
-void() set_suicide_frame;
+void () set_suicide_frame;
 
 // called by ClientKill and DeadThink
-void() respawn =
+void () respawn =
 {
-	if (coop)
+	if ( coop )
 	{
 		// make a copy of the dead body for appearances sake
 		CopyToBodyQue (self);
@@ -386,17 +627,17 @@ void() respawn =
 	else if (deathmatch)
 	{
 		// make a copy of the dead body for appearances sake
-		CopyToBodyQue (self);
+			CopyToBodyQue (self);
 		// set default spawn parms
 		if (PK) SetNewPKParms (); // *pk parms
 		else
-		SetNewParms ();
+			SetNewParms ();
 		// respawn
-		PutClientInServer ();
+			PutClientInServer ();
 	}
 	else
 	{	// restart the entire server
-		localcmd ("restart\n");
+			localcmd ("restart\n");
 	}
 };
 
@@ -408,17 +649,18 @@ ClientKill
 Player entered the suicide command
 ============
 */
-void() ClientKill =
+void () ClientKill =
 {
 	bprint (self.netname);
 	bprint (" suicides\n");
 	set_suicide_frame ();
 	self.modelindex = modelindex_player;
 	self.frags = self.frags - 2;	// extra penalty
+	countkill (self,self);
 	respawn ();
 };
 
-float(vector v) CheckSpawnPoint =
+float (vector v) CheckSpawnPoint =
 {
 	return FALSE;
 };
@@ -430,23 +672,23 @@ SelectSpawnPoint
 Returns the entity to spawn at
 ============
 */
-entity() SelectSpawnPoint =
+entity () SelectSpawnPoint =
 {
-	local	entity spot;
-	local	entity thing;
-	local	float  pcount;
-	
+	local entity spot;
+	local entity thing;
+	local float pcount;
+
 // testinfo_player_start is only found in regioned levels
-	spot = find (world, classname, "testplayerstart");
-	if (spot)
+	spot = find (world,classname,"testplayerstart");
+	if ( spot )
 		return spot;
 		
 // choose a info_player_deathmatch point
-	if (coop)
+	if ( coop )
 	{
-		lastspawn = find(lastspawn, classname, "info_player_coop");
+		lastspawn = find (lastspawn,classname,"info_player_coop");
 		if (lastspawn == world)
-			lastspawn = find (lastspawn, classname, "info_player_start");
+			lastspawn = find (lastspawn,classname,"info_player_start");
 		if (lastspawn != world)
 			return lastspawn;
 	}
@@ -455,18 +697,18 @@ entity() SelectSpawnPoint =
 		spot = lastspawn;
 		while (1)
 		{
-			spot = find(spot, classname, "info_player_deathmatch");
+			spot = find (spot,classname,"info_player_deathmatch");
 			if (spot != world)
 			{
 				if (spot == lastspawn)
 					return lastspawn;
 				pcount = 0;
-				thing = findradius(spot.origin, 32);
-				while(thing)
+				thing = findradius (spot.origin,32);
+				while ( thing )
 				{
 					if (thing.classname == "player")
 						pcount = pcount + 1;
-					thing = thing.chain;
+						thing = thing.chain;
 				}
 				if (pcount == 0)
 				{
@@ -477,17 +719,17 @@ entity() SelectSpawnPoint =
 		}
 	}
 
-	if (serverflags)
+	if ( serverflags )
 	{	// return with a rune to start
-		spot = find (world, classname, "info_player_start2");
-		if (spot)
+		spot = find (world,classname,"info_player_start2");
+		if ( spot )
 			return spot;
 	}
-	
-	spot = find (world, classname, "info_player_start");
-	if (!spot)
+
+	spot = find (world,classname,"info_player_start");
+	if ( !spot )
 		error ("PutClientInServer: no info_player_start on level");
-	
+
 	return spot;
 };
 
@@ -499,12 +741,14 @@ called each time a player is spawned
 ============
 */
 void() DecodeLevelParms;
-void() PlayerDie;
+void () PlayerDie;
+void () NewCarriedPath;
+void () initBotLevel;
 
 
-void() PutClientInServer =
+void () PutClientInServer =
 {
-	local	entity spot;
+	local entity spot;
 
 	if (PK) spot = PK_SelectSpawnPoint (); // *pk - get a spawn point, pk style 
 	else
@@ -535,7 +779,7 @@ void() PutClientInServer =
 	self.attack_finished = time;
 	self.th_pain = player_pain;
 	self.th_die = PlayerDie;
-
+	self.th_cache = cacheenemy;
 	self.deadflag = DEAD_NO;
 // paustime is set by teleporters to keep the player from moving a while
 	self.pausetime = 0;
@@ -547,26 +791,132 @@ void() PutClientInServer =
 	self.fixangle = TRUE;		// turn this way immediately
 
 // oh, this is a hack!
-	setmodel (self, "progs/eyes.mdl");
+	setmodel (self,"progs/eyes.mdl");
 	modelindex_eyes = self.modelindex;
 
-	setmodel (self, "progs/player.mdl");
+	setmodel (self,"progs/player.mdl");
 	modelindex_player = self.modelindex;
 
-	setsize (self, VEC_HULL_MIN, VEC_HULL_MAX);
+	setsize (self,VEC_HULL_MIN,VEC_HULL_MAX);
 
 	self.view_ofs = '0 0 22';
+	if ( (self.movetarget == world) )
+	{
+		NewCarriedPath ();
+	}
+	setorigin (self.movetarget,self.origin);
+	self.movetarget.movetarget = world;
+	self.pathtype = NEVERTARGET;
+	if ( !self.pather )
+	{
+		NUMPATHERS = (NUMPATHERS + 1);
+	}
+	self.pather = 1;
 
 	player_stand1 ();
 
 	if (deathmatch || coop)
 	{
-		makevectors(self.angles);
+		makevectors (self.angles);
 		spawn_tfog (self.origin + v_forward*20);
 	}
 
-	spawn_tdeath (self.origin, self);
-	if (PK) PK_CIS(); // *pk - set more stuff
+	spawn_tdeath (self.origin,self);
+	if (PK) PK_CIS(); // *pk - set client pk elements
+	local float dedflags;
+  	dedflags = cvar ("temp1");
+	if ( (dedflags & DEDICATED) )
+	{
+		serverflags = (dedflags | INITLEVEL);
+		cvar_set ("temp1","0");
+	}
+	if ( (serverflags & INITLEVEL) )
+	{
+		initBotLevel ();
+	}
+};
+
+void (entity c) PrintClientScore =
+{
+	if ( ((c.frags > -10) && (c.frags < 0)) )
+	{
+		bprint (" ");
+	}
+	else
+	{
+		if ( (c.frags >= 0) )
+		{
+			if ( (c.frags < 100) )
+			{
+				bprint (" ");
+			}
+			if ( (c.frags < 10) )
+			{
+				bprint (" ");
+			}
+		}
+	}
+};
+
+void () DumpScore =
+{
+	local entity e;
+	local entity sort;
+	local entity walk;
+	if ( world.chain )
+	{
+		error ("DumpScore: world.chain is set");
+	}
+	e = find (world,classname,"player");
+	sort = world;
+	while ( e )
+	{
+		if ( !sort )
+		{
+			sort = e;
+			e.chain = world;
+		}
+		else
+		{
+			if ( (e.frags > sort.frags) )
+			{
+				e.chain = sort;
+				sort = e;
+			}
+			else
+			{
+				walk = sort;
+				do
+				{
+					if ( !walk.chain )
+					{
+						e.chain = world;
+						walk.chain = e;
+					}
+					else
+					{
+						if ( (walk.chain.frags < e.frags) )
+						{
+							e.chain = walk.chain;
+							walk.chain = e;
+						}
+						else
+						{
+							walk = walk.chain;
+						}
+					}
+				} while ( (walk.chain != e));
+			}
+		}
+		e = find (e,classname,"player");
+	}
+	bprint ("\n");
+	while ( sort )
+	{
+		PrintClientScore (sort);
+		sort = sort.chain;
+	}
+	bprint ("\n");
 };
 
 
@@ -582,7 +932,7 @@ void() PutClientInServer =
 /*QUAKED info_player_start (1 0 0) (-16 -16 -24) (16 16 24)
 The normal starting point for a level.
 */
-void() info_player_start =
+void () info_player_start =
 {
 };
 
@@ -590,7 +940,7 @@ void() info_player_start =
 /*QUAKED info_player_start2 (1 0 0) (-16 -16 -24) (16 16 24)
 Only used on start map for the return point from an episode.
 */
-void() info_player_start2 =
+void () info_player_start2 =
 {
 };
 
@@ -598,21 +948,21 @@ void() info_player_start2 =
 /*
 saved out by quaked in region mode
 */
-void() testplayerstart =
+void () testplayerstart =
 {
 };
 
 /*QUAKED info_player_deathmatch (1 0 1) (-16 -16 -24) (16 16 24)
 potential spawning position for deathmatch games
 */
-void() info_player_deathmatch =
+void () info_player_deathmatch =
 {
 };
 
 /*QUAKED info_player_coop (1 0 1) (-16 -16 -24) (16 16 24)
 potential spawning position for coop games
 */
-void() info_player_coop =
+void () info_player_coop =
 {
 };
 
@@ -628,7 +978,7 @@ RULES
 go to the next level for deathmatch
 only called if a time or frag limit has expired
 */
-void() NextLevel =
+void () NextLevel =
 {
 	local entity o;
 
@@ -662,19 +1012,19 @@ void() NextLevel =
 		}
 	 }
 
-		o = spawn();
+		o = spawn ();
 		o.map = mapname;
 	}
 	else
 	{
 		// find a trigger changelevel
-		o = find(world, classname, "trigger_changelevel");
+		o = find (world,classname,"trigger_changelevel");
 
 		// go back to start if no trigger_changelevel
-		if (!o)
+		if ( !o )
 		{
 			mapname = "start";
-			o = spawn();
+			o = spawn ();
 			o.map = mapname;
 		}
 	}
@@ -699,40 +1049,40 @@ CheckRules
 Exit deathmatch games upon conditions
 ============
 */
-void() CheckRules =
+void () CheckRules =
 {
-	local	float		timelimit;
-	local	float		fraglimit;
+	local float timelimit;
+	local float fraglimit;
 
 	if (gameover)	// someone else quit the game already
-		return;
+		return ;
 
 	if (inHubMap)  // *pk - ingore limits if in hub...
-		return;
+		return ;
 	timelimit = cvar("timelimit") * 60;
-	fraglimit = cvar("fraglimit");
+	fraglimit = cvar ("fraglimit");
 
 	if (timelimit && time >= timelimit)
 	{
 		NextLevel ();
-		return;
+		return ;
 	}
 
 	if (fraglimit && self.frags >= fraglimit)
 	{
 		NextLevel ();
-		return;
+		return ;
 	}
 };
 
 //============================================================================
 
-void() PlayerDeathThink =
+void () PlayerDeathThink =
 {
-	local entity	old_self;
-	local float		forward;
+	local entity old_self;
+	local float forward;
 
-	if ((self.flags & FL_ONGROUND))
+	if ( (self.flags & FL_ONGROUND) )
 	{
 		forward = vlen (self.velocity);
 		forward = forward - 20;
@@ -746,23 +1096,23 @@ void() PlayerDeathThink =
 	if (self.deadflag == DEAD_DEAD)
 	{
 		if (self.button2 || self.button1 || self.button0)
-			return;
+			return ;
 		self.deadflag = DEAD_RESPAWNABLE;
-		return;
+		return ;
 	}
 
 // wait for any button down
 	if (!self.button2 && !self.button1 && !self.button0)
-		return;
+		return ;
 
 	self.button0 = 0;
 	self.button1 = 0;
 	self.button2 = 0;
-	respawn();
+	respawn ();
 };
 
 
-void() PlayerJump =
+void () PlayerJump =
 {
 	local vector start, end;
 
@@ -815,9 +1165,9 @@ WaterMove
 
 ============
 */
-.float	dmgtime;
+.float dmgtime;
 
-void() WaterMove =
+void () WaterMove =
 {
 //dprint (ftos(self.waterlevel));
 	if (self.movetype == MOVETYPE_NOCLIP)
@@ -902,7 +1252,7 @@ void() WaterMove =
 		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
 };
 
-void() CheckWaterJump =
+void () CheckWaterJump =
 {
 	local vector start, end;
 
@@ -939,10 +1289,13 @@ PlayerPreThink
 Called every frame before physics are run
 ================
 */
-void() PlayerPreThink =
+void () PlayerPreThink =
 {
 	local	float	mspeed, aspeed;
-	local	float	r;
+	local float r;
+	if (FRIKBOT)
+	if ( BotPreFrame () )
+		return ;
 
 	if (intermission_running)
 	{
@@ -1001,7 +1354,7 @@ CheckPowerups
 Check for turning off powerups
 ================
 */
-void() CheckPowerups =
+void () CheckPowerups =
 {
 	if (self.health <= 0)
 		return;
@@ -1157,10 +1510,19 @@ PlayerPostThink
 Called every frame after physics are run
 ================
 */
-void() PlayerPostThink =
+void () PlayerPostThink =
 {
 	local	float	mspeed, aspeed;
-	local	float	r;
+	local float r;
+	if (FRIKBOT)
+	if ( BotPostFrame () )
+		return ;
+
+	if (!(self.view_ofs == '0 0 0') && !self.deadflag )
+	if ( CheckDropPath () )
+	{
+		DropBotPath ();
+	}
 
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
@@ -1171,7 +1533,7 @@ void() PlayerPostThink =
 		return;
 	}
 
-	if (self.deadflag)
+	if ( self.deadflag )
 		return;
 		
 // do weapon stuff
@@ -1184,21 +1546,119 @@ void() PlayerPostThink =
 		if (self.watertype == CONTENT_WATER)
 			sound (self, CHAN_BODY, "player/h2ojump.wav", 1, ATTN_NORM);
 		else if (self.jump_flag < -650)
-		{
-			T_Damage (self, world, world, 5); 
+			{
+				T_Damage (self,world,world,5);
 			sound (self, CHAN_VOICE, "player/land2.wav", 1, ATTN_NORM);
-			self.deathtype = "falling";
-		}
-		else
+				self.deathtype = "falling";
+			}
+			else
 			sound (self, CHAN_VOICE, "player/land.wav", 1, ATTN_NORM);
 
 		self.jump_flag = 0;
 	}
 
-	if (!(self.flags & FL_ONGROUND))
+	if ( !(self.flags & FL_ONGROUND) )
 		self.jump_flag = self.velocity_z;
 
 	CheckPowerups ();
+};
+
+/*
+void () printIntro =
+{
+	local float num;
+	local float skinno;
+	if ( teamplay )
+	{
+		if ( (parm4 > 511) )
+		{
+			SKINSMODE = ((parm4 & 49152) / 16384);
+			skinno = (parm4 & 7680);
+			parm4 = (parm4 & 511);
+			skinChange (self,skinno);
+		}
+		num = ((serverflags & 3840) / 256);
+		if ( (num > 0) )
+		{
+			addTeamBots (self,num);
+		}
+		centerprint (self,"Server running team QuakeBot v1.1");
+	}
+	else
+	{
+		centerprint (self,"Server running QuakeBot v1.1");
+	}
+};
+
+*/
+float () getrandombotskin =
+{
+	local float botskin;
+	botskin = random ();
+	if ( (botskin <= 0.066) )
+	{
+		return(NAMEBOTS);
+	}
+	if ( ((botskin > 0.066) && (botskin <= 0.132)) )
+	{
+		return (1);
+	}
+	if ( ((botskin > 0.132) && (botskin <= 0.198)) )
+	{
+		return (2);
+	}
+	if ( ((botskin > 0.198) && (botskin <= 0.264)) )
+	{
+		return (3);
+	}
+	if ( ((botskin > 0.264) && (botskin <= 0.330)) )
+	{
+		return (4);
+	}
+	if ( ((botskin > 0.330) && (botskin <= 0.396)) )
+	{
+		return(TE_LIGHTNING1);
+	}
+	if ( ((botskin > 0.396) && (botskin <= 0.462)) )
+	{
+		return (6);
+	}
+	if ( ((botskin > 0.462) && (botskin <= 0.528)) )
+	{
+		return (7);
+	}
+	if ( ((botskin > 0.528) && (botskin <= 0.594)) )
+	{
+		return (8);
+	}
+	if ( ((botskin > 0.594) && (botskin <= 0.660)) )
+	{
+		return (9);
+	}
+	if ( ((botskin > 0.660) && (botskin <= 0.726)) )
+	{
+		return (10);
+	}
+	if ( ((botskin > 0.726) && (botskin <= 0.792)) )
+	{
+		return (11);
+	}
+	if ( ((botskin > 0.792) && (botskin <= 0.858)) )
+	{
+		return(12);
+	}
+	if ( ((botskin > 0.858) && (botskin <= 0.924)) )
+	{
+		return (13);
+	}
+	if ( ((botskin > 0.924) && (botskin <= 1)) )
+	{
+		return(15);
+	}
+	else
+	{
+		return(15);
+	}
 };
 
 
@@ -1209,15 +1669,23 @@ ClientConnect
 called when a player connects to a server
 ============
 */
-void() ClientConnect =
+void () ClientConnect =
 {
+	local float v;
+	if (FRIKBOT) ClientInRankings ();
+	v = (random () * 5);
 	bprint (self.netname);
 	if (PK) pk_clientconnect(); // *pk - variety connect msg
 	else
-	bprint (" entered the game\n");
+					bprint (" entered the game\n");
 
+// bot code
+	self.id = FindGood ();
+	self.impulse = 204;
+	randombotskin = getrandombotskin ();
+	initscore ();
 // a client connecting during an intermission can cause problems
-	if (intermission_running)
+	if ( intermission_running )
 		ExitIntermission ();
 };
 
@@ -1229,20 +1697,24 @@ ClientDisconnect
 called when a player disconnects from a server
 ============
 */
-void() ClientDisconnect =
+void () ClientDisconnect =
 {
-	if (gameover)
+	if (FRIKBOT) ClientDisconnected ();
+	if ( gameover )
 		return;
 	// if the level end trigger has been activated, just return
 	// since they aren't *really* leaving
 
 	if (PK) pk_clientdisconnect(); // *pk - clear stuff out
 	// let everyone else know
+	bprint (self.teamname);
 	bprint (self.netname);
 	bprint (" left the game with ");
-	bprint (ftos(self.frags));
+	MakeGood (self.id);
+	bprint (ftos (self.frags));
 	bprint (" frags\n");
 	sound (self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_NONE);
+	self.classname = "nobody";
 	set_suicide_frame ();
 };
 
@@ -1253,6 +1725,7 @@ ClientObituary
 called when a player dies
 ============
 */
+// FIX ME - merge bot code back in
 void(entity targ, entity attacker) ClientObituary =
 {
 	local	float rnum;

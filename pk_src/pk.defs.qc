@@ -3,11 +3,11 @@
 // dev - only enable this for painkeep maps or force pk mode (sv_ control) - any maps that loads a pk item / func
 float PK; // if set true painkeep code is enabled
 float PK_MAP					= 0; // bits 1 & 2 = FALSE -- map sets painkeep mode - PK = TRUE if: any pk*.bsp loaded, start.bsp loaded and message == "hub", a map loads any painkeep map item, PK = FALSE otherwise
-float PK_ALWAYS				= 1; // bit 1  = TRUE --- always in painkeep mode - PK = TRUE;
-float PK_NEVER				= 2; // bit 2  = TRUE --- never in painkeep mode - PK = FALSE;
-float PK_DYNAMIC				= 4; // bit 4  = TRUE --- when always in painkeep mode & not on a PK map, dynamically load pk items if they are not present
-										  // items include - bear trap, can o' beans, gravity well, harpoon, turret, airfist, chain thunderbolt, exploding shot, pulse nailgun
-float PK_SPIKER				= 8; // bit 8  = TRUE --- allow spike traps, set to false for original pk treatment of spike shooters - they are removed
+float PK_ALWAYS				= 1; // bit 1	= TRUE --- always in painkeep mode - PK = TRUE;
+float PK_NEVER				= 2; // bit 2	= TRUE --- never in painkeep mode - PK = FALSE;
+float PK_DYNAMIC				= 4; // bit 4	= TRUE --- when always in painkeep mode & not on a PK map, dynamically load pk items if they are not present
+											// items include - bear trap, can o' beans, gravity well, harpoon, turret, airfist, chain thunderbolt, exploding shot, pulse nailgun
+float PK_SPIKER				= 8; // bit 8	= TRUE --- allow spike traps, set to false for original pk treatment of spike shooters - they are removed
 float PK_XSOUND				= 16;// bit 16 = TRUE --- use extra pk sound set
 
 float pk_mode; // set bits to determin state of PK above, if darkplaces engine can be detected, this will load from cvar("sv_pk_mode"), otherwise first 5 bits of cvar("temp2")
@@ -29,7 +29,8 @@ float(string name, string value) registercvar = #93;
 // relocated from defs.qc
 
 // hijacked for pk_mode running non pk maps with non pk sounds
-void(entity e, float chan, string samp, float vol, float atten) pk_sound = #8;
+//void(entity e, float chan, string samp, float vol, float atten) pk_sound = #8;
+void(entity e, float chan, string samp, float vol, float atten) pk_sound;
 void(vector pos, string samp, float vol, float atten) pk_ambientsound = #74;
 
 // from triggers
@@ -54,19 +55,19 @@ void(entity client, string s, string s1, string s2, string s3, string s4, string
 .entity turret_base;
 
 // items
-.float pk_items;  // Items used for impulse 1
+.float pk_items;	// Items used for impulse 1
 .float pk_currentitem;
 
 // Items used in impulse 1
-float PK_IT_AXE         = 1;
+float PK_IT_AXE	       = 1;
 float	PK_IT_GRAVITYWELL	= 2;
-float	PK_IT_TURRET		  = 4;
-float	PK_IT_CANPAB		  = 8;
-float PK_IT_GRAPGUN     = 16;
-float PK_IT_AIRGUN      = 32;
-float	PK_IT_CLIGHT    	= 64;
+float	PK_IT_TURRET			= 4;
+float	PK_IT_CANPAB			= 8;
+float PK_IT_GRAPGUN	   = 16;
+float PK_IT_AIRGUN	    = 32;
+float	PK_IT_CLIGHT	  	= 64;
 float PK_IT_BEARTRAP		= 128;
-float PK_IT_EXTRADISP   = 256;
+float PK_IT_EXTRADISP	 = 256;
 /*
 Impulse 1 will toggle between Axe, Bear Trap, CoPB, AS, and GW.
 
@@ -123,7 +124,7 @@ float AIRG_EXCLUDEENTITY = 1;
 .float AIRG_Timeout;
 
 
-// Airblast timeout variable.  Tracks how long the "blast" affects monsters...
+// Airblast timeout variable.	Tracks how long the "blast" affects monsters...
 .float AIRG_BlastTimeout;	// Airblast origin, & viewing angle
 .vector AIRG_BlastOrigin;
 .vector AIRG_BlastAngle;
@@ -134,8 +135,8 @@ void(float firstBlast) horn_airblast;
 
 
 // chain thunder bolt
-.entity bolt_target;      // current player firing at ...
-.entity bolt_targetNext;  // next target in the chain...
+.entity bolt_target;	    // current player firing at ...
+.entity bolt_targetNext;	// next target in the chain...
 .float bolt_targetTimeout; // used to timeout the bolt_target...
 .float bolt_targetNextTimeout; // used to timeout the bolt_targetNext...
 
@@ -153,13 +154,13 @@ void(float firstBlast) horn_airblast;
 
 // harpoon
 .entity grap_cornerchainNext; // next in the rope corner chain.
-.entity grap_ropechainPrev;  	// prev in the rope chain.
+.entity grap_ropechainPrev;		// prev in the rope chain.
 .entity grap_owner; 				// Can't use owner cas the object can't see the owner!
 .entity grap_pull;
 .float grap_checkTimeout;
 .float grap_state;
 .float grap_length;
-.vector grep_offset;  			// harpoon target offset for bringing back to owner
+.vector grep_offset;				// harpoon target offset for bringing back to owner
 .float grap_firetest;
 
 float GRAP_IDEAL = 0; 			// Going nothing
@@ -209,7 +210,7 @@ void() updateStatusDisplay;
 
 .float beartrap_time;
 .float bt_immune_time;
-float BT_BUFFER = 2;    		// The nuber of secs people are immune to beartraps after spawning
+float BT_BUFFER = 2;	  		// The nuber of secs people are immune to beartraps after spawning
 
 // Quake Packet Message
 float	SVC_CENTERPRINT		= 26;
@@ -396,6 +397,6 @@ PlayerPreThink
 PlayerPostThink
 
 SPECIAL NOTE: to make mods to both v106 (or other) code and painkeep - make mod before tie in call diversion.
-				  if your code requiers more complex mods you will need to either a) mod both code sets, or b) make a new code set
-				  if you choose to mod both code sets we recommend a tie in fn() call to the same code
+					if your code requiers more complex mods you will need to either a) mod both code sets, or b) make a new code set
+					if you choose to mod both code sets we recommend a tie in fn() call to the same code
 */

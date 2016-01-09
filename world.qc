@@ -1,8 +1,20 @@
+/* ::-::
+ *
+ * dectran: decompiler translator by Cataboligne v1.3 - (3.31.8)
+ *
+ * file: world.qc
+ *
+ * date: Fri Apr  4 04:31:45 UTC 2008
+ *
+ * final qc
+ *
+ */
 
-void() InitBodyQue;
+
+void () InitBodyQue;
 
 
-void() main =
+void () main =
 {
 	dprint ("main function\n");
 
@@ -155,7 +167,7 @@ void() main =
 };
 
 
-entity	lastspawn;
+entity lastspawn;
 
 //=======================
 /*QUAKED worldspawn (0 0 0) ?
@@ -169,9 +181,14 @@ World Types:
 2: base
 */
 //=======================
-void() worldspawn =
+void () worldspawn =
 {
 	lastspawn = world;
+	if (FRIKBOT)
+	{
+		BotInit ();
+//		CamSpawn ();
+	}
 	InitBodyQue ();
 
 // custom map attributes
@@ -255,7 +272,7 @@ void() worldspawn =
 	precache_sound ("misc/water1.wav");			// swimming
   precache_sound ("misc/water2.wav");     // swimming
 
- 	precache_model ("progs/player.mdl");
+	precache_model ("progs/player.mdl");
 	precache_model ("progs/eyes.mdl");
 	precache_model ("progs/h_player.mdl");
 	precache_model ("progs/gib1.mdl");
@@ -288,6 +305,7 @@ void() worldspawn =
 	precache_model ("progs/zom_gib.mdl");
 
 	precache_model ("progs/v_light.mdl");
+	setBotGravity ();
 
 
 //
@@ -336,10 +354,11 @@ void() worldspawn =
 	lightstyle(63, "a");
 };
 
-void() StartFrame =
+void () StartFrame =
 {
-	teamplay = cvar("teamplay");
-	skill = cvar("skill");
+	if (FRIKBOT) BotFrame();
+	teamplay = cvar ("teamplay");
+	skill = cvar ("skill");
 	framecount = framecount + 1;
 };
 
@@ -351,24 +370,24 @@ BODY QUE
 ==============================================================================
 */
 
-entity	bodyque_head;
+entity bodyque_head;
 
-void() bodyque =
+void () bodyque =
 {	// just here so spawn functions don't complain after the world
 	// creates bodyques
 };
 
-void() InitBodyQue =
+void () InitBodyQue =
 {
-	local entity	e;
+	local entity e;
 
-	bodyque_head = spawn();
+	bodyque_head = spawn ();
 	bodyque_head.classname = "bodyque";
-	bodyque_head.owner = spawn();
+	bodyque_head.owner = spawn ();
 	bodyque_head.owner.classname = "bodyque";
-	bodyque_head.owner.owner = spawn();
+	bodyque_head.owner.owner = spawn ();
 	bodyque_head.owner.owner.classname = "bodyque";
-	bodyque_head.owner.owner.owner = spawn();
+	bodyque_head.owner.owner.owner = spawn ();
 	bodyque_head.owner.owner.owner.classname = "bodyque";
 	bodyque_head.owner.owner.owner.owner = bodyque_head;
 };
@@ -376,7 +395,7 @@ void() InitBodyQue =
 
 // make a body que entry for the given ent so the ent can be
 // respawned elsewhere
-void(entity ent) CopyToBodyQue =
+void (entity ent) CopyToBodyQue =
 {
 	bodyque_head.angles = ent.angles;
 	bodyque_head.model = ent.model;
@@ -387,8 +406,8 @@ void(entity ent) CopyToBodyQue =
 	bodyque_head.velocity = ent.velocity;
 	bodyque_head.flags = 0;
 	if (PK) bodyque_head.skin = ent.skin; // *pk damage skins
-	setorigin (bodyque_head, ent.origin);
-	setsize (bodyque_head, ent.mins, ent.maxs);
+	setorigin (bodyque_head,ent.origin);
+	setsize (bodyque_head,ent.mins,ent.maxs);
 	bodyque_head = bodyque_head.owner;
 };
 

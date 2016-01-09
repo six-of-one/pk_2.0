@@ -8,38 +8,38 @@
 
 void() zombie_hang =
 {
-  self.think = zombie_hang;
-  self.frame = self.frame + 1;
+	self.think = zombie_hang;
+	self.frame = self.frame + 1;
 
-  if(self.frame > 21)
-  {
-  	self.frame = 0;
+	if(self.frame > 21)
+	{
+		self.frame = 0;
 
-	  self.flags = rint(random() * 2);
+		self.flags = rint(random() * 2);
 
-    local float rs;
-    rs = rint ((random() * 2) + 1);
+	  local float rs;
+	  rs = rint ((random() * 2) + 1);
 
-    if (self.flags == 1)
-      sound (self, CHAN_VOICE, "misc/zombie/swing_1.wav", 1, ATTN_NONE);
-    else if (self.flags == 2)
-      sound (self, CHAN_VOICE, "misc/zombie/swing_2.wav", 1, ATTN_NONE);
-    else
-      sound (self, CHAN_VOICE, "misc/zombie/swing_3.wav", 1, ATTN_NONE);
-  }
+	  if (self.flags == 1)
+	    sound (self, CHAN_VOICE, "misc/zombie/swing_1.wav", 1, ATTN_NONE);
+	  else if (self.flags == 2)
+	    sound (self, CHAN_VOICE, "misc/zombie/swing_2.wav", 1, ATTN_NONE);
+	  else
+	    sound (self, CHAN_VOICE, "misc/zombie/swing_3.wav", 1, ATTN_NONE);
+	}
 
-  if(self.flags == 1)
-  {
-	  self.nextthink = time + 0.1;
-  }
-  else if(self.flags == 2)
-  {
-	  self.nextthink = time + 0.15;
-  }
-  else
-  {
-	  self.nextthink = time + 0.2;
-  }
+	if(self.flags == 1)
+	{
+		self.nextthink = time + 0.1;
+	}
+	else if(self.flags == 2)
+	{
+		self.nextthink = time + 0.15;
+	}
+	else
+	{
+		self.nextthink = time + 0.2;
+	}
 };
 
 
@@ -62,10 +62,10 @@ void() monster_zombie2 =
 	setsize (self, '-4 -16 -93', '7 2 1');
 
 	self.movetype = MOVETYPE_NONE;
-  self.frame = 22;
+	self.frame = 22;
 
-  self.think = zombie_hang;
-  self.nextthink = time + 0.1;
+	self.think = zombie_hang;
+	self.nextthink = time + 0.1;
 
 	zombie_hang ();
 };
@@ -74,13 +74,13 @@ void() monster_zombie2 =
 
 void() zombie_twist =
 {
-  self.think = zombie_twist;
-  self.frame = self.frame + 1;
+	self.think = zombie_twist;
+	self.frame = self.frame + 1;
 
-  if(self.frame > 45)
-  {
-  	self.frame = 0;
-  }
+	if(self.frame > 45)
+	{
+		self.frame = 0;
+	}
 
 	self.nextthink = time + 0.1;
 };
@@ -90,7 +90,7 @@ void() monster_zombie3 =
 {
 	if ((cvar("temp1") & PK_TP_SPARKSFLASH))
 		remove(self);
-    
+	  
 	precache_model ("progs/zombie3.mdl");
 
 	self.solid = SOLID_NOT;
@@ -101,10 +101,10 @@ void() monster_zombie3 =
 	setsize (self, '-4 -16 -93', '7 2 1');
 
 	self.movetype = MOVETYPE_NONE;
-  self.frame = 46;
+	self.frame = 46;
 
-  self.think = zombie_twist;
-  self.nextthink = time + 0.1;
+	self.think = zombie_twist;
+	self.nextthink = time + 0.1;
 
 	zombie_twist ();
 };

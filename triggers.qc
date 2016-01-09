@@ -1,21 +1,37 @@
+/* ::-::
+ *
+ * dectran: decompiler translator by Cataboligne v1.3 - (3.31.8)
+ *
+ * file: triggers.qc
+ *
+ * date: Fri Apr  4 04:31:45 UTC 2008
+ *
+ * final qc
+ *
+ */
+
+// pk stuff moved in the adaptive code
+float SOUND_GOT	 ;
+string normalsound;
+string reversesound;
 
 entity stemp, otemp, s, old;
 
 
-void() trigger_reactivate =
+void () trigger_reactivate =
 {
 	self.solid = SOLID_TRIGGER;
 };
 
 //=============================================================================
 
-float	SPAWNFLAG_NOMESSAGE = 1;
-float	SPAWNFLAG_NOTOUCH = 1;
+float SPAWNFLAG_NOMESSAGE	 = 1;
+float SPAWNFLAG_NOTOUCH	 = 1;
 
 // the wait time has passed, so set back up for another activation
-void() multi_wait =
+void () multi_wait =
 {
-	if (self.max_health)
+	if ( self.max_health )
 	{
 		self.health = self.max_health;
 		self.takedamage = DAMAGE_YES;
@@ -27,7 +43,7 @@ void() multi_wait =
 // the trigger was just touched/killed/used
 // self.enemy should be set to the activator so it can be held through a delay
 // so wait for the delay time before firing
-void() multi_trigger =
+void () multi_trigger =
 {
 	if (self.nextthink > time)
 	{
@@ -36,13 +52,14 @@ void() multi_trigger =
 
 	if (self.classname == "trigger_secret")
 	{
-		if (self.enemy.classname != "player")
-			return;
+	if (self.enemy.classname != "dmbot")
+	if (self.enemy.classname != "player")
+		return ;
 		found_secrets = found_secrets + 1;
-		WriteByte (MSG_ALL, SVC_FOUNDSECRET);
+		WriteByte (MSG_ALL,SVC_FOUNDSECRET);
 	}
 
-	if (self.noise)
+	if ( self.noise )
 		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 
 // don't trigger again until reset
@@ -50,7 +67,9 @@ void() multi_trigger =
 
 	activator = self.enemy;
 
-	SUB_UseTargets();
+	if (activator.classname == "dmbot")
+		bot_triggered (activator);
+	SUB_UseTargets ();
 
 	if (self.wait > 0)
 	{
@@ -66,22 +85,31 @@ void() multi_trigger =
 	}
 };
 
-void() multi_killed =
+void () multi_killed =
 {
 	self.enemy = damage_attacker;
-	multi_trigger();
+	multi_trigger ();
 };
 
-void() multi_use =
+void () multi_use =
 {
 	self.enemy = activator;
-	multi_trigger();
+	multi_trigger ();
 };
 
-void() multi_touch =
+void () multi_touch =
 {
+	if (other.classname != "dmbot")
 	if (other.classname != "player")
-		return;
+		return ;
+
+	if (other.classname == "dmbot")
+	{
+		self.enemy = other;
+		bot_touched ();
+		multi_trigger ();
+		return ;
+	}
 
 // if the trigger has an angles field, check player's facing direction
 	if (self.movedir != '0 0 0')
@@ -108,7 +136,7 @@ sounds
 4)
 set "message" to text string
 */
-void() trigger_multiple =
+void () trigger_multiple =
 {
 	if (self.sounds == 1)
 	{
@@ -126,13 +154,15 @@ void() trigger_multiple =
 		self.noise = "misc/trigger1.wav";
 	}
 
-	if (!self.wait)
+	if ( !self.wait )
 		self.wait = 0.2;
 	self.use = multi_use;
 
+	self.th_weight = triggerweight; // *pkr
+	self.istrigger = 1;
 	InitTrigger ();
 
-	if (self.health)
+	if ( self.health )
 	{
 		if (self.spawnflags & SPAWNFLAG_NOTOUCH)
 			objerror ("health and notouch don't make sense\n");
@@ -165,10 +195,10 @@ sounds
 4)
 set "message" to text string
 */
-void() trigger_once =
+void () trigger_once =
 {
 	self.wait = -1;
-	trigger_multiple();
+	trigger_multiple ();
 };
 
 //=============================================================================
@@ -176,7 +206,7 @@ void() trigger_once =
 /*QUAKED trigger_relay (.5 .5 .5) (-8 -8 -8) (8 8 8)
 This fixed size trigger cannot be touched, it can only be fired by other events.  It can contain killtargets, targets, delays, and messages.
 */
-void() trigger_relay =
+void () trigger_relay =
 {
 	self.use = SUB_UseTargets;
 };
@@ -193,13 +223,13 @@ sounds
 4)
 set "message" to text string
 */
-void() trigger_secret =
+void () trigger_secret =
 {
 	total_secrets = total_secrets + 1;
 	self.wait = -1;
-	if (!self.message)
+	if ( !self.message )
 		self.message = "You found a secret area!";
-	if (!self.sounds)
+	if ( !self.sounds )
 		self.sounds = 1;
 
 	if (self.sounds == 1)
@@ -219,13 +249,13 @@ void() trigger_secret =
 //=============================================================================
 
 
-void() counter_use =
+void () counter_use =
 {
 	local string junk;
 
 	self.count = self.count - 1;
 	if (self.count < 0)
-		return;
+		return ;
 
 	if (self.count != 0)
 	{
@@ -246,7 +276,7 @@ void() counter_use =
 
 	if (activator.classname == "player"
 	&& (self.spawnflags & SPAWNFLAG_NOMESSAGE) == 0)
-		centerprint(activator, "Sequence completed!");
+		centerprint (activator,"Sequence completed!");
 	self.enemy = activator;
 	multi_trigger ();
 };
@@ -258,10 +288,10 @@ If nomessage is not set, t will print "1 more.. " etc when triggered and "sequen
 
 After the counter has been triggered "count" times (default 2), it will fire all of it's targets and remove itself.
 */
-void() trigger_counter =
+void () trigger_counter =
 {
 	self.wait = -1;
-	if (!self.count)
+	if ( !self.count )
 		self.count = 2;
 
 	self.use = counter_use;
@@ -276,10 +306,10 @@ TELEPORT TRIGGERS
 ==============================================================================
 */
 
-float	PLAYER_ONLY	= 1;
-float	SILENT = 2;
+float PLAYER_ONLY	 = 1;
+float SILENT	 = 2;
 
-void() play_teleport =
+void () play_teleport =
 {
 	local	float v;
 	local	string tmpstr;
@@ -298,69 +328,75 @@ void() play_teleport =
 
 	if (PK)
 	{
-		if (!SOUND_GOT)
-			get_teleport_sounds();
-		else
-			SOUND_GOT = FALSE;	// So we get new sounds the next time
+	if ( !SOUND_GOT )
+		get_teleport_sounds ();
+	else
+		SOUND_GOT = FALSE;	// So we get new sounds the next time
 		tmpstr = normalsound;
 	}
 	sound (self, CHAN_VOICE, tmpstr, 1, ATTN_NORM);
 	remove (self);
 };
 
-void(vector org) spawn_tfog =
+void (vector org) spawn_tfog =
 {
 	s = spawn ();
 	s.origin = org;
 	s.nextthink = time + 0.2;
 	s.think = play_teleport;
 
-	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	WriteByte (MSG_BROADCAST, TE_TELEPORT);
-	WriteCoord (MSG_BROADCAST, org_x);
-	WriteCoord (MSG_BROADCAST, org_y);
-	WriteCoord (MSG_BROADCAST, org_z);
+	signalnoise (other,s);
+	WriteByte (MSG_BROADCAST,SVC_TEMPENTITY);
+	WriteByte (MSG_BROADCAST,TE_TELEPORT);
+	WriteCoord (MSG_BROADCAST,org_x);
+	WriteCoord (MSG_BROADCAST,org_y);
+	WriteCoord (MSG_BROADCAST,org_z);
 };
 
 
-void() tdeath_touch =
+void () tdeath_touch =
 {
 	if (other == self.owner)
-		return;
+		return ;
 
 // frag anyone who teleports in on top of an invincible player
-	if (other.classname == "player")
+	if ((other.classname == "player") || (other.classname == "dmbot"))
 	{
 		if (other.invincible_finished > time)
 			self.classname = "teledeath2";
+		if (self.owner.classname != "dmbot")
 		if (self.owner.classname != "player")
 		{	// other monsters explode themselves
-			T_Damage (self.owner, self, self, 50000);
-			return;
+			T_Damage (self.owner,self,self,50000);
+			return ;
 		}
+	}
+	if ( (other.classname == "peeper") )
+	{
+		other.takedamage = DAMAGE_AIM;
 
 	}
 	if (other.classname == "beartrap") // *pk - dont telefrag beartraps
 		return;
 
-	if (other.health)
+	if ( other.health )
 	{
-		T_Damage (other, self, self, 50000);
+		T_Damage (other,self,self,50000);
 	}
 };
 
 
-void(vector org, entity death_owner) spawn_tdeath =
+void (vector org, entity death_owner) spawn_tdeath =
 {
-local entity	death;
+	local entity death;
 
-	death = spawn();
+	death = spawn ();
 	death.classname = "teledeath";
 	death.movetype = MOVETYPE_NONE;
 	death.solid = SOLID_TRIGGER;
 	death.angles = '0 0 0';
 	setsize (death, death_owner.mins - '1 1 1', death_owner.maxs + '1 1 1');
-	setorigin (death, org);
+	setorigin (death,org);
 	death.touch = tdeath_touch;
 	death.nextthink = time + 0.2;
 	death.think = SUB_Remove;
@@ -369,12 +405,12 @@ local entity	death;
 	force_retouch = 2;		// make sure even still objects get hit
 };
 
-void() teleport_touch =
+void () teleport_touch =
 {
-local entity	t;
-local vector	org;
+	local entity t;
+	local vector org;
 
-	if (self.targetname)
+	if ( self.targetname )
 	{
 		if (self.nextthink < time)
 		{
@@ -384,23 +420,24 @@ local vector	org;
 
 	if (self.spawnflags & PLAYER_ONLY)
 	{
+		if (other.classname != "dmbot")
 		if (other.classname != "player")
-			return;
+			return ;
 	}
 
 // only teleport living creatures
 	if (other.health <= 0 || other.solid != SOLID_SLIDEBOX)
-		return;
+		return ;
 
 	SUB_UseTargets ();
 
-	// put a tfog where the player was
+// put a tfog where the player was
 	if (PK) spawn_tfog2(other.origin); // *pk - new teleport sounds
 	else
 	spawn_tfog (other.origin);
 
-	t = find (world, targetname, self.target);
-	if (!t)
+	t = find (world,targetname,self.target);
+	if ( !t )
 		objerror ("couldn't find target");
 
 	if (PK) ClearSpawnPoint(t);
@@ -409,19 +446,32 @@ local vector	org;
 	org = t.origin + 32 * v_forward;
 
 	spawn_tfog (org);
-	spawn_tdeath(t.origin, other);
+	spawn_tdeath (t.origin,other);
 
+	if ( (other.enemy.classname == "dmbot") )
+	{
+		enemy_touched ();
+	}
 // move the player and lock him down for a little while
-	if (!other.health)
+	if ( !other.health )
 	{
 		other.origin = t.origin;
 		other.velocity = (v_forward * other.velocity_x) + (v_forward * other.velocity_y);
 		return;
 	}
 
-	setorigin (other, t.origin);
+	setorigin (other,t.origin);
 	other.angles = t.mangle;
-	if (other.classname == "player")
+	if ( other.movetarget.movetarget )
+	{
+		addTarget (other.movetarget.movetarget,self);
+		other.movetarget.movetarget = self;
+	}
+	if ( (other.classname == "dmbot") )
+	{
+		bot_touched ();
+	}
+	if ( (other.classname == "player") || (other.classname == "dmbot") || (other.classname == "peeper") )
 	{
 		other.fixangle = 1;		// turn this way immediately
 		other.teleport_time = time + 0.7;
@@ -436,18 +486,18 @@ local vector	org;
 /*QUAKED info_teleport_destination (.5 .5 .5) (-8 -8 -8) (8 8 32)
 This is the destination marker for a teleporter.  It should have a "targetname" field with the same value as a teleporter's "target" field.
 */
-void() info_teleport_destination =
+void () info_teleport_destination =
 {
 // this does nothing, just serves as a target spot
 	self.mangle = self.angles;
 	self.angles = '0 0 0';
 	self.model = "";
 	self.origin = self.origin + '0 0 27';
-	if (!self.targetname)
+	if ( !self.targetname )
 		objerror ("no targetname");
 };
 
-void() teleport_use =
+void () teleport_use =
 {
 	self.nextthink = time + 0.2;
 	force_retouch = 2;		// make sure even still objects get hit
@@ -459,22 +509,22 @@ Any object touching this will be transported to the corresponding info_teleport_
 
 If the trigger_teleport has a targetname, it will only teleport entities when it has been fired.
 */
-void() trigger_teleport =
+void () trigger_teleport =
 {
 	local vector o;
 
 	InitTrigger ();
 	self.touch = teleport_touch;
 	// find the destination
-	if (!self.target)
+	if ( !self.target )
 		objerror ("no target");
 	self.use = teleport_use;
 
-	if (!(self.spawnflags & SILENT))
+	if ( !(self.spawnflags & SILENT) )
 	{
 		precache_sound ("ambience/hum1.wav");
 		o = (self.mins + self.maxs)*0.5;
-		ambientsound (o, "ambience/hum1.wav",0.5 , ATTN_STATIC);
+		ambientsound (o,"ambience/hum1.wav",0.5,ATTN_STATIC);
 	}
 };
 
@@ -486,19 +536,19 @@ trigger_setskill
 ==============================================================================
 */
 
-void() trigger_skill_touch =
+void () trigger_skill_touch =
 {
 	if (other.classname != "player")
-		return;
+		return ;
 
-	cvar_set ("skill", self.message);
+	cvar_set ("skill",self.message);
 };
 
 /*QUAKED trigger_setskill (.5 .5 .5) ?
 sets skill level to the value of "message".
 Only used on start map.
 */
-void() trigger_setskill =
+void () trigger_setskill =
 {
 	InitTrigger ();
 	self.touch = trigger_skill_touch;
@@ -513,15 +563,16 @@ ONLY REGISTERED TRIGGERS
 ==============================================================================
 */
 
-void() trigger_onlyregistered_touch =
+void () trigger_onlyregistered_touch =
 {
-	if (other.classname != "player")
-		return;
+		if (other.classname != "dmbot")
+		if (other.classname != "player")
+			return ;
 	if (self.attack_finished > time)
-		return;
+		return ;
 
 	self.attack_finished = time + 2;
-	if (cvar("registered"))
+	if ( cvar ("registered") )
 	{
 		self.message = "";
 		SUB_UseTargets ();
@@ -531,7 +582,8 @@ void() trigger_onlyregistered_touch =
 	{
 		if (self.message != "")
 		{
-			centerprint (other, self.message);
+			if (other.classname == "player")
+				centerprint (other,self.message);
 			sound (other, CHAN_BODY, "misc/talk.wav", 1, ATTN_NORM);
 		}
 	}
@@ -540,32 +592,34 @@ void() trigger_onlyregistered_touch =
 /*QUAKED trigger_onlyregistered (.5 .5 .5) ?
 Only fires if playing the registered version, otherwise prints the message
 */
-void() trigger_onlyregistered =
+void () trigger_onlyregistered =
 {
 	precache_sound ("misc/talk.wav");
 	InitTrigger ();
 	self.touch = trigger_onlyregistered_touch;
+	self.istrigger = 1;
+	self.th_weight = triggerweight;
 };
 
 //============================================================================
 
-void() hurt_on =
+void () hurt_on =
 {
 	self.solid = SOLID_TRIGGER;
 	self.nextthink = -1;
 };
 
-void() hurt_touch =
+void () hurt_touch =
 {
-	if (other.takedamage)
+	if ( other.takedamage )
 	{
 		self.solid = SOLID_NOT;
-		T_Damage (other, self, self, self.dmg);
+		T_Damage (other,self,self,self.dmg);
 		self.think = hurt_on;
 		self.nextthink = time + 1;
 	}
 
-	return;
+	return ;
 };
 
 /*QUAKED trigger_hurt (.5 .5 .5) ?
@@ -573,19 +627,19 @@ Any object touching this will be hurt
 set dmg to damage amount
 defalt dmg = 5
 */
-void() trigger_hurt =
+void () trigger_hurt =
 {
 	InitTrigger ();
 	self.touch = hurt_touch;
-	if (!self.dmg)
+	if ( !self.dmg )
 		self.dmg = 5;
 };
 
 //============================================================================
 
-float PUSH_ONCE = 1;
+float PUSH_ONCE	 = 1;
 
-void() trigger_push_touch =
+void () trigger_push_touch =
 {
 	if (other.classname == "grenade")
 		other.velocity = self.speed * self.movedir * 10;
@@ -600,6 +654,26 @@ void() trigger_push_touch =
 				sound (other, CHAN_AUTO, "ambience/windfly.wav", 1, ATTN_NORM);
 			}
 		}
+		else
+		{
+			if ( (other.classname == "dmbot") )
+			{
+				if ( ((self.movedir_x < 0.1) && (self.movedir_y < 0.1)) )
+				{
+					other.velocity_x = ((other.velocity_x + (80 * random ())) - 40);
+					other.velocity_y = ((other.velocity_y + (80 * random ())) - 40);
+				}
+				if ( (other.fly_sound < time) )
+				{
+					other.fly_sound = (time + 1.5);
+					sound (other,CHAN_AUTO,"ambience/windfly.wav",TRUE,ATTN_NORM);
+				}
+			}
+		}
+		if ( (other.enemy.classname == "dmbot") )
+		{
+			enemy_touched ();
+		}
 	}
 	if (self.spawnflags & PUSH_ONCE)
 		remove(self);
@@ -609,28 +683,30 @@ void() trigger_push_touch =
 /*QUAKED trigger_push (.5 .5 .5) ? PUSH_ONCE
 Pushes the player
 */
-void() trigger_push =
+void () trigger_push =
 {
 	InitTrigger ();
 	precache_sound ("ambience/windfly.wav");
 	self.touch = trigger_push_touch;
-	if (!self.speed)
+	self.istrigger = 1;
+	self.th_weight = trigpushweight;
+	if ( !self.speed )
 		self.speed = 1000;
 };
 
 //============================================================================
 
-void() trigger_monsterjump_touch =
+void () trigger_monsterjump_touch =
 {
 	if ( other.flags & (FL_MONSTER | FL_FLY | FL_SWIM) != FL_MONSTER )
-		return;
+		return ;
 
 // set XY even if not on ground, so the jump will clear lips
 	other.velocity_x = self.movedir_x * self.speed;
 	other.velocity_y = self.movedir_y * self.speed;
 
 	if ( !(other.flags & FL_ONGROUND) )
-		return;
+		return ;
 
 	other.flags = other.flags - FL_ONGROUND;
 
@@ -642,11 +718,11 @@ Walking monsters that touch this will jump in the direction of the trigger's ang
 "speed" default to 200, the speed thrown forward
 "height" default to 200, the speed thrown upwards
 */
-void() trigger_monsterjump =
+void () trigger_monsterjump =
 {
-	if (!self.speed)
+	if ( !self.speed )
 		self.speed = 200;
-	if (!self.height)
+	if ( !self.height )
 		self.height = 200;
 	if (self.angles == '0 0 0')
 		self.angles = '0 360 0';

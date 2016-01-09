@@ -55,7 +55,7 @@ void() gravity_pull =
 	{
 		if (visible(e))
 		if (e.classname != "gravity") // don't yank on any other gravity wells
-  	if(e.classname != "beartrap")
+		if(e.classname != "beartrap")
 		//if (e != self.owner)
 		if(e.movetype != MOVETYPE_NONE) // anything that can move
 		if(e.movetype != MOVETYPE_PUSH)
@@ -109,7 +109,7 @@ void() gravity_explode =
 		self.attack_finished = time + 3.2;	// duration of gravity well
 		self.touch = gravity_touch;
 		self.effects = self.effects | EF_BRIGHTLIGHT;
-    self.pk_currentitem = PK_IT_GRAVITYWELL;
+	  self.pk_currentitem = PK_IT_GRAVITYWELL;
 		self.think = gravity_pulse1;
 		self.nextthink = time + 0.1;
 	//	return;
@@ -146,9 +146,9 @@ void() drop_gravity =
 	gravity.nextthink = time + 2.0;
 	sound (self, CHAN_BODY, "misc/grav/grav_new.wav", 1, ATTN_NORM);
 
-  // Throw away from you
-  makevectors (self.angles);
-  gravity.velocity = (v_forward * (200 + random() * 100)) + (v_up * (200 + random() * 100));
+	// Throw away from you
+	makevectors (self.angles);
+	gravity.velocity = (v_forward * (200 + random() * 100)) + (v_up * (200 + random() * 100));
 
 	// For the correct death messages
 	gravity.pk_currentitem = PK_IT_GRAVITYWELL;

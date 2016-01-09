@@ -1,5 +1,6 @@
 /*
-	ambient_sound
+QUAKED ambient_sound (0 0.5 0) (-4 -4 -4) (4 4 4)
+- plays indicated sound
 
 	"classname" "ambient_sound"
 	"noise" "..." - file to play as sound

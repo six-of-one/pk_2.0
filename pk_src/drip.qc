@@ -56,8 +56,8 @@ void() func_drip_drop =
 		setorigin(drop, self.origin);
 		setmodel(drop, "progs/s_drip.spr");
 
-    // PAINKEEP SPLASH Not for splashing, but so we can remove it if it hits the water
-    AddToSplash(drop);
+	  // PAINKEEP SPLASH Not for splashing, but so we can remove it if it hits the water
+	  AddToSplash(drop);
 	}
 
 	self.nextthink = time + meantime(self.mean, self.stdev);

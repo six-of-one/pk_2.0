@@ -1,22 +1,33 @@
+/* ::-::
+ *
+ * dectran: decompiler translator by Cataboligne v1.3 - (3.31.8)
+ *
+ * file: plats.qc
+ *
+ * date: Fri Apr  4 04:31:44 UTC 2008
+ *
+ * final qc
+ *
+ */
 
 
-void() plat_center_touch;
-void() plat_outside_touch;
-void() plat_trigger_use;
-void() plat_go_up;
-void() plat_go_down;
-void() plat_crush;
-float PLAT_LOW_TRIGGER = 1;
+void () plat_center_touch;
+void () plat_outside_touch;
+void () plat_trigger_use;
+void () plat_go_up;
+void () plat_go_down;
+void () plat_crush;
+float PLAT_LOW_TRIGGER	 = 1;
 
-void() plat_spawn_inside_trigger =
+void () plat_spawn_inside_trigger =
 {
-	local entity	trigger;
+	local entity trigger;
 	local vector	tmin, tmax;
 
 //
 // middle trigger
 //	
-	trigger = spawn();
+	trigger = spawn ();
 	trigger.touch = plat_center_touch;
 	trigger.movetype = MOVETYPE_NONE;
 	trigger.solid = SOLID_TRIGGER;
@@ -27,7 +38,7 @@ void() plat_spawn_inside_trigger =
 	tmin_z = tmax_z - (self.pos1_z - self.pos2_z + 8);
 	if (self.spawnflags & PLAT_LOW_TRIGGER)
 		tmax_z = tmin_z + 8;
-	
+
 	if (self.size_x <= 50)
 	{
 		tmin_x = (self.mins_x + self.maxs_x) / 2;
@@ -38,76 +49,103 @@ void() plat_spawn_inside_trigger =
 		tmin_y = (self.mins_y + self.maxs_y) / 2;
 		tmax_y = tmin_y + 1;
 	}
-	
-	setsize (trigger, tmin, tmax);
+
+	setsize (trigger,tmin,tmax);
 };
 
-void() plat_hit_top =
+void () plat_hit_top =
 {
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.state = STATE_TOP;
 	self.think = plat_go_down;
 	self.nextthink = self.ltime + 3;
+	if (self.lastbot.goalentity.goalentity == self)
+	if (self.lasttime > (time - 10))
+	{
+		self.lastbot.search_time = time;
+		self.lastbot.goalentity.goalentity = self.lastbot.goalentity;
+	}
 };
 
-void() plat_hit_bottom =
+void () plat_hit_bottom =
 {
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.state = STATE_BOTTOM;
+	if (self.lastbot.goalentity.goalentity == self)
+	if (self.lasttime > (time - 10))
+	{
+		self.lastbot.search_time = (time + 0.5);
+		self.lastbot.goalentity.goalentity = self.lastbot.goalentity;
+	}
 };
 
-void() plat_go_down =
+void () plat_go_down =
 {
 	sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	self.state = STATE_DOWN;
-	SUB_CalcMove (self.pos2, self.speed, plat_hit_bottom);
+	SUB_CalcMove (self.pos2,self.speed,plat_hit_bottom);
 };
 
-void() plat_go_up =
+void () plat_go_up =
 {
 	sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	self.state = STATE_UP;
-	SUB_CalcMove (self.pos1, self.speed, plat_hit_top);
+	SUB_CalcMove (self.pos1,self.speed,plat_hit_top);
 };
 
-void() plat_center_touch =
+void () plat_center_touch =
 {
-	if (other.classname != "player")
+	if (other.classname != "player" && other.classname != "dmbot")
 		return;
-		
+
 	if (other.health <= 0)
-		return;
+		return ;
 
 	self = self.enemy;
 	if (self.state == STATE_BOTTOM)
+	{
+		if (other.classname == "dmbot")
+		if (other.goalentity.goalentity == self)
+			other.search_time = (time + 6);
 		plat_go_up ();
+	}
 	else if (self.state == STATE_TOP)
-		self.nextthink = self.ltime + 1;	// delay going down
+	{
+		if ( (other.classname == "dmbot") )
+		if ( (other.goalentity.goalentity == self) )
+			other.search_time = time;
+			self.nextthink = self.ltime + 1;	// delay going down
+	}
 };
 
-void() plat_outside_touch =
+void () plat_outside_touch =
 {
-	if (other.classname != "player")
+	if (other.classname != "player" && other.classname != "dmbot")
 		return;
 
 	if (other.health <= 0)
-		return;
-		
+		return ;
+
 //dprint ("plat_outside_touch\n");
 	self = self.enemy;
 	if (self.state == STATE_TOP)
+	{
+		if ( (other.classname == "dmbot") )
+		if ( (other.goalentity.goalentity == self) )
+			other.search_time = (time + 6);
 		plat_go_down ();
+	}
 };
 
-void() plat_trigger_use =
+void () plat_trigger_use =
 {
-	if (self.think)
+	if ( self.think )
 		return;		// allready activated
-	plat_go_down();
+	plat_go_down ();
 };
 
 
-void() plat_crush =
+void () plat_crush =
 {
 //dprint ("plat_crush\n");
 
@@ -116,17 +154,17 @@ void() plat_crush =
 	if (self.state == STATE_UP)
 		plat_go_down ();
 	else if (self.state == STATE_DOWN)
-		plat_go_up ();
-	else
-		objerror ("plat_crush: bad self.state\n");
+			plat_go_up ();
+		else
+			objerror ("plat_crush: bad self.state\n");
 };
 
-void() plat_use =
+void () plat_use =
 {
 	self.use = SUB_Null;
 	if (self.state != STATE_UP)
 		objerror ("plat_use: not in up state");
-	plat_go_down();
+	plat_go_down ();
 };
 
 
@@ -144,14 +182,14 @@ Set "sounds" to one of the following:
 */
 
 
-void() func_plat =
+void () func_plat =
 
 {
-local entity t;
+	local entity t;
 
-	if (!self.t_length)
+	if ( !self.t_length )
 		self.t_length = 80;
-	if (!self.t_width)
+	if ( !self.t_width )
 		self.t_width = 10;
 
 	if (self.sounds == 0)
@@ -181,18 +219,19 @@ local entity t;
 	self.classname = "plat";
 	self.solid = SOLID_BSP;
 	self.movetype = MOVETYPE_PUSH;
-	setorigin (self, self.origin);	
-	setmodel (self, self.model);
-	setsize (self, self.mins , self.maxs);
+	setorigin (self,self.origin);
+	setmodel (self,self.model);
+	setsize (self,self.mins,self.maxs);
 
+	self.th_weight = platweight;
 	self.blocked = plat_crush;
-	if (!self.speed)
+	if ( !self.speed )
 		self.speed = 150;
 
 // pos1 is the top position, pos2 is the bottom
 	self.pos1 = self.origin;
 	self.pos2 = self.origin;
-	if (self.height)
+	if ( self.height )
 		self.pos2_z = self.origin_z - self.height;
 	else
 		self.pos2_z = self.origin_z - self.size_z + 8;
@@ -201,40 +240,40 @@ local entity t;
 
 	plat_spawn_inside_trigger ();	// the "start moving" trigger	
 
-	if (self.targetname)
+	if ( self.targetname )
 	{
 		self.state = STATE_UP;
 		self.use = plat_use;
 	}
 	else
 	{
-		setorigin (self, self.pos2);
+		setorigin (self,self.pos2);
 		self.state = STATE_BOTTOM;
 	}
 };
 
 //============================================================================
 
-void() train_next;
-void() func_train_find;
+void () train_next;
+void () func_train_find;
 
-void() train_blocked =
+void () train_blocked =
 {
 	if (time < self.attack_finished)
 		return;
 	self.attack_finished = time + 0.5;
-	T_Damage (other, self, self, self.dmg);
+	T_Damage (other,self,self,self.dmg);
 };
-void() train_use =
+void () train_use =
 {
 	if (self.think != func_train_find)
 		return;		// already activated
-	train_next();
+	train_next ();
 };
 
-void() train_wait =
+void () train_wait =
 {
-	if (self.wait)
+	if ( self.wait )
 	{
 		self.nextthink = self.ltime + self.wait;
 		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
@@ -245,15 +284,15 @@ void() train_wait =
 	self.think = train_next;
 };
 
-void() train_next =
+void () train_next =
 {
-	local entity	targ;
+	local entity targ;
 
-	targ = find (world, targetname, self.target);
+	targ = find (world,targetname,self.target);
 	self.target = targ.target;
-	if (!self.target)
+	if ( !self.target )
 		objerror ("train_next: no next target");
-	if (targ.wait)
+	if ( targ.wait )
 		self.wait = targ.wait;
 	else
 		self.wait = 0;
@@ -261,15 +300,15 @@ void() train_next =
 	SUB_CalcMove (targ.origin - self.mins, self.speed, train_wait);
 };
 
-void() func_train_find =
+void () func_train_find =
 
 {
-	local entity	targ;
+	local entity targ;
 
-	targ = find (world, targetname, self.target);
+	targ = find (world,targetname,self.target);
 	self.target = targ.target;
 	setorigin (self, targ.origin - self.mins);
-	if (!self.targetname)
+	if ( !self.targetname )
 	{	// not triggered, so start immediately
 		self.nextthink = self.ltime + 0.1;
 		self.think = train_next;
@@ -287,13 +326,13 @@ sounds
 1) ratchet metal
 
 */
-void() func_train =
-{	
-	if (!self.speed)
+void () func_train =
+{
+	if ( !self.speed )
 		self.speed = 100;
-	if (!self.target)
+	if ( !self.target )
 		objerror ("func_train without a target");
-	if (!self.dmg)
+	if ( !self.dmg )
 		self.dmg = 2;
 
 	if (self.sounds == 0)
@@ -319,9 +358,10 @@ void() func_train =
 	self.use = train_use;
 	self.classname = "train";
 
-	setmodel (self, self.model);
-	setsize (self, self.mins , self.maxs);
-	setorigin (self, self.origin);
+	self.th_weight = platweight;
+	setmodel (self,self.model);
+	setsize (self,self.mins,self.maxs);
+	setorigin (self,self.origin);
 
 // start trains on the second frame, to make sure their targets have had
 // a chance to spawn
@@ -332,11 +372,11 @@ void() func_train =
 /*QUAKED misc_teleporttrain (0 .5 .8) (-8 -8 -8) (8 8 8)
 This is used for the final bos
 */
-void() misc_teleporttrain =
-{	
-	if (!self.speed)
+void () misc_teleporttrain =
+{
+	if ( !self.speed )
 		self.speed = 100;
-	if (!self.target)
+	if ( !self.target )
 		objerror ("func_train without a target");
 
 	self.cnt = 1;
@@ -352,9 +392,9 @@ void() misc_teleporttrain =
 	precache_sound ("misc/null.wav");
 
 	precache_model2 ("progs/teleport.mdl");
-	setmodel (self, "progs/teleport.mdl");
-	setsize (self, self.mins , self.maxs);
-	setorigin (self, self.origin);
+	setmodel (self,"progs/teleport.mdl");
+	setsize (self,self.mins,self.maxs);
+	setorigin (self,self.origin);
 
 // start trains on the second frame, to make sure their targets have had
 // a chance to spawn

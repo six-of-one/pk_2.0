@@ -18,31 +18,31 @@ void() turret_gibTouch;
 void() turret_dropTurret =
 {
 	local	entity turret;
-  local vector dir;
+	local vector dir;
 
-  if(self.pk_turretammo <= 0)
-  {
+	if(self.pk_turretammo <= 0)
+	{
 		return;
-  }
+	}
 
 	if(!self.button0)
 	{
-  	player_run ();
-    return;
-  }
+		player_run ();
+	  return;
+	}
 
-  // check if near a wall
-  makevectors(self.v_angle);
-  dir = self.origin + self.view_ofs;
-  traceline (dir, dir + v_forward * 50, FALSE, self);
+	// check if near a wall
+	makevectors(self.v_angle);
+	dir = self.origin + self.view_ofs;
+	traceline (dir, dir + v_forward * 50, FALSE, self);
 
-  makevectors (self.angles);
-  if(trace_fraction != 1.0 && !trace_ent.takedamage)
-  {
-  	// To near a wall, can't throw turret
-    sprint(self, "Can't throw AutoSentry, too close to a wall!!\n");
-    return;
-  }
+	makevectors (self.angles);
+	if(trace_fraction != 1.0 && !trace_ent.takedamage)
+	{
+		// To near a wall, can't throw turret
+	  sprint(self, "Can't throw AutoSentry, too close to a wall!!\n");
+	  return;
+	}
 
 	turret = spawn ();
 	turret.owner = self;
@@ -51,10 +51,10 @@ void() turret_dropTurret =
 //	turret.solid = SOLID_BBOX;
 	turret.solid = SOLID_NOT;
 	turret.classname = "turret";
-  turret.takedamage = TRUE;
-  turret.health = 300;
-  turret.th_die = turret_deathAnim;
-  turret.ammo_cells = 40;
+	turret.takedamage = TRUE;
+	turret.health = 300;
+	turret.th_die = turret_deathAnim;
+	turret.ammo_cells = 40;
 
 // set direction
 	turret.angles = self.angles;
@@ -82,12 +82,12 @@ void() turret_dropTurret =
 //	turret.turret_base.solid = SOLID_BBOX;
 	turret.turret_base.solid = SOLID_NOT;
 	turret.turret_base.classname = "turret_base";
-  turret.turret_base.takedamage = TRUE;
-  turret.turret_base.health = 200;
-  turret.turret_base.th_die = turret_deathAnimBase;
+	turret.turret_base.takedamage = TRUE;
+	turret.turret_base.health = 200;
+	turret.turret_base.th_die = turret_deathAnimBase;
 
-  // Throw away from you
-  makevectors (self.angles);
+	// Throw away from you
+	makevectors (self.angles);
 	turret.velocity = turret.turret_base.velocity = (v_forward * (200 + random() * 100)) + (v_up * (200 + random() * 100));
 
 // set direction
@@ -115,30 +115,30 @@ void() turret_dropTurret =
 
 void() turret_searchForEnemy =
 {
-  // check if the turret time is up
+	// check if the turret time is up
 	if(self.turret_timeout < time) {
-    turret_deathAnim();
-    return;
-  }
+	  turret_deathAnim();
+	  return;
+	}
 
-  // set the gun, so always lines up with the stand
+	// set the gun, so always lines up with the stand
 	setorigin(self, self.turret_base.origin);
 
-  // check if needs to be seet solid
-  if(self.solid == SOLID_NOT)
-  {
-  	turret_checkIfCanBeSolid();
-  }
+	// check if needs to be seet solid
+	if(self.solid == SOLID_NOT)
+	{
+		turret_checkIfCanBeSolid();
+	}
 
-  // set animation frame to the search frame
+	// set animation frame to the search frame
 	self.frame = $gunsearch;
 
 	// rotate and check for siting of the enemy
-  self.angles = self.angles + '0 10 0';
-  self.v_angle = self.angles;
+	self.angles = self.angles + '0 10 0';
+	self.v_angle = self.angles;
 
-  // try to find a enemy to target....
-  turret_findTarget();
+	// try to find a enemy to target....
+	turret_findTarget();
 
 	// next check time
 	self.nextthink = time + 0.1;
@@ -148,69 +148,69 @@ void() turret_searchForEnemy =
 void() turret_findTarget =
 {
 	local float dist, tempDist;
-  local entity head, selected;
+	local entity head, selected;
 
-  // find the closest target within the current view of the turret.
+	// find the closest target within the current view of the turret.
 
-  // max distance that the turret can "see"
-  dist = 10000;
-  selected = world;
+	// max distance that the turret can "see"
+	dist = 10000;
+	selected = world;
 
-  head = findradius(self.origin, dist);
+	head = findradius(self.origin, dist);
 
-  while(head)
-  {
-  	if(head.health > 1)
-    if(head.takedamage)
-    if(head != self)
+	while(head)
+	{
+		if(head.health > 1)
+	  if(head.takedamage)
+	  if(head != self)
 		if(head.classname != "beartrap")
-    if(!((head.classname == "turret") && (head.owner == self.owner)))
-    if(head.classname != "turret_base")
-    //if(!(head.classname == "turret"))
-    //if(!(head.classname == "turret_base"))
-    if(self.turret_ownertimeout < time || head != self.owner)
-   	if(head.classname != "player" || !(head.items & IT_INVISIBILITY))
-    {
-      tempDist = vlen(head.origin - self.origin);
-    	traceline(self.origin, head.origin, TRUE, self);
+	  if(!((head.classname == "turret") && (head.owner == self.owner)))
+	  if(head.classname != "turret_base")
+	  //if(!(head.classname == "turret"))
+	  //if(!(head.classname == "turret_base"))
+	  if(self.turret_ownertimeout < time || head != self.owner)
+	 	if(head.classname != "player" || !(head.items & IT_INVISIBILITY))
+	  {
+	    tempDist = vlen(head.origin - self.origin);
+	  	traceline(self.origin, head.origin, TRUE, self);
 
-      if(trace_fraction >= 1)
-      if(tempDist < dist)
-      if(turret_inFront(head))
-      if(visible(head))
-      {
-	    	selected = head;
-  	    dist = tempDist;
-      }
-    }
+	    if(trace_fraction >= 1)
+	    if(tempDist < dist)
+	    if(turret_inFront(head))
+	    if(visible(head))
+	    {
+		  	selected = head;
+		    dist = tempDist;
+	    }
+	  }
 
-    head = head.chain;
-  }
+	  head = head.chain;
+	}
 
-  // Make the turning sound.
-  if(self.turret_soundtimeout < time)
-  {
+	// Make the turning sound.
+	if(self.turret_soundtimeout < time)
+	{
 		sound (self, CHAN_WEAPON, "weapons/sentry/turrt_3.wav", 1, ATTN_NORM);
-	  self.turret_soundtimeout = time + 0.5;
-  }
+		self.turret_soundtimeout = time + 0.5;
+	}
 
-  // target found
-  if(selected != world)
-  {
-  	// set it as the enemy
-    self.enemy = selected;
+	// target found
+	if(selected != world)
+	{
+		// set it as the enemy
+	  self.enemy = selected;
 
-    // set view to the target
-	  self.angles = vectoangles(selected.origin - self.origin);
+	  // set view to the target
+		self.angles = vectoangles(selected.origin - self.origin);
 
-    // Target Acquired...
+	  // Target Acquired...
 //		sound (self, CHAN_AUTO, "weapons/sentry/turr_2b.wav", 1, ATTN_NORM);
 
-    // attack target now
+	  // attack target now
 
-    // attack until can't see anymore.
+	  // attack until can't see anymore.
 		self.think = turret_attackEnemy;
-  }
+	}
 };
 
 
@@ -218,18 +218,18 @@ void() turret_findTarget =
 // modification of infront() from ai.qc to be tighter
 float (entity e) turret_inFront =
 {
-  local vector  vec;
-  local float    dot;
+	local vector  vec;
+	local float    dot;
 
-  makevectors (self.v_angle);
-  vec = normalize (e.origin - self.origin);
-  dot = vec * v_forward;
+	makevectors (self.v_angle);
+	vec = normalize (e.origin - self.origin);
+	dot = vec * v_forward;
 
-  if ( dot > 0.8 )
-  {
-    return TRUE;
-  }
-  return FALSE;
+	if ( dot > 0.8 )
+	{
+	  return TRUE;
+	}
+	return FALSE;
 };
 
 
@@ -237,102 +237,102 @@ float (entity e) turret_inFront =
 
 void() turret_attackEnemy =
 {
-  // check if the turret time is up
+	// check if the turret time is up
 	if(self.turret_timeout < time) {
-    turret_deathAnim();
-    return;
-  }
+	  turret_deathAnim();
+	  return;
+	}
 
-  // set the gun, so always lines up with the stand
+	// set the gun, so always lines up with the stand
 	setorigin(self, self.turret_base.origin);
 
-  // check if needs to be seet solid
-  if(self.solid == SOLID_NOT)
-  {
-  	turret_checkIfCanBeSolid();
-  }
+	// check if needs to be seet solid
+	if(self.solid == SOLID_NOT)
+	{
+		turret_checkIfCanBeSolid();
+	}
 
  	if(self.ammo_cells > 0) {
-	  // attack frame's
-  	self.frame = self.frame + 1;
+		// attack frame's
+		self.frame = self.frame + 1;
 
-	  // loop if at end of anim
-  	if(self.frame > 5) {
+		// loop if at end of anim
+		if(self.frame > 5) {
 			self.frame = $gunfire1;
-  	}
-  }
-  else
-  {
-    // Not enough ammo
+		}
+	}
+	else
+	{
+	  // Not enough ammo
 
-  	if(self.frame != 5)
-    {
+		if(self.frame != 5)
+	  {
 			self.frame = $gunmisfire1;
 			sound (self, CHAN_WEAPON, "weapons/sentry/turcl_2b.wav", 0.2, ATTN_NORM);
-    }
-    else
-    {
+	  }
+	  else
+	  {
 			self.frame = $gunmisfire2;
-    }
-  }
+	  }
+	}
 
 	// if still visiable & alive
 	if(visible(self.enemy) && self.enemy.health > 1 && (self.enemy.classname != "player" || !(self.enemy.items & IT_INVISIBILITY)))
-  {
-  	local vector targetview;
+	{
+		local vector targetview;
 
-    // set view to the target
-    targetview = vectoangles((self.enemy.origin + self.enemy.view_ofs)- self.origin);
+	  // set view to the target
+	  targetview = vectoangles((self.enemy.origin + self.enemy.view_ofs)- self.origin);
 
-    if(targetview != self.angles)
-    {
-		  self.angles = targetview;
+	  if(targetview != self.angles)
+	  {
+			self.angles = targetview;
 
-      if(self.turret_soundtimeout < time)
-      {
-        sound (self, CHAN_WEAPON, "weapons/sentry/turrt_3.wav", 1, ATTN_NORM);
-        self.turret_soundtimeout = time + 0.5;
-      }
-    }
+	    if(self.turret_soundtimeout < time)
+	    {
+	      sound (self, CHAN_WEAPON, "weapons/sentry/turrt_3.wav", 1, ATTN_NORM);
+	      self.turret_soundtimeout = time + 0.5;
+	    }
+	  }
 
-    // attack target now if you can
-//    if(self.attack_finished < time)
+	  // attack target now if you can
+//	  if(self.attack_finished < time)
 		if(self.frame == 1 || self.frame == 3)
-    {
-    	if(self.ammo_cells > 0)
-      { // is there enough ammo to fire?
-      	local vector firePosition;
+	  {
+	  	if(self.ammo_cells > 0)
+	    { // is there enough ammo to fire?
+	    	local vector firePosition;
 				makevectors (self.angles);
-        if(self.frame == 1)
-        {
-        	firePosition = self.origin + (v_forward * 21) - (v_right * 3);
+	      if(self.frame == 1)
+	      {
+	      	firePosition = self.origin + (v_forward * 21) - (v_right * 3);
 					turret_launchNail(firePosition, (self.enemy.origin + self.enemy.view_ofs) - firePosition);
-        }
-        else
-        {
-        	firePosition = self.origin + (v_forward * 21) + (v_right * 3);
+	      }
+	      else
+	      {
+	      	firePosition = self.origin + (v_forward * 21) + (v_right * 3);
 					turret_launchNail(firePosition, self.enemy.origin - firePosition);
-        }
+	      }
 
-        self.ammo_cells = self.ammo_cells - 1;
-      }
+	      self.ammo_cells = self.ammo_cells - 1;
+	    }
 
-      // when can I attack again
-//      self.attack_finished = time + 0.5;
-    }
-  }
-  else
-  { // not visible, look for next target.
+	    // when can I attack again
+//	    self.attack_finished = time + 0.5;
+	  }
+	}
+	else
+	{ // not visible, look for next target.
 		self.think = turret_searchForEnemy;
 
-    // change back to gun search frame
+	  // change back to gun search frame
 		self.frame = $gunsearch;
 
-    // reset view angle to normal
-    self.angles_x = 0;
-//    self.angles_y = 0;
-    self.angles_z = 0;
-	  self.v_angle = self.angles;
+	  // reset view angle to normal
+	  self.angles_x = 0;
+//	  self.angles_y = 0;
+	  self.angles_z = 0;
+		self.v_angle = self.angles;
 	}
 
 	self.nextthink = time + 0.1;
@@ -344,23 +344,23 @@ void() turret_deathAnim =
 	local float numOfGibs;
 
 	// ThrowGib is a function in player.qc
-  turret_throwGib("progs/turgib1.mdl", -50);
-  turret_throwGib("progs/turgib2.mdl", -50);
-  turret_throwGib("progs/turgib3.mdl", -50);
+	turret_throwGib("progs/turgib1.mdl", -50);
+	turret_throwGib("progs/turgib2.mdl", -50);
+	turret_throwGib("progs/turgib3.mdl", -50);
 
 
-  numOfGibs = random() * 5;
+	numOfGibs = random() * 5;
 
-  while(numOfGibs > 0)
-  {
-  	local float dam;
-    dam = random() * -50;
-	  turret_throwGib("progs/turgib3.mdl", dam);
-    numOfGibs = numOfGibs - 1;
-  }
+	while(numOfGibs > 0)
+	{
+		local float dam;
+	  dam = random() * -50;
+		turret_throwGib("progs/turgib3.mdl", dam);
+	  numOfGibs = numOfGibs - 1;
+	}
 
-  remove(self.turret_base);
-//  remove(self);
+	remove(self.turret_base);
+//	remove(self);
 
 	T_RadiusDamage (self, self, 100, self);
 
@@ -371,7 +371,7 @@ void() turret_deathAnim =
 	WriteCoord (MSG_BROADCAST, self.origin_y);
 	WriteCoord (MSG_BROADCAST, self.origin_z);
 
-  // Functions is in weapons.qc
+	// Functions is in weapons.qc
 	BecomeExplosion ();
 };
 
@@ -379,7 +379,7 @@ void() turret_deathAnim =
 void() turret_deathAnimBase =
 {
 	self = self.owner;
-  turret_deathAnim();
+	turret_deathAnim();
 };
 
 
@@ -402,9 +402,9 @@ void(string gibname, float dm) turret_throwGib =
 	new.nextthink = time + 10 + random()*10;
 	new.frame = 0;
 	new.flags = 0;
-  new.classname = "turret_gib";
-  new.owner = self.owner;
-  new.touch = turret_gibTouch;
+	new.classname = "turret_gib";
+	new.owner = self.owner;
+	new.touch = turret_gibTouch;
 
 	// PAINKEEP SPLASH Make this entity splash
 	AddToSplash(new);
@@ -434,7 +434,7 @@ void() turret_gibTouch =
 		T_Damage (other, self, self, 10);
 
 		remove(self);
-    return;
+	  return;
 	}
 	else
 	{
@@ -473,8 +473,8 @@ void(vector org, vector vec) turret_launchNail =
 	newmis.touch = turret_nailTouch;
 
 	// For the correct death messages
-  newmis.pk_currentitem = PK_IT_TURRET;
-  newmis.weapon = IT_AXE;
+	newmis.pk_currentitem = PK_IT_TURRET;
+	newmis.weapon = IT_AXE;
 
 	// PAINKEEP SPLASH Make this entity splash
 	AddToSplash(newmis);
@@ -521,20 +521,20 @@ void() turret_nailTouch =
 
 void() turret_checkIfCanBeSolid =
 {
-  local entity head;
+	local entity head;
 
-  // see if there are any objects that block the turret from becoming solid
-  head = findradius(self.origin, 28);
+	// see if there are any objects that block the turret from becoming solid
+	head = findradius(self.origin, 28);
 
-  if(!head)
+	if(!head)
 	{
-  	// if can become solid!!!
+		// if can become solid!!!
 		self.turret_base.solid = SOLID_BBOX;
 		self.solid = SOLID_BBOX;
 
-    // make correct size
+	  // make correct size
 		setsize(self, '-15 -14 -18', '21 7 10');
 		setsize(self.turret_base, '-15 -14 -18', '9 14 1');
-  }
+	}
 };
 

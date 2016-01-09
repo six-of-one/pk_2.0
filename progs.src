@@ -3,9 +3,26 @@
 defs.qc
 // painkeep code
 pk_src/pk.defs.qc
+
+frikbot/map_dm1.qc
+frikbot/map_dm2.qc
+frikbot/map_dm3.qc
+frikbot/map_dm4.qc
+frikbot/map_dm5.qc
+frikbot/map_dm6.qc
+frikbot/bot.qc
+frikbot/bot_way.qc
+frikbot/bot_fight.qc
+frikbot/bot_ai.qc
+frikbot/bot_misc.qc
+frikbot/bot_phys.qc
+frikbot/bot_move.qc
+frikbot/bot_ed.qc
+
 pk_src/painkeep.qc
 pk_src/splash.qc
 
+botit_th.qc
 subs.qc
 
 // v106 quake code
@@ -68,3 +85,18 @@ pk_src/motd.qc
 pk_src/admin.qc
 
 // pk_src/frames.qc - not in original progs.src
+
+bot_func.qc
+botfight.qc
+botthink.qc
+botspawn.qc
+botscore.qc
+botsignl.qc
+botmove.qc
+botnoise.qc
+botvis.qc
+botgoal.qc
+bot_ai.qc
+dmbot.qc
+botroute.qc
+botimp.qc

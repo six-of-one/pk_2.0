@@ -1,69 +1,87 @@
-// button and multiple button
+/* ::-::
+ *
+ * dectran: decompiler translator by Cataboligne v1.3 - (3.31.8)
+ *
+ * file: buttons.qc
+ *
+ * date: Fri Apr  4 04:31:43 UTC 2008
+ *
+ * final qc
+ *
+ */
 
 void() button_wait;
-void() button_return;
+void () button_return;
 
-void() button_wait =
+void () button_wait =
 {
 	self.state = STATE_TOP;
 	self.nextthink = self.ltime + self.wait;
 	self.think = button_return;
 	activator = self.enemy;
-	SUB_UseTargets();
+	SUB_UseTargets ();
 	self.frame = 1;			// use alternate textures
 };
 
-void() button_done =
+void () button_done =
 {
 	self.state = STATE_BOTTOM;
 };
 
-void() button_return =
+void () button_return =
 {
 	self.state = STATE_DOWN;
-	SUB_CalcMove (self.pos1, self.speed, button_done);
+	SUB_CalcMove (self.pos1,self.speed,button_done);
 	self.frame = 0;			// use normal textures
-	if (self.health)
+	if ( self.health )
 		self.takedamage = DAMAGE_YES;	// can be shot again
 };
 
 
-void() button_blocked =
+void () button_blocked =
 {	// do nothing, just don't ome all the way back out
 };
 
 
-void() button_fire =
+void () button_fire =
 {
 	if (self.state == STATE_UP || self.state == STATE_TOP)
-		return;
+		return ;
 
 	sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 
 	self.state = STATE_UP;
-	SUB_CalcMove (self.pos2, self.speed, button_wait);
+	SUB_CalcMove (self.pos2,self.speed,button_wait);
 };
 
 
-void() button_use =
+void () button_use =
 {
 	self.enemy = activator;
+
+	if (other.classname == "dmbot")
+		bot_triggered (other);
+
 	button_fire ();
 };
 
-void() button_touch =
+void () button_touch =
 {
-	if (other.classname != "player")
+	if (other.classname != "player" && other.classname != "dmbot")
 		return;
 	self.enemy = other;
+	if (other.classname == "dmbot")
+		bot_triggered (other);
 	button_fire ();
 };
 
-void() button_killed =
+void () button_killed =
 {
 	self.enemy = damage_attacker;
 	self.health = self.max_health;
 	self.takedamage = DAMAGE_NO;	// wil be reset upon return
+	if (other.classname == "dmbot")
+		bot_triggered (other);
 	button_fire ();
 };
 
@@ -83,7 +101,7 @@ When a button is touched, it moves some distance in the direction of it's angle,
 2) metallic click
 3) in-out
 */
-void() func_button =
+void () func_button =
 {
 local float		gtemp, ftemp;
 
@@ -107,17 +125,18 @@ local float		gtemp, ftemp;
 		precache_sound ("buttons/switch04.wav");
 		self.noise = "buttons/switch04.wav";
 	}
-	
+
 	SetMovedir ();
 
 	self.movetype = MOVETYPE_PUSH;
 	self.solid = SOLID_BSP;
-	setmodel (self, self.model);
+	setmodel (self,self.model);
 
 	self.blocked = button_blocked;
 	self.use = button_use;
 
-	if (self.health)
+	self.th_weight = buttonweight;
+	if ( self.health )
 	{
 		self.max_health = self.health;
 		self.th_die = button_killed;
@@ -126,11 +145,11 @@ local float		gtemp, ftemp;
 	else
 		self.touch = button_touch;
 
-	if (!self.speed)
+	if ( !self.speed )
 		self.speed = 40;
-	if (!self.wait)
+	if ( !self.wait )
 		self.wait = 1;
-	if (!self.lip)
+	if ( !self.lip )
 		self.lip = 4;
 
 	self.state = STATE_BOTTOM;

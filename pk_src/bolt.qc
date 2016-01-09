@@ -16,9 +16,9 @@ void() bolt_fire =
 {
 	if (self.ammo_cells < 2)
 	{
-  	bolt_removeTarget(self.bolt_target);
+		bolt_removeTarget(self.bolt_target);
 
-  	self.bolt_target = world;  // disable the firing target...
+		self.bolt_target = world;  // disable the firing target...
 		self.weapon = W_BestWeapon ();
 		W_SetCurrentAmmo ();
 		return;
@@ -27,14 +27,14 @@ void() bolt_fire =
 // explode if under water
 	if (self.waterlevel > 1)
 	{
-  	local float cells;
+		local float cells;
 
 		cells = self.ammo_cells;
 		self.ammo_cells = 0;
 
-  	bolt_removeTarget(self.bolt_target);
+		bolt_removeTarget(self.bolt_target);
 
-   	self.bolt_target = world;  // disable the firing target...
+	 	self.bolt_target = world;  // disable the firing target...
 		W_SetCurrentAmmo ();
 		T_RadiusDamage (self, self, 35*cells, world);
 		return;
@@ -51,10 +51,10 @@ void() bolt_fire =
 
 	bolt_findNextTarget();
 
-  if(self.bolt_target == world && self.ammo_cells >= 2)
-  { // Can't find any targets at all.
-    // fire as normal..
-    local vector org, endpos;
+	if(self.bolt_target == world && self.ammo_cells >= 2)
+	{ // Can't find any targets at all.
+	  // fire as normal..
+	  local vector org, endpos;
 
 		self.currentammo = self.ammo_cells = self.ammo_cells - 2;
 
@@ -63,63 +63,63 @@ void() bolt_fire =
 		org = self.origin + '0 0 16';
 
 		traceline (org, org + v_forward*600, TRUE, self);
-    endpos = trace_endpos;
+	  endpos = trace_endpos;
 
-    WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-    WriteByte (MSG_BROADCAST, TE_LIGHTNING3);
-    WriteEntity (MSG_BROADCAST, self);
-    WriteCoord (MSG_BROADCAST, org_x);
-    WriteCoord (MSG_BROADCAST, org_y);
-    WriteCoord (MSG_BROADCAST, org_z);
-    WriteCoord (MSG_BROADCAST, endpos_x);
-    WriteCoord (MSG_BROADCAST, endpos_y);
-    WriteCoord (MSG_BROADCAST, endpos_z);
+	  WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
+	  WriteByte (MSG_BROADCAST, TE_LIGHTNING3);
+	  WriteEntity (MSG_BROADCAST, self);
+	  WriteCoord (MSG_BROADCAST, org_x);
+	  WriteCoord (MSG_BROADCAST, org_y);
+	  WriteCoord (MSG_BROADCAST, org_z);
+	  WriteCoord (MSG_BROADCAST, endpos_x);
+	  WriteCoord (MSG_BROADCAST, endpos_y);
+	  WriteCoord (MSG_BROADCAST, endpos_z);
 
-		traceline (self.origin,  endpos + v_forward*4, FALSE, self);
+		traceline (self.origin,	endpos + v_forward*4, FALSE, self);
 
-    // if hit a entity that can take damage & can see & is not invisible, then target for next time.
-    if(trace_ent.takedamage)
-    if(!(trace_inopen && trace_inwater))
-    if(trace_ent.health > 1)
-    if(trace_ent.classname != "player" || !(trace_ent.items & IT_INVISIBILITY))
-    {
-      self.bolt_target = trace_ent;
-      self.bolt_targetTimeout = time + 0.5; // set target timeout
+	  // if hit a entity that can take damage & can see & is not invisible, then target for next time.
+	  if(trace_ent.takedamage)
+	  if(!(trace_inopen && trace_inwater))
+	  if(trace_ent.health > 1)
+	  if(trace_ent.classname != "player" || !(trace_ent.items & IT_INVISIBILITY))
+	  {
+	    self.bolt_target = trace_ent;
+	    self.bolt_targetTimeout = time + 0.5; // set target timeout
 
-      // entity conduit timeout if the entity dies & handles being a conduit
-      self.bolt_target.bolt_conduitTimeout = time + 0.5;
+	    // entity conduit timeout if the entity dies & handles being a conduit
+	    self.bolt_target.bolt_conduitTimeout = time + 0.5;
 
-      // set it as a gib conduit entity
-//      self.bolt_target.flags = self.bolt_target.flags | FL_GIBCONDUIT;
-    }
+	    // set it as a gib conduit entity
+//	    self.bolt_target.flags = self.bolt_target.flags | FL_GIBCONDUIT;
+	  }
 
-    LightningDamage (self.origin, endpos + v_forward*4, self, 15);
-  }
+	  LightningDamage (self.origin, endpos + v_forward*4, self, 15);
+	}
 
-  // check if the conduit target is dead?
-  if(self.bolt_target)
-  if(self.bolt_target.health <= 0)
-  {
-    // set the die timeout.
-    self.bolt_target.bolt_targetTimeout = time + 0.5;
-  }
+	// check if the conduit target is dead?
+	if(self.bolt_target)
+	if(self.bolt_target.health <= 0)
+	{
+	  // set the die timeout.
+	  self.bolt_target.bolt_targetTimeout = time + 0.5;
+	}
 
-  if(self.bolt_target == world)
-  if(self.weapon == IT_AXE)
-  if(self.pk_currentitem == PK_IT_CLIGHT)
-  if(self.bolt_targetTimeout < time + 0.2)
-  {
-  	self.bolt_targetTimeout = time + 0.2; // set modal timeout
-  }
+	if(self.bolt_target == world)
+	if(self.weapon == IT_AXE)
+	if(self.pk_currentitem == PK_IT_CLIGHT)
+	if(self.bolt_targetTimeout < time + 0.2)
+	{
+		self.bolt_targetTimeout = time + 0.2; // set modal timeout
+	}
 
-  if(self.bolt_changeModelTimeout > time)
-  {
-	  self.bolt_changeModelTimeout = self.bolt_changeModelTimeout + 0.21; // set the weapon model change back..
-  }
-  else
-  {
-	  self.bolt_changeModelTimeout = time + 1; // set the weapon model change back..
-  }
+	if(self.bolt_changeModelTimeout > time)
+	{
+		self.bolt_changeModelTimeout = self.bolt_changeModelTimeout + 0.21; // set the weapon model change back..
+	}
+	else
+	{
+		self.bolt_changeModelTimeout = time + 1; // set the weapon model change back..
+	}
 };
 
 
@@ -127,223 +127,223 @@ void() bolt_findNextTarget =
 {
 	local entity boltorg, head, targetEntity;
 	local	vector org, endPos;
-  local float first, dist, tempDist;
-  local float maxTargets; // the lighting will only last for 20 targets..
-  local float loopBlow, cellsToBlow;
+	local float first, dist, tempDist;
+	local float maxTargets; // the lighting will only last for 20 targets..
+	local float loopBlow, cellsToBlow;
 
-  loopBlow = FALSE;
+	loopBlow = FALSE;
 
-  first = TRUE;
-  boltorg = self;
-  targetEntity = boltorg.bolt_target;
-  maxTargets = 20;
-  cellsToBlow = 0;
+	first = TRUE;
+	boltorg = self;
+	targetEntity = boltorg.bolt_target;
+	maxTargets = 20;
+	cellsToBlow = 0;
 
-  // check for a loop... if a loop blow...
-  // also Check all current targets are still in line of fire.
-  while(targetEntity != world && maxTargets >= 1)
-  {
-  	// check if still a valid target..
+	// check for a loop... if a loop blow...
+	// also Check all current targets are still in line of fire.
+	while(targetEntity != world && maxTargets >= 1)
+	{
+		// check if still a valid target..
 
-  	org = boltorg.origin + '0 0 16';
+		org = boltorg.origin + '0 0 16';
 
-    traceline(org, targetEntity.origin, TRUE, boltorg);
+	  traceline(org, targetEntity.origin, TRUE, boltorg);
 
-    dist = vlen(boltorg.origin - targetEntity.origin);
+	  dist = vlen(boltorg.origin - targetEntity.origin);
 
-    if(trace_fraction >= 1 && // can see...
-    	!(trace_inopen && trace_inwater) && // can't see the target if it goes tho water & air.
-      dist <= 600 && // within distance
-      (!first || bolt_infront(targetEntity)) && // in front if the first target..
-//	    (first || targetEntity.health > 0) &&  // not dead... (the first  target always acts as a conduit...)
+	  if(trace_fraction >= 1 && // can see...
+	  	!(trace_inopen && trace_inwater) && // can't see the target if it goes tho water & air.
+	    dist <= 600 && // within distance
+	    (!first || bolt_infront(targetEntity)) && // in front if the first target..
+//		  (first || targetEntity.health > 0) &&  // not dead... (the first  target always acts as a conduit...)
 			(targetEntity.solid != SOLID_NOT) && // make shore it's solid...
-    	(targetEntity.classname != "player" || !(targetEntity.items & IT_INVISIBILITY))) // not invisible..
-    {
-
-	    // check if loop
-      if(targetEntity == self)
-      {
-			  loopBlow = TRUE;
-      }
-
-      cellsToBlow = cellsToBlow + targetEntity.ammo_cells;
-
-      if(first) // reset the target timeout...
-      {
-        boltorg.bolt_targetTimeout = time + 0.5;
-
-        // set it as a gib conduit entity
-//        targetEntity.flags = targetEntity.flags | FL_GIBCONDUIT;
-      }
-      else
-      {
-        bolt_createTimeoutEntity(boltorg);
-      }
-
-      // entity conduit timeout if the entity dies & handles being a conduit
-      targetEntity.bolt_conduitTimeout = time + 0.5;
-
-      first = FALSE; // get the next target
-      boltorg = targetEntity;
-      targetEntity = boltorg.bolt_targetNext;
-      maxTargets = maxTargets - 1;
-    }
-    else
-    {
-    	// disable next target... (the rest of the path will time out if not used...)
-		  if(first)
-			{
-		  	bolt_removeTarget(targetEntity);
-		    boltorg.bolt_target = world;
-		  }
-      else
-      {
-		    boltorg.bolt_targetNext = world;
-      }
-
-      targetEntity = world;
-    }
-  }
-
-  if(maxTargets == 19) // only one target, check if firing at each other
- 	if(self.bolt_target.bolt_target == self) // & other player is firing back
-  {
-    cellsToBlow = cellsToBlow + targetEntity.ammo_cells;
-    loopBlow = TRUE;
-  }
-
-  first = TRUE;
-  boltorg = self;
-  targetEntity = boltorg.bolt_target;
-  maxTargets = 20;
-
-
-  // do damage to current target list...
-  while(targetEntity)
-  {
-    // do damage...
-	  if(loopBlow)
-  	{
-		  // loop.. blow
-      targetEntity.ammo_cells = 0;
-
-  		self.ammo_cells = cellsToBlow;
-	    bolt_doDamage(org, targetEntity, boltorg, trace_endpos, first, cellsToBlow);
-  		self.ammo_cells = cellsToBlow;
-	  }
-    else
-    {
-	    bolt_doDamage(org, targetEntity, boltorg, trace_endpos, first, 2);
-    }
-
-    first = FALSE; // get the next target
-    boltorg = targetEntity;
-
-    if(targetEntity == self)
-    {
-			targetEntity = world;
-    }
-    else
-    {
-	    targetEntity = boltorg.bolt_targetNext;
-    }
-
-    maxTargets = maxTargets - 1;
-
-    // check to see if we have run out of ammo
-    if(self.ammo_cells < 2)
-    {
-      // remove the FL_GIBCONDUIT if on
-	  	bolt_removeTarget(self.bolt_target);
-
-    	self.bolt_target = world;  // disable the firing target...
-      self.weapon = W_BestWeapon ();
-      W_SetCurrentAmmo ();
-      return;
-    }
-
-	  // if max targets reached, do no more...
-  	if(maxTargets < 1)
+	  	(targetEntity.classname != "player" || !(targetEntity.items & IT_INVISIBILITY))) // not invisible..
 	  {
-  		return;
-	  }
-  }
 
-  if(loopBlow)
-  {
-	  if(maxTargets == 19) // only one target, check if firing at each other
-  	{
-	    // loop.. blow
-  	  self.ammo_cells = cellsToBlow;
-	    bolt_doDamage(org, self, self, trace_endpos, first, cellsToBlow);
-  	}
+		  // check if loop
+	    if(targetEntity == self)
+	    {
+				loopBlow = TRUE;
+	    }
+
+	    cellsToBlow = cellsToBlow + targetEntity.ammo_cells;
+
+	    if(first) // reset the target timeout...
+	    {
+	      boltorg.bolt_targetTimeout = time + 0.5;
+
+	      // set it as a gib conduit entity
+//	      targetEntity.flags = targetEntity.flags | FL_GIBCONDUIT;
+	    }
+	    else
+	    {
+	      bolt_createTimeoutEntity(boltorg);
+	    }
+
+	    // entity conduit timeout if the entity dies & handles being a conduit
+	    targetEntity.bolt_conduitTimeout = time + 0.5;
+
+	    first = FALSE; // get the next target
+	    boltorg = targetEntity;
+	    targetEntity = boltorg.bolt_targetNext;
+	    maxTargets = maxTargets - 1;
+	  }
+	  else
+	  {
+	  	// disable next target... (the rest of the path will time out if not used...)
+			if(first)
+			{
+				bolt_removeTarget(targetEntity);
+			  boltorg.bolt_target = world;
+			}
+	    else
+	    {
+			  boltorg.bolt_targetNext = world;
+	    }
+
+	    targetEntity = world;
+	  }
+	}
+
+	if(maxTargets == 19) // only one target, check if firing at each other
+ 	if(self.bolt_target.bolt_target == self) // & other player is firing back
+	{
+	  cellsToBlow = cellsToBlow + targetEntity.ammo_cells;
+	  loopBlow = TRUE;
+	}
+
+	first = TRUE;
+	boltorg = self;
+	targetEntity = boltorg.bolt_target;
+	maxTargets = 20;
+
+
+	// do damage to current target list...
+	while(targetEntity)
+	{
+	  // do damage...
+		if(loopBlow)
+		{
+			// loop.. blow
+	    targetEntity.ammo_cells = 0;
+
+			self.ammo_cells = cellsToBlow;
+		  bolt_doDamage(org, targetEntity, boltorg, trace_endpos, first, cellsToBlow);
+			self.ammo_cells = cellsToBlow;
+		}
+	  else
+	  {
+		  bolt_doDamage(org, targetEntity, boltorg, trace_endpos, first, 2);
+	  }
+
+	  first = FALSE; // get the next target
+	  boltorg = targetEntity;
+
+	  if(targetEntity == self)
+	  {
+			targetEntity = world;
+	  }
+	  else
+	  {
+		  targetEntity = boltorg.bolt_targetNext;
+	  }
+
+	  maxTargets = maxTargets - 1;
+
+	  // check to see if we have run out of ammo
+	  if(self.ammo_cells < 2)
+	  {
+	    // remove the FL_GIBCONDUIT if on
+			bolt_removeTarget(self.bolt_target);
+
+	  	self.bolt_target = world;  // disable the firing target...
+	    self.weapon = W_BestWeapon ();
+	    W_SetCurrentAmmo ();
+	    return;
+	  }
+
+		// if max targets reached, do no more...
+		if(maxTargets < 1)
+		{
+			return;
+		}
+	}
+
+	if(loopBlow)
+	{
+		if(maxTargets == 19) // only one target, check if firing at each other
+		{
+		  // loop.. blow
+		  self.ammo_cells = cellsToBlow;
+		  bolt_doDamage(org, self, self, trace_endpos, first, cellsToBlow);
+		}
 
  		self.ammo_cells = 0;
 
-    // remove the FL_GIBCONDUIT if on
-    bolt_removeTarget(self.bolt_target);
+	  // remove the FL_GIBCONDUIT if on
+	  bolt_removeTarget(self.bolt_target);
 
-    self.bolt_target = world;  // disable the firing target...
-    self.weapon = W_BestWeapon ();
-    W_SetCurrentAmmo ();
-    return;
-  }
+	  self.bolt_target = world;  // disable the firing target...
+	  self.weapon = W_BestWeapon ();
+	  W_SetCurrentAmmo ();
+	  return;
+	}
 
-  // if max targets reached or if it's finding the first target, do no more...
-  if(maxTargets < 1 || first)
-  {
-  	return;
-  }
+	// if max targets reached or if it's finding the first target, do no more...
+	if(maxTargets < 1 || first)
+	{
+		return;
+	}
 
-  // find the closest target within the current view of the turret.
+	// find the closest target within the current view of the turret.
 
-  // max distance that the lighting can "jump"
-  dist = 600;
+	// max distance that the lighting can "jump"
+	dist = 600;
 	org = boltorg.origin + '0 0 16';
 
-  head = findradius(boltorg.origin, dist);
+	head = findradius(boltorg.origin, dist);
 
-  while(head)
-  {
-  	if(head.health > 1) // can take damage && is not dead
-    if(head.takedamage)
-    if(head != self)  // not the shotter
-    if(head != boltorg) // and not the origin
-    //if(head.classname != "beartrap")  // JON Don't target beartraps
-    if(head.classname == "player" || head.classname == "turret" || head.classname == "turret_base")
-    if(bolt_checkForLoops(head,  boltorg)) // not already in a this fire chain...
-    {
-      tempDist = vlen(head.origin - self.origin);
-    	traceline(org, head.origin, TRUE, self);
+	while(head)
+	{
+		if(head.health > 1) // can take damage && is not dead
+	  if(head.takedamage)
+	  if(head != self)  // not the shotter
+	  if(head != boltorg) // and not the origin
+	  //if(head.classname != "beartrap")  // JON Don't target beartraps
+	  if(head.classname == "player" || head.classname == "turret" || head.classname == "turret_base")
+	  if(bolt_checkForLoops(head,  boltorg)) // not already in a this fire chain...
+	  {
+	    tempDist = vlen(head.origin - self.origin);
+	  	traceline(org, head.origin, TRUE, self);
 
-      if(trace_fraction >= 1) // can see the player
-      if(tempDist < dist)     // closer than the last entity
-      if(!(trace_inopen && trace_inwater))  // can see it (ie can't see if it goes tho water & air)
+	    if(trace_fraction >= 1) // can see the player
+	    if(tempDist < dist)     // closer than the last entity
+	    if(!(trace_inopen && trace_inwater))  // can see it (ie can't see if it goes tho water & air)
 			if(targetEntity.solid != SOLID_NOT) // make shore it's solid...
-     	if(head.classname != "player" || !(head.items & IT_INVISIBILITY)) // & is not invisiable
-      {
-      	// this will NEVER be the first target... so we can use just bolt_targetNext
-	    	boltorg.bolt_targetNext = head;
+	   	if(head.classname != "player" || !(head.items & IT_INVISIBILITY)) // & is not invisiable
+	    {
+	    	// this will NEVER be the first target... so we can use just bolt_targetNext
+		  	boltorg.bolt_targetNext = head;
 
-  	    dist = tempDist;
-        endPos = trace_endpos;
-      }
-    }
+		    dist = tempDist;
+	      endPos = trace_endpos;
+	    }
+	  }
 
-    head = head.chain;
-  }
+	  head = head.chain;
+	}
 
-  // target found?
-  if(boltorg.bolt_targetNext != world)
-  {
-   	bolt_createTimeoutEntity(boltorg);
+	// target found?
+	if(boltorg.bolt_targetNext != world)
+	{
+	 	bolt_createTimeoutEntity(boltorg);
 
-    // entity conduit timeout if the entity dies & handles being a conduit
-    boltorg.bolt_targetNext.bolt_conduitTimeout = time + 0.5;
+	  // entity conduit timeout if the entity dies & handles being a conduit
+	  boltorg.bolt_targetNext.bolt_conduitTimeout = time + 0.5;
 
-    // do damage...
-    bolt_doDamage(org, boltorg.bolt_targetNext, boltorg, endPos, FALSE, 2);
-  }
+	  // do damage...
+	  bolt_doDamage(org, boltorg.bolt_targetNext, boltorg, endPos, FALSE, 2);
+	}
 };
 
 
@@ -354,16 +354,16 @@ float(entity check, entity checkFor) bolt_checkForLoops =
 	local string str;
 
 	while(check.bolt_targetNext)
-  {
-  	if(check.bolt_targetNext == checkFor)
-    {
-    	return FALSE;
-    }
+	{
+		if(check.bolt_targetNext == checkFor)
+	  {
+	  	return FALSE;
+	  }
 
-    check = check.bolt_targetNext;
-  }
+	  check = check.bolt_targetNext;
+	}
 
-  return TRUE;
+	return TRUE;
 };
 
 
@@ -371,56 +371,56 @@ float(entity check, entity checkFor) bolt_checkForLoops =
 void(vector org, entity boltTarget, entity boltOwner, vector endPos, float first, float dam) bolt_doDamage =
 {
 	local entity lightEntity;
-  local vector vangle;
+	local vector vangle;
 
 	// use uyp ammo
-  self.currentammo = self.ammo_cells = self.ammo_cells - dam;
+	self.currentammo = self.ammo_cells = self.ammo_cells - dam;
 
-  dam = ((dam / 2) * 15);
-  dam = floor(dam);
+	dam = ((dam / 2) * 15);
+	dam = floor(dam);
 
-  // display & do damage
-  particle(endPos, '0 0 100', 225, dam * 4);
+	// display & do damage
+	particle(endPos, '0 0 100', 225, dam * 4);
 
-  // only do damage if the target is not dead...
-  if(boltTarget.health > 0)
-  {
-    T_Damage(boltTarget, self, self, dam);
-  }
+	// only do damage if the target is not dead...
+	if(boltTarget.health > 0)
+	{
+	  T_Damage(boltTarget, self, self, dam);
+	}
 
-  if(boltOwner != boltTarget)
-  {
-    if(first)
-    {
-      lightEntity = boltOwner;
-    }
-    else
-    {
-      if(!boltOwner.bolt_lightningFire)
-      {
-        boltOwner.bolt_lightningFire = spawn();
-        boltOwner.bolt_lightningFire.solid = SOLID_NOT;
-        boltOwner.bolt_lightningFire.movetype = MOVETYPE_NONE;
-      }
+	if(boltOwner != boltTarget)
+	{
+	  if(first)
+	  {
+	    lightEntity = boltOwner;
+	  }
+	  else
+	  {
+	    if(!boltOwner.bolt_lightningFire)
+	    {
+	      boltOwner.bolt_lightningFire = spawn();
+	      boltOwner.bolt_lightningFire.solid = SOLID_NOT;
+	      boltOwner.bolt_lightningFire.movetype = MOVETYPE_NONE;
+	    }
 
-      boltOwner.bolt_lightningFire.origin = boltOwner.origin;
-      vangle = normalize(boltTarget.origin - org);
-      boltOwner.bolt_lightningFire.angles = vectoangles(vangle);
+	    boltOwner.bolt_lightningFire.origin = boltOwner.origin;
+	    vangle = normalize(boltTarget.origin - org);
+	    boltOwner.bolt_lightningFire.angles = vectoangles(vangle);
 
-      lightEntity = boltTarget.bolt_lightningFire;
-    }
+	    lightEntity = boltTarget.bolt_lightningFire;
+	  }
 
-    // display the bolt
-    WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-    WriteByte (MSG_BROADCAST, TE_LIGHTNING3);
-    WriteEntity (MSG_BROADCAST, lightEntity);
-    WriteCoord (MSG_BROADCAST, org_x);
-    WriteCoord (MSG_BROADCAST, org_y);
-    WriteCoord (MSG_BROADCAST, org_z);
-    WriteCoord (MSG_BROADCAST, boltTarget.origin_x);
-    WriteCoord (MSG_BROADCAST, boltTarget.origin_y);
-    WriteCoord (MSG_BROADCAST, boltTarget.origin_z);
-  }
+	  // display the bolt
+	  WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
+	  WriteByte (MSG_BROADCAST, TE_LIGHTNING3);
+	  WriteEntity (MSG_BROADCAST, lightEntity);
+	  WriteCoord (MSG_BROADCAST, org_x);
+	  WriteCoord (MSG_BROADCAST, org_y);
+	  WriteCoord (MSG_BROADCAST, org_z);
+	  WriteCoord (MSG_BROADCAST, boltTarget.origin_x);
+	  WriteCoord (MSG_BROADCAST, boltTarget.origin_y);
+	  WriteCoord (MSG_BROADCAST, boltTarget.origin_z);
+	}
 };
 
 
@@ -428,42 +428,42 @@ void(vector org, entity boltTarget, entity boltOwner, vector endPos, float first
 void() bolt_checkTargets =
 {
 	if(self.bolt_target)
-  if(self.bolt_targetTimeout < time)
-  {
-    bolt_removeTarget(self.bolt_target);
-    self.bolt_target = world;
-  }
+	if(self.bolt_targetTimeout < time)
+	{
+	  bolt_removeTarget(self.bolt_target);
+	  self.bolt_target = world;
+	}
 
-  if(self.weapon == IT_AXE)
-  if(self.pk_currentitem == PK_IT_CLIGHT)
-  if(self.bolt_changeModelTimeout < time)
-  {
-	  self.weaponmodel = "progs/v_cl_off.mdl";
-  }
+	if(self.weapon == IT_AXE)
+	if(self.pk_currentitem == PK_IT_CLIGHT)
+	if(self.bolt_changeModelTimeout < time)
+	{
+		self.weaponmodel = "progs/v_cl_off.mdl";
+	}
 
 	if(self.bolt_targetNext)
-  if(self.bolt_targetNextTimeout < time)
-  {
-  	self.bolt_targetNext = world;
-  }
+	if(self.bolt_targetNextTimeout < time)
+	{
+		self.bolt_targetNext = world;
+	}
 };
 
 
 void(entity boltOwner) bolt_createTimeoutEntity =
 {
 	if(boltOwner.classname == "player")
-  {
-    boltOwner.bolt_targetNextTimeout = time + 0.5; // set the target timeout
-  }
+	{
+	  boltOwner.bolt_targetNextTimeout = time + 0.5; // set the target timeout
+	}
 
 	if(boltOwner.bolt_targetTimeoutEntity == world)
-  {
+	{
 		boltOwner.bolt_targetTimeoutEntity = spawn();
-	  boltOwner.bolt_targetTimeoutEntity.think = bolt_timeoutNextEntity;
-    boltOwner.bolt_targetTimeoutEntity.owner = boltOwner;
-  }
+		boltOwner.bolt_targetTimeoutEntity.think = bolt_timeoutNextEntity;
+	  boltOwner.bolt_targetTimeoutEntity.owner = boltOwner;
+	}
 
-  boltOwner.bolt_targetTimeoutEntity.nextthink = time + 0.5;
+	boltOwner.bolt_targetTimeoutEntity.nextthink = time + 0.5;
 };
 
 
@@ -471,36 +471,36 @@ void() bolt_timeoutNextEntity =
 {
 	bolt_removeTarget(self.owner);
 
-  // remove the target pointers
+	// remove the target pointers
 	self.owner.bolt_targetNext = world;
-  self.owner.bolt_targetTimeoutEntity = world;
+	self.owner.bolt_targetTimeoutEntity = world;
 
-  // remove timeout entity.
-  remove(self);
+	// remove timeout entity.
+	remove(self);
 };
 
 
 
 void(entity boltTarget) bolt_removeTarget =
 {
-  // remove the FL_GIBCONDUIT if on
-//  if(boltTarget)
-//  if(boltTarget.flags & FL_GIBCONDUIT)
-//  if(boltTarget.health > 0)
-//  {
-//    boltTarget.flags = boltTarget.flags - FL_GIBCONDUIT;
-//  }
+	// remove the FL_GIBCONDUIT if on
+//	if(boltTarget)
+//	if(boltTarget.flags & FL_GIBCONDUIT)
+//	if(boltTarget.health > 0)
+//	{
+//	  boltTarget.flags = boltTarget.flags - FL_GIBCONDUIT;
+//	}
 
 
-  if(boltTarget.bolt_lightningFire)
+	if(boltTarget.bolt_lightningFire)
 
-  {
+	{
 
-  	remove(boltTarget.bolt_lightningFire);
+		remove(boltTarget.bolt_lightningFire);
 
-    boltTarget.bolt_lightningFire = world;
+	  boltTarget.bolt_lightningFire = world;
 
-  }
+	}
 
 };
 
@@ -514,25 +514,25 @@ void() player_conduitJerk =[ $fryguy1, player_conduitJerk ]
 {
 	// check if conduit times up
 	if(self.bolt_conduitTimeout < time) // it's the conduit time for this monster...
-  {
-  	// blow the fuck up!!!
-//	  if(self.flags & FL_GIBCONDUIT)
-//  	{
-	  	self.health = -99;
-//    }
+	{
+		// blow the fuck up!!!
+//		if(self.flags & FL_GIBCONDUIT)
+//		{
+			self.health = -99;
+//	  }
 		PlayerDie ();
 		return;
-  }
+	}
 
-  // choose the next frame
-  if(self.frame >  2)
-  {
-	  self.frame = $fryguy1;
-  }
-  else
-  {
-  	self.frame = self.frame + 1;
-  }
+	// choose the next frame
+	if(self.frame >  2)
+	{
+		self.frame = $fryguy1;
+	}
+	else
+	{
+		self.frame = self.frame + 1;
+	}
 };
 
 
