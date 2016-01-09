@@ -310,6 +310,7 @@ direct messages to the bots, it crashes quake :-(
 */
 void(entity	client, string s) stuffcmd =
 {
+	if (client.classname == "dmbot") return; // *bot
 	if (client.ishuman == 1)
 		frik_stuffcmd(client, s);
 	b_temp1 = player_head;
@@ -346,6 +347,7 @@ void(entity	e) setspawnparms =
 };
 void(entity	client, string s) sprint =
 {
+	if (client.classname == "dmbot") return; // *bot
 	if (client.ishuman == 1)
 		frik_sprint(client, s);
 	b_temp1 = player_head;
@@ -363,6 +365,7 @@ void(entity	client, string s) sprint =
 };
 void(entity	client, string s) centerprint =
 {
+	if (client.classname == "dmbot") return; // *bot
 	if (client.ishuman == 1)
 		frik_centerprint(client, s);
 	b_temp1 = player_head;

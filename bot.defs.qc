@@ -23,3 +23,11 @@ void() bot_skinParms;
 void() bot_skinDecode;
 void() set_CarriedPath;
 void() set_initBotLevel;
+
+// takeover, solves print to bot issues
+// inactive while installed with frikbot code, which was adapted
+/*
+void(entity	client, string s) stuffcmd;
+void(entity	client, string s) sprint;
+void(entity	client, string s) centerprint;
+*/

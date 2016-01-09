@@ -426,3 +426,39 @@ void() set_initBotLevel =
 		initBotLevel ();
 	}
 };
+
+
+/*
+ * Cataboligne
+ *
+ * only print & stuffcmd to real players - frikbot code borrow - noted to protect against sz_ overflows because bots dont retrieve the messages
+ *
+ */
+
+// inactive while installed with frikbot code, which was adapted to work the same & noted *bot
+// TDO: adapt frikbot ishuman test
+/*
+void(entity client, string s)	bot_stuffcmd = #21;
+void(entity client, string s)	bot_sprint = #24;
+void(entity client, string s)	bot_centerprint = #73;
+
+void(entity	client, string s) stuffcmd =
+{
+	if (client.classname == "dmbot") return;
+//	if (client.ishuman == 1)
+		bot_stuffcmd(client, s);
+};
+
+void(entity	client, string s) sprint =
+{
+	if (client.classname == "dmbot") return;
+//	if (client.ishuman == 1)
+		bot_sprint(client, s);
+};
+void(entity	client, string s) centerprint =
+{
+	if (client.classname == "dmbot") return;
+//	if (client.ishuman == 1)
+		bot_centerprint(client, s);
+};
+*/

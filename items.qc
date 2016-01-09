@@ -193,14 +193,14 @@ void () health_touch =
 	{
 		bot_toucheditem ();
 	}
-	if (other.classname == "player")
-	{
+//	if (other.classname == "player")
+//	{
 		sprint (other,"You receive ");
 		s = ftos (self.healamount);
 		sprint (other,s);
 		sprint (other," health\n");
-		stuffcmd (other,"bf\n");
-	}
+//		stuffcmd (other,"bf\n");
+//	}
 
 // health touch sound
 	sound(other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
@@ -315,11 +315,11 @@ void () armor_touch =
 	{
 		bot_toucheditem ();
 	}
-	if (other.classname == "player")
-	{
+//	if (other.classname == "player")
+//	{
 		sprint (other,"You got armor\n");
 		stuffcmd (other,"bf\n");
-	}
+//	}
 // armor touch sound
 	sound(other, CHAN_ITEM, "items/armor1.wav", 1, ATTN_NORM);
 	activator = other;
@@ -524,13 +524,13 @@ void () weapon_touch =
 	else
 		objerror ("weapon_touch: unknown classname");
 
-	if (other.classname == "player")
-	{
+//	if (other.classname == "player")
+//	{
 		sprint (other,"You got the ");
 		sprint (other,self.netname);
 		sprint (other,"\n");
 		stuffcmd (other,"bf\n");
-	}
+//	}
 // weapon touch sound
 	sound (other, CHAN_ITEM, "weapons/pkup.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
@@ -730,13 +730,13 @@ void () ammo_touch =
 
 	bound_other_ammo ();
 
-	if (other.classname == "player")
-	{
+//	if (other.classname == "player")
+//	{
 		sprint (other,"You got the ");
 		sprint (other,self.netname);
 		sprint (other,"\n");
 		stuffcmd (other,"bf\n");
-	}
+//	}
 // ammo touch sound
 	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
@@ -971,13 +971,13 @@ void () key_touch =
 	if (other.items & self.items)
 		return ;
 
-	if (other.classname == "player")
-	{
+//	if (other.classname == "player")
+//	{
 		sprint (other,"You got the ");
 		sprint (other,self.netname);
 		sprint (other,"\n");
 		stuffcmd (other,"bf\n");
-	}
+//	}
 
 	sound (other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
@@ -1179,13 +1179,13 @@ void () powerup_touch =
 	if (other.health <= 0)
 		return ;
 
-	if (other.classname == "player")
-	{
+//	if (other.classname == "player")
+//	{
 		sprint (other,"You got the ");
 		sprint (other,self.netname);
 		sprint (other,"\n");
 		stuffcmd (other,"bf\n");
-	}
+//	}
 
 	if (!PK || (PK && deathmatch != 4)) // *pk - my new rule, logical extrapolation
 	if (deathmatch)
@@ -1361,8 +1361,8 @@ void () BackpackTouch =
 		return ;
 
 	acount = 0;
-	if (other.classname == "player")
-	{
+//	if (other.classname == "player")
+//	{
 		sprint (other,"You get ");
 
 		if (self.items)
@@ -1373,7 +1373,7 @@ void () BackpackTouch =
 				sprint (other,self.netname);
 			}
 
-	}
+//	}
 // if the player was using his best weapon, change up to the new one if better
 	stemp = self;
 	self = other;
@@ -1394,8 +1394,8 @@ void () BackpackTouch =
 
 	bound_other_ammo ();
 
-	if (other.classname == "player")
-	{
+//	if (other.classname == "player")
+//	{
 		if (self.ammo_shells)
 		{
 			if (acount)
@@ -1435,7 +1435,7 @@ void () BackpackTouch =
 
 		sprint (other,"\n");
 		stuffcmd (other,"bf\n");
-	}
+//	}
 // backpack touch sound
 	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
 
