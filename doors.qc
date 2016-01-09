@@ -76,7 +76,7 @@ void () door_hit_bottom =
 void () door_go_down =
 {
 	sound (self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
-	if ( self.max_health )
+	if (self.max_health)
 	{
 		self.takedamage = DAMAGE_YES;
 		self.health = self.max_health;
@@ -123,7 +123,7 @@ void () door_fire =
 
 // play use key sound
 
-	if ( self.items )
+	if (self.items)
 		sound (self, CHAN_VOICE, self.noise4, 1, ATTN_NORM);
 
 	self.message = string_null;		// no more message
@@ -138,7 +138,7 @@ void () door_fire =
 			{
 				door_go_down ();
 				self = self.enemy;
-			} while ( (self != starte) && (self != world) );
+			} while ((self != starte) && (self != world));
 			self = oself;
 			return ;
 		}
@@ -150,7 +150,7 @@ void () door_fire =
 	{
 		door_go_up ();
 		self = self.enemy;
-	} while ( (self != starte) && (self != world) );
+	} while ((self != starte) && (self != world));
 	self = oself;
 };
 
@@ -160,7 +160,7 @@ void () door_use =
 	local entity oself;
 
 	signalnoise (other,self);
-	if ( (other.classname == "dmbot") )
+	if (other.classname == "dmbot")
 	{
 		bot_touched ();
 	}
@@ -232,11 +232,11 @@ void () door_touch =
 		bot_touched ();
 
 // key door stuff
-	if ( !self.items )
+	if (!self.items)
 		return ;
 
 // FIXME: blink key on player's status bar
-	if ( (self.items & other.items) != self.items )
+	if ((self.items & other.items) != self.items)
 	{
 		if (self.owner.items == IT_KEY1)
 		{
@@ -279,7 +279,7 @@ void () door_touch =
 
 	other.items = other.items - self.items;
 	self.touch = SUB_Null;
-	if ( self.enemy )
+	if (self.enemy)
 		self.enemy.touch = SUB_Null;	// get paired door
 	door_use ();
 };
@@ -341,7 +341,7 @@ void () LinkDoors =
 	local entity	t, starte;
 	local vector	cmins, cmaxs;
 
-	if ( self.enemy )
+	if (self.enemy)
 		return;		// already linked by another door
 	if (self.spawnflags & 4)
 	{
@@ -359,15 +359,15 @@ void () LinkDoors =
 	{
 		self.owner = starte;			// master door
 
-		if ( self.health )
+		if (self.health)
 			starte.health = self.health;
-		if ( self.targetname )
+		if (self.targetname)
 			starte.targetname = self.targetname;
 		if (self.message != "")
 			starte.message = self.message;
 
 		t = find (t,classname,self.classname);
-		if ( !t )
+		if (!t)
 		{
 			self.enemy = starte;		// make the chain a loop
 
@@ -376,11 +376,11 @@ void () LinkDoors =
 	
 			self = self.owner;
 
-			if ( self.health )
+			if (self.health)
 				return ;
-			if ( self.targetname )
+			if (self.targetname)
 				return ;
-			if ( self.items )
+			if (self.items)
 				return ;
 
 			self.owner.trigger_field = spawn_field (cmins,cmaxs);
@@ -388,9 +388,9 @@ void () LinkDoors =
 			return ;
 		}
 
-		if ( EntitiesTouching (self,t) )
+		if (EntitiesTouching (self,t))
 		{
-			if ( t.enemy )
+			if (t.enemy)
 				objerror ("cross connected doors");
 
 			self.enemy = t;
@@ -522,13 +522,13 @@ void () func_door =
 	if (self.spawnflags & DOOR_GOLD_KEY)
 		self.items = IT_KEY2;
 
-	if ( !self.speed )
+	if (!self.speed)
 		self.speed = 100;
-	if ( !self.wait )
+	if (!self.wait)
 		self.wait = 3;
-	if ( !self.lip )
+	if (!self.lip)
 		self.lip = 8;
-	if ( !self.dmg )
+	if (!self.dmg)
 		self.dmg = 2;
 
 	self.pos1 = self.origin;
@@ -545,13 +545,13 @@ void () func_door =
 
 	self.state = STATE_BOTTOM;
 
-	if ( self.health )
+	if (self.health)
 	{
 		self.takedamage = DAMAGE_YES;
 		self.th_die = door_killed;
 	}
 
-	if ( self.items )
+	if (self.items)
 		self.wait = -1;
 		
 	self.touch = door_touch;
@@ -600,7 +600,7 @@ void () fd_secret_use =
 
 	SUB_UseTargets();				// fire all targets / killtargets
 	
-	if ( !(self.spawnflags & SECRET_NO_SHOOT) )
+	if (!(self.spawnflags & SECRET_NO_SHOOT))
 	{
 		self.th_pain = SUB_Null;
 		self.takedamage = DAMAGE_NO;
@@ -623,7 +623,7 @@ void () fd_secret_use =
 			self. t_width = fabs(v_right * self.size);
 	}
 
-	if ( !self.t_length )
+	if (!self.t_length)
 		self. t_length = fabs(v_forward * self.size);
 
 	if (self.spawnflags & SECRET_1ST_DOWN)
@@ -655,9 +655,9 @@ void () fd_secret_move2 =
 void () fd_secret_move3 =
 {
 	sound(self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
-	if ( (self.lastbot.goalentity.goalentity == self) )
+	if (self.lastbot.goalentity.goalentity == self)
 		self.lastbot.search_time = time;
-	if ( !(self.spawnflags & SECRET_OPEN_ONCE) )
+	if (!(self.spawnflags & SECRET_OPEN_ONCE))
 	{
 		self.nextthink = self.ltime + self.wait;
 		self.think = fd_secret_move4;
@@ -721,9 +721,9 @@ void () secret_touch =
 
 	self.attack_finished = time + 2;
 	
-	if ( self.message )
+	if (self.message)
 	{
-		if ( (other.classname == "player") )
+		if (other.classname == "player")
 			centerprint (other,self.message);
 		sound (other,CHAN_BODY,"misc/talk.wav", 1,ATTN_NORM);
 	}
@@ -777,7 +777,7 @@ void () func_door_secret =
 		self.noise3 = "doors/basesec2.wav";
 	}
 
-	if ( !self.dmg )
+	if (!self.dmg)
 		self.dmg = 2;
 
 	// Magic formula...
@@ -794,7 +794,7 @@ void () func_door_secret =
 	self.blocked = secret_blocked;
 	self.speed = 50;
 	self.use = fd_secret_use;
-	if ( !self.targetname || self.spawnflags&SECRET_YES_SHOOT)
+	if (!self.targetname || self.spawnflags&SECRET_YES_SHOOT)
 	{
 		self.health = 10000;
 		self.takedamage = DAMAGE_YES;
@@ -802,6 +802,6 @@ void () func_door_secret =
 		self.th_die = fd_secret_use;
 	}
 	self.oldorigin = self.origin;
-	if ( !self.wait )
+	if (!self.wait)
 		self.wait = 5;		// 5 seconds before closing
 };

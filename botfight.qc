@@ -18,16 +18,16 @@ vector (vector src, vector trg, float invMvel) leadtarget =
 	local vector lead;
 	lead = ((self.enemy.velocity * invMvel) * vlen ((trg - src)));
 	tg = (trg + lead);
-	if ( (self.weapon == IT_ROCKET_LAUNCHER) )
+	if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
-		if ( (self.skil > 2) )
+		if (self.skil > 2)
 		{
 			traceline (src,tg,TRUE,self);
-			if ( (trace_fraction != TRUE) )
+			if (trace_fraction != TRUE)
 			{
 				tg = (tg - (lead * 0.5));
 				traceline (src,tg,TRUE,self);
-				if ( (trace_fraction != TRUE) )
+				if (trace_fraction != TRUE)
 				{
 					tg = (tg - (lead * 0.5));
 				}
@@ -50,9 +50,9 @@ vector (vector trg) adjustgrenade =
 	selfxy = self.origin;
 	selfxy_z = 0;
 	xypct = (vlen ((tgxy - selfxy)) * INVGRENADELEVELDIST);
-	if ( (xypct > 1) )
+	if (xypct > 1)
 	{
-		if ( (xypct < 12) )
+		if (xypct < 12)
 		{
 			tg_z = (tg_z + (GRENADEMAXHEIGHT * (xypct - 1)));
 		}
@@ -72,36 +72,36 @@ vector () botaim =
 	local vector src;
 	local float sk;
 	local float rnd;
-	if ( REBOUND )
+	if (REBOUND)
 	{
 		tg = REBOUNDSPOT;
 	}
 	else
 	{
 		src = self.origin;
-		if ( (self.weapon & ((IT_ROCKET_LAUNCHER + IT_SUPER_NAILGUN) + IT_NAILGUN)) )
+		if (self.weapon & ((IT_ROCKET_LAUNCHER + IT_SUPER_NAILGUN) + IT_NAILGUN))
 		{
 			src = (src + '0 0 16');
 		}
 		tg = self.enemy.origin;
 		traceline (src,tg,TRUE,self);
-		if ( (trace_fraction != TRUE) )
+		if (trace_fraction != TRUE)
 		{
 			tg = (tg + self.enemy.view_ofs);
 		}
-		if ( (self.skil > 1) )
+		if (self.skil > 1)
 		{
-			if ( (self.weapon & IT_ROCKET_LAUNCHER) )
+			if (self.weapon & IT_ROCKET_LAUNCHER)
 			{
 				tg = leadtarget (src,tg,0.001);
-				if ( (self.origin_z >= self.enemy.origin_z) )
+				if (self.origin_z >= self.enemy.origin_z)
 				{
 					rnd = ((random () * 3.5) + 1);
-					if ( (self.skil > rnd) )
+					if (self.skil > rnd)
 					{
 						tg_z = ((tg_z + self.enemy.mins_z) + 2);
 						traceline (src,tg,TRUE,self);
-						if ( (trace_fraction != TRUE) )
+						if (trace_fraction != TRUE)
 						{
 							tg_z = ((tg_z - self.enemy.mins_z) - 3);
 						}
@@ -110,13 +110,13 @@ vector () botaim =
 			}
 			else
 			{
-				if ( (self.weapon & IT_GRENADE_LAUNCHER) )
+				if (self.weapon & IT_GRENADE_LAUNCHER)
 				{
 					tg = leadtarget (src,tg,0.002);
 				}
 				else
 				{
-					if ( ((self.weapon & IT_SUPER_NAILGUN) || (self.weapon & IT_NAILGUN)) )
+					if ((self.weapon & IT_SUPER_NAILGUN) || (self.weapon & IT_NAILGUN))
 					{
 						rnd = (random () * 0.002);
 						tg = leadtarget (src,tg,rnd);
@@ -125,21 +125,21 @@ vector () botaim =
 			}
 		}
 	}
-	if ( (self.weapon == IT_GRENADE_LAUNCHER) )
+	if (self.weapon == IT_GRENADE_LAUNCHER)
 	{
 		tg = adjustgrenade (tg);
 	}
 	sk = self.skil;
-	if ( (self.weapon == IT_LIGHTNING) )
+	if (self.weapon == IT_LIGHTNING)
 	{
-		if ( (sk > 2.5) )
+		if (sk > 2.5)
 		{
 			sk = 2.5;
 		}
 	}
-	if ( (sk < 3) )
+	if (sk < 3)
 	{
-		if ( !coop  || !XRP)
+		if (!coop  || !XRP)
 		{
 		lead = (self.enemy.origin - self.enemy.oldorigin);
 		lead = (((lead * (3- sk)) * 3.5) * (random () - 0.5));
@@ -152,7 +152,7 @@ vector () botaim =
 		}
 	}
 	dir = normalize ((tg - self.origin));
-	if ( (sk < 3) )
+	if (sk < 3)
 	{
 		dir = (dir + (((3- sk) * crandom ()) * '0.060 0 0'));
 		dir = (dir + (((3- sk) * crandom ()) * '0 0.060 0'));
@@ -168,7 +168,7 @@ void () botSetNearLight =
 	local entity targ;
 	targ = self.enemy;
 	e = findradius (targ.origin,200);
-	if ( (e.classname == "light") )
+	if (e.classname == "light")
 	{
 		nearlight = 1;
 	}
@@ -181,26 +181,26 @@ float () CheckBotAttack =
 	local entity targ;
 	targ = self.enemy;
 	botSetNearLight (); // quakebot add
-	if ( (!nearlight && (random () < 0.7)) )
+	if (!nearlight && (random () < 0.7))
 	{
 		return(0);
 	}
-	if ( (time < self.attack_finished) )
+	if (time < self.attack_finished)
 	{
 		return (0);
 	}
 	spot1 = (self.origin + self.view_ofs);
 	spot2 = (targ.origin + targ.view_ofs);
 	traceline (spot1,spot2,0,self);
-	if ( (trace_ent != targ) )
+	if (trace_ent != targ)
 	{
 		return (0);
 	}
-	if ( (trace_inopen && trace_inwater) )
+	if (trace_inopen && trace_inwater)
 	{
 		spot2 = targ.origin;
 		traceline (spot1,spot2,0,self);
-		if ( (trace_inopen && trace_inwater) )
+		if (trace_inopen && trace_inwater)
 		{
 			return (0);
 		}
@@ -216,59 +216,59 @@ float () W_BestBotWeapon =
 	local float wlevel;
 	it = self.items;
 	rng = botrange (self.enemy);
-	if ( (rng != RANGE_MELEE) )
+	if (rng != RANGE_MELEE)
 	{
-		if ( ((self.ammo_rockets >= TRUE) && (it & IT_ROCKET_LAUNCHER)) )
+		if ((self.ammo_rockets >= TRUE) && (it & IT_ROCKET_LAUNCHER))
 		{
 			return(IT_ROCKET_LAUNCHER);
 		}
 	}
 	if (XRP)
-	if ( ((rng == RANGE_MELEE) && (self.enemy.health < 20)) )
+	if ((rng == RANGE_MELEE) && (self.enemy.health < 20))
 	{
 		return(IT_AXE);
 	}
-	if ( ((self.ammo_cells >= TRUE) && (it & IT_LIGHTNING)) )
+	if ((self.ammo_cells >= TRUE) && (it & IT_LIGHTNING))
 	{
-		if ( ((rng == RANGE_MELEE) || (rng == RANGE_NEAR)) )
+		if ((rng == RANGE_MELEE) || (rng == RANGE_NEAR))
 		{
 			wlevel = CheckWaterLevel ();
-			if ( (wlevel < 2) )
+			if (wlevel < 2)
 			{
 				return(IT_LIGHTNING);
 			}
-			if ( (self.items & IT_INVULNERABILITY) )
+			if (self.items & IT_INVULNERABILITY)
 			{
 				return(IT_LIGHTNING);
 			}
 		}
 	}
-	if ( ((self.ammo_nails >= 2) && (it & IT_SUPER_NAILGUN)) )
+	if ((self.ammo_nails >= 2) && (it & IT_SUPER_NAILGUN))
 	{
 		return(IT_SUPER_NAILGUN);
 	}
-	if ( (rng == RANGE_NEAR) )
+	if (rng == RANGE_NEAR)
 	{
-		if ( ((self.ammo_rockets >= TRUE) && (it & IT_GRENADE_LAUNCHER)) )
+		if ((self.ammo_rockets >= TRUE) && (it & IT_GRENADE_LAUNCHER))
 		{
-			if ( (self.enemy.origin_z < (self.origin_z + 175)) )
+			if (self.enemy.origin_z < (self.origin_z + 175))
 			{
 				return(IT_GRENADE_LAUNCHER);
 			}
 		}
 	}
-	if ( ((rng == RANGE_NEAR) || (rng == RANGE_MELEE)) )
+	if ((rng == RANGE_NEAR) || (rng == RANGE_MELEE))
 	{
-		if ( ((self.ammo_shells >= 2) && (it & IT_SUPER_SHOTGUN)) )
+		if ((self.ammo_shells >= 2) && (it & IT_SUPER_SHOTGUN))
 		{
 			return(IT_SUPER_SHOTGUN);
 		}
 	}
-	if ( ((self.ammo_nails >= TRUE) && (it & IT_NAILGUN)) )
+	if ((self.ammo_nails >= TRUE) && (it & IT_NAILGUN))
 	{
 		return(IT_NAILGUN);
 	}
-	if ( ((self.ammo_shells >= TRUE) && (it & IT_SHOTGUN)) )
+	if ((self.ammo_shells >= TRUE) && (it & IT_SHOTGUN))
 	{
 		return(IT_SHOTGUN);
 	}
@@ -280,42 +280,42 @@ float () W_BestHeldWeapon =
 	local float it;
 	local float wlevel;
 	it = self.items;
-	if ( ((self.ammo_rockets >= TRUE) && (it & IT_ROCKET_LAUNCHER)) )
+	if ((self.ammo_rockets >= TRUE) && (it & IT_ROCKET_LAUNCHER))
 	{
 		return(IT_ROCKET_LAUNCHER);
 	}
-	if ( ((self.ammo_cells >= TRUE) && (it & IT_LIGHTNING)) )
+	if ((self.ammo_cells >= TRUE) && (it & IT_LIGHTNING))
 	{
 		wlevel = CheckWaterLevel ();
-		if ( (wlevel < 2) )
+		if (wlevel < 2)
 		{
 			return(IT_LIGHTNING);
 		}
-		if ( (self.items & IT_INVULNERABILITY) )
+		if (self.items & IT_INVULNERABILITY)
 		{
 			return(IT_LIGHTNING);
 		}
 	}
-	if ( ((self.ammo_nails >= 2) && (it & IT_SUPER_NAILGUN)) )
+	if ((self.ammo_nails >= 2) && (it & IT_SUPER_NAILGUN))
 	{
 		return(IT_SUPER_NAILGUN);
 	}
-	if ( ((self.ammo_rockets >= TRUE) && (it & IT_GRENADE_LAUNCHER)) )
+	if ((self.ammo_rockets >= TRUE) && (it & IT_GRENADE_LAUNCHER))
 	{
-		if ( (self.enemy.origin_z < (self.origin_z + 175)) )
+		if (self.enemy.origin_z < (self.origin_z + 175))
 		{
 			return(IT_GRENADE_LAUNCHER);
 		}
 	}
-	if ( ((self.ammo_shells >= 2) && (it & IT_SUPER_SHOTGUN)) )
+	if ((self.ammo_shells >= 2) && (it & IT_SUPER_SHOTGUN))
 	{
 		return(IT_SUPER_SHOTGUN);
 	}
-	if ( ((self.ammo_nails >= TRUE) && (it & IT_NAILGUN)) )
+	if ((self.ammo_nails >= TRUE) && (it & IT_NAILGUN))
 	{
 		return(IT_NAILGUN);
 	}
-	if ( ((self.ammo_shells >= TRUE) && (it & IT_SHOTGUN)) )
+	if ((self.ammo_shells >= TRUE) && (it & IT_SHOTGUN))
 	{
 		return(IT_SHOTGUN);
 	}
@@ -334,42 +334,42 @@ void () W_BotAttack =
 {
 	local float r;
 	local float addt;
-	if ( !W_CheckNoAmmo () )
+	if (!W_CheckNoAmmo ())
 	{
 		return ;
 	}
-	if ( (time < self.attack_finished) )
+	if (time < self.attack_finished)
 	{
 		return ;
 	}
 	addt = 0;
-	if ( (self.skil < 3) )
+	if (self.skil < 3)
 	{
 		addt = (((3- self.skil) * random ()) * 0.350);
 	}
-	if ( (self.skil < 1) )
+	if (self.skil < 1)
 	{
 		addt = (addt + (random () * 0.3));
 	}
 	makevectors (self.v_angle);
 	self.show_hostile = (time + 1);
-	if ( (self.weapon == IT_AXE) )
+	if (self.weapon == IT_AXE)
 	{
 		sound (self,CHAN_WEAPON,"weapons/ax1.wav",TRUE,ATTN_NORM);
 		r = random ();
-		if ( (r < 0.250) )
+		if (r < 0.250)
 		{
 			bot_axe1 ();
 		}
 		else
 		{
-			if ( (r < 0.5) )
+			if (r < 0.5)
 			{
 				bot_axeb1 ();
 			}
 			else
 			{
-				if ( (r < 0.750) )
+				if (r < 0.750)
 				{
 					bot_axec1 ();
 				}
@@ -383,7 +383,7 @@ void () W_BotAttack =
 	}
 	else
 	{
-		if ( (self.weapon == IT_SHOTGUN) )
+		if (self.weapon == IT_SHOTGUN)
 		{
 			bot_shot1 ();
 			W_FireShotgun ();
@@ -391,7 +391,7 @@ void () W_BotAttack =
 		}
 		else
 		{
-			if ( (self.weapon == IT_SUPER_SHOTGUN) )
+			if (self.weapon == IT_SUPER_SHOTGUN)
 			{
 				bot_shot1 ();
 				W_FireSuperShotgun ();
@@ -399,19 +399,19 @@ void () W_BotAttack =
 			}
 			else
 			{
-				if ( (self.weapon == IT_NAILGUN) )
+				if (self.weapon == IT_NAILGUN)
 				{
 					self.think = bot_nail1;
 				}
 				else
 				{
-					if ( (self.weapon == IT_SUPER_NAILGUN) )
+					if (self.weapon == IT_SUPER_NAILGUN)
 					{
 						self.think = bot_nail1;
 					}
 					else
 					{
-						if ( (self.weapon == IT_GRENADE_LAUNCHER) )
+						if (self.weapon == IT_GRENADE_LAUNCHER)
 						{
 							bot_rocket1 ();
 							W_FireGrenade ();
@@ -419,7 +419,7 @@ void () W_BotAttack =
 						}
 						else
 						{
-							if ( (self.weapon == IT_ROCKET_LAUNCHER) )
+							if (self.weapon == IT_ROCKET_LAUNCHER)
 							{
 								bot_rocket1 ();
 								W_FireRocket ();
@@ -427,7 +427,7 @@ void () W_BotAttack =
 							}
 							else
 							{
-								if ( (self.weapon == IT_LIGHTNING) )
+								if (self.weapon == IT_LIGHTNING)
 								{
 									self.think = bot_light1;
 									self.attack_finished = (time + 0.1);
@@ -450,42 +450,42 @@ float () CheckReboundAttack =
 	local vector dir;
 	local float dist;
 	local float mel;
-	if ( (self.skil < 1) )
+	if (self.skil < 1)
 	{
 		return (0);
 	}
-	if ( (self.attack_finished > time) )
+	if (self.attack_finished > time)
 	{
 		return (0);
 	}
-	if ( !(self.items & (IT_ROCKET_LAUNCHER + IT_GRENADE_LAUNCHER)) )
+	if (!(self.items & (IT_ROCKET_LAUNCHER + IT_GRENADE_LAUNCHER)))
 	{
 		return (0);
 	}
-	if ( (self.ammo_rockets < 3) )
+	if (self.ammo_rockets < 3)
 	{
 		return (0);
 	}
 	spot1 = self.origin;
 	spot2 = self.goalentity.origin;
 	traceline (spot1,spot2,0,self);
-	if ( (trace_fraction < 1) )
+	if (trace_fraction < 1)
 	{
 		return (0);
 	}
 	dir = normalize ((self.goalentity.origin - self.origin));
 	spot2 = (spot2 + (200 * dir));
 	traceline (spot1,spot2,TRUE,self);
-	if ( (trace_fraction == 1) )
+	if (trace_fraction == 1)
 	{
-		if ( (self.origin_z < self.goalentity.origin_z) )
+		if (self.origin_z < self.goalentity.origin_z)
 		{
 			return (0);
 		}
 		spot2 = self.goalentity.origin;
 		spot2_z = (dropline (spot2) + 3);
 		traceline (spot1,spot2,TRUE,self);
-		if ( (trace_fraction != TRUE) )
+		if (trace_fraction != TRUE)
 		{
 			return (0);
 		}
@@ -496,21 +496,21 @@ float () CheckReboundAttack =
 	}
 	dist = vlen ((self.enemy.origin - spot2));
 	mel = 200;
-	if ( (self.items & IT_QUAD) )
+	if (self.items & IT_QUAD)
 	{
 		mel = (2* mel);
 	}
-	if ( (dist > mel) )
+	if (dist > mel)
 	{
 		return (0);
 	}
 	dist = vlen ((self.origin - spot2));
 	mel = ((280 - (self.health * 0.5)) - (self.armorvalue * self.armortype));
-	if ( (self.items & IT_QUAD) )
+	if (self.items & IT_QUAD)
 	{
 		mel = (2* mel);
 	}
-	if ( (dist < mel) )
+	if (dist < mel)
 	{
 		return (0);
 	}
@@ -519,7 +519,7 @@ float () CheckReboundAttack =
 	self.ideal_yaw = vectoyaw ((spot2 - self.origin));
 	ChangeYaw ();
 	bot_rebound1 ();
-	if ( (self.items & IT_ROCKET_LAUNCHER) )
+	if (self.items & IT_ROCKET_LAUNCHER)
 	{
 		W_FireRocket ();
 	}
@@ -529,7 +529,7 @@ float () CheckReboundAttack =
 		W_FireGrenade ();
 	}
 	self.attack_finished = (time + 1);
-	if ( (self.skil < 2) )
+	if (self.skil < 2)
 	{
 		self.attack_finished = (time + 1.5);
 	}
@@ -544,32 +544,32 @@ void () ChangePitch =
 	local float move;
 	current_pitch = self.angles_x;
 	ideal = self.ideal_pitch;
-	if ( (ideal > 45) )
+	if (ideal > 45)
 	{
 		ideal = 45;
 	}
 	else
 	{
-		if ( (ideal < -45) )
+		if (ideal < -45)
 		{
 			ideal = -45;
 		}
 	}
-	if ( (current_pitch == ideal) )
+	if (current_pitch == ideal)
 	{
 		return ;
 	}
 	move = (ideal - current_pitch);
-	if ( (move > 0) )
+	if (move > 0)
 	{
-		if ( (move > 6) )
+		if (move > 6)
 		{
 			move = 6;
 		}
 	}
 	else
 	{
-		if ( (move < -6) )
+		if (move < -6)
 		{
 			move = -6;
 		}

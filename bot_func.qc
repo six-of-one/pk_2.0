@@ -23,9 +23,9 @@ void () fix_thud =
 	local float tol;
 	tol = -80;
 	tol = ((tol * cvar ("sv_gravity")) / 800);
-	if ( (self.flags & FL_ONGROUND) )
+	if (self.flags & FL_ONGROUND)
 	{
-		if ( (self.velocity_z < tol) )
+		if (self.velocity_z < tol)
 		{
 			self.flags = (self.flags - (self.flags & FL_ONGROUND));
 			self.velocity_z = tol;
@@ -37,7 +37,7 @@ void () fix_watertype_bug =
 {
 	local entity bot;
 	bot = find (world,classname,"dmbot");
-	while ( bot )
+	while (bot)
 	{
 		bot.watertype = 0;
 		bot = find (bot,classname,"dmbot");
@@ -53,11 +53,11 @@ entity () find_bot =
 	selected = world;
 	best_dist = 9999;
 	head = find (world,classname,"dmbot");
-	while ( head )
+	while (head)
 	{
 		dist = vlen ((self.origin - head.origin));
 		infront (head);
-		if ( ((visible (head) && visible (head)) && (dist < best_dist)) )
+		if ((visible (head) && visible (head)) && (dist < best_dist))
 		{
 			best_dist = dist;
 			selected = head;
@@ -76,11 +76,11 @@ entity () find_monster =
 	selected = world;
 	best_dist = 9999;
 	head = findradius (self.origin,SEARCH_RADIUS);
-	while ( head )
+	while (head)
 	{
 		dist = vlen ((self.origin - head.origin));
 		infront (head);
-		if ( (((visible (head) && visible (head)) && (dist < best_dist)) && (head.flags & FL_MONSTER)) )
+		if (((visible (head) && visible (head)) && (dist < best_dist)) && (head.flags & FL_MONSTER))
 		{
 			best_dist = dist;
 			selected = head;
@@ -92,7 +92,7 @@ entity () find_monster =
 
 void (entity me) set_bot_suicide_frame =
 {
-	if ( (me.model != "progs/player.mdl") )
+	if (me.model != "progs/player.mdl")
 	{
 		return ;
 	}

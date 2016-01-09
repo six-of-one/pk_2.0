@@ -855,7 +855,7 @@ float() ClientNextAvailable =
 	{
 		clientno = clientno - 1;
 
-		if(!(active_clients & ClientBitFlag(clientno)))
+		if (!(active_clients & ClientBitFlag(clientno)))
 			return clientno;
 	}
 
@@ -954,7 +954,7 @@ void(float whichteam, float whatbot, float whatskill) BotConnect =
 	
 	f = ClientNextAvailable();
 	uself = self;
-	if(f == -1)
+	if (f == -1)
 	{
 		bprint("Unable to connect a bot, server is full.\n");
 		return;
@@ -1073,7 +1073,7 @@ void(float clientno) BotInvalidClientNo =
 	local entity bot;
 
 	bot = GetClientEntity(clientno);
-	if(bot.b_clientno > 0)
+	if (bot.b_clientno > 0)
 	{
 		if (!bot.ishuman)
 		{

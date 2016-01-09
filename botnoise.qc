@@ -29,11 +29,11 @@ void () removenoise =
 
 void (entity noisemaker, entity noiseobject) signalnoise =
 {
-	if ( (noisemaker.classname != "player") )
+	if (noisemaker.classname != "player")
 	{
 		return ;
 	}
-	if ( !NOISEQUEUE )
+	if (!NOISEQUEUE)
 	{
 		return ;
 	}
@@ -46,25 +46,25 @@ void (entity noisemaker, entity noiseobject) signalnoise =
 float (entity e) hearnoise =
 {
 	local float rnd;
-	if ( (self.skil < 1) )
+	if (self.skil < 1)
 	{
 		return (0);
 	}
-	if ( (self.skil < 2) )
+	if (self.skil < 2)
 	{
 		rnd = (random () + 0.9);
-		if ( (self.skil < rnd) )
+		if (self.skil < rnd)
 		{
 			return (0);
 		}
 	}
-	if ( (NOISEQUEUE.goalentity == e) )
+	if (NOISEQUEUE.goalentity == e)
 	{
 		dprint (self.teamname);
 		dprint (self.classname);
 		dprint (" heard ");
 		dprint (NOISEQUEUE.goalentity.netname);
-		if ( (NOISEQUEUE.movetarget.classname == "player") )
+		if (NOISEQUEUE.movetarget.classname == "player")
 		{
 			dprint (" shoot\n");
 		}

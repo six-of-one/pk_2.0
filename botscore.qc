@@ -23,32 +23,32 @@ void () initscore =
 void (entity killer, entity killed) countkill =
 {
 	local float adj;
-	if ( (skill == 1) )
+	if (skill == 1)
 	{
 		adj = 0.8;
-		if ( ((killed.playerdeaths + killed.botdeaths) > 10) )
+		if ((killed.playerdeaths + killed.botdeaths) > 10)
 		{
 			adj = 0.4;
 		}
-		if ( ((killed.playerdeaths + killed.botdeaths) > KINDA_WANT) )
+		if ((killed.playerdeaths + killed.botdeaths) > KINDA_WANT)
 		{
 			adj = 0.150;
 		}
 	}
-	if ( (killer == killed) )
+	if (killer == killed)
 	{
 		killer.suicides = (killer.suicides + 1);
 		return ;
 	}
-	if ( (killer.classname == "player") )
+	if (killer.classname == "player")
 	{
 		killed.playerdeaths = (killed.playerdeaths + 1);
-		if ( (skill == 1) )
+		if (skill == 1)
 		{
-			if ( (killed.classname == "dmbot") )
+			if (killed.classname == "dmbot")
 			{
 				killed.skil = (killed.skil + (adj * random ()));
-				if ( (killed.skil > 3) )
+				if (killed.skil > 3)
 				{
 					killed.skil = 3;
 				}
@@ -57,15 +57,15 @@ void (entity killer, entity killed) countkill =
 	}
 	else
 	{
-		if ( (killer.classname == "dmbot") )
+		if (killer.classname == "dmbot")
 		{
 			killed.botdeaths = (killed.botdeaths + 1);
-			if ( (skill == 1) )
+			if (skill == 1)
 			{
-				if ( (killed.classname == "player") )
+				if (killed.classname == "player")
 				{
 					killer.skil = (killer.skil - (adj * random ()));
-					if ( (killer.skil < 0) )
+					if (killer.skil < 0)
 					{
 						killer.skil = 0;
 					}
@@ -73,13 +73,13 @@ void (entity killer, entity killed) countkill =
 			}
 		}
 	}
-	if ( (killed.classname == "player") )
+	if (killed.classname == "player")
 	{
 		killer.playerkills = (killer.playerkills + 1);
 	}
 	else
 	{
-		if ( (killed.classname == "dmbot") )
+		if (killed.classname == "dmbot")
 		{
 			killer.botkills = (killer.botkills + 1);
 		}
@@ -89,19 +89,19 @@ void (entity killer, entity killed) countkill =
 void (float sc) FPrintScore =
 {
 	local string fs;
-	if ( ((sc > -10) && (sc < 0)) )
+	if ((sc > -10) && (sc < 0))
 	{
 		sprint (self," ");
 	}
 	else
 	{
-		if ( (sc >= 0) )
+		if (sc >= 0)
 		{
-			if ( (sc < MUST_HAVE) )
+			if (sc < MUST_HAVE)
 			{
 				sprint (self," ");
 			}
-			if ( (sc < 10) )
+			if (sc < 10)
 			{
 				sprint (self," ");
 			}
@@ -131,7 +131,7 @@ void (entity e, float scoretype) PrintScoreFor =
 	sprint (self,"|");
 	FPrintScore (e.suicides);
 	sprint (self," |");
-	if ( (scoretype == MYSCORE) )
+	if (scoretype == MYSCORE)
 	{
 		sc = totalscore (e);
 	}
@@ -155,16 +155,16 @@ entity (float scoretype) SortPlayers =
 	local float ss;
 	e = find (world,classname,"player");
 	sort = world;
-	while ( e )
+	while (e)
 	{
-		if ( !sort )
+		if (!sort)
 		{
 			sort = e;
 			e.chain = world;
 		}
 		else
 		{
-			if ( (scoretype == MYSCORE) )
+			if (scoretype == MYSCORE)
 			{
 				es = totalscore (e);
 				ss = totalscore (sort);
@@ -174,7 +174,7 @@ entity (float scoretype) SortPlayers =
 				es = e.frags;
 				ss = sort.frags;
 			}
-			if ( (es > ss) )
+			if (es > ss)
 			{
 				e.chain = sort;
 				sort = e;
@@ -185,14 +185,14 @@ entity (float scoretype) SortPlayers =
 				ss = totalscore (walk.chain);
 				do
 				{
-					if ( !walk.chain )
+					if (!walk.chain)
 					{
 						e.chain = world;
 						walk.chain = e;
 					}
 					else
 					{
-						if ( (ss < es) )
+						if (ss < es)
 						{
 							e.chain = walk.chain;
 							walk.chain = e;
@@ -202,22 +202,22 @@ entity (float scoretype) SortPlayers =
 							walk = walk.chain;
 						}
 					}
-				} while ( (walk.chain != e));
+				} while (walk.chain != e);
 			}
 		}
 		e = find (e,classname,"player");
 	}
 	e = find (world,classname,"dmbot");
-	while ( e )
+	while (e)
 	{
-		if ( !sort )
+		if (!sort)
 		{
 			sort = e;
 			e.chain = world;
 		}
 		else
 		{
-			if ( (scoretype == MYSCORE) )
+			if (scoretype == MYSCORE)
 			{
 				es = totalscore (e);
 				ss = totalscore (sort);
@@ -227,7 +227,7 @@ entity (float scoretype) SortPlayers =
 				es = e.frags;
 				ss = sort.frags;
 			}
-			if ( (es > ss) )
+			if (es > ss)
 			{
 				e.chain = sort;
 				sort = e;
@@ -238,14 +238,14 @@ entity (float scoretype) SortPlayers =
 				do
 				{
 					ss = totalscore (walk.chain);
-					if ( !walk.chain )
+					if (!walk.chain)
 					{
 						e.chain = world;
 						walk.chain = e;
 					}
 					else
 					{
-						if ( (ss < es) )
+						if (ss < es)
 						{
 							e.chain = walk.chain;
 							walk.chain = e;
@@ -255,7 +255,7 @@ entity (float scoretype) SortPlayers =
 							walk = walk.chain;
 						}
 					}
-				} while ( (walk.chain != e));
+				} while (walk.chain != e);
 			}
 		}
 		e = find (e,classname,"dmbot");
@@ -267,13 +267,13 @@ void (float scoretype) PrintTopScores =
 {
 	local entity sort;
 	local float i;
-	if ( world.chain )
+	if (world.chain)
 	{
 		error ("DumpScore: world.chain is set");
 	}
 	sort = SortPlayers (NORMALSCORE);
 	i = 0;
-	while ( sort )
+	while (sort)
 	{
 		i = (i + 1);
 		sprint (self,sort.teamname);
@@ -282,7 +282,7 @@ void (float scoretype) PrintTopScores =
 		FPrintScore (sort.frags);
 		sprint (self,"\n");
 		sort = sort.chain;
-		if ( (i == 3) )
+		if (i == 3)
 		{
 			sort = world;
 		}
@@ -292,7 +292,7 @@ void (float scoretype) PrintTopScores =
 void (float scoretype) PrintScores =
 {
 	local entity sort;
-	if ( world.chain )
+	if (world.chain)
 	{
 		error ("DumpScore: world.chain is set");
 	}
@@ -300,7 +300,7 @@ void (float scoretype) PrintScores =
 	sprint (self,"Vs. Plyr|Vs. Bots|Suic|Score\n");
 	sprint (self,"kill die|kill die|ides|\n");
 	sprint (self,"_______________________________\n");
-	while ( sort )
+	while (sort)
 	{
 		PrintScoreFor (sort,scoretype);
 		sort = sort.chain;

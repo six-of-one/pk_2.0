@@ -253,7 +253,7 @@ void() SUB_UseTargets =
 			if (!t)
 				return;
 			remove (t);
-		} while ( 1 );
+		} while (1);
 	}
 	
 //
@@ -282,7 +282,7 @@ void() SUB_UseTargets =
 			self = stemp;
 			other = otemp;
 			activator = act;
-		} while ( 1 );
+		} while (1);
 	}
 	
 

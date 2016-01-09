@@ -15,7 +15,7 @@ void () bot_start = [ 12, bot_walk ] { 	local string tmp;
 	BotPostThink ();
 	droptofloor(0, 0);
 	self.nextthink = ((time + 0.2) + (0.2 * random ()));
-	if ( (self.skil < 3) )
+	if (self.skil < 3)
 	{
 		self.nextthink = (self.nextthink + (0.1 * (3- self.skil)));
 	}
@@ -26,9 +26,9 @@ void () bot_stand1 = [ 12, bot_walk ] { 	ai_botstand ();
 };
 
 void () bot_walk = [ 6, bot_walk ] { 	self.weaponframe = 0;
-	if ( (self.weapon == IT_AXE) )
+	if (self.weapon == IT_AXE)
 	{
-		if ( (self.walkframe == 6) )
+		if (self.walkframe == 6)
 		{
 			self.walkframe = 0;
 		}
@@ -36,7 +36,7 @@ void () bot_walk = [ 6, bot_walk ] { 	self.weaponframe = 0;
 	}
 	else
 	{
-		if ( (self.walkframe == 6) )
+		if (self.walkframe == 6)
 		{
 			self.walkframe = 0;
 		}
@@ -48,9 +48,9 @@ void () bot_walk = [ 6, bot_walk ] { 	self.weaponframe = 0;
 };
 
 void () bot_run = [ 6, bot_run ] { 	self.weaponframe = 0;
-	if ( (self.weapon == IT_AXE) )
+	if (self.weapon == IT_AXE)
 	{
-		if ( (self.walkframe == 6) )
+		if (self.walkframe == 6)
 		{
 			self.walkframe = 0;
 		}
@@ -58,7 +58,7 @@ void () bot_run = [ 6, bot_run ] { 	self.weaponframe = 0;
 	}
 	else
 	{
-		if ( (self.walkframe == 6) )
+		if (self.walkframe == 6)
 		{
 			self.walkframe = 0;
 		}
@@ -70,9 +70,9 @@ void () bot_run = [ 6, bot_run ] { 	self.weaponframe = 0;
 };
 
 void () bot_chase = [ 6, bot_chase ] { 	self.weaponframe = 0;
-	if ( (self.weapon == IT_AXE) )
+	if (self.weapon == IT_AXE)
 	{
-		if ( (self.walkframe == 6) )
+		if (self.walkframe == 6)
 		{
 			self.walkframe = 0;
 		}
@@ -80,7 +80,7 @@ void () bot_chase = [ 6, bot_chase ] { 	self.weaponframe = 0;
 	}
 	else
 	{
-		if ( (self.walkframe == 6) )
+		if (self.walkframe == 6)
 		{
 			self.walkframe = 0;
 		}
@@ -96,7 +96,7 @@ void () bot_shot1 = [ 113, bot_shot2 ] { 	self.weaponframe = 1;
 };
 
 void () bot_shot2 = [ 114, bot_shot3 ] { 	self.weaponframe = 2;
-	if ( (self.skil > 0.9) )
+	if (self.skil > 0.9)
 	{
 		ai_botcharge (BOTSPEED);
 	}
@@ -104,7 +104,7 @@ void () bot_shot2 = [ 114, bot_shot3 ] { 	self.weaponframe = 2;
 };
 
 void () bot_shot3 = [ 115, bot_shot4 ] { 	self.weaponframe = 3;
-	if ( (self.skil > 0) )
+	if (self.skil > 0)
 	{
 		ai_botcharge (BOTSPEED);
 	}
@@ -112,7 +112,7 @@ void () bot_shot3 = [ 115, bot_shot4 ] { 	self.weaponframe = 3;
 };
 
 void () bot_shot4 = [ 116, bot_shot5 ] { 	self.weaponframe = 4;
-	if ( (self.skil > 0) )
+	if (self.skil > 0)
 	{
 		ai_botcharge (BOTSPEED);
 	}
@@ -245,7 +245,7 @@ void () dmbot_melee =
 
 void () bot_nail1 = [ 103, bot_nail2 ] { 	self.effects = (self.effects | EF_MUZZLEFLASH);
 	self.weaponframe = (self.weaponframe + 1);
-	if ( (self.weaponframe == 9) )
+	if (self.weaponframe == 9)
 	{
 		self.weaponframe = 1;
 	}
@@ -258,7 +258,7 @@ void () bot_nail1 = [ 103, bot_nail2 ] { 	self.effects = (self.effects | EF_MUZZ
 
 void () bot_nail2 = [ 104, bot_nail1 ] { 	self.effects = (self.effects | EF_MUZZLEFLASH);
 	self.weaponframe = (self.weaponframe + 1);
-	if ( (self.weaponframe == 9) )
+	if (self.weaponframe == 9)
 	{
 		self.weaponframe = 1;
 	}
@@ -271,7 +271,7 @@ void () bot_nail2 = [ 104, bot_nail1 ] { 	self.effects = (self.effects | EF_MUZZ
 
 void () bot_light1 = [ 105, bot_light2 ] { 	self.effects = (self.effects | EF_MUZZLEFLASH);
 	self.weaponframe = (self.weaponframe + 1);
-	if ( (self.weaponframe == 5) )
+	if (self.weaponframe == 5)
 	{
 		self.weaponframe = 1;
 	}
@@ -284,7 +284,7 @@ void () bot_light1 = [ 105, bot_light2 ] { 	self.effects = (self.effects | EF_MU
 
 void () bot_light2 = [ 106, bot_light1 ] { 	self.effects = (self.effects | EF_MUZZLEFLASH);
 	self.weaponframe = (self.weaponframe + 1);
-	if ( (self.weaponframe == 5) )
+	if (self.weaponframe == 5)
 	{
 		self.weaponframe = 1;
 	}
@@ -301,7 +301,7 @@ void () bot_rocket1 = [ 107, bot_rocket2 ] { 	self.weaponframe = 1;
 };
 
 void () bot_rocket2 = [ 108, bot_rocket3 ] { 	self.weaponframe = 2;
-	if ( (self.skil > 2) )
+	if (self.skil > 2)
 	{
 		ai_botcharge (BOTSPEED);
 	}
@@ -309,7 +309,7 @@ void () bot_rocket2 = [ 108, bot_rocket3 ] { 	self.weaponframe = 2;
 };
 
 void () bot_rocket3 = [ 109, bot_rocket4 ] { 	self.weaponframe = 3;
-	if ( (self.skil > 1) )
+	if (self.skil > 1)
 	{
 		ai_botcharge (BOTSPEED);
 	}
@@ -317,7 +317,7 @@ void () bot_rocket3 = [ 109, bot_rocket4 ] { 	self.weaponframe = 3;
 };
 
 void () bot_rocket4 = [ 110, bot_rocket5 ] { 	self.weaponframe = 4;
-	if ( (self.skil > 1) )
+	if (self.skil > 1)
 	{
 		ai_botcharge (BOTSPEED);
 	}
@@ -325,7 +325,7 @@ void () bot_rocket4 = [ 110, bot_rocket5 ] { 	self.weaponframe = 4;
 };
 
 void () bot_rocket5 = [ 111, bot_rocket6 ] { 	self.weaponframe = 5;
-	if ( (self.skil > 0) )
+	if (self.skil > 0)
 	{
 		ai_botcharge (BOTSPEED);
 	}
@@ -372,7 +372,7 @@ void () bot_pain1 = [ 35, bot_pain2 ] { 	PainSound ();
 void () bot_pain2 = [ 36, bot_pain3 ] { 	
 	local float r;
 	r = ((4* random ()) + self.skil);
-	if ( (r > 2) )
+	if (r > 2)
 	{
 		ai_botrun (BOTSPEED);
 	}
@@ -383,7 +383,7 @@ void () bot_pain2 = [ 36, bot_pain3 ] {
 	BotPostThink ();
 };
 
-void () bot_pain3 = [ 37, bot_pain4 ] { 	if ( (self.skil >= TRUE) )
+void () bot_pain3 = [ 37, bot_pain4 ] { 	if (self.skil >= TRUE)
 	{
 		ai_botrun (BOTSPEED);
 	}
@@ -394,7 +394,7 @@ void () bot_pain3 = [ 37, bot_pain4 ] { 	if ( (self.skil >= TRUE) )
 	BotPostThink ();
 };
 
-void () bot_pain4 = [ 38, bot_pain5 ] { 	if ( (self.skil > 0) )
+void () bot_pain4 = [ 38, bot_pain5 ] { 	if (self.skil > 0)
 	{
 		ai_botrun (BOTSPEED);
 	}
@@ -405,7 +405,7 @@ void () bot_pain4 = [ 38, bot_pain5 ] { 	if ( (self.skil > 0) )
 	BotPostThink ();
 };
 
-void () bot_pain5 = [ 39, bot_pain6 ] { 	if ( (self.skil > 2) )
+void () bot_pain5 = [ 39, bot_pain6 ] { 	if (self.skil > 2)
 	{
 		ai_botrun (BOTSPEED);
 	}
@@ -428,7 +428,7 @@ void () bot_axpain1 = [ 29, bot_axpain2 ] { 	PainSound ();
 void () bot_axpain2 = [ 30, bot_axpain3 ] { 	
 	local float r;
 	r = ((4* random ()) + self.skil);
-	if ( (r > 2) )
+	if (r > 2)
 	{
 		ai_botrun (BOTSPEED);
 	}
@@ -439,7 +439,7 @@ void () bot_axpain2 = [ 30, bot_axpain3 ] {
 	BotPostThink ();
 };
 
-void () bot_axpain3 = [ 31, bot_axpain4 ] { 	if ( (self.skil >= TRUE) )
+void () bot_axpain3 = [ 31, bot_axpain4 ] { 	if (self.skil >= TRUE)
 	{
 		ai_botrun (BOTSPEED);
 	}
@@ -460,15 +460,15 @@ void () bot_axpain6 = [ 34, bot_run ] { 	ai_botrun (BOTSPEED);
 
 void () bot_pain =
 {
-	if ( self.weaponframe )
+	if (self.weaponframe)
 	{
 		return ;
 	}
-	if ( (self.invisible_finished > time) )
+	if (self.invisible_finished > time)
 	{
 		return ;
 	}
-	if ( (self.weapon == IT_AXE) )
+	if (self.weapon == IT_AXE)
 	{
 		bot_axpain1 ();
 	}
@@ -487,11 +487,11 @@ void () bot_die_ax1;
 void () BotDead =
 {
 	self.nextthink = ((time + 0.3) + ((random () * (NUMBOTS + 3)) * 0.1));
-	if ( teamplay )
+	if (teamplay)
 	{
 		self.nextthink = (self.nextthink + random ());
 	}
-	if ( TELEFRAGFLAG )
+	if (TELEFRAGFLAG)
 	{
 		self.nextthink = (self.nextthink + (5* random ()));
 		TELEFRAGFLAG = 0;
@@ -503,7 +503,7 @@ void () BotDead =
 void () BotDie =
 {
 	local float i;
-	if ( (self.deadflag != DEAD_NO) )
+	if (self.deadflag != DEAD_NO)
 	{
 		return ;
 	}
@@ -520,11 +520,11 @@ void () BotDie =
 	self.solid = SOLID_NOT;
 	self.flags = (self.flags - (self.flags & FL_ONGROUND));
 	self.movetype = MOVETYPE_TOSS;
-	if ( (self.velocity_z < 10) )
+	if (self.velocity_z < 10)
 	{
 		self.velocity_z = (self.velocity_z + (random () * 300));
 	}
-	if ( (self.health < -40) )
+	if (self.health < -40)
 	{
 		GibPlayer ();
 		BotDead ();
@@ -533,35 +533,35 @@ void () BotDie =
 	DeathSound ();
 	self.angles_x = 0;
 	self.angles_z = 0;
-	if ( (self.weapon == IT_AXE) )
+	if (self.weapon == IT_AXE)
 	{
 		bot_die_ax1 ();
 		return ;
 	}
 	i = cvar ("temp2");
-	if ( !i )
+	if (!i)
 	{
 		i = (1+ floor ((random () * 6)));
 	}
-	if ( (i == 1) )
+	if (i == 1)
 	{
 		bot_diea1 ();
 	}
 	else
 	{
-		if ( (i == 2) )
+		if (i == 2)
 		{
 			bot_dieb1 ();
 		}
 		else
 		{
-			if ( (i == 3) )
+			if (i == 3)
 			{
 				bot_diec1 ();
 			}
 			else
 			{
-				if ( (i == 4) )
+				if (i == 4)
 				{
 					bot_died1 ();
 				}

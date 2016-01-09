@@ -87,9 +87,9 @@ if (!enemy_vis)
 	return;
 if (time < self.attack_finished)
 	return;	
-if ( fabs(self.origin_z - self.enemy.origin_z) > 20)
+if (fabs(self.origin_z - self.enemy.origin_z) > 20)
 	return;		// too much height change
-if ( vlen (self.origin - self.enemy.origin) < 80)
+if (vlen (self.origin - self.enemy.origin) < 80)
 	return;		// use regular attack
 
 // charge		
@@ -369,7 +369,7 @@ void(entity attacker, float damage)	hknight_pain =
 		return;
 	}
 	
-	if ((random()*30 > damage) )
+	if ((random()*30 > damage))
 		return;		// didn't flinch
 
 	self.pain_finished = time + 1;

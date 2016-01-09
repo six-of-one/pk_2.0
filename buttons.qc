@@ -33,7 +33,7 @@ void () button_return =
 	self.state = STATE_DOWN;
 	SUB_CalcMove (self.pos1,self.speed,button_done);
 	self.frame = 0;			// use normal textures
-	if ( self.health )
+	if (self.health)
 		self.takedamage = DAMAGE_YES;	// can be shot again
 };
 
@@ -136,7 +136,7 @@ local float		gtemp, ftemp;
 	self.use = button_use;
 
 	self.th_weight = buttonweight;
-	if ( self.health )
+	if (self.health)
 	{
 		self.max_health = self.health;
 		self.th_die = button_killed;
@@ -145,11 +145,11 @@ local float		gtemp, ftemp;
 	else
 		self.touch = button_touch;
 
-	if ( !self.speed )
+	if (!self.speed)
 		self.speed = 40;
-	if ( !self.wait )
+	if (!self.wait)
 		self.wait = 1;
-	if ( !self.lip )
+	if (!self.lip)
 		self.lip = 4;
 
 	self.state = STATE_BOTTOM;

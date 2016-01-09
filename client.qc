@@ -58,7 +58,7 @@ void () SetChangeParms =
 
 // remove items
 	self.items = self.items - (self.items &
-	(IT_KEY1 | IT_KEY2 | IT_INVISIBILITY | IT_INVULNERABILITY | IT_SUIT | IT_QUAD) );
+	(IT_KEY1 | IT_KEY2 | IT_INVISIBILITY | IT_INVULNERABILITY | IT_SUIT | IT_QUAD));
 
 // cap super health
 	if (self.health > 100)
@@ -131,13 +131,13 @@ entity () FindIntermission =
 
 // look for info_intermission first
 	spot = find (world,classname,"info_intermission");
-	if ( spot )
+	if (spot)
 	{	// pick a random one
 		cyc = random() * 4;
 		while (cyc > 1)
 		{
 			spot = find (spot,classname,"info_intermission");
-			if ( !spot )
+			if (!spot)
 				spot = find (spot,classname,"info_intermission");
 			cyc = cyc - 1;
 		}
@@ -146,12 +146,12 @@ entity () FindIntermission =
 
 // then look for the start position
 	spot = find (world,classname,"info_player_start");
-	if ( spot )
+	if (spot)
 		return spot;
 
 // testinfo_player_start is only found in regioned levels
 	spot = find (world,classname,"testplayerstart");
-	if (!spot )
+	if (!spot)
 		objerror ("FindIntermission: no spot");
 
 	return spot;
@@ -162,7 +162,7 @@ string nextmap;
 void () GotoNextMap =
 {
 	if (PK)
-	if((cvar("temp1") & PK_TP_USERMAPON))
+	if ((cvar("temp1") & PK_TP_USERMAPON))
 	{
 		if (!execed)
 		{
@@ -181,7 +181,7 @@ void () GotoNextMap =
 void () ExitIntermission =
 {
 // skip any text in deathmatch
-	if ( deathmatch )
+	if (deathmatch)
 	{
 		GotoNextMap ();
 		return ;
@@ -200,7 +200,7 @@ void () ExitIntermission =
 			WriteByte (MSG_ALL,SVC_CDTRACK);
 			WriteByte (MSG_ALL,2);
 			WriteByte (MSG_ALL,3);
-			if ( !cvar ("registered") )
+			if (!cvar ("registered"))
 			{
 				WriteByte (MSG_ALL,SVC_FINALE);
 				WriteString (MSG_ALL, "As the corpse of the monstrous entity\nChthon sinks back into the lava whence\nit rose, you grip the Rune of Earth\nMagic tightly. Now that you have\nconquered the Dimension of the Doomed,\nrealm of Earth Magic, you are ready to\ncomplete your task in the other three\nhaunted lands of Quake. Or are you? If\nyou don't register Quake, you'll never\nknow what awaits you in the Realm of\nBlack Magic, the Netherworld, and the\nElder World!");
@@ -248,13 +248,13 @@ void () ExitIntermission =
 
 	if (intermission_running == 3)
 	{
-		if ( !cvar ("registered") )
+		if (!cvar ("registered"))
 		{	// shareware episode has been completed, go to sell screen
 			WriteByte (MSG_ALL,SVC_SELLSCREEN);
 			return ;
 		}
 
-		if ( (serverflags&15) == 15)
+		if ((serverflags&15) == 15)
 		{
 			WriteByte (MSG_ALL,SVC_FINALE);
 			WriteString (MSG_ALL, "Now, you have all four Runes. You sense\ntremendous invisible forces moving to\nunseal ancient barriers. Shub-Niggurath\nhad hoped to use the Runes Herself to\nclear off the Earth, but now instead,\nyou will use them to enter her home and\nconfront her as an avatar of avenging\nEarth-life. If you defeat her, you will\nbe remembered forever as the savior of\nthe planet. If she conquers, it will be\nas if you had never been born.");
@@ -291,7 +291,7 @@ void () execute_changelevel =
 	intermission_running = 1;
 
 // enforce a wait time before allowing changelevel
-	if ( deathmatch )
+	if (deathmatch)
 		intermission_exittime = time + 5;
 	else
 		intermission_exittime = time + 2;
@@ -348,7 +348,7 @@ void () changelevel_touch =
 
 	SUB_UseTargets ();
 
-	if ( (self.spawnflags & 1) && (deathmatch == 0) )
+	if ((self.spawnflags & 1) && (deathmatch == 0))
 	{	// NO_INTERMISSION
 		GotoNextMap ();
 		return ;
@@ -367,7 +367,7 @@ When the player touches this, he gets sent to the map listed in the "map" variab
 */
 void () trigger_changelevel =
 {
-	if ( !self.map )
+	if (!self.map)
 		objerror ("chagnelevel trigger doesn't have map");
 
 	InitTrigger ();
@@ -388,7 +388,7 @@ void () set_suicide_frame;
 // called by ClientKill and DeadThink
 void () respawn =
 {
-	if ( coop )
+	if (coop)
 	{
 		// make a copy of the dead body for appearances sake
 		CopyToBodyQue (self);
@@ -453,11 +453,11 @@ entity () SelectSpawnPoint =
 
 // testinfo_player_start is only found in regioned levels
 	spot = find (world,classname,"testplayerstart");
-	if ( spot )
+	if (spot)
 		return spot;
 		
 // choose a info_player_deathmatch point
-	if ( coop )
+	if (coop)
 	{
 		lastspawn = find (lastspawn,classname,"info_player_coop");
 		if (lastspawn == world)
@@ -477,7 +477,7 @@ entity () SelectSpawnPoint =
 					return lastspawn;
 				pcount = 0;
 				thing = findradius (spot.origin,32);
-				while ( thing )
+				while (thing)
 				{
 					if (thing.classname == "player")
 						pcount = pcount + 1;
@@ -492,15 +492,15 @@ entity () SelectSpawnPoint =
 		}
 	}
 
-	if ( serverflags )
+	if (serverflags)
 	{	// return with a rune to start
 		spot = find (world,classname,"info_player_start2");
-		if ( spot )
+		if (spot)
 			return spot;
 	}
 
 	spot = find (world,classname,"info_player_start");
-	if ( !spot )
+	if (!spot)
 		error ("PutClientInServer: no info_player_start on level");
 
 	return spot;
@@ -689,7 +689,7 @@ void () NextLevel =
 		o = find (world,classname,"trigger_changelevel");
 
 		// go back to start if no trigger_changelevel
-		if ( !o )
+		if (!o)
 		{
 			mapname = "start";
 			o = spawn ();
@@ -750,7 +750,7 @@ void () PlayerDeathThink =
 	local entity old_self;
 	local float forward;
 
-	if ( (self.flags & FL_ONGROUND) )
+	if (self.flags & FL_ONGROUND)
 	{
 		forward = vlen (self.velocity);
 		forward = forward - 20;
@@ -812,7 +812,7 @@ void () PlayerJump =
 	if (!(self.flags & FL_ONGROUND))
 		return;
 
-	if ( !(self.flags & FL_JUMPRELEASED) )
+	if (!(self.flags & FL_JUMPRELEASED))
 		return;		// don't pogo stick
 
 	self.flags = self.flags - (self.flags & FL_JUMPRELEASED);
@@ -899,7 +899,7 @@ void () WaterMove =
 		}
 	}
 
-	if ( !(self.flags & FL_INWATER) )
+	if (!(self.flags & FL_INWATER))
 	{
 
 // player enter water sound
@@ -916,7 +916,7 @@ void () WaterMove =
 	}
 
 	if (!PK)
-	if (! (self.flags & FL_WATERJUMP) )
+	if (! (self.flags & FL_WATERJUMP))
 		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
 };
 
@@ -962,7 +962,7 @@ void () PlayerPreThink =
 	local	float	mspeed, aspeed;
 	local float r;
 	if (FRIKBOT)
-	if ( BotPreFrame () )
+	if (BotPreFrame ())
 		return ;
 
 	if (intermission_running)
@@ -1008,7 +1008,7 @@ void () PlayerPreThink =
 	if (time < self.pausetime)
 		self.velocity = '0 0 0';
 
-	if(time > self.attack_finished && self.currentammo == 0 && self.weapon != IT_AXE)
+	if (time > self.attack_finished && self.currentammo == 0 && self.weapon != IT_AXE)
 	{
 		self.weapon = W_BestWeapon ();
 		W_SetCurrentAmmo ();
@@ -1183,11 +1183,11 @@ void () PlayerPostThink =
 	local	float	mspeed, aspeed;
 	local float r;
 	if (FRIKBOT)
-	if ( BotPostFrame () )
+	if (BotPostFrame ())
 		return ;
 
-	if (!(self.view_ofs == '0 0 0') && !self.deadflag )
-	if ( CheckDropPath () )
+	if (!(self.view_ofs == '0 0 0') && !self.deadflag)
+	if (CheckDropPath ())
 	{
 		DropBotPath ();
 	}
@@ -1201,7 +1201,7 @@ void () PlayerPostThink =
 		return;
 	}
 
-	if ( self.deadflag )
+	if (self.deadflag)
 		return;
 		
 // do weapon stuff
@@ -1225,7 +1225,7 @@ void () PlayerPostThink =
 		self.jump_flag = 0;
 	}
 
-	if ( !(self.flags & FL_ONGROUND) )
+	if (!(self.flags & FL_ONGROUND))
 		self.jump_flag = self.velocity_z;
 
 	CheckPowerups ();
@@ -1255,7 +1255,7 @@ void () ClientConnect =
 	randombotskin = getrandombotskin ();
 	initscore ();
 // a client connecting during an intermission can cause problems
-	if ( intermission_running )
+	if (intermission_running)
 		ExitIntermission ();
 };
 
@@ -1270,7 +1270,7 @@ called when a player disconnects from a server
 void () ClientDisconnect =
 {
 	if (FRIKBOT) ClientDisconnected ();
-	if ( gameover )
+	if (gameover)
 		return;
 	// if the level end trigger has been activated, just return
 	// since they aren't *really* leaving
@@ -1301,7 +1301,7 @@ void(entity targ, entity attacker) ClientObituary =
 	local	string deathstring, deathstring2;
 	rnum = random();
 
-	if ( ((targ.classname == "player") || (targ.classname == "dmbot")) )
+	if ((targ.classname == "player") || (targ.classname == "dmbot"))
 	{
 		if (attacker.classname == "teledeath")
 		{
@@ -1311,12 +1311,12 @@ void(entity targ, entity attacker) ClientObituary =
 			bprint ("\n");
 
 			attacker.owner.frags = attacker.owner.frags + 1;
-			if ( (attacker.owner.classname == "dmbot") )
+			if (attacker.owner.classname == "dmbot")
 			{
 				TELEFRAGFLAG = 1;
 			}
 			countkill (attacker.owner,targ);
-			if ( (attacker.owner.classname == "dmbot") )
+			if (attacker.owner.classname == "dmbot")
 			{
 				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 				WriteByte (MSG_ALL,attacker.owner.id);
@@ -1333,7 +1333,7 @@ void(entity targ, entity attacker) ClientObituary =
 
 			targ.frags = targ.frags - 1;
 			countkill (targ,targ);
-			if ( (targ.classname == "dmbot") )
+			if (targ.classname == "dmbot")
 			{
 				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 				WriteByte (MSG_ALL,targ.id);
@@ -1348,7 +1348,7 @@ void(entity targ, entity attacker) ClientObituary =
 			{
 				// killed self
 				attacker.frags = attacker.frags - 1;
-				if ( (attacker.classname == "dmbot") )
+				if (attacker.classname == "dmbot")
 				{
 					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 					WriteByte (MSG_ALL,attacker.id);
@@ -1368,7 +1368,7 @@ void(entity targ, entity attacker) ClientObituary =
 					bprint (" becomes bored with life\n");
 				return;
 			}
-			else if ( (teamplay == 2) && (targ.team > 0)&&(targ.team == attacker.team) )
+			else if ((teamplay == 2) && (targ.team > 0)&&(targ.team == attacker.team))
 			{
 				if (rnum < 0.25)
 					deathstring = " mows down a teammate\n";
@@ -1386,7 +1386,7 @@ void(entity targ, entity attacker) ClientObituary =
 			else
 			{
 				attacker.frags = attacker.frags + 1;
-				if ( (attacker.classname == "dmbot") )
+				if (attacker.classname == "dmbot")
 				{
 					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 					WriteByte (MSG_ALL,attacker.id);

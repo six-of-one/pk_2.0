@@ -302,7 +302,7 @@ void(entity targ) bot_check_lost =
 		dist_z = 0;
 		if (vlen(dist) < 32)
 			if (self.flags & FL_ONGROUND)
-				if(!frik_recognize_plat(FALSE))
+				if (!frik_recognize_plat(FALSE))
 					bot_lost(targ, FALSE);
 	}
 	else if (targ.classname == "train")
@@ -938,12 +938,12 @@ void() BotAI =
 	{
 		if (waypoint_mode < WM_EDITOR)
                 {
-                	if(self.route_failed)
+                	if (self.route_failed)
                 	{
                 		frik_bot_roam();
                 		self.route_failed = 0;
                 	}
-                        else if(!begin_route())
+                        else if (!begin_route())
                         {	
                                 bot_look_for_crap(FALSE);
                         }

@@ -11,7 +11,7 @@ void() zombie_hang =
 	self.think = zombie_hang;
 	self.frame = self.frame + 1;
 
-	if(self.frame > 21)
+	if (self.frame > 21)
 	{
 		self.frame = 0;
 
@@ -28,11 +28,11 @@ void() zombie_hang =
 	    sound (self, CHAN_VOICE, "misc/zombie/swing_3.wav", 1, ATTN_NONE);
 	}
 
-	if(self.flags == 1)
+	if (self.flags == 1)
 	{
 		self.nextthink = time + 0.1;
 	}
-	else if(self.flags == 2)
+	else if (self.flags == 2)
 	{
 		self.nextthink = time + 0.15;
 	}
@@ -77,7 +77,7 @@ void() zombie_twist =
 	self.think = zombie_twist;
 	self.frame = self.frame + 1;
 
-	if(self.frame > 45)
+	if (self.frame > 45)
 	{
 		self.frame = 0;
 	}

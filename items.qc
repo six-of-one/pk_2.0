@@ -173,27 +173,27 @@ void () health_touch =
 	local float amount;
 	local string s;
 
-	if ( (other.classname != "player") && (other.classname != "dmbot") )
+	if ((other.classname != "player") && (other.classname != "dmbot"))
 			return;
 
 	if (self.healtype == 2) // Megahealth?  Ignore max_health...
 	{
 		if (other.health >= 250)
 			return ;
-		if ( !T_Heal (other,self.healamount, 1) )
+		if (!T_Heal (other,self.healamount, 1))
 			return ;
 	}
 	else
 	{
-		if ( !T_Heal (other,self.healamount,0) )
+		if (!T_Heal (other,self.healamount,0))
 			return ;
 	}
 
-	if ( (other.classname == "dmbot") )
+	if (other.classname == "dmbot")
 	{
 		bot_toucheditem ();
 	}
-	if ( (other.classname == "player") )
+	if (other.classname == "player")
 	{
 		sprint (other,"You receive ");
 		s = ftos (self.healamount);
@@ -217,7 +217,7 @@ void () health_touch =
 		self.nextthink = time + 5;
 		self.think = item_megahealth_rot;
 		self.owner = other;
-		if ( other.movetarget.movetarget )
+		if (other.movetarget.movetarget)
 		{
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 		}
@@ -226,7 +226,7 @@ void () health_touch =
 	{
 		if (deathmatch != 2)		// deathmatch 2 is the silly old rules
 		{
-			if ( deathmatch )
+			if (deathmatch)
 				self.nextthink = time + 20;
 			self.think = SUB_regen;
 		}
@@ -272,7 +272,7 @@ void () armor_touch =
 
 	if (other.health <= 0)
 		return;
-	if ( (other.classname != "player") && (other.classname != "dmbot") )
+	if ((other.classname != "player") && (other.classname != "dmbot"))
 			return;
 
 	if (self.classname == "item_armor1")
@@ -280,7 +280,7 @@ void () armor_touch =
 		type = 0.3;
 		value = 100;
 		bit = IT_ARMOR1;
-		if ( other.movetarget.movetarget )
+		if (other.movetarget.movetarget)
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	if (self.classname == "item_armor2")
@@ -288,7 +288,7 @@ void () armor_touch =
 		type = 0.6;
 		value = 150;
 		bit = IT_ARMOR2;
-		if ( other.movetarget.movetarget )
+		if (other.movetarget.movetarget)
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	if (self.classname == "item_armorInv")
@@ -296,7 +296,7 @@ void () armor_touch =
 		type = 0.8;
 		value = 200;
 		bit = IT_ARMOR3;
-		if ( other.movetarget.movetarget )
+		if (other.movetarget.movetarget)
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	if (other.armortype*other.armorvalue >= type*value)
@@ -311,11 +311,11 @@ void () armor_touch =
   if (deathmatch == 1)
 		self.nextthink = time + 20;
 	self.think = SUB_regen;
-	if ( (other.classname == "dmbot") )
+	if (other.classname == "dmbot")
 	{
 		bot_toucheditem ();
 	}
-	if ( (other.classname == "player") )
+	if (other.classname == "player")
 	{
 		sprint (other,"You got armor\n");
 		stuffcmd (other,"bf\n");
@@ -434,7 +434,7 @@ void(float old, float new) Deathmatch_Weapon =
 // change self.weapon if desired
 	or = RankForWeapon (self.weapon);
 	nr = RankForWeapon (new);
-	if ( nr < or )
+	if (nr < or)
 		self.weapon = new;
 };
 
@@ -451,7 +451,7 @@ void () weapon_touch =
 	local entity stemp;
 	local float leave;
 
-	if ( (other.classname != "player") && (other.classname != "dmbot") )
+	if ((other.classname != "player") && (other.classname != "dmbot"))
 			return;
 
 // if the player was using his best weapon, change up to the new one if better
@@ -475,17 +475,17 @@ void () weapon_touch =
 	}
 	else if (self.classname == "weapon_supernailgun")
 	{
-		if (leave && (other.items & IT_SUPER_NAILGUN) )
+		if (leave && (other.items & IT_SUPER_NAILGUN))
 				return ;
 		hadammo = other.ammo_rockets;
 		new = IT_SUPER_NAILGUN;
 		other.ammo_nails = other.ammo_nails + 30;
-		if ( other.movetarget.movetarget )
+		if (other.movetarget.movetarget)
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	else if (self.classname == "weapon_supershotgun")
 	{
-		if (leave && (other.items & IT_SUPER_SHOTGUN) )
+		if (leave && (other.items & IT_SUPER_SHOTGUN))
 			return ;
 		hadammo = other.ammo_rockets;
 		new = IT_SUPER_SHOTGUN;
@@ -493,38 +493,38 @@ void () weapon_touch =
 	}
 	else if (self.classname == "weapon_rocketlauncher")
 			{
-		if (leave && (other.items & IT_ROCKET_LAUNCHER) )
+		if (leave && (other.items & IT_ROCKET_LAUNCHER))
 			return ;
 		hadammo = other.ammo_rockets;
 		new = IT_ROCKET_LAUNCHER;
 		other.ammo_rockets = other.ammo_rockets + 5;
-		if ( other.movetarget.movetarget )
+		if (other.movetarget.movetarget)
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	else if (self.classname == "weapon_grenadelauncher")
 	{
-		if (leave && (other.items & IT_GRENADE_LAUNCHER) )
+		if (leave && (other.items & IT_GRENADE_LAUNCHER))
 			return;
 		hadammo = other.ammo_rockets;
 		new = IT_GRENADE_LAUNCHER;
 		other.ammo_rockets = other.ammo_rockets + 5;
-		if ( other.movetarget.movetarget )
+		if (other.movetarget.movetarget)
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	else if (self.classname == "weapon_lightning")
 	{
-		if (leave && (other.items & IT_LIGHTNING) )
+		if (leave && (other.items & IT_LIGHTNING))
 			return;
 		hadammo = other.ammo_rockets;
 		new = IT_LIGHTNING;
 		other.ammo_cells = other.ammo_cells + 15;
-		if ( other.movetarget.movetarget )
+		if (other.movetarget.movetarget)
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	else
 		objerror ("weapon_touch: unknown classname");
 
-	if ( (other.classname == "player") )
+	if (other.classname == "player")
 	{
 		sprint (other,"You got the ");
 		sprint (other,self.netname);
@@ -556,7 +556,7 @@ void () weapon_touch =
 
 	self = stemp;
 
-	if ( leave )
+	if (leave)
 		return;
 
 // remove it in single player, or setup for respawning in deathmatch
@@ -684,7 +684,7 @@ void () ammo_touch =
 	local entity stemp;
 	local float best;
 
-	if ( (other.classname != "player") && (other.classname != "dmbot") )
+	if ((other.classname != "player") && (other.classname != "dmbot"))
 			return ;
 	if (other.health <= 0)
 		return;
@@ -730,7 +730,7 @@ void () ammo_touch =
 
 	bound_other_ammo ();
 
-	if ( (other.classname == "player") )
+	if (other.classname == "player")
 	{
 		sprint (other,"You got the ");
 		sprint (other,self.netname);
@@ -743,7 +743,7 @@ void () ammo_touch =
 
 // change to a better weapon if appropriate
 
-	if ( other.weapon == best )
+	if (other.weapon == best)
 	{
 		stemp = self;
 		self = other;
@@ -964,14 +964,14 @@ void () key_touch =
 	local entity stemp;
 	local float best;
 
-	if ( (other.classname != "player") && (other.classname != "dmbot") )
+	if ((other.classname != "player") && (other.classname != "dmbot"))
 			return;
 	if (other.health <= 0)
 		return ;
 	if (other.items & self.items)
 		return ;
 
-	if ( (other.classname == "player") )
+	if (other.classname == "player")
 	{
 		sprint (other,"You got the ");
 		sprint (other,self.netname);
@@ -983,7 +983,7 @@ void () key_touch =
 	stuffcmd (other, "bf\n");
 	other.items = other.items | self.items;
 
-	if ( !coop )
+	if (!coop)
 	{
 		self.solid = SOLID_NOT;
 		self.model = string_null;
@@ -1104,7 +1104,7 @@ void () sigil_touch =
 	local entity stemp;
 	local float best;
 
-	if ( (other.classname != "player") && (other.classname != "dmbot") )
+	if ((other.classname != "player") && (other.classname != "dmbot"))
 			return;
 	if (other.health <= 0)
 		return ;
@@ -1129,7 +1129,7 @@ End of level sigil, pick up to end episode and return to jrstart.
 
 void () item_sigil =
 {
-	if ( !self.spawnflags )
+	if (!self.spawnflags)
 		objerror ("no spawnflags");
 
 	precache_sound ("misc/runekey.wav");
@@ -1174,12 +1174,12 @@ void () powerup_touch =
 	local entity stemp;
 	local float best;
 
-	if ( (other.classname != "player") && (other.classname != "dmbot") )
+	if ((other.classname != "player") && (other.classname != "dmbot"))
 			return;
 	if (other.health <= 0)
 		return ;
 
-	if ( (other.classname == "player") )
+	if (other.classname == "player")
 	{
 		sprint (other,"You got the ");
 		sprint (other,self.netname);
@@ -1188,7 +1188,7 @@ void () powerup_touch =
 	}
 
 	if (!PK || (PK && deathmatch != 4)) // *pk - my new rule, logical extrapolation
-	if ( deathmatch )
+	if (deathmatch)
 	{
 		self.mdl = self.model;
 
@@ -1218,7 +1218,7 @@ void () powerup_touch =
 	{
 		other.invincible_time = 1;
 		other.invincible_finished = time + 30;
-		if ( other.movetarget.movetarget )
+		if (other.movetarget.movetarget)
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 
@@ -1226,7 +1226,7 @@ void () powerup_touch =
 	{
 		other.invisible_time = 1;
 		other.invisible_finished = time + 30;
-		if ( other.movetarget.movetarget )
+		if (other.movetarget.movetarget)
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 
@@ -1234,7 +1234,7 @@ void () powerup_touch =
 	{
 		other.super_time = 1;
 		other.super_damage_finished = time + 30;
-		if ( other.movetarget.movetarget )
+		if (other.movetarget.movetarget)
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 
@@ -1353,7 +1353,7 @@ void () BackpackTouch =
 	local entity stemp;
 	local float acount;
 
-	if ( (other.classname != "player") && (other.classname != "dmbot") ) // FIX ME - add to pk
+	if ((other.classname != "player") && (other.classname != "dmbot")) // FIX ME - add to pk
 			return;
 	if (other.classname == "dmbot")
 		bot_toucheditem ();
@@ -1361,11 +1361,11 @@ void () BackpackTouch =
 		return ;
 
 	acount = 0;
-	if ( (other.classname == "player") )
+	if (other.classname == "player")
 	{
 		sprint (other,"You get ");
 
-		if ( self.items )
+		if (self.items)
 		if ((other.items & self.items) == 0)
 			{
 				acount = 1;
@@ -1387,7 +1387,7 @@ void () BackpackTouch =
 	other.ammo_cells = other.ammo_cells + self.ammo_cells;
 
 	new = self.items;
-	if ( !new )
+	if (!new)
 		new = other.weapon;
 	old = other.items;
 	other.items = other.items | new;
@@ -1396,36 +1396,36 @@ void () BackpackTouch =
 
 	if (other.classname == "player")
 	{
-		if ( self.ammo_shells )
+		if (self.ammo_shells)
 		{
-			if ( acount )
+			if (acount)
 				sprint (other,", ");
 			acount = 1;
 			s = ftos (self.ammo_shells);
 			sprint (other,s);
 			sprint (other," shells");
 		}
-		if ( self.ammo_nails )
+		if (self.ammo_nails)
 		{
-			if ( acount )
+			if (acount)
 				sprint (other,", ");
 			acount = 1;
 			s = ftos (self.ammo_nails);
 			sprint (other,s);
 			sprint (other," nails");
 		}
-		if ( self.ammo_rockets )
+		if (self.ammo_rockets)
 		{
-			if ( acount )
+			if (acount)
 				sprint (other,", ");
 			acount = 1;
 			s = ftos (self.ammo_rockets);
 			sprint (other,s);
 			sprint (other," rockets");
 		}
-		if ( self.ammo_cells )
+		if (self.ammo_cells)
 		{
-			if ( acount )
+			if (acount)
 				sprint (other,", ");
 			acount = 1;
 			s = ftos (self.ammo_cells);
@@ -1444,7 +1444,7 @@ void () BackpackTouch =
 	self = other;
 
 // change to the weapon
-	if ( !deathmatch )
+	if (!deathmatch)
 		self.weapon = new;
 	else
 		Deathmatch_Weapon (old, new);

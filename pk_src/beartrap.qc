@@ -65,7 +65,7 @@ $frame bear01 bear02 bear03
 void() beartrapFollow =
 {
 	// SWP: 14/05/97 - check if the player has "respawned" or dead.
-	if(!(self.beartrap_target.beartrap_time) || self.disconnectPlayer || self.beartrap_target.deadflag)
+	if (!(self.beartrap_target.beartrap_time) || self.disconnectPlayer || self.beartrap_target.deadflag)
 	{ // player is dead or respawned...
 		remove(self);
 		return;

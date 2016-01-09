@@ -20,12 +20,12 @@ void() turret_dropTurret =
 	local	entity turret;
 	local vector dir;
 
-	if(self.pk_turretammo <= 0)
+	if (self.pk_turretammo <= 0)
 	{
 		return;
 	}
 
-	if(!self.button0)
+	if (!self.button0)
 	{
 		player_run ();
 	  return;
@@ -37,7 +37,7 @@ void() turret_dropTurret =
 	traceline (dir, dir + v_forward * 50, FALSE, self);
 
 	makevectors (self.angles);
-	if(trace_fraction != 1.0 && !trace_ent.takedamage)
+	if (trace_fraction != 1.0 && !trace_ent.takedamage)
 	{
 		// To near a wall, can't throw turret
 	  sprint(self, "Can't throw AutoSentry, too close to a wall!!\n");
@@ -116,7 +116,7 @@ void() turret_dropTurret =
 void() turret_searchForEnemy =
 {
 	// check if the turret time is up
-	if(self.turret_timeout < time) {
+	if (self.turret_timeout < time) {
 	  turret_deathAnim();
 	  return;
 	}
@@ -125,7 +125,7 @@ void() turret_searchForEnemy =
 	setorigin(self, self.turret_base.origin);
 
 	// check if needs to be seet solid
-	if(self.solid == SOLID_NOT)
+	if (self.solid == SOLID_NOT)
 	{
 		turret_checkIfCanBeSolid();
 	}
@@ -160,24 +160,24 @@ void() turret_findTarget =
 
 	while(head)
 	{
-		if(head.health > 1)
-	  if(head.takedamage)
-	  if(head != self)
-		if(head.classname != "beartrap")
-	  if(!((head.classname == "turret") && (head.owner == self.owner)))
-	  if(head.classname != "turret_base")
-	  //if(!(head.classname == "turret"))
-	  //if(!(head.classname == "turret_base"))
-	  if(self.turret_ownertimeout < time || head != self.owner)
-	 	if(head.classname != "player" || !(head.items & IT_INVISIBILITY))
+		if (head.health > 1)
+	  if (head.takedamage)
+	  if (head != self)
+		if (head.classname != "beartrap")
+	  if (!((head.classname == "turret") && (head.owner == self.owner)))
+	  if (head.classname != "turret_base")
+	  //if (!(head.classname == "turret"))
+	  //if (!(head.classname == "turret_base"))
+	  if (self.turret_ownertimeout < time || head != self.owner)
+	 	if (head.classname != "player" || !(head.items & IT_INVISIBILITY))
 	  {
 	    tempDist = vlen(head.origin - self.origin);
 	  	traceline(self.origin, head.origin, TRUE, self);
 
-	    if(trace_fraction >= 1)
-	    if(tempDist < dist)
-	    if(turret_inFront(head))
-	    if(visible(head))
+	    if (trace_fraction >= 1)
+	    if (tempDist < dist)
+	    if (turret_inFront(head))
+	    if (visible(head))
 	    {
 		  	selected = head;
 		    dist = tempDist;
@@ -188,14 +188,14 @@ void() turret_findTarget =
 	}
 
 	// Make the turning sound.
-	if(self.turret_soundtimeout < time)
+	if (self.turret_soundtimeout < time)
 	{
 		sound (self, CHAN_WEAPON, "weapons/sentry/turrt_3.wav", 1, ATTN_NORM);
 		self.turret_soundtimeout = time + 0.5;
 	}
 
 	// target found
-	if(selected != world)
+	if (selected != world)
 	{
 		// set it as the enemy
 	  self.enemy = selected;
@@ -225,7 +225,7 @@ float (entity e) turret_inFront =
 	vec = normalize (e.origin - self.origin);
 	dot = vec * v_forward;
 
-	if ( dot > 0.8 )
+	if (dot > 0.8)
 	{
 	  return TRUE;
 	}
@@ -238,7 +238,7 @@ float (entity e) turret_inFront =
 void() turret_attackEnemy =
 {
 	// check if the turret time is up
-	if(self.turret_timeout < time) {
+	if (self.turret_timeout < time) {
 	  turret_deathAnim();
 	  return;
 	}
@@ -247,17 +247,17 @@ void() turret_attackEnemy =
 	setorigin(self, self.turret_base.origin);
 
 	// check if needs to be seet solid
-	if(self.solid == SOLID_NOT)
+	if (self.solid == SOLID_NOT)
 	{
 		turret_checkIfCanBeSolid();
 	}
 
- 	if(self.ammo_cells > 0) {
+ 	if (self.ammo_cells > 0) {
 		// attack frame's
 		self.frame = self.frame + 1;
 
 		// loop if at end of anim
-		if(self.frame > 5) {
+		if (self.frame > 5) {
 			self.frame = $gunfire1;
 		}
 	}
@@ -265,7 +265,7 @@ void() turret_attackEnemy =
 	{
 	  // Not enough ammo
 
-		if(self.frame != 5)
+		if (self.frame != 5)
 	  {
 			self.frame = $gunmisfire1;
 			sound (self, CHAN_WEAPON, "weapons/sentry/turcl_2b.wav", 0.2, ATTN_NORM);
@@ -277,18 +277,18 @@ void() turret_attackEnemy =
 	}
 
 	// if still visiable & alive
-	if(visible(self.enemy) && self.enemy.health > 1 && (self.enemy.classname != "player" || !(self.enemy.items & IT_INVISIBILITY)))
+	if (visible(self.enemy) && self.enemy.health > 1 && (self.enemy.classname != "player" || !(self.enemy.items & IT_INVISIBILITY)))
 	{
 		local vector targetview;
 
 	  // set view to the target
 	  targetview = vectoangles((self.enemy.origin + self.enemy.view_ofs)- self.origin);
 
-	  if(targetview != self.angles)
+	  if (targetview != self.angles)
 	  {
 			self.angles = targetview;
 
-	    if(self.turret_soundtimeout < time)
+	    if (self.turret_soundtimeout < time)
 	    {
 	      sound (self, CHAN_WEAPON, "weapons/sentry/turrt_3.wav", 1, ATTN_NORM);
 	      self.turret_soundtimeout = time + 0.5;
@@ -296,14 +296,14 @@ void() turret_attackEnemy =
 	  }
 
 	  // attack target now if you can
-//	  if(self.attack_finished < time)
-		if(self.frame == 1 || self.frame == 3)
+//	  if (self.attack_finished < time)
+		if (self.frame == 1 || self.frame == 3)
 	  {
-	  	if(self.ammo_cells > 0)
+	  	if (self.ammo_cells > 0)
 	    { // is there enough ammo to fire?
 	    	local vector firePosition;
 				makevectors (self.angles);
-	      if(self.frame == 1)
+	      if (self.frame == 1)
 	      {
 	      	firePosition = self.origin + (v_forward * 21) - (v_right * 3);
 					turret_launchNail(firePosition, (self.enemy.origin + self.enemy.view_ofs) - firePosition);
@@ -526,7 +526,7 @@ void() turret_checkIfCanBeSolid =
 	// see if there are any objects that block the turret from becoming solid
 	head = findradius(self.origin, 28);
 
-	if(!head)
+	if (!head)
 	{
 		// if can become solid!!!
 		self.turret_base.solid = SOLID_BBOX;

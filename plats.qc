@@ -111,8 +111,8 @@ void () plat_center_touch =
 	}
 	else if (self.state == STATE_TOP)
 	{
-		if ( (other.classname == "dmbot") )
-		if ( (other.goalentity.goalentity == self) )
+		if (other.classname == "dmbot")
+		if (other.goalentity.goalentity == self)
 			other.search_time = time;
 			self.nextthink = self.ltime + 1;	// delay going down
 	}
@@ -130,8 +130,8 @@ void () plat_outside_touch =
 	self = self.enemy;
 	if (self.state == STATE_TOP)
 	{
-		if ( (other.classname == "dmbot") )
-		if ( (other.goalentity.goalentity == self) )
+		if (other.classname == "dmbot")
+		if (other.goalentity.goalentity == self)
 			other.search_time = (time + 6);
 		plat_go_down ();
 	}
@@ -139,7 +139,7 @@ void () plat_outside_touch =
 
 void () plat_trigger_use =
 {
-	if ( self.think )
+	if (self.think)
 		return;		// allready activated
 	plat_go_down ();
 };
@@ -187,9 +187,9 @@ void () func_plat =
 {
 	local entity t;
 
-	if ( !self.t_length )
+	if (!self.t_length)
 		self.t_length = 80;
-	if ( !self.t_width )
+	if (!self.t_width)
 		self.t_width = 10;
 
 	if (self.sounds == 0)
@@ -225,13 +225,13 @@ void () func_plat =
 
 	self.th_weight = platweight;
 	self.blocked = plat_crush;
-	if ( !self.speed )
+	if (!self.speed)
 		self.speed = 150;
 
 // pos1 is the top position, pos2 is the bottom
 	self.pos1 = self.origin;
 	self.pos2 = self.origin;
-	if ( self.height )
+	if (self.height)
 		self.pos2_z = self.origin_z - self.height;
 	else
 		self.pos2_z = self.origin_z - self.size_z + 8;
@@ -240,7 +240,7 @@ void () func_plat =
 
 	plat_spawn_inside_trigger ();	// the "start moving" trigger	
 
-	if ( self.targetname )
+	if (self.targetname)
 	{
 		self.state = STATE_UP;
 		self.use = plat_use;
@@ -273,7 +273,7 @@ void () train_use =
 
 void () train_wait =
 {
-	if ( self.wait )
+	if (self.wait)
 	{
 		self.nextthink = self.ltime + self.wait;
 		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
@@ -290,9 +290,9 @@ void () train_next =
 
 	targ = find (world,targetname,self.target);
 	self.target = targ.target;
-	if ( !self.target )
+	if (!self.target)
 		objerror ("train_next: no next target");
-	if ( targ.wait )
+	if (targ.wait)
 		self.wait = targ.wait;
 	else
 		self.wait = 0;
@@ -308,7 +308,7 @@ void () func_train_find =
 	targ = find (world,targetname,self.target);
 	self.target = targ.target;
 	setorigin (self, targ.origin - self.mins);
-	if ( !self.targetname )
+	if (!self.targetname)
 	{	// not triggered, so start immediately
 		self.nextthink = self.ltime + 0.1;
 		self.think = train_next;
@@ -328,11 +328,11 @@ sounds
 */
 void () func_train =
 {
-	if ( !self.speed )
+	if (!self.speed)
 		self.speed = 100;
-	if ( !self.target )
+	if (!self.target)
 		objerror ("func_train without a target");
-	if ( !self.dmg )
+	if (!self.dmg)
 		self.dmg = 2;
 
 	if (self.sounds == 0)
@@ -374,9 +374,9 @@ This is used for the final bos
 */
 void () misc_teleporttrain =
 {
-	if ( !self.speed )
+	if (!self.speed)
 		self.speed = 100;
-	if ( !self.target )
+	if (!self.target)
 		objerror ("func_train without a target");
 
 	self.cnt = 1;

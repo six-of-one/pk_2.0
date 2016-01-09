@@ -52,7 +52,7 @@ If targeted, it will toggle between on or off.
 void () light =
 {
 	self.classname = "light";
-	if ( !self.targetname )
+	if (!self.targetname)
 	{	// inert light
 		remove (self);
 		return ;
@@ -100,7 +100,7 @@ Makes sparking, broken fluorescent sound
 void () light_fluorospark =
 {
 	self.classname = "light";
-	if ( !self.style )
+	if (!self.style)
 		self.style = 10;
 
 	precache_sound ("ambience/buzz1.wav");
@@ -195,7 +195,7 @@ void () misc_fireball =
 	self.classname = "fireball";
 	self.nextthink = time + (random() * 5);
 	self.think = fire_fly;
-	if ( !self.speed )
+	if (!self.speed)
 		self.speed = 1000; // Cataboligne 9.17.3 - fix compiler warning
 };
 
@@ -410,7 +410,7 @@ testing air bubbles
 void () air_bubbles =
 
 {
-	if ( deathmatch )
+	if (deathmatch)
 	{
 		remove (self);
 		return ;
@@ -574,7 +574,7 @@ This bmodel will appear if the episode has allready been completed, so players c
 void () func_episodegate =
 
 {
-	if ( !(serverflags & self.spawnflags) )
+	if (!(serverflags & self.spawnflags))
 		return;			// can still enter episode
 
 	self.angles = '0 0 0';
@@ -590,7 +590,7 @@ This bmodel appears unless players have all of the episode sigils.
 void () func_bossgate =
 
 {
-	if ( (serverflags & 15) == 15)
+	if ((serverflags & 15) == 15)
 		return;		// all episodes completed
 	self.angles = '0 0 0';
 	self.movetype = MOVETYPE_PUSH;	// so it doesn't get pushed by anything

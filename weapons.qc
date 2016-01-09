@@ -50,7 +50,7 @@ void () W_FireAxe =
 
 	makevectors (self.v_angle);
 	source = self.origin + '0 0 16';
-	if ( (self.classname == "dmbot") )
+	if (self.classname == "dmbot")
 	{
 		source = botaim ();
 	}
@@ -60,7 +60,7 @@ void () W_FireAxe =
 
 	org = trace_endpos - v_forward*4;
 
-	if ( trace_ent.takedamage )
+	if (trace_ent.takedamage)
 	{
 		trace_ent.axhitme = 1;
 		SpawnBlood (org, '0 0 0', 20);
@@ -181,14 +181,14 @@ void () ClearMultiDamage =
 
 void () ApplyMultiDamage =
 {
-	if ( !multi_ent )
+	if (!multi_ent)
 		return;
 	T_Damage (multi_ent,self,self,multi_damage);
 };
 
 void (entity hit, float damage) AddMultiDamage =
 {
-	if ( !hit )
+	if (!hit)
 		return ;
 
 	if (hit != multi_ent)
@@ -224,7 +224,7 @@ void (float damage, vector dir) TraceAttack =
 
 	org = trace_endpos - dir*4;
 
-	if ( trace_ent.takedamage )
+	if (trace_ent.takedamage)
 	{
 		SpawnBlood (org, vel*0.2, damage);
 		AddMultiDamage (trace_ent,damage);
@@ -292,7 +292,7 @@ void () W_FireShotgun =
 
 		self.currentammo =self.ammo_shells = self.ammo_shells - 1;
 		dir = aim (self,100000);
-		if ( (self.classname == "dmbot") )
+		if (self.classname == "dmbot")
 		{
 			dir = botaim ();
 		}
@@ -327,7 +327,7 @@ void () W_FireSuperShotgun =
 	
 		self.currentammo = self.ammo_shells = self.ammo_shells - 2;
 		dir = aim (self,100000);
-		if ( (self.classname == "dmbot") )
+		if (self.classname == "dmbot")
 		{
 			dir = botaim ();
 		}
@@ -375,7 +375,7 @@ void () T_MissileTouch =
 
 	damg = 100 + random()*20;
 
-	if ( other.health )
+	if (other.health)
 	{
 		if (other.classname == "monster_shambler")
 			damg = damg * 0.5;	// mostly immune
@@ -426,7 +426,7 @@ void () W_FireRocket =
 
 	makevectors (self.v_angle);
 	missile.velocity = aim (self,1000);
-	if ( (self.classname == "dmbot") )
+	if (self.classname == "dmbot")
 	{
 		missile.velocity = botaim ();
 		bfwd = botaim ();
@@ -443,7 +443,7 @@ void () W_FireRocket =
 
 	setmodel (missile,"progs/missile.mdl");
 	setsize (missile, '0 0 0', '0 0 0');
-	if ( (self.classname == "dmbot") )
+	if (self.classname == "dmbot")
 	{
 		setorigin (missile,((self.origin + (bfwd * 8)) + '0 0 16'));
 	}
@@ -482,7 +482,7 @@ void (vector p1, vector p2, entity from, float damage) LightningDamage =
 	e1 = e2 = world;
 
 	traceline (p1, p2, FALSE, self);
-	if ( trace_ent.takedamage )
+	if (trace_ent.takedamage)
 	{
 		particle (trace_endpos, '0 0 100', 225, damage*4);
 		T_Damage (trace_ent,from,from,damage);
@@ -531,10 +531,10 @@ void () W_FireLightning =
 	}
 
 // explode if under water
-	if ( (self.classname == "dmbot") )
+	if (self.classname == "dmbot")
 	{
 		wlevel = CheckWaterLevel ();
-		if ( (wlevel > 1) )
+		if (wlevel > 1)
 		{
 			T_RadiusDamage (self,self,(35* self.ammo_cells),world);
 			self.ammo_cells = 0;
@@ -565,7 +565,7 @@ void () W_FireLightning =
 
 	org = self.origin + '0 0 16';
 
-	if ( (self.classname == "dmbot") )
+	if (self.classname == "dmbot")
 	{
 		dir = botaim ();
 		traceline (org,(org + (dir * 600)),TRUE,self);
@@ -644,11 +644,11 @@ void () W_FireGrenade =
 
 	makevectors (self.v_angle);
 
-	if ( self.v_angle_x )
+	if (self.v_angle_x)
 		missile.velocity = v_forward*600 + v_up * 200 + crandom()*v_right*10 + crandom()*v_up*10;
 	else
 	{
-		if ( (self.classname == "dmbot") )
+		if (self.classname == "dmbot")
 		{
 			missile.velocity = botaim ();
 			missile.velocity = (missile.velocity * 600);
@@ -722,7 +722,7 @@ void () W_FireSuperSpikes =
 	self.attack_finished = time + 0.2;
 	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
 	dir = aim (self,1000);
-	if ( (self.classname == "dmbot") )
+	if (self.classname == "dmbot")
 	{
 		dir = botaim ();
 	}
@@ -751,7 +751,7 @@ void(float ox) W_FireSpikes =
 		self.weapon = W_BestWeapon ();
 		if (PK) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
 		W_SetCurrentAmmo ();
-		if ( (self.classname == "dmbot") )
+		if (self.classname == "dmbot")
 		{
 			self.think = self.th_run;
 		}
@@ -791,7 +791,7 @@ void () spike_touch =
 	}
 
 // hit something that bleeds
-	if ( other.takedamage )
+	if (other.takedamage)
 	{
 		spawn_touchblood (9);
 		T_Damage (other,self,self.owner,9);
@@ -831,7 +831,7 @@ void () superspike_touch =
 	}
 
 // hit something that bleeds
-	if ( other.takedamage )
+	if (other.takedamage)
 	{
 		spawn_touchblood (18);
 		T_Damage (other,self,self.owner,18);
@@ -865,10 +865,10 @@ void () W_SetCurrentAmmo =
 		PK_SetCurrentAmmo(); // *pk - handle ammo for all pk items
 		return;
 	}
-	if ( (self.classname == "player") )
+	if (self.classname == "player")
 	player_run ();		// get out of any weapon firing states
 
-	self.items = self.items - ( self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS) );
+	self.items = self.items - (self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS));
 
 	signalnoise (self,self);
 	if (self.weapon == IT_AXE)
@@ -942,15 +942,15 @@ float () W_BestWeapon =
 
 	it = self.items;
 
-	if (self.waterlevel <= 1 && self.ammo_cells >= 1 && (it & IT_LIGHTNING) )
+	if (self.waterlevel <= 1 && self.ammo_cells >= 1 && (it & IT_LIGHTNING))
 			return IT_LIGHTNING;
-	if(self.ammo_nails >= 2 && (it & IT_SUPER_NAILGUN) )
+	if (self.ammo_nails >= 2 && (it & IT_SUPER_NAILGUN))
 		return IT_SUPER_NAILGUN;
-	if(self.ammo_shells >= 2 && (it & IT_SUPER_SHOTGUN) )
+	if (self.ammo_shells >= 2 && (it & IT_SUPER_SHOTGUN))
 		return IT_SUPER_SHOTGUN;
-	if(self.ammo_nails >= 1 && (it & IT_NAILGUN) )
+	if (self.ammo_nails >= 1 && (it & IT_NAILGUN))
 		return IT_NAILGUN;
-	if(self.ammo_shells >= 1 && (it & IT_SHOTGUN) )
+	if (self.ammo_shells >= 1 && (it & IT_SHOTGUN))
 		return IT_SHOTGUN;
 	return IT_AXE;
 };
@@ -1000,7 +1000,7 @@ void () W_Attack =
 	}
 	local float r;
 
-	if ( !W_CheckNoAmmo () )
+	if (!W_CheckNoAmmo ())
 		return;
 
 	makevectors	(self.v_angle);			// calculate forward angle for velocity
@@ -1252,7 +1252,7 @@ void () CycleWeaponCommand =
 				am = 1;
 		}
 	
-		if ( (it & self.weapon) && am == 0)
+		if ((it & self.weapon) && am == 0)
 		{
 			W_SetCurrentAmmo ();
 			return;
@@ -1331,7 +1331,7 @@ void () CycleWeaponReverseCommand =
 				am = 1;
 		}
 	
-		if ( (it & self.weapon) && am == 0)
+		if ((it & self.weapon) && am == 0)
 		{
 			W_SetCurrentAmmo ();
 			return;
@@ -1407,15 +1407,15 @@ void () W_WeaponFrame =
 	if (time < self.attack_finished)
 		return;
 
-	if ( self.impulse )
+	if (self.impulse)
 	{
 		ImpulseCommands ();
 	}
-	if ( (self.classname == "peeper") )
+	if (self.classname == "peeper")
 		return;
 
 // check for attack
-	if ( self.button0 )
+	if (self.button0)
 	{
 		SuperDamageSound ();
 		W_Attack ();

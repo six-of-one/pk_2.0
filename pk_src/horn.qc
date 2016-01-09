@@ -88,17 +88,17 @@ void() launch_horn =
 	self.attack_finished = time + attackTime;
 
 	// First attack in the shotTimeout period
-	if(self.AIRG_FireCount == 0 || self.AIRG_Timeout < time)
+	if (self.AIRG_FireCount == 0 || self.AIRG_Timeout < time)
 	{
 	   // Set count and timeout length
 	   self.AIRG_Timeout = time + shotTimeout + attackTime;
 	   self.AIRG_FireCount = 1;
 	}
 	// Max Fire Rate reached, so this is a failed shot.
-	else if(self.AIRG_FireCount >= maxFireRate)
+	else if (self.AIRG_FireCount >= maxFireRate)
 	{
 	  // play failed AirFist sound
-	  if(self.waterlevel > 2)
+	  if (self.waterlevel > 2)
 	  {  // below the water, play under water sound
 	    sound (self, CHAN_AUTO, "weapons/airfist/agwfail.wav", 1, ATTN_NORM);
 	  }
@@ -128,12 +128,12 @@ void() launch_horn =
 	// affect all the entity's in the AirBlast current range.
 	horn_airblast(TRUE);
 
-	if(self.super_damage_finished > time)
+	if (self.super_damage_finished > time)
 	{ // if supercharged, increase the recoil strength...
 	  recoil = recoil * 1.5;
 	}
 
-	if(self.waterlevel > 2)
+	if (self.waterlevel > 2)
 	{  // below the water, produce bubbles
 	   DeathBubbles(numBubbles);
 	}
@@ -151,7 +151,7 @@ void() launch_horn =
 	// Produce the AirFist fire blast sprites to the top left and right of the
 	// self's view.
 	//void(float nearAWall, float adjustForward, float adjustRight, float adjustUp, float positionRight, float spriteSpeed) hornBlastSprite =
-	if(self.waterlevel > 2)
+	if (self.waterlevel > 2)
 	{
 		// under water, go slower (%50 slower)
 		hornBlastSprite(nearAWall, 50, -50, 300, -20, 0.50);
@@ -175,7 +175,7 @@ void() launch_horn =
 	  self.flags = self.flags - FL_ONGROUND;
 	 }
 
-	if(nearAWall)
+	if (nearAWall)
 	{  // hit wall, Bounce based on the distance from the wall
 	  recoil = recoil + (recoil * (1.0 - trace_fraction) * 3);
 	}
@@ -183,7 +183,7 @@ void() launch_horn =
 	// recoil self
 	self.velocity = self.velocity + v_forward * recoil * -1;
 
-	if(self.waterlevel > 2)
+	if (self.waterlevel > 2)
 	{  // below the water, play under water sound
 	  sound (self, CHAN_AUTO, "weapons/airfist/agwater.wav", 1, ATTN_NORM);
 	}
@@ -231,12 +231,12 @@ void(float firstBlast) horn_airblast =
 	// Number of bubbles generated when the AirFist is fired under water.
 	local float numBubbles = 3; // number of bubbles generated in the water
 
-	if(self.super_damage_finished > time)
+	if (self.super_damage_finished > time)
 	{ // if supercharged, double the range
 	  inRange = inRange * 2;
 	}
 
-	if(self.waterlevel > 2) // if under water, change the variables
+	if (self.waterlevel > 2) // if under water, change the variables
 	{
 		// reduced the range by %20
 	  inRange = inRange * 0.80;
@@ -255,20 +255,20 @@ void(float firstBlast) horn_airblast =
 	  // move. eg. doors.
 
 	  // You may find this code looks funny,  it is the same is doing
-	  // a if( exp & exp & exp & exp) but this way is faster.
+	  // a if (exp & exp & exp & exp) but this way is faster.
 	  //   (read the QuakeC manual for reason).
 
 	  // only affect monsters and projectiles
 	  if (hornVisible(e)) // must be visible AND
 	  if (self.waterlevel > 2 || self.super_damage_finished > time
 	  			|| hornInfront(e)) // infront of self or anywhere in the water or supercharged AND
-	  if(e.movetype != MOVETYPE_NONE) // anything that can move
-	  if(e.movetype != MOVETYPE_PUSH)
-	  if(e.movetype != MOVETYPE_NOCLIP)
+	  if (e.movetype != MOVETYPE_NONE) // anything that can move
+	  if (e.movetype != MOVETYPE_PUSH)
+	  if (e.movetype != MOVETYPE_NOCLIP)
 // AIRG_EXCLUDE_START
-	  if((e.AIRG_Flags & AIRG_EXCLUDEENTITY) != AIRG_EXCLUDEENTITY) // custom exclusion (like laser fire)
+	  if ((e.AIRG_Flags & AIRG_EXCLUDEENTITY) != AIRG_EXCLUDEENTITY) // custom exclusion (like laser fire)
 // AIRG_EXCLUDE_END
-	  if(e != self)  // but not myself!!
+	  if (e != self)  // but not myself!!
 	  {
 	    // if flying creature and movetype is step then change to fly
 	    // NOTE: For some reason the normal quakeC, flying monsters has set a
@@ -279,9 +279,9 @@ void(float firstBlast) horn_airblast =
 	    //   entity's when they died.  When dead, they fall UP instead of down.
 	    //   Other than this they did not seam to have any adverse affect.  If you
 	    //   find that you have trouble with this code, let us know.
-	    if(e.flags & FL_FLY)
+	    if (e.flags & FL_FLY)
 	    {
-	    	if(e.movetype == MOVETYPE_STEP)
+	    	if (e.movetype == MOVETYPE_STEP)
 		    {
 	        // set so we can affect velocity
 		      e.movetype = MOVETYPE_FLY;
@@ -298,7 +298,7 @@ void(float firstBlast) horn_airblast =
 	        e.AIRG_FlyTracker.think = removeFlyMode;
 
 	      }
-	      else if(e.AIRG_Flags & AIRG_STEPCONVERTEDTOFLY)
+	      else if (e.AIRG_Flags & AIRG_STEPCONVERTEDTOFLY)
 	      {
 	        // We have already converted this one, just extend the time to convert
 	        e.AIRG_FlyTracker.nextthink = time + 2;
@@ -346,18 +346,18 @@ void(float firstBlast) horn_airblast =
 	    delta = normalize(delta);
 	    delta = delta * percent * strength;
 
-			if(self.waterlevel > 2) // if under water, change the blast amount
+			if (self.waterlevel > 2) // if under water, change the blast amount
 	    {
 	      // if within 1/2 radius of the blast
-	      if(percent >= 0.50)
-	      if(e.classname == "player") // and is a player
+	      if (percent >= 0.50)
+	      if (e.classname == "player") // and is a player
 				if (self.radsuit_finished == 0) // and not wearing bio
 	      {
 	        // that's it, no more air for him, chock time!!!
 					self.air_finished = time - 1;
 	      }
 
-			  if(hornInfront(e)) // infront of self
+			  if (hornInfront(e)) // infront of self
 	      {
 	        // reduce by %20
 	        delta = delta * 0.80;
@@ -372,7 +372,7 @@ void(float firstBlast) horn_airblast =
 	      }
 	    }
 
-	    if(e.movetype == MOVETYPE_FLYMISSILE)
+	    if (e.movetype == MOVETYPE_FLYMISSILE)
 	    {
 	      // If its a missile, change the direction but keep the same speed.
 	      eSpeed = vlen(e.velocity);
@@ -390,14 +390,14 @@ void(float firstBlast) horn_airblast =
 	      // T_Damage function that recoils damaged entity's away from the attacker.
 	      //   NOTE:  If that section of code in T_Damage changesm then this will have to
 	      //          change.
-	      if(e.movetype != MOVETYPE_WALK) // to even out the T_Damage "figure momentum add"
+	      if (e.movetype != MOVETYPE_WALK) // to even out the T_Damage "figure momentum add"
 	            {
 	        dir = e.origin - (self.absmin + self.absmax) * 0.5;
 	        dir = normalize(dir);
 	        e.velocity = e.velocity + dir * ldmg * 8;
 	      }
 
-	      if(firstBlast) // damage only on the first blast... 
+	      if (firstBlast) // damage only on the first blast... 
 	      {
 		      // Apply damage to the entity.
 		      T_Damage(e, self, self, ldmg);
@@ -419,7 +419,7 @@ float (entity e) hornInfront =
 	vec = normalize (e.origin - self.AIRG_BlastOrigin - self.view_ofs);
 	dot = vec * v_forward;
 
-	if ( dot > 0.8 )
+	if (dot > 0.8)
 	{
 	  return TRUE;
 	}
@@ -473,7 +473,7 @@ void(float nearAWall, float adjustForward, float adjustRight, float adjustUp, fl
 
 	sprite.solid = SOLID_NOT;
 
-	if(oldself.waterlevel > 2)
+	if (oldself.waterlevel > 2)
 	{  // below the water, play under water animation
 		sprite.movetype = MOVETYPE_NOCLIP;
 	}
@@ -493,7 +493,7 @@ void(float nearAWall, float adjustForward, float adjustRight, float adjustUp, fl
 	// set Speed
 	sprite.velocity = sprite.velocity * spriteSpeed;
 
-	if(nearAWall)
+	if (nearAWall)
 	{
 	  // If near a wall, blast in face.
 	  setorigin(sprite, self.origin + self.view_ofs + (v_right * positionRight));  // [MWH:01/12/97] raised origin a bit
@@ -508,7 +508,7 @@ void(float nearAWall, float adjustForward, float adjustRight, float adjustUp, fl
 	// play sprite animation.
 	self = sprite;
 
-	if(oldself.waterlevel > 2)
+	if (oldself.waterlevel > 2)
 	{  // below the water, play under water animation
 		run_ablastWater1();
 	}

@@ -37,7 +37,7 @@ void() hub_teleport_touch =
 		return;
 
 	// make sure we don't gib the last player!!!
-	if(other.voteIntermission == 1)
+	if (other.voteIntermission == 1)
 		return;
 
 	// if we're single player, just go to this map
@@ -322,7 +322,7 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerVote
 	WriteB3(MSG_ONE, 6638624);
 	WriteB3(MSG_ONE, 3830886);
 
-	if(timemins < 10)
+	if (timemins < 10)
 	{
 	  // ' 0'
 	  WriteB3(MSG_ONE, 12320);
@@ -335,7 +335,7 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerVote
 
 	WriteBFloat(MSG_ONE, timemins);
 
-	if(timesec < 10)
+	if (timesec < 10)
 	{
 	  // ':0'
 	  WriteB3(MSG_ONE, 12346);
@@ -365,7 +365,7 @@ void() hub_control_status =
 	local float timemins, timedef, votecast, maxplayers;
 	local entity pl;
 
-	if(self.map == "painkeep")
+	if (self.map == "painkeep")
 	{
 	  str1 = "pk ";
 	}
@@ -374,11 +374,11 @@ void() hub_control_status =
 	  str1 = self.map;
 	}
 
-	if(first.cnt > 0)
+	if (first.cnt > 0)
 	{
-	  if(self.attack_state == 0)
+	  if (self.attack_state == 0)
 	  {
-	  	if(first.map == "painkeep")
+	  	if (first.map == "painkeep")
 	    {
 	    	str2 = "pk ";
 	    }
@@ -387,7 +387,7 @@ void() hub_control_status =
 	    	str2 = first.map;
 	    }
 
-	    if(self.map == string_null)
+	    if (self.map == string_null)
 	    {
 	      str3 = ftos(first.cnt);
 	      centerprint5(self, "\n\n\n\n\n\n\n\n\n\n\nPlease Vote             Lead: ", str2, " [", str3, "]");
@@ -403,12 +403,12 @@ void() hub_control_status =
 	  }
 	}
 
-	if(first != second)
-	if(second.cnt > 0)
+	if (first != second)
+	if (second.cnt > 0)
 	{
-		if(self.attack_state == 1)
+		if (self.attack_state == 1)
 	  {
-	  	if(second.map == "painkeep")
+	  	if (second.map == "painkeep")
 	    {
 	    	str2 = "pk ";
 	    }
@@ -417,7 +417,7 @@ void() hub_control_status =
 	    	str2 = second.map;
 	    }
 
-	    if(self.map == string_null)
+	    if (self.map == string_null)
 	    {
 	      str3 = ftos(second.cnt);
 	      centerprint5(self, "\n\n\n\n\n\n\n\n\n\n\nPlease Vote            Second: ", str2, " [", str3, "]");
@@ -432,10 +432,10 @@ void() hub_control_status =
 		}
 	}
 
-	if(first.cnt == 0 || first == second || second.cnt == 0 || self.attack_state == 2)
+	if (first.cnt == 0 || first == second || second.cnt == 0 || self.attack_state == 2)
 	{
 	  timemins = 0;
-	  if(hubStartTime > time)
+	  if (hubStartTime > time)
 	  {
 	    timedef = (hubStartTime - time);
 	    timemins = timedef / 60;
@@ -452,7 +452,7 @@ void() hub_control_status =
 	  maxplayers = votecast = 0;
 	  while (pl != world)
 	  {
-	  	if(pl.disconnectPlayer == 0)
+	  	if (pl.disconnectPlayer == 0)
 	    {
 	      if (pl.map != "")
 	        votecast = votecast + 1;
@@ -552,7 +552,7 @@ void() GoBack =
 
 void(string mapName) findAndPrintMapName =
 {
-	if(mapName == "painkeep")
+	if (mapName == "painkeep")
 	{
 	  // 'PainKeep'
 	  WriteB3(MSG_ONE, 6906192);
@@ -560,117 +560,117 @@ void(string mapName) findAndPrintMapName =
 	  WriteB3(MSG_ONE, 28773);
 
 	}
-	else if(mapName == "pk0")
+	else if (mapName == "pk0")
 	{
 	  // 'pk0'
 	  WriteB3(MSG_ONE, 3173232);
 	}
-	else if(mapName == "pk1")
+	else if (mapName == "pk1")
 	{
 	  // 'pk1'
 	  WriteB3(MSG_ONE, 3238768);
 	}
-	else if(mapName == "pk2")
+	else if (mapName == "pk2")
 	{
 	  // 'pk2'
 	  WriteB3(MSG_ONE, 3304304);
 	}
-	else if(mapName == "pk3")
+	else if (mapName == "pk3")
 	{
 	  // 'pk3'
 	  WriteB3(MSG_ONE, 3369840);
 	}
-	else if(mapName == "pk4")
+	else if (mapName == "pk4")
 	{
 	  // 'pk4'
 	  WriteB3(MSG_ONE, 3435376);
 	}
-	else if(mapName == "pk5")
+	else if (mapName == "pk5")
 	{
 	  // 'pk5'
 	  WriteB3(MSG_ONE, 3500912);
 	}
-	else if(mapName == "pk6")
+	else if (mapName == "pk6")
 	{
 	  // 'pk6'
 	  WriteB3(MSG_ONE, 3566448);
 	}
-	else if(mapName == "pk7")
+	else if (mapName == "pk7")
 	{
 	  // 'pk7'
 	  WriteB3(MSG_ONE, 3631984);
 	}
-	else if(mapName == "pk8")
+	else if (mapName == "pk8")
 	{
 	  // 'pk8'
 	  WriteB3(MSG_ONE, 3697520);
 	}
-	else if(mapName == "pk9")
+	else if (mapName == "pk9")
 	{
 	  // 'pk9'
 	  WriteB3(MSG_ONE, 3763056);
 	}
-	else if(mapName == "pk10")
+	else if (mapName == "pk10")
 	{
 	  // 'pk10'
 	  WriteB3(MSG_ONE, 3238768);
 	  WriteB3(MSG_ONE, 48);
 	}
-	else if(mapName == "pk11")
+	else if (mapName == "pk11")
 	{
 	  // 'pk11'
 	  WriteB3(MSG_ONE, 3238768);
 	  WriteB3(MSG_ONE, 49);
 	}
-	else if(mapName == "pk12")
+	else if (mapName == "pk12")
 	{
 	  // 'pk12'
 	  WriteB3(MSG_ONE, 3238768);
 	  WriteB3(MSG_ONE, 50);
 	}
-	else if(mapName == "pk13")
+	else if (mapName == "pk13")
 	{
 	  // 'pk13'
 	  WriteB3(MSG_ONE, 3238768);
 	  WriteB3(MSG_ONE, 51);
 	}
-	else if(mapName == "pk14")
+	else if (mapName == "pk14")
 	{
 	  // 'pk14'
 	  WriteB3(MSG_ONE, 3238768);
 	  WriteB3(MSG_ONE, 52);
 	}
-	else if(mapName == "pk15")
+	else if (mapName == "pk15")
 	{
 	  // 'pk15'
 	  WriteB3(MSG_ONE, 3238768);
 	  WriteB3(MSG_ONE, 53);
 	}
-	else if(mapName == "pk16")
+	else if (mapName == "pk16")
 	{
 	  // 'pk16'
 	  WriteB3(MSG_ONE, 3238768);
 	  WriteB3(MSG_ONE, 54);
 	}
-	else if(mapName == "pk17")
+	else if (mapName == "pk17")
 	{
 	  // 'pk17'
 	  WriteB3(MSG_ONE, 3238768);
 	  WriteB3(MSG_ONE, 55);
 	}
-	else if(mapName == "pk18")
+	else if (mapName == "pk18")
 	{
 	  // 'pk18'
 	  WriteB3(MSG_ONE, 3238768);
 	  WriteB3(MSG_ONE, 56);
 	}
-	else if(mapName == "pk19")
+	else if (mapName == "pk19")
 	{
 	  // 'pk19'
 	  WriteB3(MSG_ONE, 3238768);
 	  WriteB3(MSG_ONE, 57);
 	}
-	else if(mapName == "pk20")
+	else if (mapName == "pk20")
 	{
 	  // 'pk20'
 	  WriteB3(MSG_ONE, 3304304);
@@ -759,7 +759,7 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerInte
 	WriteB3(MSG_ONE, 2105376);
 	WriteB3(MSG_ONE, 2105376);
 
-	if(first.cnt > 0)
+	if (first.cnt > 0)
 	{
 	  // '\nLeading level: '
 	  WriteB3(MSG_ONE, 6638602);
@@ -789,8 +789,8 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerInte
 	  WriteB3(MSG_ONE, 2105376);
 	  WriteB3(MSG_ONE, 2105376);
 
-		if(first != second)
-		if(second.cnt > 0)
+		if (first != second)
+		if (second.cnt > 0)
 	  {
 	    // '\nSecond place: '
 	    WriteB3(MSG_ONE, 6640394);
@@ -829,7 +829,7 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerInte
 	WriteB3(MSG_ONE, 6778473);
 	WriteB3(MSG_ONE, 8250);
 
-	if(timemins < 10)
+	if (timemins < 10)
 	{
 	  // ' 0'
 	  WriteB3(MSG_ONE, 12320);
@@ -842,7 +842,7 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerInte
 
 	WriteBFloat(MSG_ONE, timemins);
 
-	if(timesec < 10)
+	if (timesec < 10)
 	{
 	  // ':0'
 	  WriteB3(MSG_ONE, 12346);
@@ -901,17 +901,17 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerInte
 void() WaitForVotesThink =
 {
 	// if intermission mode finished abnormally
-	if(self.voteIntermission == 0)
+	if (self.voteIntermission == 0)
 		return;
 
 	// next think
 	self.nextthink = time + 0.1;
 
-	if(self.messagetimeout < time)
+	if (self.messagetimeout < time)
 	{
-	  if(self.attack_state)
+	  if (self.attack_state)
 	  {
-	    if(self.laststattime < time)
+	    if (self.laststattime < time)
 	    {
 	      self.attack_state = 0;
 	    }
@@ -929,7 +929,7 @@ void() WaitForVotesThink =
 	    local entity pl;
 
 	    timemins = 0;
-	    if(hubStartTime > time)
+	    if (hubStartTime > time)
 	    {
 	      timedef = (hubStartTime - time);
 	      timemins = timedef / 60;
@@ -946,7 +946,7 @@ void() WaitForVotesThink =
 	    maxplayers = votecast = 0;
 	    while (pl != world)
 	    {
-	      if(pl.disconnectPlayer == 0)
+	      if (pl.disconnectPlayer == 0)
 	      {
 	        if (pl.map != "")
 	          votecast = votecast + 1;
@@ -962,7 +962,7 @@ void() WaitForVotesThink =
 
 	  self.messagetimeout = time + 1;
 	}
-	else if(self.attack_state)
+	else if (self.attack_state)
 	{
 	  return;
 	}

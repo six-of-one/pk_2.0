@@ -21,14 +21,14 @@ void() copb_eatCan =
 
 void() copb_checkFart =
 {
-	if(self.copb_nextFartTimeout < time) // Ended last fart?
-	if(self.search_time < time) // next fart time?
+	if (self.copb_nextFartTimeout < time) // Ended last fart?
+	if (self.search_time < time) // next fart time?
 	{ // farting time
 		local string fartNoise;
 	  local float rs;
 
 		// sound off
-	  if(random() < 0.90)
+	  if (random() < 0.90)
 	  { // 75% of the time I'm using small farts...
 		  rs = rint((random() * 2) + 1);
 
@@ -44,7 +44,7 @@ void() copb_checkFart =
 	  }
 	  else
 	  {
-	    if(random() < 0.5)
+	    if (random() < 0.5)
 		    fartNoise = "weapons/copb/copb_4.wav";
 		  else
 	  	  fartNoise = "weapons/copb/copb_5.wav";

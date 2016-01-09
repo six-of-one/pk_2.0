@@ -15,17 +15,17 @@ void (entity e) clearCache;
 float () CheckWaterLevel =
 {
 	local float pnt;
-	if ( (self.waterlevel < 1) )
+	if (self.waterlevel < 1)
 	{
 		return (0);
 	}
 	pnt = pointcontents ((self.origin + self.view_ofs));
-	if ( (pnt != CONTENT_EMPTY) )
+	if (pnt != CONTENT_EMPTY)
 	{
 		return (3);
 	}
 	pnt = pointcontents (self.origin);
-	if ( (pnt != CONTENT_EMPTY) )
+	if (pnt != CONTENT_EMPTY)
 	{
 		return (2);
 	}
@@ -39,19 +39,19 @@ void () BotWaterMove =
 	local float pnt;
 	local vector bt;
 	wlevel = CheckWaterLevel ();
-	if ( (self.health < 0) )
+	if (self.health < 0)
 	{
 		return ;
 	}
-	if ( (wlevel != 3) )
+	if (wlevel != 3)
 	{
-		if ( (self.air_finished < time) )
+		if (self.air_finished < time)
 		{
 			sound (self,CHAN_VOICE,"player/gasp2.wav",TRUE,ATTN_NORM);
 		}
 		else
 		{
-			if ( (self.air_finished < (time + 9)) )
+			if (self.air_finished < (time + 9))
 			{
 				sound (self,CHAN_VOICE,"player/gasp1.wav",TRUE,ATTN_NORM);
 			}
@@ -61,12 +61,12 @@ void () BotWaterMove =
 	}
 	else
 	{
-		if ( (self.air_finished < time) )
+		if (self.air_finished < time)
 		{
-			if ( (self.pain_finished < time) )
+			if (self.pain_finished < time)
 			{
 				self.dmg = (self.dmg + 2);
-				if ( (self.dmg > 15) )
+				if (self.dmg > 15)
 				{
 					self.dmg = 10;
 				}
@@ -76,38 +76,38 @@ void () BotWaterMove =
 		}
 	}
 	wtype = self.watertype;
-	if ( (wlevel < 1) )
+	if (wlevel < 1)
 	{
 		bt = ((self.absmin + self.absmax) * 0.5);
 		bt_z = (self.absmin_z + 1);
 		pnt = pointcontents (bt);
-		if ( (pnt != CONTENT_EMPTY) )
+		if (pnt != CONTENT_EMPTY)
 		{
 			wlevel = 1;
 			wtype = pnt;
 		}
 	}
-	if ( (self.waterlevel < 1) )
+	if (self.waterlevel < 1)
 	{
-		if ( (self.flags & FL_INWATER) )
+		if (self.flags & FL_INWATER)
 		{
 			sound (self,CHAN_BODY,"misc/outwater.wav",TRUE,ATTN_NORM);
 			self.flags = (self.flags - FL_INWATER);
 		}
-		if ( (self.flags & FL_SWIM) )
+		if (self.flags & FL_SWIM)
 		{
 			self.flags = (self.flags - FL_SWIM);
 		}
-		if ( (wlevel < 1) )
+		if (wlevel < 1)
 		{
 			return ;
 		}
 	}
-	if ( (wtype == CONTENT_LAVA) )
+	if (wtype == CONTENT_LAVA)
 	{
-		if ( (self.dmgtime < time) )
+		if (self.dmgtime < time)
 		{
-			if ( (self.radsuit_finished > time) )
+			if (self.radsuit_finished > time)
 			{
 				self.dmgtime = (time + 1);
 			}
@@ -120,35 +120,35 @@ void () BotWaterMove =
 	}
 	else
 	{
-		if ( (wtype == CONTENT_SLIME) )
+		if (wtype == CONTENT_SLIME)
 		{
-			if ( ((self.dmgtime < time) && (self.radsuit_finished < time)) )
+			if ((self.dmgtime < time) && (self.radsuit_finished < time))
 			{
 				self.dmgtime = (time + 1);
 				T_Damage (self,world,world,(4* wlevel));
 			}
 		}
 	}
-	if ( (self.waterlevel < 1) )
+	if (self.waterlevel < 1)
 	{
 		return ;
 	}
-	if ( !(self.flags & FL_INWATER) )
+	if (!(self.flags & FL_INWATER))
 	{
-		if ( (self.watertype == CONTENT_LAVA) )
+		if (self.watertype == CONTENT_LAVA)
 		{
 			sound (self,CHAN_BODY,"player/inlava.wav",TRUE,ATTN_NORM);
 		}
-		if ( (self.watertype == CONTENT_WATER) )
+		if (self.watertype == CONTENT_WATER)
 		{
 			sound (self,CHAN_BODY,"player/inh2o.wav",TRUE,ATTN_NORM);
 		}
-		if ( (self.watertype == CONTENT_SLIME) )
+		if (self.watertype == CONTENT_SLIME)
 		{
 			sound (self,CHAN_BODY,"player/slimbrn2.wav",TRUE,ATTN_NORM);
 		}
 		self.flags = (self.flags + FL_INWATER);
-		if ( !(self.flags & FL_SWIM) )
+		if (!(self.flags & FL_SWIM))
 		{
 			self.flags = (self.flags + FL_SWIM);
 		}
@@ -158,30 +158,30 @@ void () BotWaterMove =
 
 void () BotCheckPowerups =
 {
-	if ( (self.health <= 0) )
+	if (self.health <= 0)
 	{
 		return ;
 	}
-	if ( self.invisible_finished )
+	if (self.invisible_finished)
 	{
-		if ( (self.invisible_sound < time) )
+		if (self.invisible_sound < time)
 		{
 			sound (self,CHAN_AUTO,"items/inv3.wav",0.5,ATTN_IDLE);
 			self.invisible_sound = (time + ((random () * 3) + 1));
 		}
-		if ( (self.invisible_finished < (time + 3)) )
+		if (self.invisible_finished < (time + 3))
 		{
-			if ( (self.invisible_time == 1) )
+			if (self.invisible_time == 1)
 			{
 				sound (self,CHAN_AUTO,"items/inv2.wav",TRUE,ATTN_NORM);
 				self.invisible_time = (time + 1);
 			}
-			if ( (self.invisible_time < time) )
+			if (self.invisible_time < time)
 			{
 				self.invisible_time = (time + 1);
 			}
 		}
-		if ( (self.invisible_finished < time) )
+		if (self.invisible_finished < time)
 		{
 			self.items = (self.items - IT_INVISIBILITY);
 			self.invisible_finished = 0;
@@ -194,27 +194,27 @@ void () BotCheckPowerups =
 	{
 		self.modelindex = modelindex_player;
 	}
-	if ( self.invincible_finished )
+	if (self.invincible_finished)
 	{
-		if ( (self.invincible_finished < (time + 3)) )
+		if (self.invincible_finished < (time + 3))
 		{
-			if ( (self.invincible_time == 1) )
+			if (self.invincible_time == 1)
 			{
 				sound (self,CHAN_AUTO,"items/protect2.wav",TRUE,ATTN_NORM);
 				self.invincible_time = (time + 1);
 			}
-			if ( (self.invincible_time < time) )
+			if (self.invincible_time < time)
 			{
 				self.invincible_time = (time + 1);
 			}
 		}
-		if ( (self.invincible_finished < time) )
+		if (self.invincible_finished < time)
 		{
 			self.items = (self.items - IT_INVULNERABILITY);
 			self.invincible_time = 0;
 			self.invincible_finished = 0;
 		}
-		if ( (self.invincible_finished > time) )
+		if (self.invincible_finished > time)
 		{
 			self.effects = (self.effects | EF_DIMLIGHT);
 		}
@@ -223,27 +223,27 @@ void () BotCheckPowerups =
 			self.effects = (self.effects - (self.effects & EF_DIMLIGHT));
 		}
 	}
-	if ( self.super_damage_finished )
+	if (self.super_damage_finished)
 	{
-		if ( (self.super_damage_finished < (time + 3)) )
+		if (self.super_damage_finished < (time + 3))
 		{
-			if ( (self.super_time == 1) )
+			if (self.super_time == 1)
 			{
 				sound (self,CHAN_AUTO,"items/damage2.wav",TRUE,ATTN_NORM);
 				self.super_time = (time + 1);
 			}
-			if ( (self.super_time < time) )
+			if (self.super_time < time)
 			{
 				self.super_time = (time + 1);
 			}
 		}
-		if ( (self.super_damage_finished < time) )
+		if (self.super_damage_finished < time)
 		{
 			self.items = (self.items - IT_QUAD);
 			self.super_damage_finished = 0;
 			self.super_time = 0;
 		}
-		if ( (self.super_damage_finished > time) )
+		if (self.super_damage_finished > time)
 		{
 			self.effects = (self.effects | EF_DIMLIGHT);
 		}
@@ -252,22 +252,22 @@ void () BotCheckPowerups =
 			self.effects = (self.effects - (self.effects & EF_DIMLIGHT));
 		}
 	}
-	if ( self.radsuit_finished )
+	if (self.radsuit_finished)
 	{
 		self.air_finished = (time + 12);
-		if ( (self.radsuit_finished < (time + 3)) )
+		if (self.radsuit_finished < (time + 3))
 		{
-			if ( (self.rad_time == 1) )
+			if (self.rad_time == 1)
 			{
 				sound (self,CHAN_AUTO,"items/suit2.wav",TRUE,ATTN_NORM);
 				self.rad_time = (time + 1);
 			}
-			if ( (self.rad_time < time) )
+			if (self.rad_time < time)
 			{
 				self.rad_time = (time + 1);
 			}
 		}
-		if ( (self.radsuit_finished < time) )
+		if (self.radsuit_finished < time)
 		{
 			self.items = (self.items - IT_SUIT);
 			self.rad_time = 0;
@@ -280,16 +280,16 @@ void () BotDead;
 void () BotPostThink =
 {
 	local float fraglimit;
-	if ( self.pather )
+	if (self.pather)
 	{
-		if ( CheckDropPath () )
+		if (CheckDropPath ())
 		{
 			DropBotPath ();
 		}
 	}
 	self.movetarget.flags = self.flags;
 	setorigin (self.movetarget,self.origin);
-	if ( (self.deadflag != DEAD_NO) )
+	if (self.deadflag != DEAD_NO)
 	{
 		dprint ("Bot should be dead!\n");
 		GibPlayer ();
@@ -299,7 +299,7 @@ void () BotPostThink =
 	BotCheckPowerups ();
 	BotWaterMove ();
 	fraglimit = cvar ("fraglimit");
-	if ( (fraglimit && (self.frags >= fraglimit)) )
+	if (fraglimit && (self.frags >= fraglimit))
 	{
 		NextLevel ();
 		self.button0 = 1;

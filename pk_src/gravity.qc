@@ -55,11 +55,11 @@ void() gravity_pull =
 	{
 		if (visible(e))
 		if (e.classname != "gravity") // don't yank on any other gravity wells
-		if(e.classname != "beartrap")
+		if (e.classname != "beartrap")
 		//if (e != self.owner)
-		if(e.movetype != MOVETYPE_NONE) // anything that can move
-		if(e.movetype != MOVETYPE_PUSH)
-		if(e.movetype != MOVETYPE_NOCLIP)
+		if (e.movetype != MOVETYPE_NONE) // anything that can move
+		if (e.movetype != MOVETYPE_PUSH)
+		if (e.movetype != MOVETYPE_NOCLIP)
 		{
 			d = vlen(e.origin - org);
 			if (e.flags & FL_ONGROUND)

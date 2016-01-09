@@ -700,11 +700,11 @@ float(entity targ, entity inflictor) CanDamage;
 /* code for this mod - developer stuff? we take out...
 void (entity e) remove =
 {
-	if ( (e.classname == "BotTarget") )
+	if (e.classname == "BotTarget")
 	{
 		eprint (e);
 	}
-	if ( (e.classname == "beartrap") )
+	if (e.classname == "beartrap")
 	{
 		eprint (e);
 	}

@@ -11,7 +11,7 @@
 	"targetname" "..."	- Name of group of frames, also targetname for toggling on and off
 	"cnt" "#"			- Frame # (1 based)
 	
-		Optional: ( * only needed on frame #1)
+		Optional: (* only needed on frame #1)
 	* "dmg" "#"		- Damage on touch (only when moving)
 	* "target" "..."	- Target to call on touch
 	* "spawnflags" "#"	- & 1: Use on touch (frame will advance on touch, and
@@ -131,7 +131,7 @@ void() func_frame_change_frame =
 			sound (self, CHAN_VOICE, e.noise1, 1, ATTN_NORM);
 	}
 		
-	if ( !(self.spawnflags & FF_USEONTOUCH) )
+	if (!(self.spawnflags & FF_USEONTOUCH))
 	{
 		if (e.wait < 0)	// if we've hit a -1 wait, signal a stopped state
 		{
@@ -182,7 +182,7 @@ void() func_frame_touch =
 		return;	// this line shouldn't ever be reached
 		
 	// damage
-	if (self.dmg && !(self.spawnflags & FF_STOPPED) )
+	if (self.dmg && !(self.spawnflags & FF_STOPPED))
 		T_Damage(other, self, self, self.dmg);
 
 	// change frame on touch only
@@ -243,11 +243,11 @@ void() func_frame =
 		self.enemy = self;	// enemy says which frame we're on
 		
 		// if we're not use on touch
-		if ( !(self.spawnflags & FF_USEONTOUCH) )
+		if (!(self.spawnflags & FF_USEONTOUCH))
 		{
 			self.think = func_frame_change_frame;
 			// and we're not stopped
-			if ( !(self.spawnflags & FF_STOPPED) )
+			if (!(self.spawnflags & FF_STOPPED))
 				// then get going
 				self.nextthink = self.ltime + self.wait;
 		}

@@ -910,7 +910,7 @@ void(entity this, float direct) bot_get_path =
 	}
 	if (direct)
 	{
-		if(begin_route())
+		if (begin_route())
 			direct_route = TRUE;
 		else
 			bot_lost(this, FALSE);

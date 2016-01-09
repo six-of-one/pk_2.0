@@ -61,11 +61,11 @@ $frame axattd1 axattd2 axattd3 axattd4 axattd5 axattd6
 void() pk_harpoon_frames =
 {
 
-	if(self.weapon == IT_AXE && self.pk_currentitem == PK_IT_GRAPGUN && self.grap_cornerchainNext != world)
+	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_GRAPGUN && self.grap_cornerchainNext != world)
 	{
-		if(self.grap_state == GRAP_IN || self.grap_state == GRAP_TOHARPOON)
+		if (self.grap_state == GRAP_IN || self.grap_state == GRAP_TOHARPOON)
 		{
-			if(self.weaponframe > 11 || self.weaponframe < 9)
+			if (self.weaponframe > 11 || self.weaponframe < 9)
 			{
 				self.weaponframe = 9;
 			}
@@ -435,7 +435,7 @@ void() PK_GibPlayer =
 	}
 
 
-	if(random() > 0.5)
+	if (random() > 0.5)
 	{
 		ThrowGib ("progs/gib2.mdl", self.health);
 	}
@@ -497,12 +497,12 @@ void() PK_PlayerDie =
 
 	self.weaponmodel = "";
 
-	if(self.grap_cornerchainNext)	// Grappling harpoon is out there, remove...
+	if (self.grap_cornerchainNext)	// Grappling harpoon is out there, remove...
 	{
 		grap_remove(self);
 	}
 
-	if(self.bolt_conduitTimeout > time) // it's the conduit time for this player...
+	if (self.bolt_conduitTimeout > time) // it's the conduit time for this player...
 	{
 	  local entity flame;
 

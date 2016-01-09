@@ -94,7 +94,7 @@ void()	Tar_JumpTouch =
 
 	if (other.takedamage && other.classname != self.classname)
 	{
-		if ( vlen(self.velocity) > 400 )
+		if (vlen(self.velocity) > 400)
 		{
 			ldmg = 10 + 10*random();
 			T_Damage (other, self, self, ldmg);	

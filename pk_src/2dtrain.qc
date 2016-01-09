@@ -16,7 +16,7 @@ sounds
 1) ratchet metal
 
 2d changes:
-* on use ( n ), train will progress to targetn
+* on use (n), train will progress to targetn
 * stops at all path_corners
 
 use "cnt" "..." in the trigger to tell which dir (1 or 2) the button tells

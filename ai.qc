@@ -88,7 +88,7 @@ The number of seconds to spend standing or bowing for path_stand or path_bow
 
 void () movetarget_f =
 {
-	if ( !self.targetname )
+	if (!self.targetname)
 		objerror ("monster_movetarget: no targetname");
 
 	self.solid = SOLID_TRIGGER;
@@ -121,7 +121,7 @@ void () t_movetarget =
 	if (other.movetarget != self)
 		return ;
 
-	if ( other.enemy )
+	if (other.enemy)
 		return;		// fighting, not following a path
 
 	temp = self;
@@ -134,7 +134,7 @@ void () t_movetarget =
 //dprint ("t_movetarget\n");
 	self.goalentity = self.movetarget = find (world, targetname, other.target);
 	self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
-	if ( !self.movetarget )
+	if (!self.movetarget)
 	{
 		self.pausetime = time + 999999;
 		self.th_stand ();
@@ -214,7 +214,7 @@ float (entity targ) infront =
 	vec = normalize (targ.origin - self.origin);
 	dot = vec * v_forward;
 	
-	if ( dot > 0.3)
+	if (dot > 0.3)
 	{
 		return TRUE;
 	}
@@ -241,7 +241,7 @@ void() ChangeYaw =
 
 //current_yaw = self.ideal_yaw;
 // mod down the current angle
-	current_yaw = anglemod( self.angles_y );
+	current_yaw = anglemod(self.angles_y);
 	ideal = self.ideal_yaw;
 	
 	if (current_yaw == ideal)
@@ -266,7 +266,7 @@ void() ChangeYaw =
 	}
 	else
 	{
-		if (move < 0-self.yaw_speed )
+		if (move < 0-self.yaw_speed)
 			move = 0-self.yaw_speed;
 	}
 
@@ -373,7 +373,7 @@ float () FindTarget =
 // spawnflags & 3 is a big hack, because zombie crucified used the first
 // spawn flag prior to the ambush flag, and I forgot about it, so the second
 // spawn flag works as well
-	if (sight_entity_time >= time - 0.1 && !(self.spawnflags & 3) )
+	if (sight_entity_time >= time - 0.1 && !(self.spawnflags & 3))
 	{
 		client = sight_entity;
 		if (client.enemy == self.enemy)
@@ -382,7 +382,7 @@ float () FindTarget =
 	else
 	{
 		client = checkclient ();
-		if ( !client )
+		if (!client)
 			return FALSE;	// current check entity isn't in PVS
 	}
 
@@ -398,7 +398,7 @@ float () FindTarget =
 	if (r == RANGE_FAR)
 		return FALSE;
 		
-	if ( !visible (client) )
+	if (!visible (client))
 		return FALSE;
 
 	if (r == RANGE_NEAR)
@@ -408,7 +408,7 @@ float () FindTarget =
 	}
 	else if (r == RANGE_MID)
 	{
-		if ( /* client.show_hostile < time || */ !infront (client))
+		if (/* client.show_hostile < time || */ !infront (client))
 			return FALSE;
 	}
 	
@@ -459,7 +459,7 @@ void (float dist) ai_pain =
 	local float	away;
 	
 	away = anglemod (vectoyaw (self.origin - self.enemy.origin) 
-	+ 180*(random()- 0.5) );
+	+ 180*(random()- 0.5));
 	
 	walkmove (away, dist);
 */
@@ -496,7 +496,7 @@ void (float dist) ai_walk =
 		return ;
 	}
 	// check for noticing a player
-	if ( FindTarget () )
+	if (FindTarget ())
 		return ;
 
 	movetogoal (dist);
@@ -512,7 +512,7 @@ The monster is staying in one place for a while, with slight angle turns
 */
 void () ai_stand =
 {
-	if ( FindTarget () )
+	if (FindTarget ())
 		return ;
 
 	if (time > self.pausetime)
@@ -534,7 +534,7 @@ don't move, but turn towards ideal_yaw
 */
 void () ai_turn =
 {
-	if ( FindTarget () )
+	if (FindTarget ())
 		return ;
 
 	ChangeYaw ();
@@ -596,7 +596,7 @@ float () DogCheckAttack;
 
 float () CheckAnyAttack =
 {
-	if ( !enemy_vis )
+	if (!enemy_vis)
 		return FALSE; // Cataboligne 9.17.3 - fix compiler warning
 	if (self.classname == "monster_army")
 		return SoldierCheckAttack ();
@@ -626,7 +626,7 @@ void () ai_run_melee =
 	self.ideal_yaw = enemy_yaw;
 	ChangeYaw ();
 
-	if ( FacingIdeal () )
+	if (FacingIdeal ())
 	{
 		self.th_melee ();
 		self.attack_state = AS_STRAIGHT;
@@ -645,7 +645,7 @@ void () ai_run_missile =
 {
 	self.ideal_yaw = enemy_yaw;
 	ChangeYaw ();
-	if ( FacingIdeal () )
+	if (FacingIdeal ())
 	{
 		self.th_missile ();
 		self.attack_state = AS_STRAIGHT;
@@ -666,7 +666,7 @@ void () ai_run_slide =
 
 	self.ideal_yaw = enemy_yaw;
 	ChangeYaw ();
-	if ( self.lefty )
+	if (self.lefty)
 		ofs = 90;
 	else
 		ofs = -90;
@@ -706,7 +706,7 @@ void (float dist) ai_run =
 		}
 		else
 		{
-			if ( self.movetarget )
+			if (self.movetarget)
 				self.th_walk ();
 			else
 				self.th_stand ();
@@ -718,13 +718,13 @@ void (float dist) ai_run =
 
 // check knowledge of enemy
 	enemy_vis = visible (self.enemy);
-	if ( enemy_vis )
+	if (enemy_vis)
 		self.search_time = time + 5;
 
 // look for other coop players
 	if ((coop || deathmatch) && (self.search_time < time)) // *reaper
 	{
-		if ( FindTarget () )
+		if (FindTarget ())
 			return ;
 	}
 
@@ -745,7 +745,7 @@ void (float dist) ai_run =
 		return ;
 	}
 
-	if ( CheckAnyAttack () )
+	if (CheckAnyAttack ())
 		return;					// beginning an attack
 		
 	if (self.attack_state == AS_SLIDING)

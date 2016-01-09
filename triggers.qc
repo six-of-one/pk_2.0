@@ -31,7 +31,7 @@ float SPAWNFLAG_NOTOUCH	 = 1;
 // the wait time has passed, so set back up for another activation
 void () multi_wait =
 {
-	if ( self.max_health )
+	if (self.max_health)
 	{
 		self.health = self.max_health;
 		self.takedamage = DAMAGE_YES;
@@ -59,7 +59,7 @@ void () multi_trigger =
 		WriteByte (MSG_ALL,SVC_FOUNDSECRET);
 	}
 
-	if ( self.noise )
+	if (self.noise)
 		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 
 // don't trigger again until reset
@@ -154,7 +154,7 @@ void () trigger_multiple =
 		self.noise = "misc/trigger1.wav";
 	}
 
-	if ( !self.wait )
+	if (!self.wait)
 		self.wait = 0.2;
 	self.use = multi_use;
 
@@ -162,7 +162,7 @@ void () trigger_multiple =
 	self.istrigger = 1;
 	InitTrigger ();
 
-	if ( self.health )
+	if (self.health)
 	{
 		if (self.spawnflags & SPAWNFLAG_NOTOUCH)
 			objerror ("health and notouch don't make sense\n");
@@ -174,7 +174,7 @@ void () trigger_multiple =
 	}
 	else
 	{
-		if ( !(self.spawnflags & SPAWNFLAG_NOTOUCH) )
+		if (!(self.spawnflags & SPAWNFLAG_NOTOUCH))
 		{
 			self.touch = multi_touch;
 		}
@@ -227,9 +227,9 @@ void () trigger_secret =
 {
 	total_secrets = total_secrets + 1;
 	self.wait = -1;
-	if ( !self.message )
+	if (!self.message)
 		self.message = "You found a secret area!";
-	if ( !self.sounds )
+	if (!self.sounds)
 		self.sounds = 1;
 
 	if (self.sounds == 1)
@@ -291,7 +291,7 @@ After the counter has been triggered "count" times (default 2), it will fire all
 void () trigger_counter =
 {
 	self.wait = -1;
-	if ( !self.count )
+	if (!self.count)
 		self.count = 2;
 
 	self.use = counter_use;
@@ -328,7 +328,7 @@ void () play_teleport =
 
 	if (PK)
 	{
-	if ( !SOUND_GOT )
+	if (!SOUND_GOT)
 		get_teleport_sounds ();
 	else
 		SOUND_GOT = FALSE;	// So we get new sounds the next time
@@ -371,7 +371,7 @@ void () tdeath_touch =
 			return ;
 		}
 	}
-	if ( (other.classname == "peeper") )
+	if (other.classname == "peeper")
 	{
 		other.takedamage = DAMAGE_AIM;
 
@@ -379,7 +379,7 @@ void () tdeath_touch =
 	if (other.classname == "beartrap") // *pk - dont telefrag beartraps
 		return;
 
-	if ( other.health )
+	if (other.health)
 	{
 		T_Damage (other,self,self,50000);
 	}
@@ -410,7 +410,7 @@ void () teleport_touch =
 	local entity t;
 	local vector org;
 
-	if ( self.targetname )
+	if (self.targetname)
 	{
 		if (self.nextthink < time)
 		{
@@ -437,7 +437,7 @@ void () teleport_touch =
 	spawn_tfog (other.origin);
 
 	t = find (world,targetname,self.target);
-	if ( !t )
+	if (!t)
 		objerror ("couldn't find target");
 
 	if (PK) ClearSpawnPoint(t);
@@ -448,12 +448,12 @@ void () teleport_touch =
 	spawn_tfog (org);
 	spawn_tdeath (t.origin,other);
 
-	if ( (other.enemy.classname == "dmbot") )
+	if (other.enemy.classname == "dmbot")
 	{
 		enemy_touched ();
 	}
 // move the player and lock him down for a little while
-	if ( !other.health )
+	if (!other.health)
 	{
 		other.origin = t.origin;
 		other.velocity = (v_forward * other.velocity_x) + (v_forward * other.velocity_y);
@@ -462,16 +462,16 @@ void () teleport_touch =
 
 	setorigin (other,t.origin);
 	other.angles = t.mangle;
-	if ( other.movetarget.movetarget )
+	if (other.movetarget.movetarget)
 	{
 		addTarget (other.movetarget.movetarget,self);
 		other.movetarget.movetarget = self;
 	}
-	if ( (other.classname == "dmbot") )
+	if (other.classname == "dmbot")
 	{
 		bot_touched ();
 	}
-	if ( (other.classname == "player") || (other.classname == "dmbot") || (other.classname == "peeper") )
+	if ((other.classname == "player") || (other.classname == "dmbot") || (other.classname == "peeper"))
 	{
 		other.fixangle = 1;		// turn this way immediately
 		other.teleport_time = time + 0.7;
@@ -493,7 +493,7 @@ void () info_teleport_destination =
 	self.angles = '0 0 0';
 	self.model = "";
 	self.origin = self.origin + '0 0 27';
-	if ( !self.targetname )
+	if (!self.targetname)
 		objerror ("no targetname");
 };
 
@@ -516,11 +516,11 @@ void () trigger_teleport =
 	InitTrigger ();
 	self.touch = teleport_touch;
 	// find the destination
-	if ( !self.target )
+	if (!self.target)
 		objerror ("no target");
 	self.use = teleport_use;
 
-	if ( !(self.spawnflags & SILENT) )
+	if (!(self.spawnflags & SILENT))
 	{
 		precache_sound ("ambience/hum1.wav");
 		o = (self.mins + self.maxs)*0.5;
@@ -572,7 +572,7 @@ void () trigger_onlyregistered_touch =
 		return ;
 
 	self.attack_finished = time + 2;
-	if ( cvar ("registered") )
+	if (cvar ("registered"))
 	{
 		self.message = "";
 		SUB_UseTargets ();
@@ -611,7 +611,7 @@ void () hurt_on =
 
 void () hurt_touch =
 {
-	if ( other.takedamage )
+	if (other.takedamage)
 	{
 		self.solid = SOLID_NOT;
 		T_Damage (other,self,self,self.dmg);
@@ -631,7 +631,7 @@ void () trigger_hurt =
 {
 	InitTrigger ();
 	self.touch = hurt_touch;
-	if ( !self.dmg )
+	if (!self.dmg)
 		self.dmg = 5;
 };
 
@@ -656,21 +656,21 @@ void () trigger_push_touch =
 		}
 		else
 		{
-			if ( (other.classname == "dmbot") )
+			if (other.classname == "dmbot")
 			{
-				if ( ((self.movedir_x < 0.1) && (self.movedir_y < 0.1)) )
+				if ((self.movedir_x < 0.1) && (self.movedir_y < 0.1))
 				{
 					other.velocity_x = ((other.velocity_x + (80 * random ())) - 40);
 					other.velocity_y = ((other.velocity_y + (80 * random ())) - 40);
 				}
-				if ( (other.fly_sound < time) )
+				if (other.fly_sound < time)
 				{
 					other.fly_sound = (time + 1.5);
 					sound (other,CHAN_AUTO,"ambience/windfly.wav",TRUE,ATTN_NORM);
 				}
 			}
 		}
-		if ( (other.enemy.classname == "dmbot") )
+		if (other.enemy.classname == "dmbot")
 		{
 			enemy_touched ();
 		}
@@ -690,7 +690,7 @@ void () trigger_push =
 	self.touch = trigger_push_touch;
 	self.istrigger = 1;
 	self.th_weight = trigpushweight;
-	if ( !self.speed )
+	if (!self.speed)
 		self.speed = 1000;
 };
 
@@ -698,14 +698,14 @@ void () trigger_push =
 
 void () trigger_monsterjump_touch =
 {
-	if ( other.flags & (FL_MONSTER | FL_FLY | FL_SWIM) != FL_MONSTER )
+	if (other.flags & (FL_MONSTER | FL_FLY | FL_SWIM) != FL_MONSTER)
 		return ;
 
 // set XY even if not on ground, so the jump will clear lips
 	other.velocity_x = self.movedir_x * self.speed;
 	other.velocity_y = self.movedir_y * self.speed;
 
-	if ( !(other.flags & FL_ONGROUND) )
+	if (!(other.flags & FL_ONGROUND))
 		return ;
 
 	other.flags = other.flags - FL_ONGROUND;
@@ -720,9 +720,9 @@ Walking monsters that touch this will jump in the direction of the trigger's ang
 */
 void () trigger_monsterjump =
 {
-	if ( !self.speed )
+	if (!self.speed)
 		self.speed = 200;
-	if ( !self.height )
+	if (!self.height)
 		self.height = 200;
 	if (self.angles == '0 0 0')
 		self.angles = '0 360 0';

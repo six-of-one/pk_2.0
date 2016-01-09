@@ -150,23 +150,23 @@ float (entity e) doorweight =
 {
 	local float weight;
 	weight = KINDA_WANT;
-	if ( e.owner.targetname )
+	if (e.owner.targetname)
 	{
 		weight = DONT_WANT;
 	}
-	else if ( (e.touch == secret_touch) )
+	else if (e.touch == secret_touch)
 	{
 		weight = KINDA_WANT;
 	}
-	else if ( (e.state == STATE_TOP) )
+	else if (e.state == STATE_TOP)
 	{
 		weight = DONT_WANT;
 	}
-	else if ( (e.state == STATE_UP) )
+	else if (e.state == STATE_UP)
 	{
 		weight = KINDA_WANT;
 	}
-	if ( !Spotvisible (e) )
+	if (!Spotvisible (e))
 	{
 		weight = DONT_WANT;
 	}
@@ -177,8 +177,8 @@ float (entity e) buttonweight =
 {
 	local float weight;
 	weight = DONT_WANT;
-	if ( (e.state == STATE_BOTTOM) )
-	if ( Spotvisible (e) )
+	if (e.state == STATE_BOTTOM)
+	if (Spotvisible (e))
 	{
 		weight = (KINDA_WANT + 1);
 	}
@@ -189,8 +189,8 @@ float (entity e) platweight =
 {
 	local float weight;
 	weight = KINDA_WANT;
-	if ( !Platvisible (e) )
-	if ( !Spotvisible (e) )
+	if (!Platvisible (e))
+	if (!Spotvisible (e))
 	{
 		weight = DONT_WANT;
 	}
@@ -208,17 +208,17 @@ float (entity e) trigpushweight =
 	spot = org;
 	spot_z = self.origin_z;
 	traceline (self.origin,spot,TRUE,self);
-	if ( (trace_fraction == 1) )
+	if (trace_fraction == 1)
 	{
 		traceline (spot,org,TRUE,self);
-		if ( (trace_fraction == 1) )
+		if (trace_fraction == 1)
 		{
 			spot_z = dropline (org);
-			if ( (self.absmin_z > spot_z) )
+			if (self.absmin_z > spot_z)
 			{
 				spot_z = self.absmin_z;
 			}
-			if ( (org_z < (((self.maxs_z - self.mins_z) + spot_z) + MAXJUMP)) )
+			if (org_z < (((self.maxs_z - self.mins_z) + spot_z) + MAXJUMP))
 			{
 				weight = KINDA_WANT;
 			}
@@ -233,11 +233,11 @@ float (entity e) triggerweight =
 	local float rnd;
 	weight = (KINDA_WANT - 2);
 	rnd = random ();
-	if ( (rnd < 0.250) )
+	if (rnd < 0.250)
 	{
 		weight = WANT;
 	}
-	if ( !Spotvisible (e) )
+	if (!Spotvisible (e))
 	{
 		weight = DONT_WANT;
 	}
@@ -250,11 +250,11 @@ float (entity e) backpackweight =
 	local float weight;
 	weight = WANT;
 	lnd = pointcontents ((e.absmin + '0 0 1'));
-	if ( (e.items & (IT_ROCKET_LAUNCHER + IT_LIGHTNING)) )
+	if (e.items & (IT_ROCKET_LAUNCHER + IT_LIGHTNING))
 	{
 		weight = (MUST_HAVE - 1);
 	}
-	if ( ((lnd == CONTENT_LAVA) || (lnd == CONTENT_SLIME)) )
+	if ((lnd == CONTENT_LAVA) || (lnd == CONTENT_SLIME))
 	{
 		weight = DONT_WANT;
 	}
@@ -265,15 +265,15 @@ float (entity e) healthweight =
 {
 	local float weight;
 	weight = WANT;
-	if ( (self.health < 60) )
+	if (self.health < 60)
 	{
 		weight = (MUST_HAVE - 1);
 	}
-	else if ( (e.healtype == 2) )
+	else if (e.healtype == 2)
 	{
 		weight = MUST_HAVE;
 	}
-	else if ( (self.health > 99) )
+	else if (self.health > 99)
 	{
 		weight = DONT_WANT;
 	}
@@ -284,13 +284,13 @@ float (entity e) nailweight =
 {
 	local float weight;
 	weight = (WANT - 1);
-	if ( (self.ammo_nails > 199) )
+	if (self.ammo_nails > 199)
 	{
 		weight = DONT_WANT;
 	}
 	else
 	{
-		if ( (self.ammo_nails > 120) )
+		if (self.ammo_nails > 120)
 		{
 			weight = (KINDA_WANT - 2);
 		}
@@ -302,13 +302,13 @@ float (entity e) shellweight =
 {
 	local float weight;
 	weight = (WANT - 1);
-	if ( (self.ammo_shells > 99) )
+	if (self.ammo_shells > 99)
 	{
 		weight = DONT_WANT;
 	}
 	else
 	{
-		if ( (self.ammo_shells > 50) )
+		if (self.ammo_shells > 50)
 		{
 			weight = (KINDA_WANT - 2);
 		}
@@ -320,7 +320,7 @@ float (entity e) cellweight =
 {
 	local float weight;
 	weight = WANT;
-	if ( (self.ammo_cells > 99) )
+	if (self.ammo_cells > 99)
 	{
 		weight = DONT_WANT;
 	}
@@ -331,7 +331,7 @@ float (entity e) rocketweight =
 {
 	local float weight;
 	weight = WANT;
-	if ( (self.ammo_rockets > 99) )
+	if (self.ammo_rockets > 99)
 	{
 		weight = DONT_WANT;
 	}
@@ -342,7 +342,7 @@ float (entity e) rlauncherweight =
 {
 	local float weight;
 	weight = (WANT + 2);
-	if ( !(self.items & IT_ROCKET_LAUNCHER) )
+	if (!(self.items & IT_ROCKET_LAUNCHER))
 	{
 		weight = MUST_HAVE;
 	}
@@ -353,7 +353,7 @@ float (entity e) lightningweight =
 {
 	local float weight;
 	weight = (WANT + 2);
-	if ( !(self.items & IT_LIGHTNING) )
+	if (!(self.items & IT_LIGHTNING))
 	{
 		weight = MUST_HAVE;
 	}
@@ -364,7 +364,7 @@ float (entity e) glauncherweight =
 {
 	local float weight;
 	weight = (WANT + 1);
-	if ( !(self.items & IT_GRENADE_LAUNCHER) )
+	if (!(self.items & IT_GRENADE_LAUNCHER))
 	{
 		weight = (MUST_HAVE - 1);
 	}
@@ -380,7 +380,7 @@ float (entity e) supernailweight =
 {
 	local float weight;
 	weight = (WANT + 1);
-	if ( !(self.items & IT_SUPER_NAILGUN) )
+	if (!(self.items & IT_SUPER_NAILGUN))
 	{
 		weight = (MUST_HAVE - 1);
 	}
@@ -403,7 +403,7 @@ float (entity e) artifactweight =
 {
 	local float weight;
 	weight = (MUST_HAVE + 2);
-	if ( (e.classname == "item_artifact_envirosuit") )
+	if (e.classname == "item_artifact_envirosuit")
 	{
 		weight = WANT;
 	}
@@ -412,9 +412,9 @@ float (entity e) artifactweight =
 
 float (entity node, float len, entity item) cacherocket =
 {
-	if ( (node.rocketlen > 0) )
+	if (node.rocketlen > 0)
 	{
-		if ( (len >= node.rocketlen) )
+		if (len >= node.rocketlen)
 		{
 			return (0);
 		}
@@ -426,9 +426,9 @@ float (entity node, float len, entity item) cacherocket =
 
 float (entity node, float len, entity item) cachelightning =
 {
-	if ( (node.lightninglen > 0) )
+	if (node.lightninglen > 0)
 	{
-		if ( (len >= node.lightninglen) )
+		if (len >= node.lightninglen)
 		{
 			return (0);
 		}
@@ -440,9 +440,9 @@ float (entity node, float len, entity item) cachelightning =
 
 float (entity node, float len, entity item) cachearmor =
 {
-	if ( (node.armorlen > 0) )
+	if (node.armorlen > 0)
 	{
-		if ( (len >= node.armorlen) )
+		if (len >= node.armorlen)
 		{
 			return (0);
 		}
@@ -454,9 +454,9 @@ float (entity node, float len, entity item) cachearmor =
 
 float (entity node, float len, entity item) cachenail =
 {
-	if ( (node.naillen > 0) )
+	if (node.naillen > 0)
 	{
-		if ( (len >= node.naillen) )
+		if (len >= node.naillen)
 		{
 			return (0);
 		}
@@ -468,9 +468,9 @@ float (entity node, float len, entity item) cachenail =
 
 float (entity node, float len, entity item) cachegrenade =
 {
-	if ( (node.grenadelen > 0) )
+	if (node.grenadelen > 0)
 	{
-		if ( (len >= node.grenadelen) )
+		if (len >= node.grenadelen)
 		{
 			return (0);
 		}
@@ -482,9 +482,9 @@ float (entity node, float len, entity item) cachegrenade =
 
 float (entity node, float len, entity item) cachepowerup =
 {
-	if ( (node.poweruplen > 0) )
+	if (node.poweruplen > 0)
 	{
-		if ( (len >= node.poweruplen) )
+		if (len >= node.poweruplen)
 		{
 			return (0);
 		}
@@ -496,9 +496,9 @@ float (entity node, float len, entity item) cachepowerup =
 
 float (entity node, float len, entity item) cacheenemy =
 {
-	if ( (node.enemylen > 0) )
+	if (node.enemylen > 0)
 	{
-		if ( (len >= node.enemylen) )
+		if (len >= node.enemylen)
 		{
 			return (0);
 		}
@@ -560,9 +560,9 @@ void () printIntro =
 {
 	local float num;
 	local float skinno;
-	if ( teamplay )
+	if (teamplay)
 	{
-		if ( (parm4 > 511) )
+		if (parm4 > 511)
 		{
 			SKINSMODE = ((parm4 & 49152) / 16384);
 			skinno = (parm4 & 7680);
@@ -570,7 +570,7 @@ void () printIntro =
 			skinChange (self,skinno);
 		}
 		num = ((serverflags & TEAMBOTS) / 256);
-		if ( (num > 0) )
+		if (num > 0)
 		{
 			addTeamBots (self,num);
 		}

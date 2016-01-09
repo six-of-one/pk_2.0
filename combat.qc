@@ -120,7 +120,7 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	local float save;
 	local float take;
 
-	if ( !targ.takedamage )
+	if (!targ.takedamage)
 		return;
 
 // used by buttons and triggers to set activator for target firing
@@ -162,7 +162,7 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	}
 
 // figure momentum add
-	if ( (inflictor != world) && (targ.movetype == MOVETYPE_WALK || targ.classname == "dmbot") )
+	if ((inflictor != world) && (targ.movetype == MOVETYPE_WALK || targ.classname == "dmbot"))
 	{
 		dir = targ.origin - (inflictor.absmin + inflictor.absmax) * 0.5;
 		dir = normalize (dir);
@@ -183,7 +183,7 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	}
 
 // team play damage avoidance
-	if ( (teamplay == 1) && (targ.team > 0)&&(targ.team == attacker.team) )
+	if ((teamplay == 1) && (targ.team > 0)&&(targ.team == attacker.team))
 		return ;
 
 // do the damage
@@ -201,14 +201,14 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 // react to the damage
 	oldself = self;
 	self = targ;
-	if ( (self.classname == "dmbot") )
+	if (self.classname == "dmbot")
 	{
 		if (attacker != world && inflictor != world)
 			{
 // xreaper code - looks good
 				if ((attacker != self) && !coop)
 				{
-					if ( self.enemy )
+					if (self.enemy)
 					{
 						secondEnemy (attacker);
 					}
@@ -228,8 +228,8 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 // get mad unless of the same class (except for soldiers)
 			if (self != attacker && attacker != self.enemy)
 			{
-				if ( (self.classname != attacker.classname)
-				|| (self.classname == "monster_army" ) )
+				if ((self.classname != attacker.classname)
+				|| (self.classname == "monster_army"))
 				{
 					if (self.enemy.classname == "player")
 						self.oldenemy = self.enemy;
@@ -240,7 +240,7 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 		}
 	}
 
-	if ( self.th_pain )
+	if (self.th_pain)
 	{
 		self.th_pain (attacker,take);
 	// nightmare mode monsters don't go into pain frames often
@@ -264,11 +264,11 @@ void (entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDa
 
 	head = findradius(inflictor.origin, damage+40);
 
-	while ( head )
+	while (head)
 	{
 		if (head != ignore)
 		{
-			if ( head.takedamage )
+			if (head.takedamage)
 			{
 				org = head.origin + (head.mins + head.maxs)*0.5;
 				points = 0.5*vlen (inflictor.origin - org);
@@ -279,7 +279,7 @@ void (entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDa
 					points = points * 0.5;
 				if (points > 0)
 				{
-					if ( CanDamage (head,inflictor) )
+					if (CanDamage (head,inflictor))
 					{	// shambler takes half damage from all explosions
 						if (head.classname == "monster_shambler")
 							T_Damage (head, inflictor, attacker, points*0.5);
@@ -305,9 +305,9 @@ void (entity attacker, float damage) T_BeamDamage =
 
 	head = findradius(attacker.origin, damage+40);
 
-	while ( head )
+	while (head)
 	{
-		if ( head.takedamage )
+		if (head.takedamage)
 		{
 			points = 0.5*vlen (attacker.origin - head.origin);
 			if (points < 0)
@@ -317,7 +317,7 @@ void (entity attacker, float damage) T_BeamDamage =
 				points = points * 0.5;
 			if (points > 0)
 			{
-				if ( CanDamage (head,attacker) )
+				if (CanDamage (head,attacker))
 				{
 					if (head.classname == "monster_shambler")
 						T_Damage (head, attacker, attacker, points*0.5);

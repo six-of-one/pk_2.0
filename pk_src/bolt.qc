@@ -51,7 +51,7 @@ void() bolt_fire =
 
 	bolt_findNextTarget();
 
-	if(self.bolt_target == world && self.ammo_cells >= 2)
+	if (self.bolt_target == world && self.ammo_cells >= 2)
 	{ // Can't find any targets at all.
 	  // fire as normal..
 	  local vector org, endpos;
@@ -78,10 +78,10 @@ void() bolt_fire =
 		traceline (self.origin,	endpos + v_forward*4, FALSE, self);
 
 	  // if hit a entity that can take damage & can see & is not invisible, then target for next time.
-	  if(trace_ent.takedamage)
-	  if(!(trace_inopen && trace_inwater))
-	  if(trace_ent.health > 1)
-	  if(trace_ent.classname != "player" || !(trace_ent.items & IT_INVISIBILITY))
+	  if (trace_ent.takedamage)
+	  if (!(trace_inopen && trace_inwater))
+	  if (trace_ent.health > 1)
+	  if (trace_ent.classname != "player" || !(trace_ent.items & IT_INVISIBILITY))
 	  {
 	    self.bolt_target = trace_ent;
 	    self.bolt_targetTimeout = time + 0.5; // set target timeout
@@ -97,22 +97,22 @@ void() bolt_fire =
 	}
 
 	// check if the conduit target is dead?
-	if(self.bolt_target)
-	if(self.bolt_target.health <= 0)
+	if (self.bolt_target)
+	if (self.bolt_target.health <= 0)
 	{
 	  // set the die timeout.
 	  self.bolt_target.bolt_targetTimeout = time + 0.5;
 	}
 
-	if(self.bolt_target == world)
-	if(self.weapon == IT_AXE)
-	if(self.pk_currentitem == PK_IT_CLIGHT)
-	if(self.bolt_targetTimeout < time + 0.2)
+	if (self.bolt_target == world)
+	if (self.weapon == IT_AXE)
+	if (self.pk_currentitem == PK_IT_CLIGHT)
+	if (self.bolt_targetTimeout < time + 0.2)
 	{
 		self.bolt_targetTimeout = time + 0.2; // set modal timeout
 	}
 
-	if(self.bolt_changeModelTimeout > time)
+	if (self.bolt_changeModelTimeout > time)
 	{
 		self.bolt_changeModelTimeout = self.bolt_changeModelTimeout + 0.21; // set the weapon model change back..
 	}
@@ -151,7 +151,7 @@ void() bolt_findNextTarget =
 
 	  dist = vlen(boltorg.origin - targetEntity.origin);
 
-	  if(trace_fraction >= 1 && // can see...
+	  if (trace_fraction >= 1 && // can see...
 	  	!(trace_inopen && trace_inwater) && // can't see the target if it goes tho water & air.
 	    dist <= 600 && // within distance
 	    (!first || bolt_infront(targetEntity)) && // in front if the first target..
@@ -161,14 +161,14 @@ void() bolt_findNextTarget =
 	  {
 
 		  // check if loop
-	    if(targetEntity == self)
+	    if (targetEntity == self)
 	    {
 				loopBlow = TRUE;
 	    }
 
 	    cellsToBlow = cellsToBlow + targetEntity.ammo_cells;
 
-	    if(first) // reset the target timeout...
+	    if (first) // reset the target timeout...
 	    {
 	      boltorg.bolt_targetTimeout = time + 0.5;
 
@@ -191,7 +191,7 @@ void() bolt_findNextTarget =
 	  else
 	  {
 	  	// disable next target... (the rest of the path will time out if not used...)
-			if(first)
+			if (first)
 			{
 				bolt_removeTarget(targetEntity);
 			  boltorg.bolt_target = world;
@@ -205,8 +205,8 @@ void() bolt_findNextTarget =
 	  }
 	}
 
-	if(maxTargets == 19) // only one target, check if firing at each other
- 	if(self.bolt_target.bolt_target == self) // & other player is firing back
+	if (maxTargets == 19) // only one target, check if firing at each other
+ 	if (self.bolt_target.bolt_target == self) // & other player is firing back
 	{
 	  cellsToBlow = cellsToBlow + targetEntity.ammo_cells;
 	  loopBlow = TRUE;
@@ -222,7 +222,7 @@ void() bolt_findNextTarget =
 	while(targetEntity)
 	{
 	  // do damage...
-		if(loopBlow)
+		if (loopBlow)
 		{
 			// loop.. blow
 	    targetEntity.ammo_cells = 0;
@@ -239,7 +239,7 @@ void() bolt_findNextTarget =
 	  first = FALSE; // get the next target
 	  boltorg = targetEntity;
 
-	  if(targetEntity == self)
+	  if (targetEntity == self)
 	  {
 			targetEntity = world;
 	  }
@@ -251,7 +251,7 @@ void() bolt_findNextTarget =
 	  maxTargets = maxTargets - 1;
 
 	  // check to see if we have run out of ammo
-	  if(self.ammo_cells < 2)
+	  if (self.ammo_cells < 2)
 	  {
 	    // remove the FL_GIBCONDUIT if on
 			bolt_removeTarget(self.bolt_target);
@@ -263,15 +263,15 @@ void() bolt_findNextTarget =
 	  }
 
 		// if max targets reached, do no more...
-		if(maxTargets < 1)
+		if (maxTargets < 1)
 		{
 			return;
 		}
 	}
 
-	if(loopBlow)
+	if (loopBlow)
 	{
-		if(maxTargets == 19) // only one target, check if firing at each other
+		if (maxTargets == 19) // only one target, check if firing at each other
 		{
 		  // loop.. blow
 		  self.ammo_cells = cellsToBlow;
@@ -290,7 +290,7 @@ void() bolt_findNextTarget =
 	}
 
 	// if max targets reached or if it's finding the first target, do no more...
-	if(maxTargets < 1 || first)
+	if (maxTargets < 1 || first)
 	{
 		return;
 	}
@@ -305,22 +305,22 @@ void() bolt_findNextTarget =
 
 	while(head)
 	{
-		if(head.health > 1) // can take damage && is not dead
-	  if(head.takedamage)
-	  if(head != self)  // not the shotter
-	  if(head != boltorg) // and not the origin
-	  //if(head.classname != "beartrap")  // JON Don't target beartraps
-	  if(head.classname == "player" || head.classname == "turret" || head.classname == "turret_base")
-	  if(bolt_checkForLoops(head,  boltorg)) // not already in a this fire chain...
+		if (head.health > 1) // can take damage && is not dead
+	  if (head.takedamage)
+	  if (head != self)  // not the shotter
+	  if (head != boltorg) // and not the origin
+	  //if (head.classname != "beartrap")  // JON Don't target beartraps
+	  if (head.classname == "player" || head.classname == "turret" || head.classname == "turret_base")
+	  if (bolt_checkForLoops(head,  boltorg)) // not already in a this fire chain...
 	  {
 	    tempDist = vlen(head.origin - self.origin);
 	  	traceline(org, head.origin, TRUE, self);
 
-	    if(trace_fraction >= 1) // can see the player
-	    if(tempDist < dist)     // closer than the last entity
-	    if(!(trace_inopen && trace_inwater))  // can see it (ie can't see if it goes tho water & air)
-			if(targetEntity.solid != SOLID_NOT) // make shore it's solid...
-	   	if(head.classname != "player" || !(head.items & IT_INVISIBILITY)) // & is not invisiable
+	    if (trace_fraction >= 1) // can see the player
+	    if (tempDist < dist)     // closer than the last entity
+	    if (!(trace_inopen && trace_inwater))  // can see it (ie can't see if it goes tho water & air)
+			if (targetEntity.solid != SOLID_NOT) // make shore it's solid...
+	   	if (head.classname != "player" || !(head.items & IT_INVISIBILITY)) // & is not invisiable
 	    {
 	    	// this will NEVER be the first target... so we can use just bolt_targetNext
 		  	boltorg.bolt_targetNext = head;
@@ -334,7 +334,7 @@ void() bolt_findNextTarget =
 	}
 
 	// target found?
-	if(boltorg.bolt_targetNext != world)
+	if (boltorg.bolt_targetNext != world)
 	{
 	 	bolt_createTimeoutEntity(boltorg);
 
@@ -355,7 +355,7 @@ float(entity check, entity checkFor) bolt_checkForLoops =
 
 	while(check.bolt_targetNext)
 	{
-		if(check.bolt_targetNext == checkFor)
+		if (check.bolt_targetNext == checkFor)
 	  {
 	  	return FALSE;
 	  }
@@ -383,20 +383,20 @@ void(vector org, entity boltTarget, entity boltOwner, vector endPos, float first
 	particle(endPos, '0 0 100', 225, dam * 4);
 
 	// only do damage if the target is not dead...
-	if(boltTarget.health > 0)
+	if (boltTarget.health > 0)
 	{
 	  T_Damage(boltTarget, self, self, dam);
 	}
 
-	if(boltOwner != boltTarget)
+	if (boltOwner != boltTarget)
 	{
-	  if(first)
+	  if (first)
 	  {
 	    lightEntity = boltOwner;
 	  }
 	  else
 	  {
-	    if(!boltOwner.bolt_lightningFire)
+	    if (!boltOwner.bolt_lightningFire)
 	    {
 	      boltOwner.bolt_lightningFire = spawn();
 	      boltOwner.bolt_lightningFire.solid = SOLID_NOT;
@@ -427,22 +427,22 @@ void(vector org, entity boltTarget, entity boltOwner, vector endPos, float first
 // Used to timeout the targets, called from PlayerPostThink
 void() bolt_checkTargets =
 {
-	if(self.bolt_target)
-	if(self.bolt_targetTimeout < time)
+	if (self.bolt_target)
+	if (self.bolt_targetTimeout < time)
 	{
 	  bolt_removeTarget(self.bolt_target);
 	  self.bolt_target = world;
 	}
 
-	if(self.weapon == IT_AXE)
-	if(self.pk_currentitem == PK_IT_CLIGHT)
-	if(self.bolt_changeModelTimeout < time)
+	if (self.weapon == IT_AXE)
+	if (self.pk_currentitem == PK_IT_CLIGHT)
+	if (self.bolt_changeModelTimeout < time)
 	{
 		self.weaponmodel = "progs/v_cl_off.mdl";
 	}
 
-	if(self.bolt_targetNext)
-	if(self.bolt_targetNextTimeout < time)
+	if (self.bolt_targetNext)
+	if (self.bolt_targetNextTimeout < time)
 	{
 		self.bolt_targetNext = world;
 	}
@@ -451,12 +451,12 @@ void() bolt_checkTargets =
 
 void(entity boltOwner) bolt_createTimeoutEntity =
 {
-	if(boltOwner.classname == "player")
+	if (boltOwner.classname == "player")
 	{
 	  boltOwner.bolt_targetNextTimeout = time + 0.5; // set the target timeout
 	}
 
-	if(boltOwner.bolt_targetTimeoutEntity == world)
+	if (boltOwner.bolt_targetTimeoutEntity == world)
 	{
 		boltOwner.bolt_targetTimeoutEntity = spawn();
 		boltOwner.bolt_targetTimeoutEntity.think = bolt_timeoutNextEntity;
@@ -484,15 +484,15 @@ void() bolt_timeoutNextEntity =
 void(entity boltTarget) bolt_removeTarget =
 {
 	// remove the FL_GIBCONDUIT if on
-//	if(boltTarget)
-//	if(boltTarget.flags & FL_GIBCONDUIT)
-//	if(boltTarget.health > 0)
+//	if (boltTarget)
+//	if (boltTarget.flags & FL_GIBCONDUIT)
+//	if (boltTarget.health > 0)
 //	{
 //	  boltTarget.flags = boltTarget.flags - FL_GIBCONDUIT;
 //	}
 
 
-	if(boltTarget.bolt_lightningFire)
+	if (boltTarget.bolt_lightningFire)
 
 	{
 
@@ -513,10 +513,10 @@ $frame fryguy1 fryguy2 fryguy3 fryguy4
 void() player_conduitJerk =[ $fryguy1, player_conduitJerk ]
 {
 	// check if conduit times up
-	if(self.bolt_conduitTimeout < time) // it's the conduit time for this monster...
+	if (self.bolt_conduitTimeout < time) // it's the conduit time for this monster...
 	{
 		// blow the fuck up!!!
-//		if(self.flags & FL_GIBCONDUIT)
+//		if (self.flags & FL_GIBCONDUIT)
 //		{
 			self.health = -99;
 //	  }
@@ -525,7 +525,7 @@ void() player_conduitJerk =[ $fryguy1, player_conduitJerk ]
 	}
 
 	// choose the next frame
-	if(self.frame >  2)
+	if (self.frame >  2)
 	{
 		self.frame = $fryguy1;
 	}
@@ -545,7 +545,7 @@ float(entity targetEntity) bolt_infront =
 	vec = normalize (targetEntity.origin - self.origin);
 	dot = vec * v_forward;
 
-	if ( dot > 0.85)
+	if (dot > 0.85)
 	{
 		return TRUE;
 	}

@@ -32,17 +32,17 @@ void () t_botmovetarget =
 	local entity tmp;
 	local entity pth;
 	local float rnd;
-	if ( (other.goalentity != self) )
+	if (other.goalentity != self)
 	{
 		return ;
 	}
-	if ( (self.classname != "BotTarget") )
+	if (self.classname != "BotTarget")
 	{
 		objerror ("bad bot target in bot_touch! 1\n");
 	}
-	if ( (self.goalentity.classname != "player") )
+	if (self.goalentity.classname != "player")
 	{
-		if ( VERBOSEBOT )
+		if (VERBOSEBOT)
 		{
 			dprint (other.teamname);
 			dprint (other.netname);
@@ -51,25 +51,25 @@ void () t_botmovetarget =
 			dprint ("\n");
 		}
 		other.lefty = (other.lefty - (other.lefty & LOCAL_TIME));
-		if ( (self.goalentity.classname == "door") )
+		if (self.goalentity.classname == "door")
 		{
-			if ( (self.goalentity.use == fd_secret_use) )
+			if (self.goalentity.use == fd_secret_use)
 			{
 				return ;
 			}
 		}
-		if ( (self.goalentity.classname == "train") )
+		if (self.goalentity.classname == "train")
 		{
-			if ( !(other.lefty & ONTRAIN) )
+			if (!(other.lefty & ONTRAIN))
 			{
 				other.lefty = (other.lefty | ONTRAIN);
 				other.search_time = (time + 1);
 			}
 			return ;
 		}
-		if ( (self.goalentity.classname != "func_button") )
+		if (self.goalentity.classname != "func_button")
 		{
-			if ( (other.lefty & GETGOODY) )
+			if (other.lefty & GETGOODY)
 			{
 				other.goody_time = time;
 			}
@@ -88,7 +88,7 @@ void () t_botmovetarget =
 		other.nextthink = (time + 0.3);
 		return ;
 	}
-	if ( VERBOSEBOT )
+	if (VERBOSEBOT)
 	{
 		dprint (other.teamname);
 		dprint (other.netname);
@@ -100,7 +100,7 @@ void () t_botmovetarget =
 	pth = BestChaseRoute (other,self.goalentity);
 	rnd = ((2000 + (random () * 1000)) + (other.skil * SEARCH_RADIUS));
 	rnd = (rnd - vlen ((other.origin - pth.origin)));
-	if ( (rnd < pth.enemylen) )
+	if (rnd < pth.enemylen)
 	{
 		other.search_time = (time - 1);
 		return ;
@@ -108,12 +108,12 @@ void () t_botmovetarget =
 	random ();
 	random ();
 	rnd = (random () * (other.skil + 1));
-	if ( (rnd < 0.1) )
+	if (rnd < 0.1)
 	{
 		other.search_time = (time - 1);
 		return ;
 	}
-	if ( (self.classname != "BotTarget") )
+	if (self.classname != "BotTarget")
 	{
 		objerror ("bad bot target in bot_touch! 2\n");
 	}
@@ -123,9 +123,9 @@ void () t_botmovetarget =
 
 void () bot_toucheditem =
 {
-	if ( (other.goalentity.goalentity == self) )
+	if (other.goalentity.goalentity == self)
 	{
-		if ( VERBOSEBOT )
+		if (VERBOSEBOT)
 		{
 			dprint (other.teamname);
 			dprint (other.netname);
@@ -143,29 +143,29 @@ void (entity bot) bot_triggered =
 	local vector org;
 	local entity Botgoal;
 	Botgoal = bot.goalentity;
-	if ( (Botgoal.goalentity != self) )
+	if (Botgoal.goalentity != self)
 	{
 		return ;
 	}
 	Botgoal.goalentity = find (world,targetname,self.target);
-	if ( (Botgoal.goalentity.classname == "light") )
+	if (Botgoal.goalentity.classname == "light")
 	{
 		bot.search_time = time;
 		return ;
 	}
-	if ( Botgoal.goalentity )
+	if (Botgoal.goalentity)
 	{
 		bot.search_time = (time + 3);
 		org = ((Botgoal.goalentity.absmax + Botgoal.goalentity.absmin) * 0.5);
 		org_z = (Botgoal.goalentity.absmin_z + 1);
-		if ( (Botgoal.classname != "BotTarget") )
+		if (Botgoal.classname != "BotTarget")
 		{
 			objerror ("bad bot target in bot_touch! 3\n");
 		}
 		setorigin (Botgoal,org);
 		Botgoal.goalentity.lastbot = bot;
 		Botgoal.goalentity.lasttime = time;
-		if ( VERBOSEBOT )
+		if (VERBOSEBOT)
 		{
 			dprint ("now Bot will go after the triggered ");
 			dprint (Botgoal.goalentity.classname);
@@ -180,19 +180,19 @@ void () bot_touched =
 	local entity tmp;
 	tmp = self;
 	self = other.goalentity;
-	if ( (self.classname != "BotTarget") )
+	if (self.classname != "BotTarget")
 	{
 		objerror ("bad bot target in bot_touch! 4\n");
 	}
-	if ( (self.goalentity == tmp) )
+	if (self.goalentity == tmp)
 	{
 		t_botmovetarget ();
 	}
 	else
 	{
-		if ( (self.goalentity.classname == "door") )
+		if (self.goalentity.classname == "door")
 		{
-			if ( (tmp.classname == "door") )
+			if (tmp.classname == "door")
 			{
 				t_botmovetarget ();
 			}
@@ -205,7 +205,7 @@ void () enemy_touched =
 {
 	local entity tmp;
 	local vector org;
-	if ( VERBOSEBOT )
+	if (VERBOSEBOT)
 	{
 		dprint (other.enemy.teamname);
 		dprint (other.enemy.netname);
@@ -218,22 +218,22 @@ void () enemy_touched =
 	}
 	org = ((self.absmax + self.absmin) * 0.5);
 	org_z = (self.absmin_z + 1);
-	if ( (self.classname == "door") )
+	if (self.classname == "door")
 	{
 		org = other.origin;
 	}
 	tmp = self;
 	self = other.enemy;
-	if ( (self.enemy != other) )
+	if (self.enemy != other)
 	{
 		self = tmp;
 		return ;
 	}
-	if ( (tmp.classname == "trigger_push") )
+	if (tmp.classname == "trigger_push")
 	{
 		endEnemy ();
 		self.search_time = (time + 4);
-		if ( (self.goalentity.classname != "BotTarget") )
+		if (self.goalentity.classname != "BotTarget")
 		{
 			objerror ("bad bot target in bot_touch! 5\n");
 		}
@@ -241,14 +241,14 @@ void () enemy_touched =
 		self = tmp;
 		return ;
 	}
-	if ( (self.goalentity.classname != "BotTarget") )
+	if (self.goalentity.classname != "BotTarget")
 	{
 		objerror ("ERROR - bad bot target!\n");
 	}
 	setorigin (self.goalentity,org);
 	self.goalentity.goalentity = self.enemy;
 	self.search_time = (time + 4);
-	if ( (self.lefty & GETGOODY) )
+	if (self.lefty & GETGOODY)
 	{
 		self.lefty = (self.lefty - GETGOODY);
 	}

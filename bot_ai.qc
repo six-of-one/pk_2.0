@@ -15,11 +15,11 @@ void () endEnemy =
 {
 	local entity olden;
 	olden = self.enemy;
-	if ( (self.lefty & GETGOODY) )
+	if (self.lefty & GETGOODY)
 	{
 		self.lefty = (self.lefty - GETGOODY);
 	}
-	if ( (self.lefty & MULTIENEMY) )
+	if (self.lefty & MULTIENEMY)
 	{
 		self.lefty = (self.lefty - MULTIENEMY);
 	}
@@ -29,9 +29,9 @@ void () endEnemy =
 	self.search_time = (time - 1);
 	self.enemyrun = 0;
 	self.goalentity.goalentity = self.goalentity;
-	if ( (olden.classname == "player") )
+	if (olden.classname == "player")
 	{
-		if ( (olden.enemy == self) )
+		if (olden.enemy == self)
 		{
 			olden.enemy = world;
 		}
@@ -46,23 +46,23 @@ void () CallForHelp =
 	local float d;
 	HELPING = 1;
 	e = find (world,classname,"dmbot");
-	while ( e )
+	while (e)
 	{
-		if ( (e != self) )
+		if (e != self)
 		{
-			if ( (e.team == self.team) )
+			if (e.team == self.team)
 			{
-				if ( (e.enemy == world) )
+				if (e.enemy == world)
 				{
-					if ( (e.health > 80) )
+					if (e.health > 80)
 					{
-						if ( (e.items & ((((IT_ROCKET_LAUNCHER + IT_LIGHTNING) + IT_SUPER_NAILGUN) + IT_SUPER_SHOTGUN) + IT_GRENADE_LAUNCHER)) )
+						if (e.items & ((((IT_ROCKET_LAUNCHER + IT_LIGHTNING) + IT_SUPER_NAILGUN) + IT_SUPER_SHOTGUN) + IT_GRENADE_LAUNCHER))
 						{
 							p = BestChaseRoute (e,self.enemy);
 							traceline (e.origin,self.enemy.origin,TRUE,e);
-							if ( ((trace_fraction == 1) || (p.enemycache == self.enemy)) )
+							if ((trace_fraction == 1) || (p.enemycache == self.enemy))
 							{
-								if ( VERBOSEBOT )
+								if (VERBOSEBOT)
 								{
 									dprint (e.teamname);
 									dprint (e.netname);
@@ -72,7 +72,7 @@ void () CallForHelp =
 								tmp = self;
 								self = e;
 								BotFoundTarget ();
-								if ( (self.goalentity.classname != "BotTarget") )
+								if (self.goalentity.classname != "BotTarget")
 								{
 									objerror ("bad bot target in bot_ai! 1\n");
 								}
@@ -94,18 +94,18 @@ float () RunAway =
 	local float runawayspeakchance;
 	local float weap;
 	runawayspeakchance = random ();
-	if ( !VERBOSEBOT )
+	if (!VERBOSEBOT)
 	{
 		runawayspeakchance = 1;
 	}
-	if ( (self.items & IT_INVULNERABILITY) )
+	if (self.items & IT_INVULNERABILITY)
 	{
 		return (0);
 	}
-	if ( (self.enemy.items & IT_INVULNERABILITY) )
+	if (self.enemy.items & IT_INVULNERABILITY)
 	{
 		if (XRP)
-		if ( (runawayspeakchance <= 0.1) )
+		if (runawayspeakchance <= 0.1)
 		{
 			bprint (self.netname);
 			bprint (": Run for it, ");
@@ -114,49 +114,49 @@ float () RunAway =
 		}
 		return (1);
 	}
-	if ( (self.enemy.health < WANT) )
+	if (self.enemy.health < WANT)
 	{
 		return (0);
 	}
 	weap = W_BestHeldWeapon ();
-	if ( (weap & (IT_ROCKET_LAUNCHER + IT_LIGHTNING)) )
+	if (weap & (IT_ROCKET_LAUNCHER + IT_LIGHTNING))
 	{
 		return (0);
 	}
-	if ( (self.items & IT_QUAD) )
+	if (self.items & IT_QUAD)
 	{
-		if ( ((self.health + (self.armorvalue * self.armortype)) > 50) )
+		if ((self.health + (self.armorvalue * self.armortype)) > 50)
 		{
 			return (0);
 		}
 	}
 // xreaper add
 	if (XRP)
-	if ( (self.health < 15) )
+	if (self.health < 15)
 	{
-		if ( (runawayspeakchance <= 0.001) )
+		if (runawayspeakchance <= 0.001)
 		{
 			bprint (self.netname);
 			bprint (": I'm totally fucked!\n");
 		}
-		if ( ((runawayspeakchance <= 0.002) && (runawayspeakchance > 0.001)) )
+		if ((runawayspeakchance <= 0.002) && (runawayspeakchance > 0.001))
 		{
 			bprint (self.netname);
 			bprint (": Run Away!\n");
 		}
 		return (1);
 	}
-	if ( (self.health < 45) )
+	if (self.health < 45)
 	{
 		return (1);
 	}
-	if ( (weap & ((IT_SHOTGUN + IT_AXE) + IT_NAILGUN)) )
+	if (weap & ((IT_SHOTGUN + IT_AXE) + IT_NAILGUN))
 	{
-		if ( (self.enemy.items & IT_QUAD) )
+		if (self.enemy.items & IT_QUAD)
 		{
 // xreaper add
 	if (XRP)
-			if ( (runawayspeakchance <= 0.1) )
+			if (runawayspeakchance <= 0.1)
 			{
 				bprint (self.netname);
 				bprint (": Run for it, ");
@@ -165,17 +165,17 @@ float () RunAway =
 			}
 			return (1);
 		}
-		if ( (self.enemy.weapon & ((IT_ROCKET_LAUNCHER + IT_LIGHTNING) + IT_SUPER_NAILGUN)) )
+		if (self.enemy.weapon & ((IT_ROCKET_LAUNCHER + IT_LIGHTNING) + IT_SUPER_NAILGUN))
 		{
 			return (1);
 		}
 	}
-	if ( (self.lefty & MULTIENEMY) )
+	if (self.lefty & MULTIENEMY)
 	{
-		if ( (self.health < 70) )
+		if (self.health < 70)
 		{
 		if (XRP)
-			if ( (runawayspeakchance <= 0.1) )
+			if (runawayspeakchance <= 0.1)
 			{
 				bprint (self.netname);
 				bprint (": I'm being assraped by convicts!");
@@ -188,7 +188,7 @@ float () RunAway =
 
 void () BotHuntTarget =
 {
-	if ( VERBOSEBOT )
+	if (VERBOSEBOT)
 	{
 		dprint (self.teamname);
 		dprint (self.netname);
@@ -199,16 +199,16 @@ void () BotHuntTarget =
 	}
 	self.enemyrun = 0;
 	self.strafetime = 0;
-	if ( (self.lefty & ONTRAIN) )
+	if (self.lefty & ONTRAIN)
 	{
 		self.lefty = (self.lefty - ONTRAIN);
 	}
 	self.goalentity.goalentity = self.enemy;
-	if ( (self.enemy.enemy == world) )
+	if (self.enemy.enemy == world)
 	{
 		self.enemy.enemy = self;
 	}
-	if ( (self.goalentity.classname != "BotTarget") )
+	if (self.goalentity.classname != "BotTarget")
 	{
 		objerror ("bad bot target in bot_ai! 2\n");
 	}
@@ -221,9 +221,9 @@ void () BotHuntTarget =
 	self.attack_finished = ((time + 0.7) - (0.2 * self.skil));
 	self.search_time = (time + 7);
 	clearCache (self);
-	if ( teamplay )
+	if (teamplay)
 	{
-		if ( !HELPING )
+		if (!HELPING)
 		{
 			CallForHelp ();
 		}
@@ -236,73 +236,73 @@ float () BotFoundTarget =
 	local float huntspeakchance;
 	huntspeakchance = random ();
 	if (!XRP)
-	if ( !VERBOSEBOT )
+	if (!VERBOSEBOT)
 	{
 		huntspeakchance = 1;
 	}
-	if ( (huntspeakchance <= 0.010) )
+	if (huntspeakchance <= 0.010)
 	{
 		bprint (self.netname);
 		bprint (": I'm gonna make you my bitch ");
 		bprint (self.enemy.netname);
 		bprint ("!\n");
 	}
-	if ( ((huntspeakchance <= 0.020) && (huntspeakchance > 0.010)) )
+	if ((huntspeakchance <= 0.020) && (huntspeakchance > 0.010))
 	{
 		bprint (self.netname);
 		bprint (": Don't Fuck with Daddy ");
 		bprint (self.enemy.netname);
 		bprint ("!\n");
 	}
-	if ( ((huntspeakchance <= 0.030) && (huntspeakchance > 0.020)) )
+	if ((huntspeakchance <= 0.030) && (huntspeakchance > 0.020))
 	{
 		bprint (self.netname);
 		bprint (": Come meet my lil' friend ");
 		bprint (self.enemy.netname);
 		bprint ("!\n");
 	}
-	if ( ((huntspeakchance <= 0.040) && (huntspeakchance > 0.030)) )
+	if ((huntspeakchance <= 0.040) && (huntspeakchance > 0.030))
 	{
 		bprint (self.netname);
 		bprint (": Looks like ");
 		bprint (self.enemy.netname);
 		bprint (" just shit his pants!\n");
 	}
-	if ( ((huntspeakchance <= 0.050) && (huntspeakchance > 0.040)) )
+	if ((huntspeakchance <= 0.050) && (huntspeakchance > 0.040))
 	{
 		bprint (self.netname);
 		bprint (": ");
 		bprint (self.enemy.netname);
 		bprint (" has 5 seconds to beg for mercy, Times up!\n");
 	}
-	if ( (self.enemy == world) )
+	if (self.enemy == world)
 	{
 		return (0);
 	}
-	if ( teamplay )
+	if (teamplay)
 	{
-		if ( (self.enemy.team == self.team) )
+		if (self.enemy.team == self.team)
 		{
 			self.enemy = world;
 			return (0);
 		}
 	}
-	if ( (self.deadflag != DEAD_NO) )
+	if (self.deadflag != DEAD_NO)
 	{
 		self.enemy = world;
 		return (0);
 	}
-	if ( (self.enemy.deadflag != DEAD_NO) )
+	if (self.enemy.deadflag != DEAD_NO)
 	{
 		self.enemy = world;
 		return (0);
 	}
-	if ( ((self.enemy.classname != "player") && (self.enemy.classname != "dmbot")) )
+	if ((self.enemy.classname != "player") && (self.enemy.classname != "dmbot"))
 	{
 		self.enemy = world;
 		return (0);
 	}
-	if ( (self.enemy == self) )
+	if (self.enemy == self)
 	{
 		self.enemy = world;
 		return (0);
@@ -313,9 +313,9 @@ float () BotFoundTarget =
 
 void (entity en2) secondEnemy =
 {
-	if ( (self.enemy.classname != "player") )
+	if (self.enemy.classname != "player")
 	{
-		if ( (en2.classname == "player") )
+		if (en2.classname == "player")
 		{
 			endEnemy ();
 			self.enemy = en2;
@@ -323,15 +323,15 @@ void (entity en2) secondEnemy =
 			return ;
 		}
 	}
-	if ( !enemyvisible (self.enemy) )
+	if (!enemyvisible (self.enemy))
 	{
 		endEnemy ();
 		self.enemy = en2;
 		BotFoundTarget ();
 	}
-	if ( (en2.weapon & (IT_LIGHTNING + IT_ROCKET_LAUNCHER)) )
+	if (en2.weapon & (IT_LIGHTNING + IT_ROCKET_LAUNCHER))
 	{
-		if ( !(self.enemy.weapon & (IT_LIGHTNING + IT_ROCKET_LAUNCHER)) )
+		if (!(self.enemy.weapon & (IT_LIGHTNING + IT_ROCKET_LAUNCHER)))
 		{
 			endEnemy ();
 			self.enemy = en2;
@@ -344,24 +344,24 @@ float () BotfindBot =
 {
 	local float n;
 	local entity bots;
-	if ( !self.lastbot )
+	if (!self.lastbot)
 	{
 		self.lastbot = find (world,classname,"dmbot");
 	}
 	n = 4;
-	while ( (n > 0) )
+	while (n > 0)
 	{
 		n = (n - 1);
 		bots = self.lastbot;
-		if ( (!teamplay || (self.team != bots.team)) )
+		if (!teamplay || (self.team != bots.team))
 		{
-			if ( (bots != self) )
+			if (bots != self)
 			{
-				if ( (bots != self.enemy) )
+				if (bots != self.enemy)
 				{
-					if ( visible (bots) )
+					if (visible (bots))
 					{
-						if ( (bots.health > 0) )
+						if (bots.health > 0)
 						{
 							self.enemy = bots;
 							return(BotFoundTarget ());
@@ -371,7 +371,7 @@ float () BotfindBot =
 			}
 		}
 		self.lastbot = find (bots,classname,"dmbot");
-		if ( !self.lastbot )
+		if (!self.lastbot)
 		{
 			self.lastbot = find (world,classname,"dmbot");
 		}
@@ -385,57 +385,57 @@ float /* indeterminate fn() type */ () BotFindTarget =
 	local float len;
 	local float bw;
 	client = checkclient ();
-	if ( !client )
+	if (!client)
 	{
 		return(BotfindBot ());
 	}
-	if ( (client.classname == "peeper") )
+	if (client.classname == "peeper")
 	{
 		return(BotfindBot ());
 	}
-	if ( (client == self.enemy) )
+	if (client == self.enemy)
 	{
 		return (0);
 	}
-	if ( teamplay )
+	if (teamplay)
 	{
-		if ( (self.team == client.team) )
+		if (self.team == client.team)
 		{
 			return(BotfindBot ());
 		}
 	}
-	if ( (client.flags & FL_NOTARGET) )
+	if (client.flags & FL_NOTARGET)
 	{
 		return(BotfindBot ());
 	}
-	if ( !enemyvisible (client) )
+	if (!enemyvisible (client))
 	{
 		return(BotfindBot ());
 	}
-	if ( !infrontofbot (client) )
+	if (!infrontofbot (client))
 	{
-		if ( !hearnoise (client) )
+		if (!hearnoise (client))
 		{
 			return(BotfindBot ());
 		}
 	}
-	if ( ((self.origin_z > (client.origin_z + 120)) || ((self.origin_z + 120) < client.origin_z)) )
+	if ((self.origin_z > (client.origin_z + 120)) || ((self.origin_z + 120) < client.origin_z))
 	{
 		self.enemy = client;
-		if ( RunAway () )
+		if (RunAway ())
 		{
 			self.enemy = world;
 			return(BotfindBot ());
 		}
 	}
-	if ( (client.items & IT_INVISIBILITY) )
+	if (client.items & IT_INVISIBILITY)
 	{
 		return(BotfindBot ());
 	}
-	if ( (self.skil < 1) )
+	if (self.skil < 1)
 	{
 		len = (random () * MUST_HAVE);
-		if ( (len > 25) )
+		if (len > 25)
 		{
 			return (0);
 		}
@@ -446,7 +446,7 @@ float /* indeterminate fn() type */ () BotFindTarget =
 
 void () ai_botstand =
 {
-	if ( BotFindTarget () )
+	if (BotFindTarget ())
 	{
 		return ;
 	}
@@ -454,7 +454,7 @@ void () ai_botstand =
 
 void () ai_botturn =
 {
-	if ( BotFindTarget () )
+	if (BotFindTarget ())
 	{
 		return ;
 	}
@@ -465,7 +465,7 @@ void () aibot_run_melee =
 {
 	self.ideal_yaw = vectoyaw ((self.enemy.origin - self.origin));
 	ChangeYaw ();
-	if ( FacingIdeal () )
+	if (FacingIdeal ())
 	{
 		self.attack_state = AS_STRAIGHT;
 		self.th_melee ();
@@ -487,48 +487,48 @@ void (float dist, float turn) aibot_run_slide =
 	ofs = 90;
 	dis = dist;
 	self.strafeonly = (self.strafeonly - 1);
-	if ( (self.strafeonly > 0) )
+	if (self.strafeonly > 0)
 	{
 		trn = NOTURN;
 	}
 	rdir = (random () * 3);
 	rng = botrange (self.enemy);
-	if ( (rng == RANGE_NEAR) )
+	if (rng == RANGE_NEAR)
 	{
 		rdir = (rdir + 0.8);
 	}
 	else
 	{
-		if ( (rng == RANGE_MELEE) )
+		if (rng == RANGE_MELEE)
 		{
 			rdir = (rdir + 1.2);
 			rnd = random ();
 			weap = W_BestHeldWeapon ();
-			if ( (weap == IT_ROCKET_LAUNCHER) )
+			if (weap == IT_ROCKET_LAUNCHER)
 			{
 				rnd = 0;
 			}
 			else
 			{
-				if ( (weap == IT_GRENADE_LAUNCHER) )
+				if (weap == IT_GRENADE_LAUNCHER)
 				{
 					rnd = 0;
 				}
 				else
 				{
-					if ( (self.enemyrun > 4) )
+					if (self.enemyrun > 4)
 					{
 						rnd = 1;
 					}
 					else
 					{
-						if ( (weap == IT_AXE) )
+						if (weap == IT_AXE)
 						{
 							rnd = 1;
 						}
 						else
 						{
-							if ( (self.enemy.weapon == IT_ROCKET_LAUNCHER) )
+							if (self.enemy.weapon == IT_ROCKET_LAUNCHER)
 							{
 								rnd = 1;
 							}
@@ -536,9 +536,9 @@ void (float dist, float turn) aibot_run_slide =
 					}
 				}
 			}
-			if ( (rnd < 0.3) )
+			if (rnd < 0.3)
 			{
-				if ( botwalkmove ((self.ideal_yaw + 180),dis) )
+				if (botwalkmove ((self.ideal_yaw + 180),dis))
 				{
 					return ;
 				}
@@ -546,10 +546,10 @@ void (float dist, float turn) aibot_run_slide =
 		}
 		else
 		{
-			if ( (rng == RANGE_MID) )
+			if (rng == RANGE_MID)
 			{
 				weap = W_BestHeldWeapon ();
-				if ( (weap == IT_LIGHTNING) )
+				if (weap == IT_LIGHTNING)
 				{
 					rdir = (rdir - 3);
 				}
@@ -560,70 +560,70 @@ void (float dist, float turn) aibot_run_slide =
 			}
 			else
 			{
-				if ( (rng == RANGE_FAR) )
+				if (rng == RANGE_FAR)
 				{
 					rdir = (rdir - 2.5);
 				}
 			}
 		}
 	}
-	if ( (self.weapon == IT_AXE) )
+	if (self.weapon == IT_AXE)
 	{
 		rdir = 0;
 	}
 	else
 	{
-		if ( (self.weapon == IT_ROCKET_LAUNCHER) )
+		if (self.weapon == IT_ROCKET_LAUNCHER)
 		{
 			rdir = (rdir + 1.5);
 		}
 		else
 		{
-			if ( (self.weapon == IT_GRENADE_LAUNCHER) )
+			if (self.weapon == IT_GRENADE_LAUNCHER)
 			{
 				rdir = (rdir + 1.5);
 			}
 		}
 	}
-	if ( (self.enemy.weapon == IT_ROCKET_LAUNCHER) )
+	if (self.enemy.weapon == IT_ROCKET_LAUNCHER)
 	{
 		rdir = (rdir + 1.5);
 	}
 	else
 	{
-		if ( (self.enemy.weapon == IT_LIGHTNING) )
+		if (self.enemy.weapon == IT_LIGHTNING)
 		{
 			rdir = (rdir + 1.5);
 		}
 	}
-	if ( (self.enemyrun > 8) )
+	if (self.enemyrun > 8)
 	{
 		rdir = (rdir - 2);
 	}
 	else
 	{
-		if ( (self.origin_z > (self.enemy.origin_z + 130)) )
+		if (self.origin_z > (self.enemy.origin_z + 130))
 		{
 			rdir = ((rdir + 1.1) + random ());
-			if ( (rdir >= 1.5) )
+			if (rdir >= 1.5)
 			{
 				trn = NOTURN;
 			}
-			if ( (self.weapon == IT_AXE) )
+			if (self.weapon == IT_AXE)
 			{
 				trn = turn;
 				rdir = 0;
 			}
 		}
 	}
-	if ( (rdir < 1.5) )
+	if (rdir < 1.5)
 	{
-		if ( (trn == CANTURN) )
+		if (trn == CANTURN)
 		{
 			Botmovetogoal (dis);
 			return ;
 		}
-		if ( botwalkmove (self.ideal_yaw,dis) )
+		if (botwalkmove (self.ideal_yaw,dis))
 		{
 			return ;
 		}
@@ -631,42 +631,42 @@ void (float dist, float turn) aibot_run_slide =
 	}
 	else
 	{
-		if ( (rdir < 2.4) )
+		if (rdir < 2.4)
 		{
 			ofs = 45;
 		}
 	}
-	if ( (self.skil == 0) )
+	if (self.skil == 0)
 	{
 		return ;
 	}
 	self.strafetime = (self.strafetime + 0.1);
-	if ( (self.skil < 2) )
+	if (self.skil < 2)
 	{
-		if ( (self.skil < 1) )
+		if (self.skil < 1)
 		{
 			dis = (0.7 * dis);
 		}
-		if ( (self.strafetime == 0.1) )
+		if (self.strafetime == 0.1)
 		{
 			rnd = (random () * 4);
-			if ( (self.skil >= TRUE) )
+			if (self.skil >= TRUE)
 			{
 				rnd = ((rnd - self.skil) + 0.5);
 			}
-			if ( (rnd > self.skil) )
+			if (rnd > self.skil)
 			{
 				self.strafetime = 0;
 				return ;
 			}
 		}
 	}
-	if ( (self.strafetime > 0.4) )
+	if (self.strafetime > 0.4)
 	{
 		rnd = (random () * 2);
-		if ( (rnd > 1.870) )
+		if (rnd > 1.870)
 		{
-			if ( (self.lefty & STRAFE_DIR) )
+			if (self.lefty & STRAFE_DIR)
 			{
 				self.lefty = (self.lefty - STRAFE_DIR);
 			}
@@ -678,16 +678,16 @@ void (float dist, float turn) aibot_run_slide =
 			return ;
 		}
 	}
-	if ( (self.lefty & STRAFE_DIR) )
+	if (self.lefty & STRAFE_DIR)
 	{
 		ofs = (-1* ofs);
 	}
-	if ( botwalkmove ((self.ideal_yaw + ofs),dis) )
+	if (botwalkmove ((self.ideal_yaw + ofs),dis))
 	{
 		return ;
 	}
 	self.strafetime = 0;
-	if ( (self.lefty & STRAFE_DIR) )
+	if (self.lefty & STRAFE_DIR)
 	{
 		self.lefty = (self.lefty - STRAFE_DIR);
 	}
@@ -695,18 +695,18 @@ void (float dist, float turn) aibot_run_slide =
 	{
 		self.lefty = (self.lefty + STRAFE_DIR);
 	}
-	if ( ((ofs == 90) || (ofs == -90)) )
+	if ((ofs == 90) || (ofs == -90))
 	{
 		rnd = random ();
-		if ( (rnd < 0.050) )
+		if (rnd < 0.050)
 		{
-			if ( (trn == CANTURN) )
+			if (trn == CANTURN)
 			{
 				Botmovetogoal (dis);
 				return ;
 			}
 		}
-		if ( (rnd < 0.5) )
+		if (rnd < 0.5)
 		{
 			walkmove ((self.ideal_yaw + 180),(dis * 0.5));
 		}
@@ -720,25 +720,25 @@ void (float dist) ai_botcharge =
 {
 	local float rng;
 	local float oldrng;
-	if ( (self.lefty & GETGOODY) )
+	if (self.lefty & GETGOODY)
 	{
 		ai_botgetGoody (dist);
 		return ;
 	}
-	if ( enemyvisible (self.enemy) )
+	if (enemyvisible (self.enemy))
 	{
 		rng = vlen ((self.enemy.origin - self.origin));
 		oldrng = vlen ((self.goalentity.origin - self.origin));
-		if ( (self.goalentity.classname != "BotTarget") )
+		if (self.goalentity.classname != "BotTarget")
 		{
 			objerror ("bad bot target in bot_ai! 3\n");
 		}
 		setorigin (self.goalentity,self.enemy.origin);
-		if ( (self.enemyrun > 0) )
+		if (self.enemyrun > 0)
 		{
 			self.enemyrun = (self.enemyrun - 1);
 		}
-		if ( (rng > (oldrng + 10)) )
+		if (rng > (oldrng + 10))
 		{
 			self.enemyrun = (self.enemyrun + 2);
 		}
@@ -749,15 +749,15 @@ void (float dist) ai_botcharge =
 void (float dist) ai_botnailcharge =
 {
 	local float rnd;
-	if ( !enemyvisible (self.enemy) )
+	if (!enemyvisible (self.enemy))
 	{
 		self.think = self.th_run;
 	}
-	if ( !FacingIdeal () )
+	if (!FacingIdeal ())
 	{
 		self.think = self.th_run;
 	}
-	if ( (self.enemy.deadflag != DEAD_NO) )
+	if (self.enemy.deadflag != DEAD_NO)
 	{
 		endEnemy ();
 		return ;
@@ -776,35 +776,35 @@ void (float dist) ai_botrun =
 	local float ang_rint;
 	local float ang_floor;
 	local float ang_ceil;
-	if ( (self.enemy.deadflag != DEAD_NO) )
+	if (self.enemy.deadflag != DEAD_NO)
 	{
 		endEnemy ();
 		return ;
 	}
-	if ( !self.enemy )
+	if (!self.enemy)
 	{
 		endEnemy ();
 		return ;
 	}
-	if ( (self.lefty & GETGOODY) )
+	if (self.lefty & GETGOODY)
 	{
 		ai_botgetGoody (dist);
 		return ;
 	}
 	enemy_vis = enemyvisible (self.enemy);
-	if ( (enemy_vis || Spotvisible (self.enemy)) )
+	if (enemy_vis || Spotvisible (self.enemy))
 	{
 		rng = vlen ((self.enemy.origin - self.origin));
 		oldrng = vlen ((self.goalentity.origin - self.origin));
-		if ( (self.enemyrun > 0) )
+		if (self.enemyrun > 0)
 		{
 			self.enemyrun = (self.enemyrun - 1);
 		}
-		if ( (rng > (oldrng + 10)) )
+		if (rng > (oldrng + 10))
 		{
 			self.enemyrun = (self.enemyrun + 2);
 		}
-		if ( (self.goalentity.classname != "BotTarget") )
+		if (self.goalentity.classname != "BotTarget")
 		{
 			eprint (self.goalentity);
 			objerror ("bad bot target in bot_ai! 4\n");
@@ -812,28 +812,28 @@ void (float dist) ai_botrun =
 		setorigin (self.goalentity,self.enemy.origin);
 		self.search_time = (time + 7);
 	}
-	if ( (self.search_time < time) )
+	if (self.search_time < time)
 	{
 		endEnemy ();
 		BotFindTarget ();
 		return ;
 	}
-	if ( ((self.lefty & LOCAL_TIME) > 5) )
+	if ((self.lefty & LOCAL_TIME) > 5)
 	{
 		self.lefty = (self.lefty - (self.lefty & LOCAL_TIME));
 		self.lastseenpos = self.goalentity.origin;
-		if ( aibot_checkforGoodies (DONT_WANT) )
+		if (aibot_checkforGoodies (DONT_WANT))
 		{
 			ai_botgetGoody (dist);
 			return ;
 		}
 	}
 	self.lefty = (self.lefty + 1);
-	if ( RunAway () )
+	if (RunAway ())
 	{
 		self.lefty = (self.lefty - (self.lefty & LOCAL_TIME));
 		self.lastseenpos = self.goalentity.origin;
-		if ( aibot_checkforGoodies (DONT_WANT) )
+		if (aibot_checkforGoodies (DONT_WANT))
 		{
 			ai_botgetGoody (dist);
 			return ;
@@ -841,13 +841,13 @@ void (float dist) ai_botrun =
 	}
 	enemy_infront = infrontofbot (self.enemy);
 	enemy_yaw = vectoyaw ((self.enemy.origin - self.origin));
-	if ( !enemy_vis )
+	if (!enemy_vis)
 	{
 		aibot_setupchase ();
 		Botmovetogoal (dist);
 		return ;
 	}
-	if ( (self.attack_state == AS_MELEE) )
+	if (self.attack_state == AS_MELEE)
 	{
 		aibot_run_melee ();
 	}
@@ -860,11 +860,11 @@ void () aibot_setupchase =
 {
 	local entity pth;
 	self.think = bot_chase;
-	if ( TrueReachable (self.goalentity) )
+	if (TrueReachable (self.goalentity))
 	{
 		return ;
 	}
-	if ( RunAway () )
+	if (RunAway ())
 	{
 		self.lefty = (self.lefty - (self.lefty & LOCAL_TIME));
 		aibot_checkforGoodies ((WANT - 1));
@@ -872,11 +872,11 @@ void () aibot_setupchase =
 		return ;
 	}
 	pth = BestChaseRoute (self,self.enemy);
-	if ( (self.goalentity.classname != "BotTarget") )
+	if (self.goalentity.classname != "BotTarget")
 	{
 		objerror ("bad bot target in bot_ai! 1\n");
 	}
-	if ( (pth != self.enemy) )
+	if (pth != self.enemy)
 	{
 		setorigin (self.goalentity,pth.origin);
 	}
@@ -888,25 +888,25 @@ void (float dist) aibot_chase =
 	local entity olden;
 	local float weap;
 	local float rnd;
-	if ( (self.enemy.deadflag != DEAD_NO) )
+	if (self.enemy.deadflag != DEAD_NO)
 	{
 		endEnemy ();
 		return ;
 	}
-	if ( (self.lefty & GETGOODY) )
+	if (self.lefty & GETGOODY)
 	{
 		ai_botgetGoody (dist);
 		return ;
 	}
 	enemy_vis = enemyvisible (self.enemy);
 	rnd = random ();
-	if ( (rnd < 0.9) )
+	if (rnd < 0.9)
 	{
 		enemy_vis = enemy_vis;
 	}
-	if ( enemy_vis )
+	if (enemy_vis)
 	{
-		if ( (self.goalentity.classname != "BotTarget") )
+		if (self.goalentity.classname != "BotTarget")
 		{
 			objerror ("bad bot target in bot_ai! 1\n");
 		}
@@ -916,34 +916,34 @@ void (float dist) aibot_chase =
 		Botmovetogoal (dist);
 		return ;
 	}
-	if ( RunAway () )
+	if (RunAway ())
 	{
-		if ( (self.search_time < time) )
+		if (self.search_time < time)
 		{
 			endEnemy ();
 			return ;
 		}
 		self.lefty = (self.lefty - (self.lefty & LOCAL_TIME));
-		if ( aibot_checkforGoodies ((WANT - 1)) )
+		if (aibot_checkforGoodies ((WANT - 1)))
 		{
 			ai_botgetGoody (dist);
 			self.lastseenpos = self.goalentity.origin;
 			return ;
 		}
 	}
-	if ( (self.enemy.items & IT_INVISIBILITY) )
+	if (self.enemy.items & IT_INVISIBILITY)
 	{
-		if ( (self.skil < 3) )
+		if (self.skil < 3)
 		{
 			endEnemy ();
 			return ;
 		}
 	}
-	if ( ((self.lefty & LOCAL_TIME) > 5) )
+	if ((self.lefty & LOCAL_TIME) > 5)
 	{
 		self.lastseenpos = self.goalentity.origin;
 		self.lefty = (self.lefty - (self.lefty & LOCAL_TIME));
-		if ( aibot_checkforGoodies ((MUST_HAVE - 3)) )
+		if (aibot_checkforGoodies ((MUST_HAVE - 3)))
 		{
 			ai_botgetGoody (dist);
 			return ;
@@ -951,20 +951,20 @@ void (float dist) aibot_chase =
 	}
 	self.lefty = (self.lefty + 1);
 	olden = self.enemy;
-	if ( BotFindTarget () )
+	if (BotFindTarget ())
 	{
-		if ( (olden.enemy == self) )
+		if (olden.enemy == self)
 		{
 			olden.enemy = world;
 		}
 		return ;
 	}
-	if ( (self.search_time < time) )
+	if (self.search_time < time)
 	{
 		endEnemy ();
 		return ;
 	}
-	if ( CheckReboundAttack () )
+	if (CheckReboundAttack ())
 	{
 		return ;
 	}
@@ -984,7 +984,7 @@ float (float minweight) aibot_checkforGoodies =
 	local float weap;
 	local float minimum;
 	local vector spot;
-	if ( (self.air_finished < (time + 9)) )
+	if (self.air_finished < (time + 9))
 	{
 		goForAir ();
 		self.lefty = (self.lefty | GETGOODY);
@@ -995,43 +995,43 @@ float (float minweight) aibot_checkforGoodies =
 	botTarget = self.goalentity;
 	e = findradius (self.origin,SEARCH_RADIUS);
 	best = DONT_WANT;
-	while ( e )
+	while (e)
 	{
 		weight = DONT_WANT;
-		if ( (e.origin_z > (self.origin_z + (0.7 * MAXJUMP))) )
+		if (e.origin_z > (self.origin_z + (0.7 * MAXJUMP)))
 		{
 			weight = DONT_WANT;
 		}
 		else
 		{
-			if ( ((e.pathtype == DROPPED) || (e.pathtype == TELEPORT)) )
+			if ((e.pathtype == DROPPED) || (e.pathtype == TELEPORT))
 			{
 				weight = DONT_WANT;
-				if ( AFRAID )
+				if (AFRAID)
 				{
 					weight = RunAwayWeight (e);
 				}
 			}
 			else
 			{
-				if ( (e.pathtype != REGULARTARGET) )
+				if (e.pathtype != REGULARTARGET)
 				{
 					weight = DONT_WANT;
 				}
 				else
 				{
-					if ( (e.solid != SOLID_TRIGGER) )
+					if (e.solid != SOLID_TRIGGER)
 					{
 						weight = DONT_WANT;
 					}
 					else
 					{
-						if ( !e.istrigger )
+						if (!e.istrigger)
 						{
 							weight = itemweight (e);
-							if ( (weight < MUST_HAVE) )
+							if (weight < MUST_HAVE)
 							{
-								if ( (((e.origin_z < self.enemy.absmin_z) && (e.origin_z < self.absmin_z)) && !AFRAID) )
+								if (((e.origin_z < self.enemy.absmin_z) && (e.origin_z < self.absmin_z)) && !AFRAID)
 								{
 									weight = DONT_WANT;
 								}
@@ -1041,7 +1041,7 @@ float (float minweight) aibot_checkforGoodies =
 				}
 			}
 		}
-		if ( (weight > best) )
+		if (weight > best)
 		{
 			botTarget.goalentity = e;
 			best = weight;
@@ -1049,18 +1049,18 @@ float (float minweight) aibot_checkforGoodies =
 		e = e.chain;
 	}
 	minimum = minweight;
-	if ( (self.skil < 1) )
+	if (self.skil < 1)
 	{
-		if ( (minimum < (WANT + 2)) )
+		if (minimum < (WANT + 2))
 		{
 			minimum = (WANT + 2);
 		}
 	}
-	if ( (best > DONT_WANT) )
+	if (best > DONT_WANT)
 	{
-		if ( ((best > minimum) || AFRAID) )
+		if ((best > minimum) || AFRAID)
 		{
-			if ( (botTarget.classname != "BotTarget") )
+			if (botTarget.classname != "BotTarget")
 			{
 				objerror ("bad bot target in bot_ai! 6\n");
 			}
@@ -1076,22 +1076,22 @@ float (float minweight) aibot_checkforGoodies =
 
 void (float dist) ai_endgetGoody =
 {
-	if ( (self.lefty & GETGOODY) )
+	if (self.lefty & GETGOODY)
 	{
 		self.lefty = (self.lefty - GETGOODY);
 	}
-	if ( (self.goalentity.classname != "BotTarget") )
+	if (self.goalentity.classname != "BotTarget")
 	{
 		objerror ("bad bot target in bot_ai! 7\n");
 	}
 	setorigin (self.goalentity,self.lastseenpos);
 	self.goalentity.goalentity = self.enemy;
-	if ( enemyvisible (self.enemy) )
+	if (enemyvisible (self.enemy))
 	{
 		self.lastseenpos = self.enemy.origin;
-		if ( (self.attack_finished < time) )
+		if (self.attack_finished < time)
 		{
-			if ( (self.attack_state == AS_MELEE) )
+			if (self.attack_state == AS_MELEE)
 			{
 				aibot_run_melee ();
 			}
@@ -1107,41 +1107,41 @@ void (float dist) ai_botgetGoody =
 	local float dis;
 	local float weap;
 	self.search_time = (self.search_time + 0.1);
-	if ( (time > self.goody_time) )
+	if (time > self.goody_time)
 	{
 		ai_endgetGoody (dist);
 		return ;
 	}
-	if ( (self.goalentity.goalentity.solid == SOLID_NOT) )
+	if (self.goalentity.goalentity.solid == SOLID_NOT)
 	{
 		ai_endgetGoody (dist);
 		return ;
 	}
-	if ( !Spotvisible (self.goalentity.goalentity) )
+	if (!Spotvisible (self.goalentity.goalentity))
 	{
-		if ( (self.air_finished > 9) )
+		if (self.air_finished > 9)
 		{
 			ai_endgetGoody (dist);
 			return ;
 		}
 	}
 	goody_yaw = vectoyaw ((self.goalentity.origin - self.origin));
-	if ( enemyvisible (self.enemy) )
+	if (enemyvisible (self.enemy))
 	{
 		self.lastseenpos = self.enemy.origin;
 		weap = W_BestBotWeapon ();
-		if ( (((self.enemy.items & IT_INVULNERABILITY) || (self.skil < 1)) || (weap == IT_AXE)) )
+		if (((self.enemy.items & IT_INVULNERABILITY) || (self.skil < 1)) || (weap == IT_AXE))
 		{
 			self.ideal_yaw = goody_yaw;
 			ChangeYaw ();
 		}
 		else
 		{
-			if ( (self.attack_finished < time) )
+			if (self.attack_finished < time)
 			{
 				self.ideal_yaw = vectoyaw ((self.enemy.origin - self.origin));
 				ChangeYaw ();
-				if ( (self.attack_state == AS_MELEE) )
+				if (self.attack_state == AS_MELEE)
 				{
 					aibot_run_melee ();
 				}
@@ -1149,44 +1149,44 @@ void (float dist) ai_botgetGoody =
 			}
 		}
 	}
-	if ( (self.air_finished < 6) )
+	if (self.air_finished < 6)
 	{
 		waterupz (SVC_TEMPENTITY);
 		return ;
 	}
-	if ( (self.flags & FL_SWIM) )
+	if (self.flags & FL_SWIM)
 	{
-		if ( waterupdown (dist) )
+		if (waterupdown (dist))
 		{
 			return ;
 		}
 	}
 	dis = vlen ((self.origin - self.goalentity.origin));
-	if ( (dis > dist) )
+	if (dis > dist)
 	{
 		dis = dist;
 	}
 	else
 	{
-		if ( (self.goalentity.goalentity.pathtype == DROPPED) )
+		if (self.goalentity.goalentity.pathtype == DROPPED)
 		{
 			ai_endgetGoody (dist);
 			return ;
 		}
 	}
-	if ( botwalkmove (goody_yaw,dis) )
+	if (botwalkmove (goody_yaw,dis))
 	{
 		return ;
 	}
-	if ( Bot_tryjump (270,dist,0) )
+	if (Bot_tryjump (270,dist,0))
 	{
 		return ;
 	}
-	if ( (self.lefty & GETGOODY) )
+	if (self.lefty & GETGOODY)
 	{
 		self.lefty = (self.lefty - GETGOODY);
 	}
-	if ( (self.goalentity.classname != "BotTarget") )
+	if (self.goalentity.classname != "BotTarget")
 	{
 		objerror ("bad bot target in bot_ai! 8\n");
 	}

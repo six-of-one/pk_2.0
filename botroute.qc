@@ -13,11 +13,11 @@
 
 void () t_botpath =
 {
-	if ( (other.classname != "dmbot") )
+	if (other.classname != "dmbot")
 	{
 		return ;
 	}
-	if ( (other.movetarget == self) )
+	if (other.movetarget == self)
 	{
 		return ;
 	}
@@ -41,27 +41,27 @@ entity () botpath =
 
 float (entity a, entity b) IsUpstream =
 {
-	if ( (b.movetarget == a) )
+	if (b.movetarget == a)
 	{
 		return (1);
 	}
-	if ( (b.movetarget2 == a) )
+	if (b.movetarget2 == a)
 	{
 		return (1);
 	}
-	if ( (b.movetarget3 == a) )
+	if (b.movetarget3 == a)
 	{
 		return (1);
 	}
-	if ( (b.movetarget4 == a) )
+	if (b.movetarget4 == a)
 	{
 		return (1);
 	}
-	if ( (b.movetarget5 == a) )
+	if (b.movetarget5 == a)
 	{
 		return (1);
 	}
-	if ( (b.movetarget6 == a) )
+	if (b.movetarget6 == a)
 	{
 		return (1);
 	}
@@ -72,27 +72,27 @@ void (entity node, entity targ, float len, entity item) cacheRouteTarget;
 void (entity a, entity b, float recurse) updateRouteCache =
 {
 	RECURSEDEPTH = recurse;
-	if ( (b.rocketlen > 0) )
+	if (b.rocketlen > 0)
 	{
 		cacheRouteTarget (b,a,b.rocketlen,b.rocketcache);
 	}
-	if ( (b.lightninglen > 0) )
+	if (b.lightninglen > 0)
 	{
 		cacheRouteTarget (b,a,b.lightninglen,b.lightningcache);
 	}
-	if ( (b.armorlen > 0) )
+	if (b.armorlen > 0)
 	{
 		cacheRouteTarget (b,a,b.armorlen,b.armorcache);
 	}
-	if ( (b.poweruplen > 0) )
+	if (b.poweruplen > 0)
 	{
 		cacheRouteTarget (b,a,b.poweruplen,b.powerupcache);
 	}
-	if ( (b.naillen > 0) )
+	if (b.naillen > 0)
 	{
 		cacheRouteTarget (b,a,b.naillen,b.nailcache);
 	}
-	if ( (b.grenadelen > 0) )
+	if (b.grenadelen > 0)
 	{
 		cacheRouteTarget (b,a,b.grenadelen,b.grenadecache);
 	}
@@ -100,49 +100,49 @@ void (entity a, entity b, float recurse) updateRouteCache =
 
 void (entity a, entity b) addTarget =
 {
-	if ( (a == b) )
+	if (a == b)
 	{
 		return ;
 	}
-	if ( (b.movetarget == a) )
+	if (b.movetarget == a)
 	{
 		return ;
 	}
-	if ( !a )
+	if (!a)
 	{
 		return ;
 	}
 	else
 	{
-		if ( (b.movetarget2 == a) )
+		if (b.movetarget2 == a)
 		{
 			updateRouteCache (a,b,16);
 			return ;
 		}
 		else
 		{
-			if ( (b.movetarget3 == a) )
+			if (b.movetarget3 == a)
 			{
 				updateRouteCache (a,b,16);
 				return ;
 			}
 			else
 			{
-				if ( (b.movetarget4 == a) )
+				if (b.movetarget4 == a)
 				{
 					updateRouteCache (a,b,16);
 					return ;
 				}
 				else
 				{
-					if ( (b.movetarget5 == a) )
+					if (b.movetarget5 == a)
 					{
 						updateRouteCache (a,b,16);
 						return ;
 					}
 					else
 					{
-						if ( (b.movetarget6 == a) )
+						if (b.movetarget6 == a)
 						{
 							updateRouteCache (a,b,16);
 							return ;
@@ -152,37 +152,37 @@ void (entity a, entity b) addTarget =
 			}
 		}
 	}
-	if ( !b.movetarget )
+	if (!b.movetarget)
 	{
 		b.movetarget = a;
 	}
 	else
 	{
-		if ( !b.movetarget2 )
+		if (!b.movetarget2)
 		{
 			b.movetarget2 = a;
 		}
 		else
 		{
-			if ( !b.movetarget3 )
+			if (!b.movetarget3)
 			{
 				b.movetarget3 = a;
 			}
 			else
 			{
-				if ( !b.movetarget4 )
+				if (!b.movetarget4)
 				{
 					b.movetarget4 = a;
 				}
 				else
 				{
-					if ( !b.movetarget5 )
+					if (!b.movetarget5)
 					{
 						b.movetarget5 = a;
 					}
 					else
 					{
-						if ( !b.movetarget6 )
+						if (!b.movetarget6)
 						{
 							b.movetarget6 = a;
 						}
@@ -203,7 +203,7 @@ float () FindAltPath =
 	local float dropPath;
 	local float bestrng;
 	local float rng;
-	if ( (self.lefty & NODROP) )
+	if (self.lefty & NODROP)
 	{
 		self.lefty = (self.lefty - NODROP);
 		return(FindAPath ());
@@ -213,16 +213,16 @@ float () FindAltPath =
 	dropPath = 1;
 	carriedPath = self.movetarget;
 	bestPath = carriedPath.movetarget;
-	while ( e )
+	while (e)
 	{
-		if ( (e.pathtype == DROPPED) )
+		if (e.pathtype == DROPPED)
 		{
 			rng = vlen ((e.origin - self.origin));
-			if ( (rng < bestrng) )
+			if (rng < bestrng)
 			{
-				if ( BotReachable (e,self) )
+				if (BotReachable (e,self))
 				{
-					if ( BotReachable (carriedPath.movetarget,e) )
+					if (BotReachable (carriedPath.movetarget,e))
 					{
 						addTarget (carriedPath.movetarget,e);
 						bestPath = e;
@@ -251,14 +251,14 @@ float () FindAPath =
 	e = findradius (self.origin,SEARCH_RADIUS);
 	bestrng = 1000;
 	bestPath = carriedPath.movetarget;
-	while ( e )
+	while (e)
 	{
-		if ( (e.pathtype == DROPPED) )
+		if (e.pathtype == DROPPED)
 		{
 			rng = vlen ((e.origin - self.origin));
-			if ( (rng < bestrng) )
+			if (rng < bestrng)
 			{
-				if ( BotReachable (e,self) )
+				if (BotReachable (e,self))
 				{
 					addTarget (carriedPath.movetarget,e);
 					bestPath = e;
@@ -282,27 +282,27 @@ float () CheckDropPath =
 	local float OK_HIGH;
 	local string tmp;
 // this is a fix point if overflow occurs with waypoints - fix by reducing 160
-	if ( (NUMPATHS > 160) )
+	if (NUMPATHS > 160)
 	{
 		return (0);
 	}
 	carriedPath = self.movetarget;
 	upstreamPath = carriedPath.movetarget;
 	lnd = pointcontents (carriedPath.origin);
-	if ( (lnd == CONTENT_EMPTY) )
+	if (lnd == CONTENT_EMPTY)
 	{
 		rng = dropline (carriedPath.origin);
-		if ( (rng < (carriedPath.origin_z - SVC_FOUNDSECRET)) )
+		if (rng < (carriedPath.origin_z - SVC_FOUNDSECRET))
 		{
-			if ( !(carriedPath.flags & (FL_ONGROUND + 16)) )
+			if (!(carriedPath.flags & (FL_ONGROUND + 16)))
 			{
 				return (0);
 			}
 		}
 		lnd = pointcontents (((carriedPath.origin + self.mins) + '0 0 1'));
-		if ( (lnd != CONTENT_EMPTY) )
+		if (lnd != CONTENT_EMPTY)
 		{
-			if ( (lnd != CONTENT_WATER) )
+			if (lnd != CONTENT_WATER)
 			{
 				self.lefty = (self.lefty | NODROP);
 				return (0);
@@ -311,40 +311,40 @@ float () CheckDropPath =
 	}
 	else
 	{
-		if ( (lnd != CONTENT_WATER) )
+		if (lnd != CONTENT_WATER)
 		{
 			self.lefty = (self.lefty | NODROP);
 			return (0);
 		}
 	}
-	if ( ((trace_ent.classname == "plat") || (trace_ent.classname == "train")) )
+	if ((trace_ent.classname == "plat") || (trace_ent.classname == "train"))
 	{
-		if ( trace_ent.think )
+		if (trace_ent.think)
 		{
 			self.lefty = (self.lefty | NODROP);
 			return (0);
 		}
 	}
-	if ( (self.teleport_time > time) )
+	if (self.teleport_time > time)
 	{
 		self.lefty = (self.lefty | NODROP);
-		if ( (self.teleport_time > (time + 0.5)) )
+		if (self.teleport_time > (time + 0.5))
 		{
 			return (0);
 		}
-		if ( (self.lefty & NODROP) )
+		if (self.lefty & NODROP)
 		{
 			self.lefty = (self.lefty - NODROP);
 		}
 		return(FindAPath ());
 	}
-	if ( !upstreamPath )
+	if (!upstreamPath)
 	{
 		return(FindAPath ());
 	}
-	if ( !BotReachable (upstreamPath,self) )
+	if (!BotReachable (upstreamPath,self))
 	{
-		if ( (upstreamPath.origin_z > (self.origin_z + MAXJUMP)) )
+		if (upstreamPath.origin_z > (self.origin_z + MAXJUMP))
 		{
 			return(FindAPath ());
 		}
@@ -366,12 +366,12 @@ void () DropBotPath =
 	local entity oldpath;
 	local float drop;
 	oldpath = self.movetarget;
-	if ( oldpath.movetarget )
+	if (oldpath.movetarget)
 	{
-		if ( (oldpath.origin_z > ((oldpath.movetarget.origin_z + (MAXJUMP * 0.6)) - 1)) )
+		if (oldpath.origin_z > ((oldpath.movetarget.origin_z + (MAXJUMP * 0.6)) - 1))
 		{
 			drop = (((oldpath.movetarget.origin_z - oldpath.origin_z) + (MAXJUMP * 0.6)) - 1);
-			if ( (drop < (self.mins_z + 2)) )
+			if (drop < (self.mins_z + 2))
 			{
 				drop = (self.mins_z + 2);
 			}
@@ -389,13 +389,13 @@ void (entity node, entity targ, float len, entity item) cacheRouteTarget =
 {
 	local float rng;
 	rng = vlen ((node.origin - targ.origin));
-	if ( (targ.pathtype == TELEPORT) )
+	if (targ.pathtype == TELEPORT)
 	{
 		rng = 250;
 	}
 	rng = ((rng + len) + KINDA_WANT);
 	RECURSEDEPTH = (RECURSEDEPTH + 2);
-	if ( (RECURSEDEPTH < 24) )
+	if (RECURSEDEPTH < 24)
 	{
 		cacheRouteMsg (targ,rng,item);
 	}
@@ -410,39 +410,39 @@ void (entity node, entity targ, float len, entity item) cacheRoute =
 {
 	RECURSEDEPTH = 1;
 	cacheRouteTarget (node,targ,len,item);
-	if ( (other.classname == "dmbot") )
+	if (other.classname == "dmbot")
 	{
-		if ( (other.rocketcache == item) )
+		if (other.rocketcache == item)
 		{
 			clearCache (other);
 		}
 		else
 		{
-			if ( (other.lightningcache == item) )
+			if (other.lightningcache == item)
 			{
 				clearCache (other);
 			}
 			else
 			{
-				if ( (other.armorcache == item) )
+				if (other.armorcache == item)
 				{
 					clearCache (other);
 				}
 				else
 				{
-					if ( (other.powerupcache == item) )
+					if (other.powerupcache == item)
 					{
 						clearCache (other);
 					}
 					else
 					{
-						if ( (other.nailcache == item) )
+						if (other.nailcache == item)
 						{
 							clearCache (other);
 						}
 						else
 						{
-							if ( (other.grenadecache == item) )
+							if (other.grenadecache == item)
 							{
 								clearCache (other);
 							}
@@ -456,9 +456,9 @@ void (entity node, entity targ, float len, entity item) cacheRoute =
 
 void (entity node, float len, entity item) cacheRouteMsg =
 {
-	if ( item.th_cache )
+	if (item.th_cache)
 	{
-		if ( !item.th_cache (node,len,item) )
+		if (!item.th_cache (node,len,item))
 		{
 			return ;
 		}
@@ -467,27 +467,27 @@ void (entity node, float len, entity item) cacheRouteMsg =
 	{
 		return ;
 	}
-	if ( node.movetarget )
+	if (node.movetarget)
 	{
 		cacheRouteTarget (node,node.movetarget,len,item);
 	}
-	if ( node.movetarget2 )
+	if (node.movetarget2)
 	{
 		cacheRouteTarget (node,node.movetarget2,len,item);
 	}
-	if ( node.movetarget3 )
+	if (node.movetarget3)
 	{
 		cacheRouteTarget (node,node.movetarget3,len,item);
 	}
-	if ( node.movetarget4 )
+	if (node.movetarget4)
 	{
 		cacheRouteTarget (node,node.movetarget4,len,item);
 	}
-	if ( node.movetarget5 )
+	if (node.movetarget5)
 	{
 		cacheRouteTarget (node,node.movetarget5,len,item);
 	}
-	if ( node.movetarget6 )
+	if (node.movetarget6)
 	{
 		cacheRouteTarget (node,node.movetarget6,len,item);
 	}
@@ -515,46 +515,46 @@ void (entity en) RouteToEnemy =
 	local entity e;
 	RECURSEDEPTH = 8;
 	e = find (world,classname,"BotPath");
-	while ( e )
+	while (e)
 	{
 		e.enemycache = world;
 		e.endpoint = 0;
 		e = find (e,classname,"BotPath");
 	}
-	if ( en.movetarget )
+	if (en.movetarget)
 	{
-		if ( en.movetarget.movetarget )
+		if (en.movetarget.movetarget)
 		{
 			cacheRouteTarget (en.movetarget,en.movetarget.movetarget,0,en);
 			e = find (world,classname,"BotPath");
-			while ( e )
+			while (e)
 			{
-				if ( e.endpoint )
+				if (e.endpoint)
 				{
-					if ( (e.enemycache == en) )
+					if (e.enemycache == en)
 					{
 						RECURSEDEPTH = 8;
-						if ( e.movetarget )
+						if (e.movetarget)
 						{
 							cacheRouteTarget (e,e.movetarget,e.enemylen,en);
 						}
-						if ( e.movetarget2 )
+						if (e.movetarget2)
 						{
 							cacheRouteTarget (e,e.movetarget2,e.enemylen,en);
 						}
-						if ( e.movetarget3 )
+						if (e.movetarget3)
 						{
 							cacheRouteTarget (e,e.movetarget3,e.enemylen,en);
 						}
-						if ( e.movetarget4 )
+						if (e.movetarget4)
 						{
 							cacheRouteTarget (e,e.movetarget4,e.enemylen,en);
 						}
-						if ( e.movetarget5 )
+						if (e.movetarget5)
 						{
 							cacheRouteTarget (e,e.movetarget5,e.enemylen,en);
 						}
-						if ( e.movetarget6 )
+						if (e.movetarget6)
 						{
 							cacheRouteTarget (e,e.movetarget6,e.enemylen,en);
 						}

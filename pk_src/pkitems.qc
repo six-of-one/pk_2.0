@@ -39,7 +39,7 @@ void () painkeep_weapon_touch =
 	local	entity	stm2;
 	local float leave;
 
-	if ( (other.classname != "player") )
+	if (other.classname != "player")
 	{
 		grap_checkIfGrap ();
 		return ;
@@ -56,19 +56,19 @@ void () painkeep_weapon_touch =
 	else
 		leave = 0;
 
-	if(self.pk_currentitem == PK_IT_GRAPGUN)
+	if (self.pk_currentitem == PK_IT_GRAPGUN)
 	{
-		if (leave && (other.pk_items & PK_IT_GRAPGUN) )
+		if (leave && (other.pk_items & PK_IT_GRAPGUN))
 			return ;
 		new = PK_IT_GRAPGUN;
 	}
-	else if(self.pk_currentitem == PK_IT_AIRGUN)
+	else if (self.pk_currentitem == PK_IT_AIRGUN)
 	{
-		if (leave && (other.pk_items & PK_IT_AIRGUN) )
+		if (leave && (other.pk_items & PK_IT_AIRGUN))
 				return ;
 			new = PK_IT_AIRGUN;
 	}
-	else if(self.pk_currentitem == PK_IT_CLIGHT)
+	else if (self.pk_currentitem == PK_IT_CLIGHT)
 	{
 		if (leave && (other.pk_items & PK_IT_CLIGHT))
 			return ;
@@ -112,7 +112,7 @@ void () painkeep_weapon_touch =
 
 	self = stm2;
 
-	if ( leave )
+	if (leave)
 		return ;
 
 // remove it in single player, or setup for respawning in deathmatch
@@ -252,7 +252,7 @@ void() pk_ammo_touch =
 
 // change to a better weapon if appropriate
 
-	if ( other.weapon == best )
+	if (other.weapon == best)
 		if (best != IT_AXE || bestpk == other.pk_currentitem) // *pk best pk wep checks
 	{
 		sv = self;
@@ -329,37 +329,37 @@ void() painkeep_touch =
 	}
 
 	// check if it can be picked up
-	if(self.pk_items == PK_IT_BEARTRAP)
+	if (self.pk_items == PK_IT_BEARTRAP)
 	{
 		// check ammo
-		if(other.pk_beartrapammo >= PK_BEARTRAPAMMO_MAX)
+		if (other.pk_beartrapammo >= PK_BEARTRAPAMMO_MAX)
 		{
 			return;
 		}
 		other.pk_beartrapammo = other.pk_beartrapammo + 1;
 	}
-	else if(self.pk_items == PK_IT_TURRET)
+	else if (self.pk_items == PK_IT_TURRET)
 	{
 		// check ammo
-		if(other.pk_turretammo >= PK_TURRETAMMO_MAX)
+		if (other.pk_turretammo >= PK_TURRETAMMO_MAX)
 		{
 			return;
 		}
 		other.pk_turretammo = other.pk_turretammo + 1;
 	}
-	if(self.pk_items == PK_IT_GRAVITYWELL)
+	if (self.pk_items == PK_IT_GRAVITYWELL)
 	{
 		// check ammo
-		if(other.pk_gravitywellammo >= PK_GRAVITYWELLAMMO_MAX)
+		if (other.pk_gravitywellammo >= PK_GRAVITYWELLAMMO_MAX)
 		{
 			return;
 		}
 		other.pk_gravitywellammo = other.pk_gravitywellammo + 1;
 	}
-	else if(self.pk_items == PK_IT_CANPAB)
+	else if (self.pk_items == PK_IT_CANPAB)
 	{
 		// check ammo
-		if(other.pk_canpabammo >= PK_CANPABAMMO_MAX)
+		if (other.pk_canpabammo >= PK_CANPABAMMO_MAX)
 		{
 			return;
 		}
@@ -392,7 +392,7 @@ void() painkeep_touch =
 	self.model = string_null;
 	if (deathmatch != 2)
 	{
-		if(self.pk_items == PK_IT_GRAVITYWELL)
+		if (self.pk_items == PK_IT_GRAVITYWELL)
 			self.nextthink = time + 60*2;
 		else
 			self.nextthink = time + 60;
@@ -530,8 +530,8 @@ void() ip_regen =
 
 void() ip_checkForMovement =
 {
-	if(self.solid != SOLID_NOT)
-	if(self.ip_orgOrigin != self.origin)
+	if (self.solid != SOLID_NOT)
+	if (self.ip_orgOrigin != self.origin)
 	{ // position has changed... repawn after x minutes..
 		self.think = ip_regen;
 		self.nextthink = time + (ip_timeout * 60);
@@ -574,16 +574,16 @@ void() pk_bound_ammo =
 	if (other.ammo_cells > 200)
 		other.ammo_cells = 200;
 
-	if(other.pk_gravitywellammo > PK_GRAVITYWELLAMMO_MAX)
+	if (other.pk_gravitywellammo > PK_GRAVITYWELLAMMO_MAX)
 		other.pk_gravitywellammo = PK_GRAVITYWELLAMMO_MAX;
-	if(other.pk_turretammo > PK_TURRETAMMO_MAX)
+	if (other.pk_turretammo > PK_TURRETAMMO_MAX)
 		other.pk_turretammo = PK_TURRETAMMO_MAX;
-	if(other.pk_canpabammo > PK_CANPABAMMO_MAX)
+	if (other.pk_canpabammo > PK_CANPABAMMO_MAX)
 		other.pk_canpabammo = PK_CANPABAMMO_MAX;
-	if(other.pk_beartrapammo > PK_BEARTRAPAMMO_MAX)
+	if (other.pk_beartrapammo > PK_BEARTRAPAMMO_MAX)
 		other.pk_beartrapammo = PK_BEARTRAPAMMO_MAX;
 
-	if(other.pk_explode_ammo > PK_EXPLODEAMMO_MAX)
+	if (other.pk_explode_ammo > PK_EXPLODEAMMO_MAX)
 		other.pk_explode_ammo = PK_EXPLODEAMMO_MAX;
 };
 
@@ -813,19 +813,19 @@ bprint("PK_DropBackpack\n");
 	item.items = self.weapon;
 	if (item.items == IT_AXE)
 	{
-		if(self.pk_currentitem == PK_IT_AXE)
+		if (self.pk_currentitem == PK_IT_AXE)
 			item.netname = "Axe";
-		else if(self.pk_currentitem == PK_IT_GRAVITYWELL)
+		else if (self.pk_currentitem == PK_IT_GRAVITYWELL)
 			item.netname = "Gravity Well";
-		else if(self.pk_currentitem == PK_IT_TURRET)
+		else if (self.pk_currentitem == PK_IT_TURRET)
 			item.netname = "AutoSentry";
-		else if(self.pk_currentitem == PK_IT_GRAPGUN)
+		else if (self.pk_currentitem == PK_IT_GRAPGUN)
 			item.netname = "Harpoon Gun";
-		else if(self.pk_currentitem == PK_IT_BEARTRAP)
+		else if (self.pk_currentitem == PK_IT_BEARTRAP)
 			item.netname = "Bear Trap";
-		else if(self.pk_currentitem == PK_IT_AIRGUN)
+		else if (self.pk_currentitem == PK_IT_AIRGUN)
 			item.netname = "AirFist";
-		else if(self.pk_currentitem == PK_IT_CLIGHT)
+		else if (self.pk_currentitem == PK_IT_CLIGHT)
 			item.netname = "Chain Thunderbolt";
 	}
 	else if (item.items == IT_SHOTGUN)

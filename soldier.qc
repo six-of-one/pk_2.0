@@ -228,10 +228,10 @@ void()	army_conduitPain5	=[	$pain5,		army_conduitPain6	] {};
 void()	army_conduitPain6	=[	$pain6,		army_conduitPain1	]
 {
 	// check if conduit times up
-	if(self.bolt_conduitTimeout < time) // it's the conduit time for this monster...
+	if (self.bolt_conduitTimeout < time) // it's the conduit time for this monster...
   {
   	// blow the fuck up!!!
-//	  if(self.flags & FL_GIBCONDUIT)
+//	  if (self.flags & FL_GIBCONDUIT)
 //  	{
 	    self.health = -99;
 //    }
@@ -258,7 +258,7 @@ void() army_die =
 	sound (self, CHAN_VOICE, "soldier/death1.wav", 1, ATTN_NORM);
   
 // BOLT_START
-	if(self.bolt_conduitTimeout > time) // it's the conduit time for this monster...
+	if (self.bolt_conduitTimeout > time) // it's the conduit time for this monster...
   {
   	army_conduitPain1();
   	return;

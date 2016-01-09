@@ -398,7 +398,7 @@ void() PK_SetNewParms =
 // do hub message.
 	parm16 = 256;
 
-	if((cvar("temp1") & PK_TP_STATUSON))
+	if ((cvar("temp1") & PK_TP_STATUSON))
 	{
 		parm10 = parm10 | PK_IT_EXTRADISP;
 	}
@@ -436,7 +436,7 @@ void() SetNewPKParms =
 	parm15 = 0;
 	parm16 = MOTDTIME + 1;
 
-	if(self.pk_items & PK_IT_EXTRADISP)
+	if (self.pk_items & PK_IT_EXTRADISP)
 	{
 		parm10 = parm10 | PK_IT_EXTRADISP;
 	}
@@ -448,13 +448,13 @@ void(entity spot) ClearSpawnPoint =
 {
 	local	entity thing;
 
-	if(deathmatch < 2)
+	if (deathmatch < 2)
 		return;
 
 	thing = findradius(spot.origin, 80);
 	while(thing)
 	{
-	 if(thing.solid == SOLID_TRIGGER && thing.takedamage == DAMAGE_NO &&
+	 if (thing.solid == SOLID_TRIGGER && thing.takedamage == DAMAGE_NO &&
 	 			thing.classname != "trigger_teleport")
 	 {
 	 	// crash point!!!
@@ -464,7 +464,7 @@ void(entity spot) ClearSpawnPoint =
 		thing.nextthink = time + 10;
 		 thing.think = SUB_regen;
 	 }
-	 else if(thing.think == SUB_regen)
+	 else if (thing.think == SUB_regen)
 	 {
 		thing.nextthink = thing.nextthink + 10;
 	 }
@@ -537,7 +537,7 @@ entity() PK_SelectSpawnPoint =
 
 	numspots = numspots - 1;
 
-	numspots = rint((random() * numspots ) );
+	numspots = rint((random() * numspots) );
 
 	spot = spots;
 	while (numspots > 0) {
@@ -567,14 +567,14 @@ void() PK_CIS =
 	self.bolt_targetNext = world;
 	self.bolt_targetTimeout = 0;
 	self.bolt_targetNextTimeout = 0;
-	if(self.bolt_targetTimeoutEntity)
+	if (self.bolt_targetTimeoutEntity)
 	{
 		remove(self.bolt_targetTimeoutEntity);
 	}
 	self.bolt_targetTimeoutEntity = world;
 	self.bolt_conduitTimeout = 0;
 	self.bolt_changeModelTimeout = 0;
-	if(self.bolt_lightningFire)
+	if (self.bolt_lightningFire)
 	{
 		remove(self.bolt_lightningFire);
 	}
@@ -590,14 +590,14 @@ void() PK_CIS =
 	self.pklastweapon = self.pk_currentitem;
 	self.pkprevweapon = self.pk_currentitem;
 
-	if(inHubMap)
+	if (inHubMap)
 	{ // give the respawn guy a fighting chance...
 		self.items = self.items | IT_INVULNERABILITY;
 		self.invincible_time = 1;
 		self.invincible_finished = time + 15;
 
 		// PAINKEEP timeout for the hub "how to vote" message.
-		if(parm16 & 256)
+		if (parm16 & 256)
 		{
 			self.hubstartupmessage = time + 15;
 		}
@@ -664,10 +664,10 @@ void() pk_pre_think =
 {
 // PK_DUTYCHECKING_START
 	// removed from WaterMove, it has to be done every frame.
-	if (! (self.flags & FL_WATERJUMP) )
+	if (! (self.flags & FL_WATERJUMP))
 		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
 
-	if(self.pk_dutychecking == 0)
+	if (self.pk_dutychecking == 0)
 	{
 		CheckRules ();
 		WaterMove ();
@@ -675,7 +675,7 @@ void() pk_pre_think =
 	 if (self.waterlevel == 2)
 		CheckWaterJump ();
 	}
-	else if(time > self.pk_dutychecking)
+	else if (time > self.pk_dutychecking)
 	{
 		CheckRules ();
 		WaterMove ();
@@ -705,9 +705,9 @@ void() pk_pre_think =
 		self.velocity = '0 0 0';
 
 // PAINKEEP_START
-	if(time > self.attack_finished)
-	if(self.currentammo == 0)
-	if(self.weapon != IT_AXE || self.pk_currentitem != PK_IT_AXE)
+	if (time > self.attack_finished)
+	if (self.currentammo == 0)
+	if (self.weapon != IT_AXE || self.pk_currentitem != PK_IT_AXE)
 	{
 		self.weapon = W_BestWeapon ();
 		self.pk_currentitem = W_BestPKWeapon ();
@@ -718,14 +718,14 @@ void() pk_pre_think =
 	grap_maintainHarpoon();
 	self.oldorigin = self.origin;
 
-	if(self.pk_dutychecking == 0)
+	if (self.pk_dutychecking == 0)
 	{
 		// PAINKEEP SPLASH Check for entities splashing
 		CheckWaterLevels();
 
 		updateStatusDisplay();
 	}
-	else if(time > self.pk_dutychecking)
+	else if (time > self.pk_dutychecking)
 	{
 		// PAINKEEP SPLASH Check for entities splashing
 		CheckWaterLevels();
@@ -776,20 +776,20 @@ void() pk_post_think =
 		self.jump_flag = self.velocity_z;
 
 	// If it's air blast time, blow entity's
-	if(self.AIRG_BlastTimeout > time)
+	if (self.AIRG_BlastTimeout > time)
 	{
 		horn_airblast(FALSE);
 	}
 
 // PK_DUTYCHECKING_START
-	if(self.pk_dutychecking == 0)
+	if (self.pk_dutychecking == 0)
 	{
 	 bolt_checkTargets();
 
 		CheckPowerups ();
-		if(self.copb_timeout)
+		if (self.copb_timeout)
 		{
-			if(self.copb_timeout >= time)
+			if (self.copb_timeout >= time)
 			{
 				copb_checkFart();
 			}
@@ -799,19 +799,19 @@ void() pk_post_think =
 			}
 		}
 
-		if((cvar("temp1") & PK_TP_DUTYON))
+		if ((cvar("temp1") & PK_TP_DUTYON))
 		{
 			self.pk_dutychecking = time + 0.5;
 		}
 	}
-	else if(time > self.pk_dutychecking)
+	else if (time > self.pk_dutychecking)
 	{
 		bolt_checkTargets();
 
 		CheckPowerups ();
-		if(self.copb_timeout)
+		if (self.copb_timeout)
 		{
-			if(self.copb_timeout >= time)
+			if (self.copb_timeout >= time)
 			{
 				copb_checkFart();
 			}
@@ -821,7 +821,7 @@ void() pk_post_think =
 			}
 		}
 
-		if((cvar("temp1") & PK_TP_DUTYON))
+		if ((cvar("temp1") & PK_TP_DUTYON))
 		{
 			self.pk_dutychecking = time + 0.5;
 		}
@@ -832,7 +832,7 @@ void() pk_post_think =
 	}
 	else
 	{
-		if(!(cvar("temp1") & PK_TP_DUTYON))
+		if (!(cvar("temp1") & PK_TP_DUTYON))
 		{
 			self.pk_dutychecking = 0;
 		}
@@ -893,14 +893,14 @@ void() pk_clientdisconnect =
 	self.bolt_targetNext = world;
 	self.bolt_targetTimeout = 0;
 	self.bolt_targetNextTimeout = 0;
-	if(self.bolt_targetTimeoutEntity)
+	if (self.bolt_targetTimeoutEntity)
 	{
 		remove(self.bolt_targetTimeoutEntity);
 	}
 	self.bolt_targetTimeoutEntity = world;
 	self.bolt_conduitTimeout = 0;
 	self.bolt_changeModelTimeout = 0;
-	if(self.bolt_lightningFire)
+	if (self.bolt_lightningFire)
 	{
 		remove(self.bolt_lightningFire);
 	}
@@ -970,7 +970,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 					bprint (" becomes bored with life\n");
 				return;
 			}
-			else if ( (teamplay == 2) && (targ.team > 0)&&(targ.team == attacker.team) )
+			else if ((teamplay == 2) && (targ.team > 0)&&(targ.team == attacker.team))
 			{
 				if (rnum < 0.25)
 					deathstring = " mows down a teammate\n";
@@ -996,12 +996,12 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 				if (rnum == IT_AXE)
 				{
 // PAINKEEP_START
-					if(inflictor.pk_currentitem == PK_IT_AXE)
+					if (inflictor.pk_currentitem == PK_IT_AXE)
 					{
 						deathstring = " was ax-murdered by ";
 						deathstring2 = "\n";
 					}
-					else if(inflictor.pk_currentitem == PK_IT_AIRGUN)
+					else if (inflictor.pk_currentitem == PK_IT_AIRGUN)
 					{
 // AIRG_WEAPON_START
 
@@ -1023,24 +1023,24 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 					}
 // AIRG_WEAPON_END
 // GRAPPLING_START
-					else if(inflictor.pk_currentitem == PK_IT_GRAPGUN)
+					else if (inflictor.pk_currentitem == PK_IT_GRAPGUN)
 					{
 						deathstring = " got ";
 						deathstring2 = "'s point\n";
 					}
 // GRAPPLING_END
-					else if(inflictor.pk_currentitem == PK_IT_BEARTRAP)
+					else if (inflictor.pk_currentitem == PK_IT_BEARTRAP)
 					{
 						deathstring = " was clamped by ";
 						deathstring2 = "\n";
 					}
-					else if(inflictor.pk_currentitem == PK_IT_GRAVITYWELL)
+					else if (inflictor.pk_currentitem == PK_IT_GRAVITYWELL)
 					{
 						deathstring = " fountains in front of ";
 						deathstring2 = "\n";
 					}
 // BOLT_START
-					else if(inflictor.pk_currentitem == PK_IT_CLIGHT)
+					else if (inflictor.pk_currentitem == PK_IT_CLIGHT)
 					{
 						if (attacker.waterlevel > 1)
 						{
@@ -1062,7 +1062,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 				if (rnum == IT_SHOTGUN)
 				{
 // EXPLODESHELLS_START
-					if(inflictor.classname == "ExplodeShellsAttack")
+					if (inflictor.classname == "ExplodeShellsAttack")
 					{
 						bprint (attacker.netname);
 						bprint (" turns ");
@@ -1080,7 +1080,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 				if (rnum == IT_SUPER_SHOTGUN)
 				{
 // EXPLODESHELLS_START
-					if(inflictor.classname == "ExplodeShellsAttack")
+					if (inflictor.classname == "ExplodeShellsAttack")
 					{
 						bprint (attacker.netname);
 						bprint (" turns ");
@@ -1143,12 +1143,12 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			return;
 		}
 // TURRET_START
-	 else if(attacker.classname == "turret" || attacker.classname == "turret_gib")
+	 else if (attacker.classname == "turret" || attacker.classname == "turret_gib")
 	 {
 			bprint(targ.netname);
 
 	 	// check if killed the droper of the turret.
-		if(attacker.owner == targ) {
+		if (attacker.owner == targ) {
 				// killed self
 				targ.frags = targ.frags - 1;
 				bprint(" forgot to hide from his own AutoSentry!\n");

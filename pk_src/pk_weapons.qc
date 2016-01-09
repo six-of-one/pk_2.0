@@ -15,7 +15,7 @@ void() BecomeShellExplosion =
 	self.velocity = '0 0 0';
 	self.touch = SUB_Null;
 
-	if(random() < 0.5)
+	if (random() < 0.5)
 	{
 		setmodel (self, "progs/x_explo1.spr");
 	}
@@ -37,7 +37,7 @@ void() explodeAttack =
 
 	if (self.enemy.health)
 	{
-		T_Damage (self.enemy, self, self.owner, damg );
+		T_Damage (self.enemy, self, self.owner, damg);
 	}
 
 	// don't do radius damage to the other, because all the damage
@@ -90,7 +90,7 @@ void(float shotcount, vector dir, vector spread) FireExplodeShells =
 	local	vector	src;
 	local float damage;
 
-	if(shotcount >= 2)
+	if (shotcount >= 2)
 	{
 		damage = 2;
 	}
@@ -140,7 +140,7 @@ void(float shots) W_FireShotgunExploder =
 	}
 
 // if we run of out explode, switch to normal shells.
-	if(self.pk_explode_ammo == 0)
+	if (self.pk_explode_ammo == 0)
 	{
 		self.currentammo = self.ammo_shells;
 		W_SetCurrentAmmo();
@@ -250,7 +250,7 @@ void() PK_SetCurrentAmmo =
 
 	player_run ();		// get out of any weapon firing states
 
-	self.items = self.items - ( self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS) );
+	self.items = self.items - (self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS));
 
 	// PAINKEEP_PREVWEAPON_START
 	if ((self.prevweapon != self.weapon) || (self.pkprevweapon != self.pk_currentitem) || (self.forcewchange == 1))
@@ -269,7 +269,7 @@ void() PK_SetCurrentAmmo =
 
 	if (self.weapon == IT_AXE)
 	{
-		if(self.pk_currentitem == PK_IT_AXE)
+		if (self.pk_currentitem == PK_IT_AXE)
 		{
 			self.currentammo = 0;
 			self.weaponmodel = "progs/v_axe.mdl";
@@ -277,7 +277,7 @@ void() PK_SetCurrentAmmo =
 			if (self.items & IT_INVISIBILITY && wchanged)
 				sprint(self, "Axe\n");
 		}
-		else if(self.pk_currentitem == PK_IT_GRAVITYWELL)
+		else if (self.pk_currentitem == PK_IT_GRAVITYWELL)
 		{
 			self.currentammo = self.pk_gravitywellammo;
 			self.weaponmodel = "progs/v_cube.mdl";
@@ -285,7 +285,7 @@ void() PK_SetCurrentAmmo =
 			if (self.items & IT_INVISIBILITY && wchanged)
 				sprint(self, "Gravity Well\n");
 		}
-		else if(self.pk_currentitem == PK_IT_TURRET)
+		else if (self.pk_currentitem == PK_IT_TURRET)
 		{
 			self.currentammo = self.pk_turretammo;
 			self.weaponmodel = "progs/v_turret.mdl";
@@ -293,7 +293,7 @@ void() PK_SetCurrentAmmo =
 			if (self.items & IT_INVISIBILITY && wchanged)
 				sprint(self, "AutoSentry\n");
 		}
-		else if(self.pk_currentitem == PK_IT_CANPAB)
+		else if (self.pk_currentitem == PK_IT_CANPAB)
 		{
 			self.currentammo = self.pk_canpabammo;
 			self.weaponmodel = "progs/v_beans.mdl";
@@ -301,13 +301,13 @@ void() PK_SetCurrentAmmo =
 			if (self.items & IT_INVISIBILITY && wchanged)
 				sprint(self, "Can of Pork & Beans\n");
 		}
-		else if(self.pk_currentitem == PK_IT_GRAPGUN)
+		else if (self.pk_currentitem == PK_IT_GRAPGUN)
 		{
 // GRAPPLING_START
 			self.currentammo = 1;
 			self.weaponmodel = "progs/v_harp.mdl";
 
-			if(self.grap_cornerchainNext != world)
+			if (self.grap_cornerchainNext != world)
 			{
 				self.weaponframe = 8;
 			}
@@ -318,7 +318,7 @@ void() PK_SetCurrentAmmo =
 			if (self.items & IT_INVISIBILITY && wchanged)
 				sprint(self, "Harpoon Gun\n");
 		}
-		else if(self.pk_currentitem == PK_IT_BEARTRAP)
+		else if (self.pk_currentitem == PK_IT_BEARTRAP)
 		{
 			self.currentammo = self.pk_beartrapammo;
 			self.weaponmodel = "progs/v_bear.mdl";
@@ -326,7 +326,7 @@ void() PK_SetCurrentAmmo =
 			if (self.items & IT_INVISIBILITY && wchanged)
 				sprint(self, "Beartrap\n");
 		}
-		else if(self.pk_currentitem == PK_IT_AIRGUN)
+		else if (self.pk_currentitem == PK_IT_AIRGUN)
 		{
 			self.currentammo = 1;
 			self.weaponmodel = "progs/v_airgun.mdl";
@@ -335,10 +335,10 @@ void() PK_SetCurrentAmmo =
 				sprint(self, "AirFist\n");
 		}
 // BOLT_START
-		else if(self.pk_currentitem == PK_IT_CLIGHT)
+		else if (self.pk_currentitem == PK_IT_CLIGHT)
 		{
 			self.currentammo = self.ammo_cells;
-			if(self.bolt_changeModelTimeout < time)
+			if (self.bolt_changeModelTimeout < time)
 			{
 				self.weaponmodel = "progs/v_cl_off.mdl";
 			}
@@ -355,7 +355,7 @@ void() PK_SetCurrentAmmo =
 	else if (self.weapon == IT_SHOTGUN)
 	{
 // EXPLODESHELLS_START
-		if(self.pk_explode_ammo) {
+		if (self.pk_explode_ammo) {
 			self.currentammo = self.pk_explode_ammo;
 			self.weaponmodel = "progs/v_eshot.mdl";
 
@@ -371,7 +371,7 @@ void() PK_SetCurrentAmmo =
 	else if (self.weapon == IT_SUPER_SHOTGUN)
 	{
 // EXPLODESHELLS_START
-		if(self.pk_explode_ammo) {
+		if (self.pk_explode_ammo) {
 			self.currentammo = self.pk_explode_ammo;
 			self.weaponmodel = "progs/v_eshot2.mdl";
 
@@ -444,11 +444,11 @@ void() PK_SetCurrentAmmo =
 
 float() W_BestPKWeapon =
 {
-	if(self.weapon == IT_AXE)
+	if (self.weapon == IT_AXE)
 	{
-		if(self.waterlevel <= 1 && self.ammo_cells >= 2 && (self.pk_items & PK_IT_CLIGHT))
+		if (self.waterlevel <= 1 && self.ammo_cells >= 2 && (self.pk_items & PK_IT_CLIGHT))
 			return PK_IT_CLIGHT;
-		if(self.pk_items & PK_IT_AIRGUN)
+		if (self.pk_items & PK_IT_AIRGUN)
 			return PK_IT_AIRGUN;
 	}
 	return PK_IT_AXE;
@@ -475,22 +475,22 @@ float(float weaponnum, float pknum) HasAmmo =
 		}
 		else if (pknum == PK_IT_GRAVITYWELL)
 		{
-			if(self.pk_gravitywellammo < 1)
+			if (self.pk_gravitywellammo < 1)
 				return FALSE;
 		}
 		else if (pknum == PK_IT_TURRET)
 		{
-			if(self.pk_turretammo < 1)
+			if (self.pk_turretammo < 1)
 				return FALSE;
 		}
 		else if (pknum == PK_IT_BEARTRAP)
 		{
-			if(self.pk_beartrapammo < 1)
+			if (self.pk_beartrapammo < 1)
 				return FALSE;
 		}
 		else if (pknum == PK_IT_CANPAB)
 		{
-			if(self.pk_canpabammo < 1)
+			if (self.pk_canpabammo < 1)
 				return FALSE;
 		}
 	}
@@ -559,56 +559,56 @@ float(float weaponnum, float pknum) CanSelect =
 
 void() pk_special_impulse =
 {
-	if(self.impulse == 30)
+	if (self.impulse == 30)
 	{
-		if(!(self.pk_items & PK_IT_AIRGUN))
+		if (!(self.pk_items & PK_IT_AIRGUN))
 			return;
 
 		self.pk_currentitem = PK_IT_AIRGUN;
 	}
-	else if(self.impulse == 31 || self.impulse == 21 || self.impulse == 22)
+	else if (self.impulse == 31 || self.impulse == 21 || self.impulse == 22)
 	{
-		if(!(self.pk_items & PK_IT_GRAPGUN))
+		if (!(self.pk_items & PK_IT_GRAPGUN))
 			return;
 
 		self.pk_currentitem = PK_IT_GRAPGUN;
 	}
-	else if(self.impulse == 32)
+	else if (self.impulse == 32)
 	{
-		if(self.ammo_cells < 2 || !(self.pk_items & PK_IT_CLIGHT))
+		if (self.ammo_cells < 2 || !(self.pk_items & PK_IT_CLIGHT))
 			return;
 
 		self.pk_currentitem = PK_IT_CLIGHT;
 	}
-	else if(self.impulse == 33)
+	else if (self.impulse == 33)
 	{
-		if(self.pk_gravitywellammo < 1)
+		if (self.pk_gravitywellammo < 1)
 			return;
 
 	 	self.pk_currentInventory = self.pk_currentitem = PK_IT_GRAVITYWELL;
 	}
-	else if(self.impulse == 34)
+	else if (self.impulse == 34)
 	{
-		if(self.pk_beartrapammo < 1)
+		if (self.pk_beartrapammo < 1)
 			return;
 
 	 	self.pk_currentInventory = self.pk_currentitem = PK_IT_BEARTRAP;
 	}
-	else if(self.impulse == 35)
+	else if (self.impulse == 35)
 	{
-		if(self.pk_turretammo < 1)
+		if (self.pk_turretammo < 1)
 			return;
 
 		self.pk_currentInventory = self.pk_currentitem = PK_IT_TURRET;
 	}
-	else if(self.impulse == 36)
+	else if (self.impulse == 36)
 	{
-		if(self.pk_canpabammo < 1)
+		if (self.pk_canpabammo < 1)
 			return;
 
 		self.pk_currentInventory = self.pk_currentitem = PK_IT_CANPAB;
 	}
-	else if(self.impulse == 37)
+	else if (self.impulse == 37)
 	{
 		self.pk_currentInventory = self.pk_currentitem = PK_IT_AXE;
 	}
@@ -739,7 +739,7 @@ void() pk_special_impulse =
 		// '\n'
 		WriteB3(MSG_ONE, 10);
 
-		if(self.pk_items & PK_IT_GRAPGUN)
+		if (self.pk_items & PK_IT_GRAPGUN)
 		{
 			// 'Harpoon Gun	'
 			WriteB3(MSG_ONE, 7496008);
@@ -758,7 +758,7 @@ void() pk_special_impulse =
 			WriteB3(MSG_ONE, 32);
 		}
 
-		if(self.pk_items & PK_IT_AIRGUN)
+		if (self.pk_items & PK_IT_AIRGUN)
 		{
 			// 'AirFist	 '
 			WriteB3(MSG_ONE, 7498049);
@@ -775,7 +775,7 @@ void() pk_special_impulse =
 			WriteB3(MSG_ONE, 32);
 		}
 
-		if(self.pk_items & PK_IT_CLIGHT)
+		if (self.pk_items & PK_IT_CLIGHT)
 		{
 			// 'Chain Thunderbolt '
 			WriteB3(MSG_ONE, 6383683);
@@ -817,22 +817,22 @@ float() PK_BestWeapon =
 
 	it = self.items;
 
-	if(self.waterlevel <= 1 && self.ammo_cells >= 2 && (self.pk_items & PK_IT_CLIGHT))
+	if (self.waterlevel <= 1 && self.ammo_cells >= 2 && (self.pk_items & PK_IT_CLIGHT))
 		return IT_AXE;
 
-	if (self.waterlevel <= 1 && self.ammo_cells >= 1 && (it & IT_LIGHTNING) )
+	if (self.waterlevel <= 1 && self.ammo_cells >= 1 && (it & IT_LIGHTNING))
 			return IT_LIGHTNING;
 
-	if(self.ammo_nails >= 2 && (it & IT_SUPER_NAILGUN) )
+	if (self.ammo_nails >= 2 && (it & IT_SUPER_NAILGUN))
 		return IT_SUPER_NAILGUN;
 
-	if((self.ammo_shells >= 2 || self.pk_explode_ammo >= 2) && (it & IT_SUPER_SHOTGUN) )
+	if ((self.ammo_shells >= 2 || self.pk_explode_ammo >= 2) && (it & IT_SUPER_SHOTGUN))
 		return IT_SUPER_SHOTGUN;
 
-	if(self.ammo_nails >= 1 && (it & IT_NAILGUN) )
+	if (self.ammo_nails >= 1 && (it & IT_NAILGUN))
 		return IT_NAILGUN;
 
-	if((self.ammo_shells >= 1 || self.pk_explode_ammo >= 1) && (it & IT_SHOTGUN) )
+	if ((self.ammo_shells >= 1 || self.pk_explode_ammo >= 1) && (it & IT_SHOTGUN))
 		return IT_SHOTGUN;
 
 	if (self.pk_items & PK_IT_AIRGUN)
@@ -874,7 +874,7 @@ void() PK_Attack =
 
 	if (self.weapon == IT_AXE)
 	{
-		if(self.pk_currentitem == PK_IT_AXE)
+		if (self.pk_currentitem == PK_IT_AXE)
 		{
 			sound (self, CHAN_WEAPON, "weapons/ax1.wav", 1, ATTN_NORM);
 			r = random();
@@ -888,7 +888,7 @@ void() PK_Attack =
 				player_axed1 ();
 			self.attack_finished = time + 0.5;
 		}
-		else if(self.pk_currentitem == PK_IT_GRAVITYWELL)
+		else if (self.pk_currentitem == PK_IT_GRAVITYWELL)
 		{
 			// drop Gravity Well
 			drop_gravity();
@@ -897,7 +897,7 @@ void() PK_Attack =
 			self.attack_finished = time + 0.5;
 
 			// check if run out, change to bestweapon then.
-			if(self.pk_gravitywellammo < 1)
+			if (self.pk_gravitywellammo < 1)
 			{
 				self.pk_currentInventory = PK_IT_AXE;
 				self.weapon = W_BestWeapon();
@@ -905,14 +905,14 @@ void() PK_Attack =
 				W_SetCurrentAmmo();
 			}
 		}
-		else if(self.pk_currentitem == PK_IT_TURRET)
+		else if (self.pk_currentitem == PK_IT_TURRET)
 		{
 			// Drop Turret
 			turret_dropTurret();
 			self.currentammo = self.pk_turretammo = self.pk_turretammo - 1;
 
 			self.attack_finished = time + 0.5;
-			if(self.pk_turretammo < 1)
+			if (self.pk_turretammo < 1)
 			{
 				self.pk_currentInventory = PK_IT_AXE;
 				self.weapon = W_BestWeapon();
@@ -920,7 +920,7 @@ void() PK_Attack =
 				W_SetCurrentAmmo();
 			}
 		}
-		else if(self.pk_currentitem == PK_IT_CANPAB)
+		else if (self.pk_currentitem == PK_IT_CANPAB)
 		{
 			if (self.health > 249)
 				return;
@@ -931,7 +931,7 @@ void() PK_Attack =
 			self.pk_canpabammo = self.pk_canpabammo - 1;
 
 			self.attack_finished = time + 0.5;
-			if(self.pk_canpabammo < 1)
+			if (self.pk_canpabammo < 1)
 			{
 				self.pk_currentInventory = PK_IT_AXE;
 				self.weapon = W_BestWeapon();
@@ -939,21 +939,21 @@ void() PK_Attack =
 				W_SetCurrentAmmo();
 			}
 		}
-		else if(self.pk_currentitem == PK_IT_GRAPGUN)
+		else if (self.pk_currentitem == PK_IT_GRAPGUN)
 		{
 			// Fire grappling gun
 // GRAPPLING_START
 			grap_fire();
 		}
 // BEARTRAP_START
-		else if(self.pk_currentitem == PK_IT_BEARTRAP)
+		else if (self.pk_currentitem == PK_IT_BEARTRAP)
 		{
 			// Drop bear trap
 			beartrap_dropBearTrap();
 			self.currentammo = self.pk_beartrapammo = self.pk_beartrapammo - 1;
 
 			self.attack_finished = time + 0.5;
-			if(self.pk_beartrapammo < 1)
+			if (self.pk_beartrapammo < 1)
 			{
 				self.pk_currentInventory = PK_IT_AXE;
 				self.weapon = W_BestWeapon();
@@ -961,12 +961,12 @@ void() PK_Attack =
 				W_SetCurrentAmmo();
 			}
 		}
-		else if(self.pk_currentitem == PK_IT_AIRGUN)
+		else if (self.pk_currentitem == PK_IT_AIRGUN)
 		{
 			// Fire the AirFist weapon
 			launch_horn();
 		}
-		else if(self.pk_currentitem == PK_IT_CLIGHT)
+		else if (self.pk_currentitem == PK_IT_CLIGHT)
 		{
 			// Fire chain ligthning gun
 // BOLT_START
@@ -1021,15 +1021,15 @@ void() pk_cycleObjects =
 {
 	while (1)
 	{
-		if(self.pk_currentitem == PK_IT_AXE)
+		if (self.pk_currentitem == PK_IT_AXE)
 			self.pk_currentitem = PK_IT_GRAVITYWELL;
-		else if(self.pk_currentitem == PK_IT_GRAVITYWELL)
+		else if (self.pk_currentitem == PK_IT_GRAVITYWELL)
 			self.pk_currentitem = PK_IT_TURRET;
-		else if(self.pk_currentitem == PK_IT_TURRET)
+		else if (self.pk_currentitem == PK_IT_TURRET)
 			self.pk_currentitem = PK_IT_BEARTRAP;
-		else if(self.pk_currentitem == PK_IT_BEARTRAP)
+		else if (self.pk_currentitem == PK_IT_BEARTRAP)
 			self.pk_currentitem = PK_IT_CANPAB;
-		else if(self.pk_currentitem == PK_IT_CANPAB)
+		else if (self.pk_currentitem == PK_IT_CANPAB)
 			self.pk_currentitem = PK_IT_AXE;
 		else
 			return;		// get's here when the currentitem == a normal pk weapon
@@ -1056,7 +1056,7 @@ void() PK_ChangeWeapon =
 		fl = IT_AXE;
 
 // PAINKEEP_START
-		if(self.weapon == IT_AXE)
+		if (self.weapon == IT_AXE)
 				{ // if already selected axe.
 
 			// toggle through all the objects we have.
@@ -1090,15 +1090,15 @@ void() PK_ChangeWeapon =
 // PAINKEEP_START
 	// if already have the weapon or if you don't have the weapon, try the
 		// double tap impulses.
-		if(self.weapon == fl || !(self.items & fl) || (fl == IT_AXE && !(self.pk_items & fl2)) || am == 1)
+		if (self.weapon == fl || !(self.items & fl) || (fl == IT_AXE && !(self.pk_items & fl2)) || am == 1)
 		{
-			if(self.impulse == 2)
+			if (self.impulse == 2)
 				{
 				fl = IT_AXE;
 						fl2 = PK_IT_AIRGUN;
 						am = !HasAmmo(fl, fl2);
 				}
-				else if(self.impulse == 8)
+				else if (self.impulse == 8)
 				{
 						fl = IT_LIGHTNING;
 						am = !HasAmmo(fl, fl2);
@@ -1302,7 +1302,7 @@ void() PK_ImpulseCommands =
 	}
 
 // GRAPPLING_START
-	else if(self.impulse == 50)
+	else if (self.impulse == 50)
 	{
 		grap_releaseHarpoon();
 	}
@@ -1379,7 +1379,7 @@ void() PK_ImpulseCommands =
 	{
 		temp1 = cvar("temp1");
 
-		if(temp1 & PK_TP_DUTYON)
+		if (temp1 & PK_TP_DUTYON)
 		{
 			bprint("Duty Checking OFF\n");
 			temp1 = temp1 - PK_TP_DUTYON;
@@ -1399,7 +1399,7 @@ void() PK_ImpulseCommands =
 	{
 		temp1 = cvar("temp1");
 
-		if(temp1 & PK_TP_DUTYON)
+		if (temp1 & PK_TP_DUTYON)
 			sprint(self, "Duty Checking On\n");
 		else
 			sprint(self, "Duty Checking Off\n");
@@ -1409,12 +1409,12 @@ void() PK_ImpulseCommands =
 		else
 			sprint(self, "SFX Off\n");
 
-		if(temp1 & PK_TP_STATUSON)
+		if (temp1 & PK_TP_STATUSON)
 			sprint(self, "Status On\n");
 		else
 			sprint(self, "Status Off\n");	 
 
-		if(temp1 & PK_TP_USERMAPON)
+		if (temp1 & PK_TP_USERMAPON)
 			sprint(self, "Custom Maps On\n");
 		else
 			sprint(self, "Custom Maps Off\n");
@@ -1439,8 +1439,8 @@ void() PK_WeaponFrame =
 // check for attack
 	if (self.button0)
 	{
-		if(inHubMap)
-		if(self.hubstartupmessage > time)
+		if (inHubMap)
+		if (self.hubstartupmessage > time)
 		{
 			self.hubstartupmessage = 0;
 		}

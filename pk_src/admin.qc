@@ -323,7 +323,7 @@ void() GravToggle =
         local float  pad;
 
         pad = cvar("sv_gravity");
-        if ( ((pad > 0)&&(self.impulse == A_GRAVD)) || ((pad < 3000)&&(self.impulse == A_GRAVU)) )
+        if (((pad > 0)&&(self.impulse == A_GRAVD)) || ((pad < 3000)&&(self.impulse == A_GRAVU)))
         {
                 if (self.impulse == A_GRAVD)
                         pad = pad - 100;
@@ -357,7 +357,7 @@ void() FricToggle =
         local float  pad;
 
         pad = cvar("sv_friction");
-        if ( ((pad > 0)&&(self.impulse == A_FRICD)) || ((pad < 10)&&(self.impulse == A_FRICU)) )
+        if (((pad > 0)&&(self.impulse == A_FRICD)) || ((pad < 10)&&(self.impulse == A_FRICU)))
         {
                 if (self.impulse == A_FRICD)
                         pad = pad - 0.5;

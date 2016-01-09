@@ -26,19 +26,19 @@ void () initBotLevel =
 	NUMPATHS = 0;
 	NUMPATHERS = 0;
 	offset = 1;
-	while ( (num > 0) )
+	while (num > 0)
 	{
 		num = (num - 1);
-		if ( ((NUMBOTS < 5) && !(serverflags & DEDICATED)) )
+		if ((NUMBOTS < 5) && !(serverflags & DEDICATED))
 		{
 			skill = ((0.1 * (parm10 & (offset * 31))) / offset);
 		}
 		offset = (offset * 32);
 		AddAnotherBot ();
 	}
-	if ( (serverflags & TEAMFLAG) )
+	if (serverflags & TEAMFLAG)
 	{
-		if ( !teamplay )
+		if (!teamplay)
 		{
 			serverflags = (serverflags - TEAMFLAG);
 			serverflags = (serverflags - (serverflags & TEAMBOTS));
@@ -47,31 +47,31 @@ void () initBotLevel =
 	}
 	else
 	{
-		if ( teamplay )
+		if (teamplay)
 		{
 			serverflags = (serverflags + TEAMFLAG);
 			serverflags = (serverflags - (serverflags & TEAMBOTS));
 			return ;
 		}
 	}
-	if ( !teamplay )
+	if (!teamplay)
 	{
 		return ;
 	}
 	num = ((serverflags & TEAMBOTS) / 256);
-	if ( (num == 0) )
+	if (num == 0)
 	{
 		return ;
 	}
 	e = find (world,classname,"player");
-	while ( e )
+	while (e)
 	{
 		i = 0;
 		offset = 1;
-		while ( (i < num) )
+		while (i < num)
 		{
 			i = (i + 1);
-			if ( ((i < 6) && !(serverflags & DEDICATED)) )
+			if ((i < 6) && !(serverflags & DEDICATED))
 			{
 				skill = ((0.1 * (parm11 & (offset * 31))) / offset);
 			}
@@ -80,7 +80,7 @@ void () initBotLevel =
 		}
 		e = find (e,classname,"player");
 	}
-	if ( (serverflags & DEDICATED) )
+	if (serverflags & DEDICATED)
 	{
 		serverflags = (serverflags - DEDICATED);
 	}
@@ -100,7 +100,7 @@ void () setBotGravity =
 	newmax = 0;
 	vel = 270;
 	MAXJUMP = -1;
-	while ( (newmax > MAXJUMP) )
+	while (newmax > MAXJUMP)
 	{
 		vel = (vel - GRAVITY);
 		MAXJUMP = newmax;
@@ -114,7 +114,7 @@ void () setBotGravity =
 	LEVELJUMPTIME = 0;
 	vel = 270;
 	newmax = 0;
-	while ( (newmax > -1) )
+	while (newmax > -1)
 	{
 		LEVELJUMPTIME = (LEVELJUMPTIME + 0.1);
 		vel = (vel - GRAVITY);
@@ -128,7 +128,7 @@ void () setBotGravity =
 	newmax = 0;
 	vel = 200;
 	GRENADEMAXHEIGHT = -1;
-	while ( (newmax > GRENADEMAXHEIGHT) )
+	while (newmax > GRENADEMAXHEIGHT)
 	{
 		vel = (vel - GRAVITY);
 		GRENADEMAXHEIGHT = newmax;
@@ -157,39 +157,39 @@ void () respawnBot =
 	local float o;
 	local entity e;
 	CopyToBodyQue (self);
-	if ( !teamplay )
+	if (!teamplay)
 	{
-		if ( (serverflags & TEAMBOTS) )
+		if (serverflags & TEAMBOTS)
 		{
 			n = (NUMBOTS + numplayers ());
 			o = ((serverflags & TEAMBOTS) / 256);
-			if ( ((o < n) || (self.team != 99)) )
+			if ((o < n) || (self.team != 99))
 			{
 				self.nextthink = (time + 1);
-				if ( (self.team == 99) )
+				if (self.team == 99)
 				{
 					NUMBOTS = (NUMBOTS - 1);
 				}
 				remove (self.movetarget);
 				remove (self.goalentity);
 				self.think = SUB_Remove;
-				if ( self.pather )
+				if (self.pather)
 				{
 					NUMPATHERS = (NUMPATHERS - 1);
 				}
-				if ( (self.team != 99) )
+				if (self.team != 99)
 				{
 					m = ": I'm going to find a team server.\n";
 				}
 				else
 				{
-					if ( (totalscore (self) < 0) )
+					if (totalscore (self) < 0)
 					{
 						m = ": I'm tired of getting fragged.  I'm off\n";
 					}
 					else
 					{
-						if ( (totalscore (self) > MUST_HAVE) )
+						if (totalscore (self) > MUST_HAVE)
 						{
 							m = ": I'm going to find some real competition\n";
 						}
@@ -214,12 +214,12 @@ void () respawnBot =
 	}
 	else
 	{
-		if ( (self.team != 99) )
+		if (self.team != 99)
 		{
 			e = find (world,classname,"player");
-			while ( e )
+			while (e)
 			{
-				if ( (e.team == self.team) )
+				if (e.team == self.team)
 				{
 					PutBotInServer ();
 					return ;
@@ -240,7 +240,7 @@ void () respawnBot =
 		}
 		else
 		{
-			if ( (SKINSMODE == 2) )
+			if (SKINSMODE == 2)
 			{
 // CHECK: painkeep damage skins
 //				skinChange (self,randombotskin);
@@ -282,7 +282,7 @@ void () PutBotInServer =
 	self.invincible_time = 0;
 	self.yaw_speed = (45 + (25 * self.skil));
 	self.lefty = STRAFE_DIR;
-	if ( (self.goalentity == world) )
+	if (self.goalentity == world)
 	{
 		self.goalentity = botmovetarget ();
 	}
@@ -317,7 +317,7 @@ void () PutBotInServer =
 	setmodel (self,"progs/player.mdl");
 	modelindex_player = self.modelindex;
 	setsize (self,VEC_HULL_MIN,VEC_HULL_MAX);
-	if ( (self.movetarget == world) )
+	if (self.movetarget == world)
 	{
 		NewCarriedPath ();
 	}
@@ -327,12 +327,12 @@ void () PutBotInServer =
 	}
 	self.movetarget.movetarget = world;
 	clearCache (self);
-	if ( self.pather )
+	if (self.pather)
 	{
 		NUMPATHERS = (NUMPATHERS - 1);
 		self.pather = 0;
 	}
-	if ( (NUMPATHERS < MAXPATHERS) )
+	if (NUMPATHERS < MAXPATHERS)
 	{
 		self.pather = 1;
 		NUMPATHERS = (NUMPATHERS + 1);
@@ -341,7 +341,7 @@ void () PutBotInServer =
 	makevectors (self.angles);
 	spawn_tfog ((self.origin + (v_forward * KINDA_WANT)));
 	spawn_tdeath (self.origin,self);
-	if ( (BOTSPEED < 32) )
+	if (BOTSPEED < 32)
 	{
 		dprint ("Feeling kind of slow today (SV_MAXSPEED = ");
 		tmp = ftos ((BOTSPEED * 10));
@@ -349,7 +349,7 @@ void () PutBotInServer =
 		dprint ("\n");
 	}
 	aimvar = cvar ("sv_aim");
-	if ( (aimvar != 0.930) )
+	if (aimvar != 0.930)
 	{
 		dprint ("Seems like sv_aim isn't 0.93\n");
 	}
@@ -359,7 +359,7 @@ void () SpawnNewBot =
 {
 	local string tmp;
 // xreaper code - looks good, not qualifying
-	if ( intermission_running )
+	if (intermission_running)
 	{
 		return ;
 	}
@@ -384,13 +384,13 @@ entity () AddBot =
 	self.think = SpawnNewBot;
 	self.nextthink = (time + (12 * random ()));
 	self.skil = skill;
-	if ( (self.skil < 0) )
+	if (self.skil < 0)
 	{
 		self.skil = 0;
 	}
 	else
 	{
-		if ( (self.skil > 3) )
+		if (self.skil > 3)
 		{
 			self.skil = 3;
 		}
@@ -406,7 +406,7 @@ float () numplayers =
 	local float n;
 	n = 0;
 	e = find (world,classname,"player");
-	while ( e )
+	while (e)
 	{
 		n = (n + 1);
 		e = find (e,classname,"player");
@@ -423,19 +423,19 @@ void () AddAnotherBot =
 	local float top;
 	local float bottom;
 	self.impulse = 0;
-	if ( !teamplay )
+	if (!teamplay)
 	{
-		if ( (serverflags & TEAMBOTS) )
+		if (serverflags & TEAMBOTS)
 		{
 			n = (NUMBOTS + numplayers ());
-			if ( ((serverflags & TEAMBOTS) < n) )
+			if ((serverflags & TEAMBOTS) < n)
 			{
 				bprint ("Can't add bot - exceeds bound\n");
 				return ;
 			}
 		}
 	}
-	if ( (fClientNo == 15) )
+	if (fClientNo == 15)
 		return;
   
 	newbot = AddBot ();
@@ -444,19 +444,19 @@ void () AddAnotherBot =
 	newbot.colormap = 0;
 // CHECK: painkeep damageskins
 /*
-	if ( teamplay )
+	if (teamplay)
 	{
 		skinChange (newbot,randombotskin);
 	}
 	else
 	{
-		if ( (SKINSMODE == 1) )
+		if (SKINSMODE == 1)
 		{
 			skinChange (newbot,NUMBOTS);
 		}
 		else
 		{
-			if ( (SKINSMODE == 2) )
+			if (SKINSMODE == 2)
 			{
 				st = ftos (((newbot.skil & MOVETYPE_WALK) + 1));
 				dprint (st);
@@ -466,25 +466,25 @@ void () AddAnotherBot =
 		}
 	}
 	newbot.team = 99;
-	if ( NAMEBOTS )
+	if (NAMEBOTS)
 	{
 		newbot.teamname = self.netname;
 	}
 	else
 	{
-		if ( (newbot.skil < 1) )
+		if (newbot.skil < 1)
 		{
 			newbot.teamname = "[Bot0]";
 		}
 		else
 		{
-			if ( (newbot.skil < 2) )
+			if (newbot.skil < 2)
 			{
 				newbot.teamname = "[Bot1]";
 			}
 			else
 			{
-				if ( (newbot.skil < 3) )
+				if (newbot.skil < 3)
 				{
 					newbot.teamname = "[Bot2]";
 				}
@@ -498,15 +498,15 @@ void () AddAnotherBot =
  // NOTE: --- disabled team names for now - irritating qbot stuff
 */
 	NUMBOTS = (NUMBOTS + 1);
-	if ( (NUMBOTS == 1) )
+	if (NUMBOTS == 1)
 	{
 		newbot.nextthink = (time + 0.1);
 	}
-	if ( (NUMBOTS < 16) )
+	if (NUMBOTS < 16)
 	{
 		serverflags = ((serverflags - (serverflags & BOTS)) + (16* NUMBOTS));
 	}
-	if ( (NUMBOTS == 1) )
+	if (NUMBOTS == 1)
 	{
 		newbot.netname = "Alpha";
 		top = 1;
@@ -514,7 +514,7 @@ void () AddAnotherBot =
 	}
 	else
 	{
-		if ( (NUMBOTS == 2) )
+		if (NUMBOTS == 2)
 		{
 			newbot.netname = "Gamma";
 			top = 2;
@@ -522,7 +522,7 @@ void () AddAnotherBot =
 		}
 		else
 		{
-			if ( (NUMBOTS == 3) )
+			if (NUMBOTS == 3)
 			{
 				newbot.netname = "Epsilon";
 				top = 4;
@@ -530,7 +530,7 @@ void () AddAnotherBot =
 			}
 			else
 			{
-				if ( (NUMBOTS == 4) )
+				if (NUMBOTS == 4)
 				{
 					newbot.netname = "Delta";
 					top = NEVERTARGET;
@@ -538,7 +538,7 @@ void () AddAnotherBot =
 				}
 				else
 				{
-					if ( (NUMBOTS == 5) )
+					if (NUMBOTS == 5)
 					{
 						newbot.netname = "Zeta";
 						top = 12;
@@ -546,7 +546,7 @@ void () AddAnotherBot =
 					}
 					else
 					{
-						if ( (NUMBOTS == 6) )
+						if (NUMBOTS == 6)
 						{
 							newbot.netname = "Theta";
 							top = NAMEBOTS;
@@ -554,7 +554,7 @@ void () AddAnotherBot =
 						}
 						else
 						{
-							if ( (NUMBOTS == 7) )
+							if (NUMBOTS == 7)
 							{
 								newbot.netname = "Lambda";
 								top = 1;
@@ -562,7 +562,7 @@ void () AddAnotherBot =
 							}
 							else
 							{
-								if ( (NUMBOTS == 8) )
+								if (NUMBOTS == 8)
 								{
 									newbot.netname = "Omicron";
 									top = 4;
@@ -570,7 +570,7 @@ void () AddAnotherBot =
 								}
 								else
 								{
-									if ( (NUMBOTS == 9) )
+									if (NUMBOTS == 9)
 									{
 										newbot.netname = "Xi";
 										top = NEVERTARGET;
@@ -578,7 +578,7 @@ void () AddAnotherBot =
 									}
 									else
 									{
-										if ( (NUMBOTS == 10) )
+										if (NUMBOTS == 10)
 										{
 											newbot.netname = "Rho";
 											top = 11;
@@ -586,7 +586,7 @@ void () AddAnotherBot =
 										}
 										else
 										{
-											if ( (NUMBOTS == 11) )
+											if (NUMBOTS == 11)
 											{
 												newbot.netname = "Sigma";
 												top = NAMEBOTS;
@@ -594,7 +594,7 @@ void () AddAnotherBot =
 											}
 											else
 											{
-												if ( (NUMBOTS == 12) )
+												if (NUMBOTS == 12)
 												{
 													newbot.netname = "Tau";
 													top = 13;
@@ -602,7 +602,7 @@ void () AddAnotherBot =
 												}
 												else
 												{
-													if ( (NUMBOTS == 13) )
+													if (NUMBOTS == 13)
 													{
 														newbot.netname = "Chi";
 														top = 12;
@@ -610,7 +610,7 @@ void () AddAnotherBot =
 													}
 													else
 													{
-														if ( (NUMBOTS == 14) )
+														if (NUMBOTS == 14)
 														{
 															newbot.netname = "Psi";
 															top = 9;
@@ -618,7 +618,7 @@ void () AddAnotherBot =
 														}
 														else
 														{
-															if ( (NUMBOTS == 15) )
+															if (NUMBOTS == 15)
 															{
 																newbot.netname = "Reaper";//Omega";
 																top = 10;
@@ -655,26 +655,26 @@ void (entity ply, float n) addTeamBots =
 	local entity tmp;
 	local float i;
 	i = n;
-	while ( (i > 0) )
+	while (i > 0)
 	{
 		newbot = AddBot ();
 		newbot.colormap = ply.colormap;
 		newbot.team = ply.team;
 		newbot.teamname = ply.netname;
 		skinChange (newbot,ply.skin);
-		if ( (newbot.skil < 1) )
+		if (newbot.skil < 1)
 		{
 			newbot.netname = "[Bot0]";
 		}
 		else
 		{
-			if ( (newbot.skil < 2) )
+			if (newbot.skil < 2)
 			{
 				newbot.netname = "[Bot1]";
 			}
 			else
 			{
-				if ( (newbot.skil < 3) )
+				if (newbot.skil < 3)
 				{
 					newbot.netname = "[Bot2]";
 				}
@@ -694,17 +694,17 @@ void (entity ply, float n) removeTeamBots =
 	local entity e;
 	i = n;
 	e = find (world,classname,"dmbot");
-	while ( (i > 0) )
+	while (i > 0)
 	{
-		while ( ((e != world) && (e.team != ply.team)) )
+		while ((e != world) && (e.team != ply.team))
 		{
 			e = find (e,classname,"dmbot");
 		}
-		if ( !e )
+		if (!e)
 		{
 			return ;
 		}
-		if ( e.pather )
+		if (e.pather)
 		{
 			NUMPATHERS = (NUMPATHERS - 1);
 		}
@@ -719,13 +719,13 @@ void () removeAllBots =
 {
 	local entity e;
 	e = find (world,classname,"dmbot");
-	while ( e )
+	while (e)
 	{
-		if ( !e )
+		if (!e)
 		{
 			return ;
 		}
-		if ( e.pather )
+		if (e.pather)
 		{
 			NUMPATHERS = (NUMPATHERS - 1);
 		}
@@ -743,7 +743,7 @@ void (float n) SetMaxBots =
 	local float t;
 	local string tmp;
 	self.impulse = 0;
-	if ( (serverflags & TEAMFLAG) )
+	if (serverflags & TEAMFLAG)
 	{
 		bprint ("Entering bounded deathmatch mode\n");
 		serverflags = ((serverflags - TEAMFLAG) - (serverflags & TEAMBOTS));
@@ -754,7 +754,7 @@ void (float n) SetMaxBots =
 	bprint ("\n");
 	serverflags = ((serverflags - (serverflags & TEAMBOTS)) + (n * 256));
 	t = numplayers ();
-	while ( ((NUMBOTS + t) < n) )
+	while ((NUMBOTS + t) < n)
 	{
 		AddAnotherBot ();
 	}
@@ -766,7 +766,7 @@ void (float n) SetTeamBots =
 	local entity e;
 	local string tmp;
 	self.impulse = 0;
-	if ( !(serverflags & TEAMFLAG) )
+	if (!(serverflags & TEAMFLAG))
 	{
 		bprint ("Entering bot team mode\n");
 		serverflags = ((serverflags + TEAMFLAG) - (serverflags & TEAMBOTS));
@@ -777,21 +777,21 @@ void (float n) SetTeamBots =
 	bprint ("\n");
 	t = ((serverflags & TEAMBOTS) / 256);
 	serverflags = ((serverflags - (serverflags & TEAMBOTS)) + (n * 256));
-	if ( (t < n) )
+	if (t < n)
 	{
 		e = find (world,classname,"player");
 		t = (n - t);
-		while ( e )
+		while (e)
 		{
 			addTeamBots (e,t);
 			e = find (e,classname,"player");
 		}
 		return ;
 	}
-	if ( (t > n) )
+	if (t > n)
 	{
 		e = find (world,classname,"player");
-		while ( e )
+		while (e)
 		{
 			t = (t - n);
 			removeTeamBots (e,t);
@@ -805,9 +805,9 @@ void () UpdateTeamColors =
 {
 	local entity e;
 	e = find (world,classname,"dmbot");
-	while ( e )
+	while (e)
 	{
-		if ( (e.colormap == self.colormap) )
+		if (e.colormap == self.colormap)
 		{
 			e.team = self.team;
 		}

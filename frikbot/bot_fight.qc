@@ -151,9 +151,9 @@ void() bot_dodge_stuff =
 			foe = findradius(self.origin, foedist);
 			while(foe)
 			{
-				if(foe.flags & FL_MONSTER)
+				if (foe.flags & FL_MONSTER)
 				{
-					if(foe.health > 0)
+					if (foe.health > 0)
 					{
 						flen = vlen(foe.origin - self.origin);
 						if (flen < foedist)
@@ -180,7 +180,7 @@ void() bot_dodge_stuff =
 		foe = player_head;
 		while(foe)
 		{
-			if(foe != self)
+			if (foe != self)
 			{
 				if (foe.modelindex != 0)
 				{
@@ -275,7 +275,7 @@ void(float brange) bot_weapon_switch =
 			flag = 64;
 			pulse = 8;
 		}
-		else if(self.ammo_nails >= 2 && (it & 8))
+		else if (self.ammo_nails >= 2 && (it & 8))
 		{
 			flag = 8;
 			pulse = 5;
@@ -285,17 +285,17 @@ void(float brange) bot_weapon_switch =
 			flag = 16;
 			pulse = 6;
 		}
-		else if(self.ammo_shells >= 2 && (it & 2))
+		else if (self.ammo_shells >= 2 && (it & 2))
 		{
 			flag = 2;
 			pulse = 3;
 		}
-		else if(self.ammo_nails >= 1 && (it & 4))
+		else if (self.ammo_nails >= 1 && (it & 4))
 		{
 			flag = 4;
 			pulse = 4;
 		}
-		else if(self.ammo_shells >= 1 && (it & 1))
+		else if (self.ammo_shells >= 1 && (it & 1))
 		{
 			flag = 1;
 			pulse = 2;

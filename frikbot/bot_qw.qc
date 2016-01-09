@@ -394,16 +394,16 @@ void(float to, entity s) WriteEntity =
 
 float(float clientno) ClientIsActive =
 {
-	if(clientno > 16)
+	if (clientno > 16)
 	{
-		if(active_clients2 & ClientBitFlag(clientno - 16))
+		if (active_clients2 & ClientBitFlag(clientno - 16))
 			return TRUE;
 		else
 			return FALSE;
 	}
 	else
 	{
-		if(active_clients1 & ClientBitFlag(clientno))
+		if (active_clients1 & ClientBitFlag(clientno))
 			return TRUE;
 		else
 			return FALSE;
@@ -466,7 +466,7 @@ void() ClientInRankings =
 	}
    	cno = self.colormap - 1;
 	BotInvalidClientNo (cno);
-	if(cno > 16)
+	if (cno > 16)
 		active_clients2 = active_clients2 | ClientBitFlag(cno - 16);
 	else
 		active_clients1 = active_clients1 | ClientBitFlag(cno);
@@ -484,7 +484,7 @@ void() ClientDisconnected =
 		self._next._last = self._last;
 	if (self._last)
 		self._last._next = self._next;
-	if(self.b_clientno > 16)
+	if (self.b_clientno > 16)
 		active_clients2 = active_clients2 - (active_clients2 & ClientBitFlag(self.b_clientno - 16));
 	else
 		active_clients1 = active_clients1 | (active_clients1 & ClientBitFlag(self.b_clientno));
@@ -629,7 +629,7 @@ signs on to the server.
 
 void(entity who) UpdateClient =
 {
-	WriteByte(2, 14 );
+	WriteByte(2, 14);
 	WriteByte(2, who.b_clientno);
 	WriteShort(2, who.frags);
 	WriteByte(2, 36);
@@ -638,7 +638,7 @@ void(entity who) UpdateClient =
 	WriteByte(2, 37);                // update entertime
 	WriteByte(2, who.b_clientno);          // client number
 	WriteLong(2, time - who.b_entertime);   // client entertime
-	WriteByte(2, 40 );            // update userinfo
+	WriteByte(2, 40);            // update userinfo
 	WriteByte(2, who.b_clientno);      // client number
 	WriteLong(2, who.b_userid);      // client userid
 	WriteByte(2, 92); // \
@@ -654,7 +654,7 @@ void(entity who) UpdateClient =
 	WriteByte(2, 111); // o
 	WriteByte(2, 114); // r
 	WriteByte(2, 92); // \
-	if(who.b_pants > 9)
+	if (who.b_pants > 9)
 	{
 		WriteByte(2, 49);
 		WriteByte(2, 38 + who.b_pants);
@@ -671,7 +671,7 @@ void(entity who) UpdateClient =
 	WriteByte(2, 111); // o
 	WriteByte(2, 114); // r
 	WriteByte(2, 92);  // \
-	if(who.b_shirt > 9)
+	if (who.b_shirt > 9)
 	{
 		WriteByte(2, 49);
 		WriteByte(2, 38 + who.b_shirt);
@@ -689,7 +689,7 @@ void(entity who) UpdateClient =
 	WriteByte(2, 116); // t
 	// FIXME: do teams properly
 	// note this has no effect on infokey
-	WriteByte(2, 92 );  // \
+	WriteByte(2, 92);  // \
 	WriteByte(2, 115); // s
 	WriteByte(2, 107); // k
 	WriteByte(2, 105); // i
@@ -705,7 +705,7 @@ void(entity who) UpdateClient =
 	WriteByte(2, 109); // m
 	WriteByte(2, 101); // e
 	WriteByte(2, 92);  // \
-	WriteString( 2, who.netname);
+	WriteString(2, who.netname);
 };
 
 float(float clientno) ClientBitFlag =
@@ -729,7 +729,7 @@ float() ClientNextAvailable =
 	{
 		clientno = clientno + 1;
 
-		if(!ClientIsActive(clientno))
+		if (!ClientIsActive(clientno))
 			return clientno;
 	}
 	return -1;
@@ -766,12 +766,12 @@ void(float whatbot, float whatskill) BotConnect =
 	
 	f = ClientNextAvailable();
 	uself = self;
-	if(f == -1)
+	if (f == -1)
 	{
 		bprint(PRINT_HIGH, "Unable to connect a bot, server is full.\n");
 		return;
 	}
-	if(f > 16)
+	if (f > 16)
 		active_clients2 = active_clients2 | ClientBitFlag(f - 16);
 	else
 		active_clients1 = active_clients1 | ClientBitFlag(f);
@@ -829,7 +829,7 @@ void(entity bot) BotDisconnect =
 		self.b_shirt = 0;
 		self.ammo_shells = self.ammo_nails = self.ammo_rockets = self.ammo_cells = 0;
 		UpdateClient(self);
-		if(self.b_clientno > 16)
+		if (self.b_clientno > 16)
 			active_clients2 = active_clients2 - (active_clients2 & ClientBitFlag(self.b_clientno - 16));
 		else
 			active_clients1 = active_clients1 | (active_clients1 & ClientBitFlag(self.b_clientno));
@@ -851,13 +851,13 @@ void(float clientno) BotInvalidClientNo =
 	local entity bot;
 
 	bot = GetClientEntity(clientno);
-	if(bot.b_clientno > 0)
+	if (bot.b_clientno > 0)
 	{
 		if (!bot.ishuman)
 		{
 			bot.b_clientno = -1;
 			BotDisconnect(bot);
-			if(self.b_clientno > 16)
+			if (self.b_clientno > 16)
       				active_clients2 = active_clients2 | ClientBitFlag(self.b_clientno - 16);
 			else
       				active_clients1 = active_clients1 | ClientBitFlag(self.b_clientno);

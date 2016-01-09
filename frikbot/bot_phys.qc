@@ -466,15 +466,15 @@ float(vector dir) botCheckForStep =
 	dir = normalize(dir);
 	dir_z = 0;
 	yaw = vectoyaw(dir); 
-	if(walkmove(yaw, 3))
+	if (walkmove(yaw, 3))
 	{	
-		if(droptofloor(0,0))
+		if (droptofloor(0,0))
 		{	
 			stepdistance = self.origin_z - currentorigin_z;
 			v = self.origin - currentorigin;
 			v_z = 0;
 			movedistance = vlen(v); 
-			if((stepdistance > 0 && stepdistance <= 16) && movedistance != 0)
+			if ((stepdistance > 0 && stepdistance <= 16) && movedistance != 0)
 			{
 				self.flags = currentflags | FL_PARTIALGROUND;
 				return 1;
@@ -538,7 +538,7 @@ void() PostPhysics =
 						back = vectoyaw(obstr);
 						cflags = self.flags;
 						self.flags = self.flags | FL_PARTIALGROUND;
-						if(walkmove(back, dst))
+						if (walkmove(back, dst))
 						{
 							self.flags = cflags;
 							self.phys_obj.dest1_z = 0;
