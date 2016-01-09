@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:40:01 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 
@@ -15,7 +15,7 @@ void (float dist) ai_botrun;
 void () bot_chase;
 void () bot_trigger1;
 void () aibot_chooseGoal;
-float /* indeterminate fn() type */ () BotFindTarget;
+float () BotFindTarget;
 void () shoottarget =
 {
 	local vector dir;
@@ -24,7 +24,7 @@ void () shoottarget =
 	bot_trigger1 ();
 	sound (self,CHAN_WEAPON,"weapons/guncock.wav",TRUE,ATTN_NORM);
 	dir = ((botTarget.goalentity.absmin + botTarget.goalentity.absmax) * 0.5);
-	dir = normalize ((dir - self.origin));
+	dir = normalize (dir - self.origin);
 	FireBullets (MOVETYPE_TOSS,dir,'0.040 0.040 0');
 	self.attack_finished = (time + 0.5);
 	self.enemy = world;
@@ -60,9 +60,9 @@ void (float dist) ai_botseek =
 		}
 		if (botTarget.goalentity.solid != SOLID_NOT)
 		{
-			oldrng = vlen ((botTarget.origin - self.origin));
+			oldrng = vlen (botTarget.origin - self.origin);
 			Botmovetogoal (dist);
-			rng = vlen ((botTarget.origin - self.origin));
+			rng = vlen (botTarget.origin - self.origin);
 			if (rng >= oldrng)
 			{
 				self.search_time = (self.search_time - 0.4);
@@ -229,8 +229,8 @@ vector (float n) chooseRoamTarget =
 	}
 	bestorg_z = (((bestorg_z + ((3* MAXJUMP) * random ())) - (2* MAXJUMP)) - 1);
 	traceline (self.origin,bestorg,TRUE,self);
-	dir = normalize ((bestorg - self.origin));
-	len = vlen ((bestorg - self.origin));
+	dir = normalize (bestorg - self.origin);
+	len = vlen (bestorg - self.origin);
 	bestorg = (self.origin + (dir * ((len * trace_fraction) - KINDA_WANT)));
 	below = bestorg;
 	below_z = (dropline (below) + 1);
@@ -241,7 +241,7 @@ vector (float n) chooseRoamTarget =
 		{
 			if (n < 7)
 			{
-				return(chooseRoamTarget ((n + 1)));
+				return(chooseRoamTarget (n + 1));
 			}
 		}
 	}
@@ -254,7 +254,7 @@ vector (float n) chooseRoamTarget =
 		{
 			if (n < 7)
 			{
-				return(chooseRoamTarget ((n + 1)));
+				return(chooseRoamTarget (n + 1));
 			}
 		}
 	}
@@ -263,12 +263,12 @@ vector (float n) chooseRoamTarget =
 	{
 		bestorg_z = (below_z - self.mins_z);
 	}
-	len = vlen ((bestorg - self.origin));
+	len = vlen (bestorg - self.origin);
 	if (len < KINDA_WANT)
 	{
 		if (n < 7)
 		{
-			return(chooseRoamTarget ((n + 1)));
+			return(chooseRoamTarget (n + 1));
 		}
 	}
 	return(bestorg);
@@ -288,7 +288,7 @@ float (entity e) cacheweight =
 			return(weight);
 		}
 	}
-	dis = vlen ((self.origin - e.origin));
+	dis = vlen (self.origin - e.origin);
 	it = self.items;
 	e.pendingcache = world;
 	e.pendinglen = 0;
@@ -419,7 +419,7 @@ float (entity e) pathweight =
 		{
 			return(weight);
 		}
-		weight = vlen ((self.origin - org));
+		weight = vlen (self.origin - org);
 		weight = ((50 * SEARCH_RADIUS) - weight);
 		if (e.lastbot == self)
 		{
@@ -720,8 +720,8 @@ void () aibot_chooseGoal =
 				}
 				if (weight == best)
 				{
-					d1 = vlen ((self.origin - bestorg));
-					d2 = vlen ((self.origin - org));
+					d1 = vlen (self.origin - bestorg);
+					d2 = vlen (self.origin - org);
 					weight = ((weight + (random () * 5)) - 2);
 					if (d1 < d2)
 					{
@@ -837,7 +837,7 @@ float (entity e) RunAwayWeight =
 	{
 		return (0);
 	}
-	traceline ((self.enemy.origin + self.enemy.view_ofs),e.origin,TRUE,self.enemy);
+	traceline (self.enemy.origin + self.enemy.view_ofs, e. origin, TRUE, self.enemy);
 	if (trace_fraction != TRUE)
 	{
 		weight = WANT;
@@ -846,7 +846,7 @@ float (entity e) RunAwayWeight =
 	{
 		weight = (WANT - 5);
 	}
-	weight = (weight + (0.1 * vlen ((self.enemy.origin - e.origin))));
+	weight = (weight + (0.1 * vlen (self.enemy.origin - e.origin)));
 	weight = (weight + (KINDA_WANT * random ()));
 	return(weight);
 };
@@ -875,7 +875,7 @@ entity (entity chaser, entity en) BestChaseRoute =
 			{
 				if (TrueReachable (e))
 				{
-					weight = (e.enemylen + (vlen ((self.origin - e.origin)) * 0.5));
+					weight = (e.enemylen + (vlen (self.origin - e.origin)) * 0.5);
 				}
 			}
 			if (weight < best)

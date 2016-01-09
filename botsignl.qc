@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:40:02 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 
@@ -99,7 +99,7 @@ void () t_botmovetarget =
 	}
 	pth = BestChaseRoute (other,self.goalentity);
 	rnd = ((2000 + (random () * 1000)) + (other.skil * SEARCH_RADIUS));
-	rnd = (rnd - vlen ((other.origin - pth.origin)));
+	rnd = (rnd - vlen (other.origin - pth.origin));
 	if (rnd < pth.enemylen)
 	{
 		other.search_time = (time - 1);

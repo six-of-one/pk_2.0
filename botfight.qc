@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:40:01 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 
@@ -16,7 +16,7 @@ vector (vector src, vector trg, float invMvel) leadtarget =
 {
 	local vector tg;
 	local vector lead;
-	lead = ((self.enemy.velocity * invMvel) * vlen ((trg - src)));
+	lead = (self.enemy.velocity * invMvel) * vlen ((trg - src));
 	tg = (trg + lead);
 	if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
@@ -49,7 +49,7 @@ vector (vector trg) adjustgrenade =
 	tgxy_z = 0;
 	selfxy = self.origin;
 	selfxy_z = 0;
-	xypct = (vlen ((tgxy - selfxy)) * INVGRENADELEVELDIST);
+	xypct = (vlen (tgxy - selfxy) * INVGRENADELEVELDIST);
 	if (xypct > 1)
 	{
 		if (xypct < 12)
@@ -151,7 +151,7 @@ vector () botaim =
 			tg = (tg + lead);
 		}
 	}
-	dir = normalize ((tg - self.origin));
+	dir = normalize (tg - self.origin);
 	if (sk < 3)
 	{
 		dir = (dir + (((3- sk) * crandom ()) * '0.060 0 0'));
@@ -473,7 +473,7 @@ float () CheckReboundAttack =
 	{
 		return (0);
 	}
-	dir = normalize ((self.goalentity.origin - self.origin));
+	dir = normalize (self.goalentity.origin - self.origin);
 	spot2 = (spot2 + (200 * dir));
 	traceline (spot1,spot2,TRUE,self);
 	if (trace_fraction == 1)
@@ -494,7 +494,7 @@ float () CheckReboundAttack =
 	{
 		spot2 = (self.goalentity.origin + ((200 * dir) * trace_fraction));
 	}
-	dist = vlen ((self.enemy.origin - spot2));
+	dist = vlen (self.enemy.origin - spot2);
 	mel = 200;
 	if (self.items & IT_QUAD)
 	{
@@ -504,7 +504,7 @@ float () CheckReboundAttack =
 	{
 		return (0);
 	}
-	dist = vlen ((self.origin - spot2));
+	dist = vlen (self.origin - spot2);
 	mel = ((280 - (self.health * 0.5)) - (self.armorvalue * self.armortype));
 	if (self.items & IT_QUAD)
 	{
@@ -516,7 +516,7 @@ float () CheckReboundAttack =
 	}
 	REBOUNDSPOT = spot2;
 	REBOUND = 1;
-	self.ideal_yaw = vectoyaw ((spot2 - self.origin));
+	self.ideal_yaw = vectoyaw (spot2 - self.origin);
 	ChangeYaw ();
 	bot_rebound1 ();
 	if (self.items & IT_ROCKET_LAUNCHER)

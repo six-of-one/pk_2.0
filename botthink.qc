@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:40:02 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 
@@ -19,7 +19,7 @@ float () CheckWaterLevel =
 	{
 		return (0);
 	}
-	pnt = pointcontents ((self.origin + self.view_ofs));
+	pnt = pointcontents (self.origin + self.view_ofs);
 	if (pnt != CONTENT_EMPTY)
 	{
 		return (3);

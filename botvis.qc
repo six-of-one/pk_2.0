@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:40:02 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 
@@ -19,7 +19,7 @@ float (entity targ) botrange =
 	local float r;
 	spot1 = (self.origin + self.view_ofs);
 	spot2 = (targ.origin + targ.view_ofs);
-	r = vlen ((spot1 - spot2));
+	r = vlen (spot1 - spot2);
 	mel = ((180 - (self.health * 0.5)) - (self.armorvalue * self.armortype));
 	if (self.items & IT_QUAD)
 	{
@@ -33,19 +33,13 @@ float (entity targ) botrange =
 	{
 		return(RANGE_MELEE);
 	}
-	else
+	else if (r < SEARCH_RADIUS)
 	{
-		if (r < SEARCH_RADIUS)
-		{
-			return(RANGE_NEAR);
-		}
-		else
-		{
-			if (r < 1000)
-			{
-				return(RANGE_MID);
-			}
-		}
+		return(RANGE_NEAR);
+	}
+	else if (r < 1000)
+	{
+		return(RANGE_MID);
 	}
 	return(RANGE_FAR);
 };
@@ -61,7 +55,7 @@ float (entity targ) infrontofbot =
 	{
 		return (1);
 	}
-	lnd = pointcontents ((self.origin + self.view_ofs));
+	lnd = pointcontents (self.origin + self.view_ofs);
 	if (lnd != CONTENT_WATER)
 	{
 		if (self.skil < 2)
@@ -81,7 +75,7 @@ float (entity targ) infrontofbot =
 		}
 	}
 	makevectors (self.angles);
-	vec = normalize ((targ.origin - self.origin));
+	vec = normalize (targ.origin - self.origin);
 	dot = (vec * v_forward);
 	fov = (0.7 - (self.skil * 0.280));
 	if (dot > fov)
@@ -217,9 +211,9 @@ float (entity a, entity b, float bmaxjump) BotWalkable =
 		borg = b.origin;
 	}
 	spot1 = a.origin;
-	dir = normalize ((borg - a.origin));
+	dir = normalize (borg - a.origin);
 	dir = (((dir * LEVELJUMPTIME) * BOTSPEED) * 6.5);
-	tests = vlen ((borg - a.origin));
+	tests = vlen (borg - a.origin);
 	tests = (tests / ((LEVELJUMPTIME * BOTSPEED) * 6.5));
 	if (b.pathtype == DROPPED)
 	{
@@ -266,7 +260,7 @@ float (entity a, entity b, float bmaxjump) BotWalkable =
 };
 
 float (entity a, entity b) IsUpstream;
-float /* indeterminate fn() type */ (entity a, entity b, float truereach) Reachable =
+float (entity a, entity b, float truereach) Reachable =
 {
 	local vector spot1;
 	local vector spot2;
@@ -310,7 +304,7 @@ float /* indeterminate fn() type */ (entity a, entity b, float truereach) Reacha
 	{
 		spot2_z = ((b.absmin_z + b.absmax_z) * 0.5);
 	}
-	rng = vlen ((spot2 - spot1));
+	rng = vlen (spot2 - spot1);
 	if (truereach)
 	{
 		if (rng > SEARCH_RADIUS)
@@ -348,7 +342,7 @@ float /* indeterminate fn() type */ (entity a, entity b, float truereach) Reacha
 		if (truereach)
 		{
 			maxzd = 45;
-			lnd = pointcontents ((a.origin + self.view_ofs));
+			lnd = pointcontents (a.origin + self.view_ofs);
 			if (lnd == CONTENT_WATER)
 			{
 				maxzd = (maxzd + self.view_ofs_z);
@@ -381,7 +375,7 @@ float /* indeterminate fn() type */ (entity a, entity b, float truereach) Reacha
 	spot1_z = 0;
 	spot2 = borg;
 	spot2_z = 0;
-	diffxy = vlen ((spot2 - spot1));
+	diffxy = vlen (spot2 - spot1);
 	diffxy = (diffxy - ((LEVELJUMPTIME * BOTSPEED) * 10));
 	if (diffxy < 0)
 	{
@@ -402,12 +396,12 @@ float /* indeterminate fn() type */ (entity a, entity b, float truereach) Reacha
 	return(BotWalkable (a,b,bmaxjump));
 };
 
-float /* indeterminate fn() type */ (entity a, entity b) BotReachable =
+float (entity a, entity b) BotReachable =
 {
 	return(Reachable (a,b,0));
 };
 
-float /* indeterminate fn() type */ (entity b) TrueReachable =
+float (entity b) TrueReachable =
 {
 	return(Reachable (self,b,TRUE));
 };

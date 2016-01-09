@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:40:02 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 
@@ -339,12 +339,12 @@ void () PutBotInServer =
 	}
 	self.view_ofs = '0 0 22';
 	makevectors (self.angles);
-	spawn_tfog ((self.origin + (v_forward * KINDA_WANT)));
+	spawn_tfog (self.origin + (v_forward * KINDA_WANT));
 	spawn_tdeath (self.origin,self);
 	if (BOTSPEED < 32)
 	{
 		dprint ("Feeling kind of slow today (SV_MAXSPEED = ");
-		tmp = ftos ((BOTSPEED * 10));
+		tmp = ftos (BOTSPEED * 10);
 		dprint (tmp);
 		dprint ("\n");
 	}
@@ -458,7 +458,7 @@ void () AddAnotherBot =
 		{
 			if (SKINSMODE == 2)
 			{
-				st = ftos (((newbot.skil & MOVETYPE_WALK) + 1));
+				st = ftos ((newbot.skil & MOVETYPE_WALK) + 1);
 				dprint (st);
 				dprint ("= skil skin\n");
 				skinChange (newbot,((newbot.skil & MOVETYPE_WALK) + 1));

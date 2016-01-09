@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:31:45 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 void (entity targ, entity inflictor, entity attacker, float damage) T_Damage;

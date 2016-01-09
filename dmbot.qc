@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:40:02 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 
@@ -118,7 +118,7 @@ void () bot_shot4 = [ 116, bot_shot5 ] { 	self.weaponframe = 4;
 	}
 	else
 	{
-		ai_botcharge ((BOTSPEED * 0.5));
+		ai_botcharge (BOTSPEED * 0.5);
 	}
 	BotPostThink ();
 };
@@ -541,7 +541,7 @@ void () BotDie =
 	i = cvar ("temp2");
 	if (!i)
 	{
-		i = (1+ floor ((random () * 6)));
+		i = (1+ floor (random () * 6));
 	}
 	if (i == 1)
 	{

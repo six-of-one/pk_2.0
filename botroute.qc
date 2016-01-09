@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:40:02 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 
@@ -217,7 +217,7 @@ float () FindAltPath =
 	{
 		if (e.pathtype == DROPPED)
 		{
-			rng = vlen ((e.origin - self.origin));
+			rng = vlen (e.origin - self.origin);
 			if (rng < bestrng)
 			{
 				if (BotReachable (e,self))
@@ -255,7 +255,7 @@ float () FindAPath =
 	{
 		if (e.pathtype == DROPPED)
 		{
-			rng = vlen ((e.origin - self.origin));
+			rng = vlen (e.origin - self.origin);
 			if (rng < bestrng)
 			{
 				if (BotReachable (e,self))
@@ -299,7 +299,7 @@ float () CheckDropPath =
 				return (0);
 			}
 		}
-		lnd = pointcontents (((carriedPath.origin + self.mins) + '0 0 1'));
+		lnd = pointcontents ((carriedPath.origin + self.mins) + '0 0 1');
 		if (lnd != CONTENT_EMPTY)
 		{
 			if (lnd != CONTENT_WATER)
@@ -388,7 +388,7 @@ void (entity node, float len, entity item) cacheRouteMsg;
 void (entity node, entity targ, float len, entity item) cacheRouteTarget =
 {
 	local float rng;
-	rng = vlen ((node.origin - targ.origin));
+	rng = vlen (node.origin - targ.origin);
 	if (targ.pathtype == TELEPORT)
 	{
 		rng = 250;

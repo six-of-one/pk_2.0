@@ -249,7 +249,7 @@ float (entity e) backpackweight =
 	local float lnd;
 	local float weight;
 	weight = WANT;
-	lnd = pointcontents ((e.absmin + '0 0 1'));
+	lnd = pointcontents (e.absmin + '0 0 1');
 	if (e.items & (IT_ROCKET_LAUNCHER + IT_LIGHTNING))
 	{
 		weight = (MUST_HAVE - 1);

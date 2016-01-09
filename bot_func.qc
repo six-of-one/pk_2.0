@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:40:01 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 
@@ -55,7 +55,7 @@ entity () find_bot =
 	head = find (world,classname,"dmbot");
 	while (head)
 	{
-		dist = vlen ((self.origin - head.origin));
+		dist = vlen (self.origin - head.origin);
 		infront (head);
 		if ((visible (head) && visible (head)) && (dist < best_dist))
 		{
@@ -78,7 +78,7 @@ entity () find_monster =
 	head = findradius (self.origin,SEARCH_RADIUS);
 	while (head)
 	{
-		dist = vlen ((self.origin - head.origin));
+		dist = vlen (self.origin - head.origin);
 		infront (head);
 		if (((visible (head) && visible (head)) && (dist < best_dist)) && (head.flags & FL_MONSTER))
 		{

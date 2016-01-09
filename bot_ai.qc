@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:40:01 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 
@@ -215,7 +215,7 @@ void () BotHuntTarget =
 	setorigin (self.goalentity,self.enemy.origin);
 	self.think = self.th_run;
 	self.strafeonly = 0;
-	self.ideal_yaw = vectoyaw ((self.enemy.origin - self.origin));
+	self.ideal_yaw = vectoyaw (self.enemy.origin - self.origin);
 	self.lefty = ((self.lefty - (self.lefty & LOCAL_TIME)) + 6);
 	self.nextthink = (time + 0.1);
 	self.attack_finished = ((time + 0.7) - (0.2 * self.skil));
@@ -379,7 +379,7 @@ float () BotfindBot =
 	return (0);
 };
 
-float /* indeterminate fn() type */ () BotFindTarget =
+float () BotFindTarget =
 {
 	local entity client;
 	local float len;
@@ -463,7 +463,7 @@ void () ai_botturn =
 
 void () aibot_run_melee =
 {
-	self.ideal_yaw = vectoyaw ((self.enemy.origin - self.origin));
+	self.ideal_yaw = vectoyaw (self.enemy.origin - self.origin);
 	ChangeYaw ();
 	if (FacingIdeal ())
 	{
@@ -482,7 +482,7 @@ void (float dist, float turn) aibot_run_slide =
 	local float trn;
 	local float weap;
 	trn = turn;
-	self.ideal_yaw = vectoyaw ((self.enemy.origin - self.origin));
+	self.ideal_yaw = vectoyaw (self.enemy.origin - self.origin);
 	ChangeYaw ();
 	ofs = 90;
 	dis = dist;
@@ -708,7 +708,7 @@ void (float dist, float turn) aibot_run_slide =
 		}
 		if (rnd < 0.5)
 		{
-			walkmove ((self.ideal_yaw + 180),(dis * 0.5));
+			walkmove (self.ideal_yaw + 180, dis * 0.5);
 		}
 		return ;
 	}
@@ -727,8 +727,8 @@ void (float dist) ai_botcharge =
 	}
 	if (enemyvisible (self.enemy))
 	{
-		rng = vlen ((self.enemy.origin - self.origin));
-		oldrng = vlen ((self.goalentity.origin - self.origin));
+		rng = vlen (self.enemy.origin - self.origin);
+		oldrng = vlen (self.goalentity.origin - self.origin);
 		if (self.goalentity.classname != "BotTarget")
 		{
 			objerror ("bad bot target in bot_ai! 3\n");
@@ -794,8 +794,8 @@ void (float dist) ai_botrun =
 	enemy_vis = enemyvisible (self.enemy);
 	if (enemy_vis || Spotvisible (self.enemy))
 	{
-		rng = vlen ((self.enemy.origin - self.origin));
-		oldrng = vlen ((self.goalentity.origin - self.origin));
+		rng = vlen (self.enemy.origin - self.origin);
+		oldrng = vlen (self.goalentity.origin - self.origin);
 		if (self.enemyrun > 0)
 		{
 			self.enemyrun = (self.enemyrun - 1);
@@ -840,7 +840,7 @@ void (float dist) ai_botrun =
 		}
 	}
 	enemy_infront = infrontofbot (self.enemy);
-	enemy_yaw = vectoyaw ((self.enemy.origin - self.origin));
+	enemy_yaw = vectoyaw (self.enemy.origin - self.origin);
 	if (!enemy_vis)
 	{
 		aibot_setupchase ();
@@ -867,7 +867,7 @@ void () aibot_setupchase =
 	if (RunAway ())
 	{
 		self.lefty = (self.lefty - (self.lefty & LOCAL_TIME));
-		aibot_checkforGoodies ((WANT - 1));
+		aibot_checkforGoodies (WANT - 1);
 		self.lastseenpos = self.goalentity.origin;
 		return ;
 	}
@@ -1125,7 +1125,7 @@ void (float dist) ai_botgetGoody =
 			return ;
 		}
 	}
-	goody_yaw = vectoyaw ((self.goalentity.origin - self.origin));
+	goody_yaw = vectoyaw (self.goalentity.origin - self.origin);
 	if (enemyvisible (self.enemy))
 	{
 		self.lastseenpos = self.enemy.origin;
@@ -1139,7 +1139,7 @@ void (float dist) ai_botgetGoody =
 		{
 			if (self.attack_finished < time)
 			{
-				self.ideal_yaw = vectoyaw ((self.enemy.origin - self.origin));
+				self.ideal_yaw = vectoyaw (self.enemy.origin - self.origin);
 				ChangeYaw ();
 				if (self.attack_state == AS_MELEE)
 				{
@@ -1161,7 +1161,7 @@ void (float dist) ai_botgetGoody =
 			return ;
 		}
 	}
-	dis = vlen ((self.origin - self.goalentity.origin));
+	dis = vlen (self.origin - self.goalentity.origin);
 	if (dis > dist)
 	{
 		dis = dist;

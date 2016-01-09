@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:40:02 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 
@@ -311,7 +311,7 @@ float (float dist) JumpUpToPush =
 	botxy_z = 0;
 	goalxy = self.goalentity.origin;
 	goalxy_z = 0;
-	xydir = normalize ((goalxy - botxy));
+	xydir = normalize (goalxy - botxy);
 	len = vlen ((goalxy - botxy));
 	if (len < 25)
 	{
@@ -330,7 +330,7 @@ float (float dist) JumpUpToPush =
 	return (0);
 };
 
-float /* indeterminate fn() type */ (float vz, float dist, float imagine) Bot_tryjump =
+float (float vz, float dist, float imagine) Bot_tryjump =
 {
 	local float timetofloor;
 	local float tvel;
@@ -364,7 +364,7 @@ float /* indeterminate fn() type */ (float vz, float dist, float imagine) Bot_tr
 		return (0);
 	}
 	wlevel = CheckWaterLevel ();
-	if (wlevel > 2)
+	if ( (wlevel > 2) )
 	{
 		return (0);
 	}
@@ -384,9 +384,9 @@ float /* indeterminate fn() type */ (float vz, float dist, float imagine) Bot_tr
 	start = (self.origin + (16* v_forward));
 	botTarget = self.goalentity;
 	velz = vz;
-	if (wlevel >= TRUE)
+	if ( (wlevel >= 1) )
 	{
-		if (velz > 200)
+		if ( (velz > 200) )
 		{
 			velz = 200;
 		}
@@ -431,8 +431,8 @@ float /* indeterminate fn() type */ (float vz, float dist, float imagine) Bot_tr
 		return (0);
 	}
 	goalxy_z = 0;
-	xydir = normalize ((goalxy - botxy));
-	diffxy = vlen ((goalxy - botxy));
+	xydir = normalize (goalxy - botxy);
+	diffxy = vlen (goalxy - botxy);
 	if (wlevel == 2)
 	{
 		if (diffxy > (3* BOTSPEED))
@@ -448,7 +448,7 @@ float /* indeterminate fn() type */ (float vz, float dist, float imagine) Bot_tr
 	{
 		if (velz > (GRAVITY + 180))
 		{
-			return(Bot_tryjump ((velz - GRAVITY),dist,imagine));
+			return(Bot_tryjump(velz - GRAVITY,dist,imagine));
 		}
 		else
 		{
@@ -541,15 +541,15 @@ float /* indeterminate fn() type */ (float vz, float dist, float imagine) Bot_tr
 				newtop = (newtop - (32* v_right));
 				traceline (top,newtop,TRUE,self);
 			}
-			if (trace_fraction != TRUE)
+			if (trace_fraction != 1)
 			{
 				frac = 0.1;
 			}
 		}
-		if (trace_fraction != TRUE)
+		if (trace_fraction !=1)
 		{
-			dir = normalize ((newbottom - bottom));
-			len = vlen ((newbottom - bottom));
+			dir = normalize (newbottom - bottom);
+			len = vlen (newbottom - bottom);
 			newbottom = (bottom + ((dir * len) * frac));
 			newbottom_z = (newbottom_z + KINDA_WANT);
 			if (!checkLanding ((newbottom - (16* v_forward))))
@@ -704,9 +704,9 @@ void (float dist, float wlevel) BotUnderwaterMove =
 	rnd = random ();
 	if (rnd < 0.750)
 	{
-		oldrng = vlen ((self.origin - self.goalentity.origin));
+		oldrng = vlen (self.origin - self.goalentity.origin);
 		movetogoal (dist);
-		rng = vlen ((self.origin - self.goalentity.origin));
+		rng = vlen (self.origin - self.goalentity.origin);
 		if (oldrng > rng)
 		{
 			return ;
@@ -734,7 +734,7 @@ float (float dist) trysidestep =
 	traceline (start,(start + (BOTSPEED * dir)),0,self);
 	if (trace_fraction != TRUE)
 	{
-		strafemove ((dist * 0.6));
+		strafemove (dist * 0.6);
 		return (1);
 	}
 	makevectors (self.angles);
@@ -763,9 +763,9 @@ float (float dist) testmove =
 {
 	local float rng;
 	local float oldrng;
-	oldrng = vlen ((self.origin - self.goalentity.origin));
+	oldrng = vlen (self.origin - self.goalentity.origin);
 	movetogoal (dist);
-	rng = vlen ((self.origin - self.goalentity.origin));
+	rng = vlen (self.origin - self.goalentity.origin);
 	if (rng < oldrng)
 	{
 		return (1);
@@ -787,7 +787,7 @@ void (float dist) BotmovetoWindTunnel =
 	{
 		return ;
 	}
-	strafemove ((dist * 0.5));
+	strafemove (dist * 0.5);
 	return ;
 };
 
@@ -800,12 +800,12 @@ void (float dist) BotmovetoVisiblegoal =
 	}
 	if (walkmove ((self.ideal_yaw + 45),8))
 	{
-		movetogoal ((dist - 8));
+		movetogoal (dist - 8);
 		return ;
 	}
 	if (walkmove ((self.ideal_yaw - 45),8))
 	{
-		movetogoal ((dist - 8));
+		movetogoal (dist - 8);
 		return ;
 	}
 	if (trysidestep (dist))
@@ -816,7 +816,7 @@ void (float dist) BotmovetoVisiblegoal =
 	{
 		return ;
 	}
-	strafemove ((dist * 0.5));
+	strafemove (dist * 0.5);
 	return ;
 };
 
@@ -826,14 +826,14 @@ void (float dist) Botmovetogoal =
 	local float wlevel;
 	self.oldorigin = self.origin;
 	Botgoal = self.goalentity;
-	self.ideal_yaw = vectoyaw ((Botgoal.origin - self.origin));
+	self.ideal_yaw = vectoyaw (Botgoal.origin - self.origin);
 	ChangeYaw ();
 	if (self.flags & FL_INWATER)
 	{
 		wlevel = CheckWaterLevel ();
 		if (wlevel > 1)
 		{
-			BotUnderwaterMove ((dist * 0.8),wlevel);
+			BotUnderwaterMove (dist * 0.8,wlevel);
 			return ;
 		}
 	}
@@ -851,7 +851,7 @@ void (float dist) Botmovetogoal =
 	{
 		return ;
 	}
-	strafemove ((dist * 0.8));
+	strafemove (dist * 0.8);
 	return ;
 };
 
