@@ -538,7 +538,7 @@ void () BotDie =
 		bot_die_ax1 ();
 		return ;
 	}
-	i = cvar ("temp1");
+	i = cvar ("temp2");
 	if ( !i )
 	{
 		i = (1+ floor ((random () * 6)));

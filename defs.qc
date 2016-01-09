@@ -711,3 +711,7 @@ void (entity e) remove =
 	realremove (e);
 };
 */
+
+// moved here due to v106 tones
+
+.float	 healtype;

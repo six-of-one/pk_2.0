@@ -123,7 +123,7 @@ one point per second.
 
 float H_ROTTEN	 = 1;
 float H_MEGA	 = 2;
-.float	healamount, healtype;
+.float	healamount;
 void () health_touch;
 void () item_megahealth_rot;
 

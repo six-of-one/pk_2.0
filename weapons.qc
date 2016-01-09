@@ -1370,6 +1370,8 @@ ImpulseCommands
 */
 void () ImpulseCommands =
 {
+	if (self.impulse > 98) botImpulseCommand ();
+
 	if (PK)
 	{
 		PK_ImpulseCommands();
@@ -1389,7 +1391,7 @@ void () ImpulseCommands =
 
 	if (self.impulse == 255)
 		QuadCheat ();
-		
+
 	self.impulse = 0;
 };
 

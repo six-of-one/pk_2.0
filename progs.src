@@ -3,6 +3,7 @@
 defs.qc
 // painkeep code
 pk_src/pk.defs.qc
+bot.defs.qc
 
 frikbot/map_dm1.qc
 frikbot/map_dm2.qc
@@ -86,6 +87,7 @@ pk_src/admin.qc
 
 // pk_src/frames.qc - not in original progs.src
 
+bot.qc
 bot_func.qc
 botfight.qc
 botthink.qc

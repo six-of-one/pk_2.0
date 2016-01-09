@@ -142,11 +142,11 @@ void () botRestrictedCommand =
 			{
 				if ( teamplay )
 				{
-					SetTeamBots ((self.impulse - MUST_HAVE));
+					SetTeamBots (self.impulse - 100);
 				}
 				else
 				{
-					SetMaxBots ((self.impulse - MUST_HAVE));
+					SetMaxBots (self.impulse - 100);
 				}
 			}
 			else

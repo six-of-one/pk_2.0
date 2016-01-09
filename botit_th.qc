@@ -6,7 +6,7 @@
  *
  * date: Fri Apr  4 04:40:02 UTC 2008
  *
- * test 6
+ * final qc
  *
  */
 
@@ -36,11 +36,20 @@ void () setBotGravity;
 void () bot_touched;
 void () enemy_touched;
 void (entity bot) bot_triggered;
+
+void (entity noisemaker, entity noiseobject) signalnoise;
+float (entity e) hearnoise;
+entity () noisetarget;
+float (entity targ) Spotvisible;
+float (entity targ) Platvisible;
+float (vector spot) dropline;
+void () secret_touch;
+
 .float(entity e) th_weight;
 .float(entity node, float len, entity item) th_cache;
 .void() th_update;
 .float istrigger;
-.float healtype;
+//.float healtype;
 .float playerkills;
 .float playerdeaths;
 .float botkills;
@@ -82,64 +91,61 @@ void (entity bot) bot_triggered;
 .entity enemycache;
 .float endpoint;
 .string teamname;
-float NORMALSCORE	 = 1;
-float MYSCORE	 = 2;
-float MUST_HAVE	 = 100;
-float WANT	 = 35;
-float KINDA_WANT	 = 20;
-float DONT_WANT	 ;
-float CANTURN	 = 1;
-float NOTURN	 = 2;
-float SEARCH_RADIUS	 = 600;
-float LOOPTIME	 = 20;
-float MAXPATHERS	 = 16;
-float DROPPED	 = 2;
-float CARRIED	 = 1;
-float NEVERTARGET	 = 3;
-float REGULARTARGET	 ;
-float TELEPORT	 = 4;
-float BOTS	 = 240;
-float TEAMBOTS	 = 3840;
-float RESTRICT	 = 4096;
-float SUPERRESTRICT	 = 8192;
-float TEAMFLAG	 = 16384;
-float INITLEVEL	 = 32768;
-float DEDICATED	 = 4194304;
-float LOCAL_TIME	 = 7;
-float STRAFE_DIR	 = 16;
-float FAR_SEEK	 = 32;
-float WATERUPDOWN	 = 64;
-float NODROP	 = 128;
-float RUNAWAY	 = 256;
-float GETGOODY	 = 512;
-float ONTRAIN	 = 1024;
-float MULTIENEMY	 = 2048;
-float VERBOSEBOT	 ;
-float BOTSPEED	 ;
-float NUMBOTS	 ;
-float GRAVITY	 ;
-float MAXJUMP	 ;
-float INVGRENADELEVELDIST	 ;
-float GRENADEMAXHEIGHT	 ;
-float LEVELJUMPTIME	 ;
-float NUMPATHS	 ;
-float NUMGIBS	 ;
-float NUMPATHERS	 ;
-float SKINSMODE	 ;
-float RECURSEDEPTH	 ;
-vector REBOUNDSPOT	;
-float REBOUND	 ;
-float TELEFRAGFLAG	 ;
+
+float NORMALSCORE			= 1;
+float MYSCORE					= 2;
+float DONT_WANT				= 0;
+float KINDA_WANT				= 20;
+float WANT						= 35;
+float MUST_HAVE				= 100;
+float SEARCH_RADIUS			= 600;
+float LOOPTIME				= 20;
+float MAXPATHERS				= 16;
+float REGULARTARGET	 		= 0;
+float CARRIED					= 1;
+float DROPPED					= 2;
+float NEVERTARGET			= 3;
+float TELEPORT				= 4;
+float BOTS						= 240;
+float TEAMBOTS				= 3840;
+float RESTRICT				= 4096;
+float SUPERRESTRICT			= 8192;
+float TEAMFLAG				= 16384;
+float INITLEVEL				= 32768;
+float DEDICATED				= 4194304;
+float LOCAL_TIME				= 7;
+float CANTURN					= 1;
+float NOTURN					= 2;
+float STRAFE_DIR				= 16;
+float FAR_SEEK				= 32;
+float WATERUPDOWN			= 64;
+float NODROP					= 128;
+float RUNAWAY					= 256;
+float GETGOODY				= 512;
+float ONTRAIN					= 1024;
+float MULTIENEMY				= 2048;
+
+float VERBOSEBOT;
+float BOTSPEED;
+float NUMBOTS;
+float GRAVITY;
+float MAXJUMP;
+float INVGRENADELEVELDIST;
+float GRENADEMAXHEIGHT;
+float LEVELJUMPTIME;
+float NUMPATHS;
+float NUMGIBS;
+float NUMPATHERS;
+float SKINSMODE;
+float RECURSEDEPTH;
+vector REBOUNDSPOT;
+float REBOUND;
+float TELEFRAGFLAG;
 entity NOISEQUEUE;
-float HELPING	 ;
-float NAMEBOTS	 ;
-void (entity noisemaker, entity noiseobject) signalnoise;
-float (entity e) hearnoise;
-entity () noisetarget;
-float (entity targ) Spotvisible;
-float (entity targ) Platvisible;
-float (vector spot) dropline;
-void () secret_touch;
+float HELPING;
+float NAMEBOTS;
+
+
 float (entity e) doorweight =
 {
 	local float weight;
@@ -148,26 +154,17 @@ float (entity e) doorweight =
 	{
 		weight = DONT_WANT;
 	}
-	else
+	else if ( (e.touch == secret_touch) )
 	{
-		if ( (e.touch == secret_touch) )
-		{
-			weight = KINDA_WANT;
-		}
-		else
-		{
-			if ( (e.state == STATE_TOP) )
-			{
-				weight = DONT_WANT;
-			}
-			else
-			{
-				if ( (e.state == STATE_UP) )
-				{
-					weight = KINDA_WANT;
-				}
-			}
-		}
+		weight = KINDA_WANT;
+	}
+	else if ( (e.state == STATE_TOP) )
+	{
+		weight = DONT_WANT;
+	}
+	else if ( (e.state == STATE_UP) )
+	{
+		weight = KINDA_WANT;
 	}
 	if ( !Spotvisible (e) )
 	{
@@ -181,11 +178,9 @@ float (entity e) buttonweight =
 	local float weight;
 	weight = DONT_WANT;
 	if ( (e.state == STATE_BOTTOM) )
+	if ( Spotvisible (e) )
 	{
-		if ( Spotvisible (e) )
-		{
-			weight = (KINDA_WANT + 1);
-		}
+		weight = (KINDA_WANT + 1);
 	}
 	return(weight);
 };
@@ -195,11 +190,9 @@ float (entity e) platweight =
 	local float weight;
 	weight = KINDA_WANT;
 	if ( !Platvisible (e) )
+	if ( !Spotvisible (e) )
 	{
-		if ( !Spotvisible (e) )
-		{
-			weight = DONT_WANT;
-		}
+		weight = DONT_WANT;
 	}
 	return(weight);
 };
@@ -276,19 +269,13 @@ float (entity e) healthweight =
 	{
 		weight = (MUST_HAVE - 1);
 	}
-	else
+	else if ( (e.healtype == 2) )
 	{
-		if ( (e.healtype == 2) )
-		{
-			weight = MUST_HAVE;
-		}
-		else
-		{
-			if ( (self.health > 99) )
-			{
-				weight = DONT_WANT;
-			}
-		}
+		weight = MUST_HAVE;
+	}
+	else if ( (self.health > 99) )
+	{
+		weight = DONT_WANT;
 	}
 	return(weight);
 };
@@ -566,6 +553,7 @@ void () CopyrightNotice =
 {
 	dprint (" The Quake C modifications included in this archive are Copyright 1996, Steven Polge.");
 	dprint ("The original QuakeC source is Copyright 1996, id software.");
+	dprint ("All new non-derivitive code (c) 2007 Cataboligne.");
 };
 
 void () printIntro =
@@ -586,11 +574,11 @@ void () printIntro =
 		{
 			addTeamBots (self,num);
 		}
-		centerprint (self,"Server running team Reaper (quake) bots v1.1\nand PainKeep v1.0");
+		centerprint (self,"Server running team Reaper (quake) bots v1.1\nand PainKeep v1.1");
 	}
 	else
 	{
-		centerprint (self,"Server running Reaper (quake) bots v1.1\nand PainKeep v1.0");
+		centerprint (self,"Server running Reaper (quake) bots v1.1\nand PainKeep v1.1");
 	}
 };
 

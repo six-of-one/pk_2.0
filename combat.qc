@@ -203,12 +203,10 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	self = targ;
 	if ( (self.classname == "dmbot") )
 	{
-		if ( (attacker != world) )
-		{
-			if ( (inflictor != world) )
+		if (attacker != world && inflictor != world)
 			{
 // xreaper code - looks good
-				if ( ((attacker != self) && !coop) )
+				if ((attacker != self) && !coop)
 				{
 					if ( self.enemy )
 					{
@@ -221,7 +219,6 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 					}
 				}
 			}
-		}
 	}
 	else
 	{
