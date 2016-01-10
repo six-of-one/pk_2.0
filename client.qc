@@ -550,7 +550,7 @@ void () PutClientInServer =
 	self.attack_finished = time;
 	self.th_pain = player_pain;
 	self.th_die = PlayerDie;
-	self.th_cache = cacheenemy;
+
 	self.deadflag = DEAD_NO;
 // paustime is set by teleporters to keep the player from moving a while
 	self.pausetime = 0;
@@ -572,8 +572,6 @@ void () PutClientInServer =
 
 	self.view_ofs = '0 0 22';
 
-	set_CarriedPath(); // *bot
-
 	player_stand1 ();
 
 	if (deathmatch || coop)
@@ -584,9 +582,10 @@ void () PutClientInServer =
 
 	spawn_tdeath (self.origin,self);
 	if (PK) PK_CIS(); // *pk - set client pk elements
-
 	set_initBotLevel(); // *bot
+//	set_CarriedPath(); // *bot - deprecated into prev fn
 };
+
 
 /*
 =============================================================================
@@ -1187,7 +1186,7 @@ void () PlayerPostThink =
 		return ;
 
 	if (!(self.view_ofs == '0 0 0') && !self.deadflag)
-	if (CheckDropPath ())
+	if (CheckDropPath ()) // *bot
 	{
 		DropBotPath ();
 	}
@@ -1247,11 +1246,7 @@ void () ClientConnect =
 	else
 					bprint (" entered the game\n");
 
-// bot code
-	self.id = FindGood ();
-	self.impulse = 204;
-	randombotskin = getrandombotskin ();
-	initscore ();
+	bot_con(TRUE); // *bot
 // a client connecting during an intermission can cause problems
 	if (intermission_running)
 		ExitIntermission ();
@@ -1275,14 +1270,13 @@ void () ClientDisconnect =
 
 	if (PK) pk_clientdisconnect(); // *pk - clear stuff out
 	// let everyone else know
+	bot_con(FALSE); // *bot
 	bprint (self.teamname);
 	bprint (self.netname);
 	bprint (" left the game with ");
-	MakeGood (self.id);
 	bprint (ftos (self.frags));
 	bprint (" frags\n");
 	sound (self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_NONE);
-	self.classname = "nobody";
 	set_suicide_frame ();
 };
 
@@ -1309,7 +1303,7 @@ void(entity targ, entity attacker) ClientObituary =
 			bprint ("\n");
 
 			attacker.owner.frags = attacker.owner.frags + 1;
-			if (attacker.owner.classname == "dmbot")
+/*			if (attacker.owner.classname == "dmbot")
 			{
 				TELEFRAGFLAG = 1;
 			}
@@ -1319,7 +1313,7 @@ void(entity targ, entity attacker) ClientObituary =
 				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 				WriteByte (MSG_ALL,attacker.owner.id);
 				WriteShort (MSG_ALL,attacker.owner.frags);
-			}
+			}*/
 			return;
 		}
 
@@ -1330,13 +1324,13 @@ void(entity targ, entity attacker) ClientObituary =
 			bprint ("'s telefrag\n");
 
 			targ.frags = targ.frags - 1;
-			countkill (targ,targ);
+/*			countkill (targ,targ);
 			if (targ.classname == "dmbot")
 			{
 				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 				WriteByte (MSG_ALL,targ.id);
 				WriteShort (MSG_ALL,targ.frags);
-			}
+			}*/
 			return;
 		}
 
@@ -1346,13 +1340,13 @@ void(entity targ, entity attacker) ClientObituary =
 			{
 				// killed self
 				attacker.frags = attacker.frags - 1;
-				if (attacker.classname == "dmbot")
+/*				if (attacker.classname == "dmbot")
 				{
 					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 					WriteByte (MSG_ALL,attacker.id);
 					WriteShort (MSG_ALL,attacker.frags);
 				}
-				countkill (attacker,attacker);
+				countkill (attacker,attacker);*/
 				bprint (targ.netname);
 				
 				if (targ.weapon == 64 && targ.waterlevel > 1)
@@ -1384,13 +1378,13 @@ void(entity targ, entity attacker) ClientObituary =
 			else
 			{
 				attacker.frags = attacker.frags + 1;
-				if (attacker.classname == "dmbot")
+/*				if (attacker.classname == "dmbot")
 				{
 					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 					WriteByte (MSG_ALL,attacker.id);
 					WriteShort (MSG_ALL,attacker.frags);
 				}
-				countkill (attacker,targ);
+				countkill (attacker,targ);*/
 				rnum = attacker.weapon;
 				if (rnum == IT_AXE)
 				{
@@ -1455,7 +1449,7 @@ void(entity targ, entity attacker) ClientObituary =
 		else
 		{
 			targ.frags = targ.frags - 1;
-			countkill (targ,targ);
+//			countkill (targ,targ);
 			bprint (targ.netname);
 
 			// killed by a montser?

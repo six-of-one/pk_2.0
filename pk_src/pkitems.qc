@@ -142,7 +142,6 @@ void () weapon_airfist =
 	self.touch = painkeep_weapon_touch;
 	setsize (self,'-16 -16 0','16 16 56');
 	//setsize (self, '-15 -9 25', '17 9 43');
-	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -166,7 +165,6 @@ void () weapon_chainlg =
 	self.netname = "Chain Thunderbolt";
 	self.touch = painkeep_weapon_touch;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -184,7 +182,6 @@ void () weapon_grapgun =
 	self.pk_currentitem = PK_IT_GRAPGUN;
 	self.netname = "Harpoon Gun";
 	setsize (self,'-16 -16 0','16 16 56');
-	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -287,6 +284,18 @@ void() painkeep_touch =
 {
 	local entity stm2;
 
+	if (self.state == CACHE_ROUTE_TOUCH) // *bot code - patch in cacheRoute for bot code - routes here because this is PK master touch fn()
+	{
+		if (other.movetarget.movetarget){
+			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
+bprint("hi, code base here, ran PK cacheRoute for item ( ");
+bprint(self.classname);
+bprint(" , ");
+bprint(self.netname);
+bprint(" )\n");
+}
+	}
+
 	if (other.classname != "player") // pk - this is where the grap can grab stuff
 	{
 		grap_checkIfGrap();
@@ -322,7 +331,6 @@ void() painkeep_touch =
 				self.nextthink = time + 15;
 			if (self.pk_touch == armor_touch)
 				self.nextthink = time + 20;
-			
 		}
 
 		return;
@@ -417,7 +425,6 @@ void () item_painkeep_gwell =
 	self.pk_items = PK_IT_GRAVITYWELL;
 	//setsize (self, '-32 -32 -32', '32 32 32');
 	setsize (self, '-16 -16 -24', '16 16 32');
-	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -434,7 +441,6 @@ void () item_painkeep_turret =
 	self.pk_items = PK_IT_TURRET;
 
 	setsize (self,'-7 -7 -7','4 7 21');
-	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -458,7 +464,6 @@ void () item_painkeep_can =
 	self.netname = "Can of pork and beans";
 	self.pk_items = PK_IT_CANPAB;
 	setsize (self, '-16 -16 -24', '16 16 32');
-	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -474,7 +479,6 @@ void () item_painkeep_beartrap =
 	self.netname = "Bear Trap";
 	self.pk_items = PK_IT_BEARTRAP;
 	setsize (self, '-16 -16 -24', '16 16 32');
-	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -508,7 +512,6 @@ void () item_painkeep_expshells =
 	self.weapon = 5;
 	self.netname = "Exploding Shells";
 	setsize (self, '0 0 0', '32 32 56');
-	self.th_weight = dont_weight;
 	StartItem ();
 	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
@@ -798,75 +801,74 @@ void() PK_BackpackTouch =
 
 void() PK_DropBackpack =
 {
-	local entity	item;
-
+	newmis = world;
 	if (!(self.ammo_shells + self.ammo_nails + self.ammo_rockets + self.ammo_cells + self.pk_explode_ammo))
 		return;	// nothing in it
 
-	item = spawn();
-	item.origin = self.origin - '0 0 24';
+	newmis = spawn();
+	newmis.origin = self.origin - '0 0 24';
 
-	item.pk_items = 0;
-	item.items = self.weapon;
-	if (item.items == IT_AXE)
+	newmis.pk_items = 0;
+	newmis.items = self.weapon;
+	if (newmis.items == IT_AXE)
 	{
 		if (self.pk_currentitem == PK_IT_AXE)
-			item.netname = "Axe";
+			newmis.netname = "Axe";
 		else if (self.pk_currentitem == PK_IT_GRAVITYWELL)
-			item.netname = "Gravity Well";
+			newmis.netname = "Gravity Well";
 		else if (self.pk_currentitem == PK_IT_TURRET)
-			item.netname = "AutoSentry";
+			newmis.netname = "AutoSentry";
 		else if (self.pk_currentitem == PK_IT_GRAPGUN)
-			item.netname = "Harpoon Gun";
+			newmis.netname = "Harpoon Gun";
 		else if (self.pk_currentitem == PK_IT_BEARTRAP)
-			item.netname = "Bear Trap";
+			newmis.netname = "Bear Trap";
 		else if (self.pk_currentitem == PK_IT_AIRGUN)
-			item.netname = "AirFist";
+			newmis.netname = "AirFist";
 		else if (self.pk_currentitem == PK_IT_CLIGHT)
-			item.netname = "Chain Thunderbolt";
+			newmis.netname = "Chain Thunderbolt";
 	}
-	else if (item.items == IT_SHOTGUN)
-		item.netname = "Shotgun";
-	else if (item.items == IT_SUPER_SHOTGUN)
-		item.netname = "Double-barrelled Shotgun";
-	else if (item.items == IT_NAILGUN)
-		item.netname = "Pulse Rifle";
-	else if (item.items == IT_SUPER_NAILGUN)
-		item.netname = "Super Nailgun";
-	else if (item.items == IT_GRENADE_LAUNCHER)
-		item.netname = "Grenade Launcher";
-	else if (item.items == IT_ROCKET_LAUNCHER)
-		item.netname = "Rocket Launcher";
-	else if (item.items == IT_LIGHTNING)
-		item.netname = "Thunderbolt";
+	else if (newmis.items == IT_SHOTGUN)
+		newmis.netname = "Shotgun";
+	else if (newmis.items == IT_SUPER_SHOTGUN)
+		newmis.netname = "Double-barrelled Shotgun";
+	else if (newmis.items == IT_NAILGUN)
+		newmis.netname = "Pulse Rifle";
+	else if (newmis.items == IT_SUPER_NAILGUN)
+		newmis.netname = "Super Nailgun";
+	else if (newmis.items == IT_GRENADE_LAUNCHER)
+		newmis.netname = "Grenade Launcher";
+	else if (newmis.items == IT_ROCKET_LAUNCHER)
+		newmis.netname = "Rocket Launcher";
+	else if (newmis.items == IT_LIGHTNING)
+		newmis.netname = "Thunderbolt";
 	else
-		item.netname = "";
+		newmis.netname = "";
 
-	item.ammo_shells = self.ammo_shells;
-	item.ammo_nails = self.ammo_nails;
-	item.ammo_rockets = self.ammo_rockets;
-	item.ammo_cells = self.ammo_cells;
+	newmis.ammo_shells = self.ammo_shells;
+	newmis.ammo_nails = self.ammo_nails;
+	newmis.ammo_rockets = self.ammo_rockets;
+	newmis.ammo_cells = self.ammo_cells;
 
-		item.pk_gravitywellammo = self.pk_gravitywellammo;
-		item.pk_turretammo = self.pk_turretammo;
-		item.pk_canpabammo = self.pk_canpabammo;
-		item.pk_beartrapammo = self.pk_beartrapammo;
-	item.pk_explode_ammo = self.pk_explode_ammo;
-	
-	item.velocity_z = 300;
-	item.velocity_x = -100 + (random() * 200);
-	item.velocity_y = -100 + (random() * 200);
+	newmis.pk_gravitywellammo = self.pk_gravitywellammo;
+	newmis.pk_turretammo = self.pk_turretammo;
+	newmis.pk_canpabammo = self.pk_canpabammo;
+	newmis.pk_beartrapammo = self.pk_beartrapammo;
+	newmis.pk_explode_ammo = self.pk_explode_ammo;
 
-	item.flags = FL_ITEM;
-	item.solid = SOLID_TRIGGER;
-	item.movetype = MOVETYPE_TOSS;
-	setmodel (item, "progs/backpack.mdl");
-	setsize (item, '-16 -16 0', '16 16 56');
-	item.touch = BackpackTouch;
+	newmis.velocity_z = 300;
+	newmis.velocity_x = -100 + (random() * 200);
+	newmis.velocity_y = -100 + (random() * 200);
 
-	item.nextthink = time + 120;	// remove after 2 minutes
-	item.think = SUB_Remove;
-	AddToSplash(item); // *pk - splash tossed items
+	newmis.flags = FL_ITEM;
+	newmis.solid = SOLID_TRIGGER;
+	newmis.movetype = MOVETYPE_TOSS;
+	setmodel (newmis, "progs/backpack.mdl");
+	setsize (newmis, '-16 -16 0', '16 16 56');
+	newmis.touch = BackpackTouch;
+
+	newmis.nextthink = time + 120;	// remove after 2 minutes
+	newmis.think = SUB_Remove;
+	AddToSplash(newmis); // *pk - splash tossed items
 };
 
 // called from PlaceItem - sorts many things now - happens 0.2 secs after map load

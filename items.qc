@@ -132,7 +132,6 @@ void () item_health =
 {
 	self.touch = health_touch;
 
-	self.th_weight = healthweight;
 	if (self.spawnflags & H_ROTTEN)
 	{
 		precache_model ("maps/b_bh10.bsp");
@@ -152,8 +151,6 @@ void () item_health =
 			self.noise = "items/r_item2.wav";
 			self.healamount = 100;
 			self.healtype = 2;
-			self.th_cache = cachepowerup;
-			self.th_update = updatepowerup;
 		}
 		else
 		{
@@ -190,18 +187,12 @@ void () health_touch =
 			return ;
 	}
 
-	if (other.classname == "dmbot")
-	{
+	if (other.classname == "dmbot") // *bot
 		bot_toucheditem ();
-	}
-//	if (other.classname == "player")
-//	{
-		sprint (other,"You receive ");
-		s = ftos (self.healamount);
-		sprint (other,s);
-		sprint (other," health\n");
-//		stuffcmd (other,"bf\n");
-//	}
+	sprint (other,"You receive ");
+	s = ftos (self.healamount);
+	sprint (other,s);
+	sprint (other," health\n");
 
 // health touch sound
 	sound(other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
@@ -218,10 +209,6 @@ void () health_touch =
 		self.nextthink = time + 5;
 		self.think = item_megahealth_rot;
 		self.owner = other;
-		if (other.movetarget.movetarget)
-		{
-			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
-		}
 	}
 	else
 	{
@@ -281,24 +268,18 @@ void () armor_touch =
 		type = 0.3;
 		value = 100;
 		bit = IT_ARMOR1;
-		if (other.movetarget.movetarget)
-			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	if (self.classname == "item_armor2")
 	{
 		type = 0.6;
 		value = 150;
 		bit = IT_ARMOR2;
-		if (other.movetarget.movetarget)
-			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	if (self.classname == "item_armorInv")
 	{
 		type = 0.8;
 		value = 200;
 		bit = IT_ARMOR3;
-		if (other.movetarget.movetarget)
-			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	if (other.armortype*other.armorvalue >= type*value)
 		return ;
@@ -312,17 +293,14 @@ void () armor_touch =
   if (deathmatch == 1)
 		self.nextthink = time + 20;
 	self.think = SUB_regen;
-	if (other.classname == "dmbot")
-	{
+	if (other.classname == "dmbot") // *bot
 		bot_toucheditem ();
-	}
-//	if (other.classname == "player")
-//	{
-		sprint (other,"You got armor\n");
-		stuffcmd (other,"bf\n");
-//	}
+
+	sprint(other, "You got armor\n");
 // armor touch sound
 	sound(other, CHAN_ITEM, "items/armor1.wav", 1, ATTN_NORM);
+	stuffcmd (other, "bf\n");
+
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
 };
@@ -339,9 +317,6 @@ void () item_armor1 =
 	self.skin = 0;
 	setsize (self,'-16 -16 0','16 16 56');
 	self.armorvalue = 100;
-	self.th_weight = armorweight;
-	self.th_cache = cachearmor;
-	self.th_update = updatearmor;
 	StartItem ();
 };
 
@@ -356,9 +331,6 @@ void () item_armor2 =
 	self.skin = 1;
 	setsize (self,'-16 -16 0','16 16 56');
 	self.armorvalue = 150;
-	self.th_weight = armorweight;
-	self.th_cache = cachearmor;
-	self.th_update = updatearmor;
 	StartItem ();
 };
 
@@ -373,9 +345,6 @@ void () item_armorInv =
 	self.skin = 2;
 	setsize (self,'-16 -16 0','16 16 56');
 	self.armorvalue = 200;
-	self.th_weight = armorweight;
-	self.th_cache = cachearmor;
-	self.th_update = updatearmor;
 	StartItem ();
 };
 
@@ -481,8 +450,6 @@ void () weapon_touch =
 		hadammo = other.ammo_rockets;
 		new = IT_SUPER_NAILGUN;
 		other.ammo_nails = other.ammo_nails + 30;
-		if (other.movetarget.movetarget)
-			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	else if (self.classname == "weapon_supershotgun")
 	{
@@ -499,8 +466,6 @@ void () weapon_touch =
 		hadammo = other.ammo_rockets;
 		new = IT_ROCKET_LAUNCHER;
 		other.ammo_rockets = other.ammo_rockets + 5;
-		if (other.movetarget.movetarget)
-			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	else if (self.classname == "weapon_grenadelauncher")
 	{
@@ -509,8 +474,6 @@ void () weapon_touch =
 		hadammo = other.ammo_rockets;
 		new = IT_GRENADE_LAUNCHER;
 		other.ammo_rockets = other.ammo_rockets + 5;
-		if (other.movetarget.movetarget)
-			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	else if (self.classname == "weapon_lightning")
 	{
@@ -519,19 +482,13 @@ void () weapon_touch =
 		hadammo = other.ammo_rockets;
 		new = IT_LIGHTNING;
 		other.ammo_cells = other.ammo_cells + 15;
-		if (other.movetarget.movetarget)
-			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 	else
 		objerror ("weapon_touch: unknown classname");
 
-//	if (other.classname == "player")
-//	{
-		sprint (other,"You got the ");
-		sprint (other,self.netname);
-		sprint (other,"\n");
-		stuffcmd (other,"bf\n");
-//	}
+	sprint (other,"You got the ");
+	sprint (other,self.netname);
+	sprint (other,"\n");
 // weapon touch sound
 	sound (other, CHAN_ITEM, "weapons/pkup.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
@@ -544,6 +501,7 @@ void () weapon_touch =
 
 	stemp = self;
 	self = other;
+
 // PK-NOTE: "old" variable above does nothing...what was iD's plan for it?
 	if (PK)
 		PK_Deathmatch_Weapon (new, 0); // *pk - new wep switch rule for higher risk weps
@@ -583,7 +541,6 @@ void () weapon_supershotgun =
 	self.netname = "Double-barrelled Shotgun";
 	self.touch = weapon_touch;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.th_weight = ssgweight;
 	StartItem ();
 };
 
@@ -598,7 +555,6 @@ void () weapon_nailgun =
 	self.netname = "nailgun";
 	self.touch = weapon_touch;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.th_weight = nailgunweight;
 	StartItem ();
 };
 
@@ -613,9 +569,6 @@ void () weapon_supernailgun =
 	self.netname = "Super Nailgun";
 	self.touch = weapon_touch;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.th_weight = supernailweight;
-	self.th_cache = cachenail;
-	self.th_update = updatenail;
 	StartItem ();
 };
 
@@ -630,9 +583,6 @@ void () weapon_grenadelauncher =
 	self.netname = "Grenade Launcher";
 	self.touch = weapon_touch;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.th_weight = glauncherweight;
-	self.th_cache = cachegrenade;
-	self.th_update = updategrenade;
 	StartItem ();
 };
 
@@ -647,9 +597,6 @@ void () weapon_rocketlauncher =
 	self.netname = "Rocket Launcher";
 	self.touch = weapon_touch;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.th_weight = rlauncherweight;
-	self.th_cache = cacherocket;
-	self.th_update = updaterocket;
 	StartItem ();
 };
 
@@ -665,9 +612,6 @@ void () weapon_lightning =
 	self.netname = "Thunderbolt";
 	self.touch = weapon_touch;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.th_weight = lightningweight;
-	self.th_cache = cachelightning;
-	self.th_update = updatelightning;
 	StartItem ();
 };
 
@@ -729,15 +673,14 @@ void () ammo_touch =
 		other.ammo_cells = other.ammo_cells + self.aflag;
 	}
 
+	if ( (other.classname == "dmbot") )
+		bot_toucheditem ();
+
 	bound_other_ammo ();
 
-//	if (other.classname == "player")
-//	{
-		sprint (other,"You got the ");
-		sprint (other,self.netname);
-		sprint (other,"\n");
-		stuffcmd (other,"bf\n");
-//	}
+	sprint (other,"You got the ");
+	sprint (other,self.netname);
+	sprint (other,"\n");
 // ammo touch sound
 	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
@@ -797,7 +740,6 @@ void () item_shells =
 	self.weapon = 1;
 	self.netname = "shells";
 	setsize (self, '0 0 0', '32 32 56');
-	self.th_weight = shellweight;
 	StartItem ();
 };
 
@@ -823,7 +765,6 @@ void () item_spikes =
 	self.weapon = 2;
 	self.netname = "nails";
 	setsize (self, '0 0 0', '32 32 56');
-	self.th_weight = nailweight;
 	StartItem ();
 };
 
@@ -849,7 +790,6 @@ void () item_rockets =
 	self.weapon = 3;
 	self.netname = "rockets";
 	setsize (self, '0 0 0', '32 32 56');
-	self.th_weight = rocketweight;
 	StartItem ();
 };
 
@@ -876,7 +816,6 @@ void () item_cells =
 	self.weapon = 4;
 	self.netname = "cells";
 	setsize (self, '0 0 0', '32 32 56');
-	self.th_weight = cellweight;
 	StartItem ();
 };
 
@@ -972,13 +911,9 @@ void () key_touch =
 	if (other.items & self.items)
 		return ;
 
-//	if (other.classname == "player")
-//	{
-		sprint (other,"You got the ");
-		sprint (other,self.netname);
-		sprint (other,"\n");
-		stuffcmd (other,"bf\n");
-//	}
+	sprint (other,"You got the ");
+	sprint (other,self.netname);
+	sprint (other,"\n");
 
 	sound (other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
@@ -1180,13 +1115,9 @@ void () powerup_touch =
 	if (other.health <= 0)
 		return ;
 
-//	if (other.classname == "player")
-//	{
-		sprint (other,"You got the ");
-		sprint (other,self.netname);
-		sprint (other,"\n");
-		stuffcmd (other,"bf\n");
-//	}
+	sprint (other,"You got the ");
+	sprint (other,self.netname);
+	sprint (other,"\n");
 
 	if (!PK || (PK && deathmatch != 4)) // *pk - my new rule, logical extrapolation
 	if (deathmatch)
@@ -1219,24 +1150,18 @@ void () powerup_touch =
 	{
 		other.invincible_time = 1;
 		other.invincible_finished = time + 30;
-		if (other.movetarget.movetarget)
-			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 
 	if (self.classname == "item_artifact_invisibility")
 	{
 		other.invisible_time = 1;
 		other.invisible_finished = time + 30;
-		if (other.movetarget.movetarget)
-			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 
 	if (self.classname == "item_artifact_super_damage")
 	{
 		other.super_time = 1;
 		other.super_damage_finished = time + 30;
-		if (other.movetarget.movetarget)
-			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
 	}
 
 	activator = other;
@@ -1261,9 +1186,6 @@ void () item_artifact_invulnerability =
 	self.netname = "Pentagram of Protection";
 	self.items = IT_INVULNERABILITY;
 	setsize (self, '-16 -16 -24', '16 16 32');
-	self.th_weight = artifactweight;
-	self.th_cache = cachepowerup;
-	self.th_update = updatepowerup;
 	StartItem ();
 };
 
@@ -1282,7 +1204,6 @@ void () item_artifact_envirosuit =
 	self.netname = "Biosuit";
 	self.items = IT_SUIT;
 	setsize (self, '-16 -16 -24', '16 16 32');
-	self.th_weight = artifactweight;
 	StartItem ();
 };
 
@@ -1303,9 +1224,6 @@ void () item_artifact_invisibility =
 	self.netname = "Ring of Shadows";
 	self.items = IT_INVISIBILITY;
 	setsize (self, '-16 -16 -24', '16 16 32');
-	self.th_weight = artifactweight;
-	self.th_cache = cachepowerup;
-	self.th_update = updatepowerup;
 	StartItem ();
 };
 
@@ -1326,9 +1244,6 @@ void () item_artifact_super_damage =
 	self.netname = "Quad Damage";
 	self.items = IT_QUAD;
 	setsize (self, '-16 -16 -24', '16 16 32');
-	self.th_weight = artifactweight;
-	self.th_cache = cachepowerup;
-	self.th_update = updatepowerup;
 	StartItem ();
 };
 
@@ -1356,25 +1271,22 @@ void () BackpackTouch =
 
 	if ((other.classname != "player") && (other.classname != "dmbot")) // FIX ME - add to pk
 			return;
-	if (other.classname == "dmbot")
+	if (other.classname == "dmbot") // *bot
 		bot_toucheditem ();
 	if (other.health <= 0)
 		return ;
 
 	acount = 0;
-//	if (other.classname == "player")
-//	{
-		sprint (other,"You get ");
+	sprint (other,"You get ");
 
-		if (self.items)
-		if ((other.items & self.items) == 0)
-			{
-				acount = 1;
-				sprint (other,"the ");
-				sprint (other,self.netname);
-			}
+	if (self.items)
+	if ((other.items & self.items) == 0)
+		{
+			acount = 1;
+			sprint (other,"the ");
+			sprint (other,self.netname);
+		}
 
-//	}
 // if the player was using his best weapon, change up to the new one if better
 	stemp = self;
 	self = other;
@@ -1395,50 +1307,47 @@ void () BackpackTouch =
 
 	bound_other_ammo ();
 
-//	if (other.classname == "player")
-//	{
-		if (self.ammo_shells)
-		{
-			if (acount)
-				sprint (other,", ");
-			acount = 1;
-			s = ftos (self.ammo_shells);
-			sprint (other,s);
-			sprint (other," shells");
-		}
-		if (self.ammo_nails)
-		{
-			if (acount)
-				sprint (other,", ");
-			acount = 1;
-			s = ftos (self.ammo_nails);
-			sprint (other,s);
-			sprint (other," nails");
-		}
-		if (self.ammo_rockets)
-		{
-			if (acount)
-				sprint (other,", ");
-			acount = 1;
-			s = ftos (self.ammo_rockets);
-			sprint (other,s);
-			sprint (other," rockets");
-		}
-		if (self.ammo_cells)
-		{
-			if (acount)
-				sprint (other,", ");
-			acount = 1;
-			s = ftos (self.ammo_cells);
-			sprint (other,s);
-			sprint (other," cells");
-		}
+	if (self.ammo_shells)
+	{
+		if (acount)
+			sprint(other, ", ");
+		acount = 1;
+		s = ftos(self.ammo_shells);
+		sprint (other, s);
+		sprint (other, " shells");
+	}
+	if (self.ammo_nails)
+	{
+		if (acount)
+			sprint(other, ", ");
+		acount = 1;
+		s = ftos(self.ammo_nails);
+		sprint (other, s);
+		sprint (other, " nails");
+	}
+	if (self.ammo_rockets)
+	{
+		if (acount)
+			sprint(other, ", ");
+		acount = 1;
+		s = ftos(self.ammo_rockets);
+		sprint (other, s);
+		sprint (other, " rockets");
+	}
+	if (self.ammo_cells)
+	{
+		if (acount)
+			sprint(other, ", ");
+		acount = 1;
+		s = ftos(self.ammo_cells);
+		sprint (other, s);
+		sprint (other, " cells");
+	}
 
-		sprint (other,"\n");
-		stuffcmd (other,"bf\n");
-//	}
+	sprint (other, "\n");
 // backpack touch sound
 	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
+	stuffcmd (other, "bf\n");
 
 // remove the backpack, change self to the player
 	remove (self);
@@ -1463,8 +1372,8 @@ void () DropBackpack =
 	if (PK)
 	{
 		PK_DropBackpack();
-//		item.classname = "Backpack"; // FIX ME
-//		item.th_weight = backpackweight;
+		newmis.classname = "Backpack"; // *bot
+		newmis.th_weight = backpackweight; // *bot
 		return;
 	}
 	local entity item;
@@ -1513,6 +1422,6 @@ void () DropBackpack =
 
 	item.nextthink = time + 120;	// remove after 2 minutes
 	item.think = SUB_Remove;
-	item.classname = "Backpack";
-	item.th_weight = backpackweight;
+	item.classname = "Backpack"; // * bot
+	item.th_weight = backpackweight; // *bot
 };

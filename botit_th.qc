@@ -574,11 +574,11 @@ void () printIntro =
 		{
 			addTeamBots (self,num);
 		}
-		centerprint (self,"Server running team Reaper (quake) bots v1.1\nand PainKeep v1.1");
+		centerprint (self,"Server running team pk*bots v1.1\nand PainKeep v1.1");
 	}
 	else
 	{
-		centerprint (self,"Server running Reaper (quake) bots v1.1\nand PainKeep v1.1");
+		centerprint (self,"Server running pk*bots v1.1\nand PainKeep v1.1");
 	}
 };
 

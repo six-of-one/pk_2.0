@@ -722,7 +722,7 @@ void (float dist) ai_run =
 		self.search_time = time + 5;
 
 // look for other coop players
-	if ((coop || deathmatch) && (self.search_time < time)) // *reaper
+	if ((coop || deathmatch) && (self.search_time < time)) // *bot
 	{
 		if (FindTarget ())
 			return ;

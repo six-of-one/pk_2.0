@@ -61,7 +61,6 @@ void () button_use =
 
 	if (other.classname == "dmbot")
 		bot_triggered (other);
-
 	button_fire ();
 };
 

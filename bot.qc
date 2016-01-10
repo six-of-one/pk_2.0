@@ -330,7 +330,7 @@ float () getrandombotskin =
 void() bot_skinParms =
 {
 
-//	reaper skin code - not sure to include - requiers parm mod
+//	*bot skin code - not sure to include - requiers parm mod
 
 	local float offset;
 	local float toffset;
@@ -395,6 +395,8 @@ void() bot_skinDecode =
 	}
 };
 
+// deprecated into below
+/*
 void() set_CarriedPath =
 {
 	if (self.movetarget == world)
@@ -409,7 +411,12 @@ void() set_CarriedPath =
 		NUMPATHERS = (NUMPATHERS + 1);
 	}
 	self.pather = 1;
+
+// other init code
+	self.th_cache = cacheenemy;
+
 };
+*/
 
 void() set_initBotLevel =
 {
@@ -425,8 +432,125 @@ void() set_initBotLevel =
 	{
 		initBotLevel ();
 	}
+
+// from prev fn()
+	if (self.movetarget == world)
+	{
+		NewCarriedPath ();
+	}
+	setorigin (self.movetarget,self.origin);
+	self.movetarget.movetarget = world;
+	self.pathtype = NEVERTARGET;
+	if (!self.pather)
+	{
+		NUMPATHERS = (NUMPATHERS + 1);
+	}
+	self.pather = 1;
+
+// other init code
+	self.th_cache = cacheenemy;
 };
 
+// client connect / disconnect handle for *bots
+
+void(float con) bot_con =
+{
+// connection
+	if (con)
+	{
+		self.id = FindGood ();
+		self.impulse = 204; // printinit
+		randombotskin = getrandombotskin ();
+		initscore ();
+	}
+	else // disconnect
+	{
+		MakeGood (self.id);
+		self.classname = "nobody";
+	}
+};
+
+// count bot kills & deaths for scoreboard - extract from ClientObituary, called after ClientObit divert
+
+void(entity targ, entity attacker) bot_kill =
+{
+	local	float rnum;
+	local	string deathstring, deathstring2;
+	rnum = random();
+
+	if ((targ.classname == "player") || (targ.classname == "dmbot"))
+	{
+		if (attacker.classname == "teledeath")
+		{
+//			attacker.owner.frags = attacker.owner.frags + 1;
+			if (attacker.owner.classname == "dmbot")
+			{
+				TELEFRAGFLAG = 1;
+			}
+			countkill (attacker.owner,targ);
+			if (attacker.owner.classname == "dmbot")
+			{
+				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
+				WriteByte (MSG_ALL,attacker.owner.id);
+				WriteShort (MSG_ALL,attacker.owner.frags);
+			}
+			return;
+		}
+
+		if (attacker.classname == "teledeath2")
+		{
+//			targ.frags = targ.frags - 1;
+			countkill (targ,targ);
+			if (targ.classname == "dmbot")
+			{
+				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
+				WriteByte (MSG_ALL,targ.id);
+				WriteShort (MSG_ALL,targ.frags);
+			}
+			return;
+		}
+
+		if ((attacker.classname == "player") || (attacker.classname == "dmbot"))
+		{
+			if (targ == attacker)
+			{
+				// killed self
+//				attacker.frags = attacker.frags - 1;
+				if (attacker.classname == "dmbot")
+				{
+					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
+					WriteByte (MSG_ALL,attacker.id);
+					WriteShort (MSG_ALL,attacker.frags);
+				}
+				countkill (attacker,attacker);
+			
+				return;
+			}
+			else if ((teamplay == 2) && (targ.team > 0)&&(targ.team == attacker.team))
+			{
+//				attacker.frags = attacker.frags - 1;
+				return;
+			}
+			else
+			{
+//				attacker.frags = attacker.frags + 1;
+				if (attacker.classname == "dmbot")
+				{
+					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
+					WriteByte (MSG_ALL,attacker.id);
+					WriteShort (MSG_ALL,attacker.frags);
+				}
+				countkill (attacker,targ);
+			}
+			return;
+		}
+		else
+		{
+//			targ.frags = targ.frags - 1;
+			countkill (targ,targ);
+		}
+	}
+};
 
 /*
  * Cataboligne
@@ -463,4 +587,195 @@ void(entity	client, string s) centerprint =
 };
 */
 
+// bot touch - do bot stuff for some items - removed touch hooks
 
+void() bot_touch =
+{
+	
+	if (self.state == CACHE_ROUTE_TOUCH)
+	{
+		if (other.movetarget.movetarget){
+			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
+bprint("hi, code base here, ran bot cacheRoute for item ( ");
+bprint(self.classname);
+bprint(" , ");
+bprint(self.netname);
+bprint(" )\n");
+}
+	}
+//	self.bot_item_touch();
+	self.pk_touch();
+};
+
+// remove item hooks & put here - code diverts here from PlaceItem
+
+void(entity e) bot_item_linx =
+{
+if (e.state)
+{
+bprint("hi, code base here with a dev note, this is odd: bot item ( ");
+bprint(e.classname);
+bprint(" , ");
+bprint(e.netname);
+bprint(" ) - already has .state set?\n");
+}
+
+// clear state for cacheRoute calls
+	e.state = 0;
+// set bot item master touch
+	if (!PK)
+	{
+//		e.bot_item_touch = e.touch;
+		e.pk_touch = e.touch;
+	}
+// health items
+	if (e.classname == "item_health") // || e.model == "maps/b_bh10.bsp" / "maps/b_bh25.bsp / maps/b_bh100.bsp
+	{
+//bprint("in bot item health\n");
+		e.th_weight = healthweight;
+		if (e.healtype == 2) // || e.model == "maps/b_bh100.bsp"
+		{
+			e.th_cache = cachepowerup;
+			e.th_update = updatepowerup;	
+			e.state = CACHE_ROUTE_TOUCH;
+			if (!PK) e.touch = bot_touch;
+		}
+		return;
+	}
+
+// armor
+	if (e.model == "progs/armor.mdl") // IDEA: how to catch armor if model can change?
+	{
+//bprint("in bot item armor\n");
+		e.th_weight = armorweight;
+		e.th_cache = cachearmor;
+		e.th_update = updatearmor;
+		e.state = CACHE_ROUTE_TOUCH;
+		if (!PK) e.touch = bot_touch;
+		return;
+	}
+
+// weapons
+	if (e.classname == "weapon_supershotgun")
+	{
+		e.th_weight = ssgweight;
+	}
+	else if (e.classname == "weapon_nailgun")
+	{
+		e.th_weight = nailgunweight;
+	}
+	else if (e.classname == "weapon_supernailgun")
+	{
+		e.th_weight = supernailweight;
+		e.th_cache = cachenail;
+		e.th_update = updatenail;
+		e.state = CACHE_ROUTE_TOUCH;
+		if (!PK) e.touch = bot_touch;
+	}
+	else if (e.classname == "weapon_grenadelauncher")
+	{
+		e.th_weight = glauncherweight;
+		e.th_cache = cachegrenade;
+		e.th_update = updategrenade;
+		e.state = CACHE_ROUTE_TOUCH;
+		if (!PK) e.touch = bot_touch;
+	}
+	else if (e.classname == "weapon_rocketlauncher")
+	{
+		e.th_weight = rlauncherweight;
+		e.th_cache = cacherocket;
+		e.th_update = updaterocket;
+		e.state = CACHE_ROUTE_TOUCH;
+		if (!PK) e.touch = bot_touch;
+	}
+	else if (e.classname == "weapon_lightning")
+	{
+		e.th_weight = lightningweight;
+		e.th_cache = cachelightning;
+		e.th_update = updatelightning;
+		e.state = CACHE_ROUTE_TOUCH;
+		if (!PK) e.touch = bot_touch;
+	}
+	if (e.touch == weapon_touch || e.pk_touch == weapon_touch) return;
+
+// ammo
+	if (e.classname == "item_shells")
+	{
+		e.th_weight = shellweight;
+	}
+	else if (e.classname == "item_spikes")
+	{
+		e.th_weight = nailweight;
+	}
+	else if (e.classname == "item_rockets")
+	{
+		e.th_weight = rocketweight;
+	}
+	else if (e.classname == "item_cells")
+	{
+		e.th_weight = cellweight;
+	}
+	if (e.touch == ammo_touch || e.pk_touch == ammo_touch) return;
+
+// artifacts
+	if (e.touch == powerup_touch || e.pk_touch == powerup_touch)
+	{
+//bprint("in bot item powerup\n");
+		e.th_weight = artifactweight;
+		if (e.classname != "item_artifact_envirosuit")
+		{
+			e.th_weight = artifactweight;
+			e.th_cache = cachepowerup;
+			e.th_update = updatepowerup;
+			e.state = CACHE_ROUTE_TOUCH;
+			if (!PK) e.touch = bot_touch;
+		}
+		return;
+	}
+
+// any painkeep item - seems coder didnt program bot for these
+	if (e.pk_items || e.pk_currentitem || e.netname == "Exploding Shells") // yuk :(~
+	{
+//bprint("in bot item PK\n");
+	e.th_weight = dont_weight;
+	return;
+	}
+
+bprint("hi, code base here, this is odd: bot item ( ");
+bprint(e.classname);
+bprint(" , ");
+bprint(e.netname);
+bprint(" ) - fell through tests!\n");
+
+/* deprecated for easy code above
+	if (e.classname == "item_artifact_super_damage")
+	{
+		e.th_weight = artifactweight;
+		e.th_cache = cachepowerup;
+		e.th_update = updatepowerup;
+	}
+	else if (e.classname == "item_artifact_invulnerability")
+	{
+		e.th_weight = artifactweight;
+		e.th_cache = cachepowerup;
+		e.th_update = updatepowerup;
+	}
+	else if (e.classname == "item_artifact_invisibility")
+	{
+		e.th_weight = artifactweight;
+		e.th_cache = cachepowerup;
+		e.th_update = updatepowerup;
+	}
+	else if (e.classname == "item_artifact_envirosuit")
+	{
+		e.th_weight = artifactweight;
+	}
+	if (e.touch == powerup_touch || e.pk_touch == powerup_touch) return;
+*/
+
+
+//	else if (e.classname == "")
+//	{
+//
+//	}
+};

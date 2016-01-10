@@ -656,9 +656,9 @@ void () W_FireGrenade =
 		}
 		else
 		{
-			missile.velocity = aim (self,10000);
+		missile.velocity = aim (self,10000);
 		missile.velocity = missile.velocity * 600;
-			missile.velocity_z = 200;
+		missile.velocity_z = 200;
 		}
 	}
 

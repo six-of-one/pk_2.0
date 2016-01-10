@@ -94,6 +94,7 @@ void(entity targ, entity attacker) Killed =
 	if (PK) PK_ClientObituary(self, damage_inflictor, attacker);
 	else
 	ClientObituary(self, attacker);
+	bot_kill(self, attacker); // *bot - tie in to count bot kills / deaths
 
 	self.takedamage = DAMAGE_NO;
 	self.touch = SUB_Null;
@@ -223,18 +224,18 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	else
 	{
 
-		if ((self.flags & FL_MONSTER) && attacker != world)
+	if ((self.flags & FL_MONSTER) && attacker != world)
+	{
+	// get mad unless of the same class (except for soldiers)
+		if (self != attacker && attacker != self.enemy)
 		{
-// get mad unless of the same class (except for soldiers)
-			if (self != attacker && attacker != self.enemy)
+			if ( (self.classname != attacker.classname)
+			|| (self.classname == "monster_army" ) )
 			{
-				if ((self.classname != attacker.classname)
-				|| (self.classname == "monster_army"))
-				{
-					if (self.enemy.classname == "player")
-						self.oldenemy = self.enemy;
-					self.enemy = attacker;
-					FoundTarget ();
+				if (self.enemy.classname == "player")
+					self.oldenemy = self.enemy;
+				self.enemy = attacker;
+				FoundTarget ();
 				}
 			}
 		}

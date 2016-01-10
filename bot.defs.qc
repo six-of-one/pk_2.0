@@ -2,9 +2,14 @@
 // bot consts & protos
 // **************************************
 
-float MSG_UPDATENAME	 = 13;
-float MSG_UPDATEFRAGS	 = 14;
-float MSG_UPDATECOLORS	 = 17;
+float MSG_UPDATENAME			= 13;
+float MSG_UPDATEFRAGS		= 14;
+float MSG_UPDATECOLORS		= 17;
+
+// if .state ==, call cacheRoute when touching this item
+float CACHE_ROUTE_TOUCH		= -1559742;
+// do item touch bot checks - disabled because PK has its own master touch
+//.void() bot_item_touch; 
 
 .float id;
 
@@ -21,8 +26,13 @@ void () NewCarriedPath;
 void () initBotLevel;
 void() bot_skinParms;
 void() bot_skinDecode;
-void() set_CarriedPath;
+//void() set_CarriedPath;
 void() set_initBotLevel;
+void(float con) bot_con;
+void(entity targ, entity attacker) bot_kill;
+
+// item links
+void(entity e) bot_item_linx;
 
 // takeover, solves print to bot issues
 // inactive while installed with frikbot code, which was adapted

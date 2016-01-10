@@ -110,7 +110,6 @@ void () multi_touch =
 		multi_trigger ();
 		return ;
 	}
-
 // if the trigger has an angles field, check player's facing direction
 	if (self.movedir != '0 0 0')
 	{
@@ -582,8 +581,7 @@ void () trigger_onlyregistered_touch =
 	{
 		if (self.message != "")
 		{
-//			if (other.classname == "player")
-				centerprint (other,self.message);
+			centerprint (other,self.message);
 			sound (other, CHAN_BODY, "misc/talk.wav", 1, ATTN_NORM);
 		}
 	}
