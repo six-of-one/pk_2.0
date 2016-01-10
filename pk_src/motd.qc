@@ -13,7 +13,7 @@ void() connectmessage =
 
 	Line3 = "Version 1.11\n";
 
-if (self.classname != "dmbot" && (!FRIKBOT ||self.ishuman))
+if (self.classname != "pk*bot" && (!FRIKBOT ||self.ishuman))
 {
 	// The welcome message
 	if (self.msgcount == 1)

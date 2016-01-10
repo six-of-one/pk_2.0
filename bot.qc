@@ -22,130 +22,86 @@ float () FindGood =
 		fActiveClients = (fActiveClients | 1);
 		return (1);
 	}
+	else if (!(fActiveClients & 2))
+	{
+		fActiveClients = (fActiveClients | 2);
+		return (2);
+	}
+	else if (!(fActiveClients & 4))
+	{
+		fActiveClients = (fActiveClients | 4);
+		return (3);
+	}
+	else if (!(fActiveClients & 8))
+	{
+		fActiveClients = (fActiveClients | 8);
+		return (4);
+	}
+	else if (!(fActiveClients & 16))
+	{
+		fActiveClients = (fActiveClients | 16);
+		return(TE_LIGHTNING1);
+	}
+	else if (!(fActiveClients & 32))
+	{
+		fActiveClients = (fActiveClients | 32);
+		return (6);
+	}
+	else if (!(fActiveClients & 64))
+	{
+		fActiveClients = (fActiveClients | 64);
+		return (7);
+	}
+	else if (!(fActiveClients & 128))
+	{
+		fActiveClients = (fActiveClients | 128);
+		return (8);
+	}
+	else if (!(fActiveClients & 256))
+	{
+		fActiveClients = (fActiveClients | 256);
+		return (9);
+	}
+	else if (!(fActiveClients & 512))
+	{
+		fActiveClients = (fActiveClients | 512);
+		return (10);
+	}
+	else if (!(fActiveClients & 1024))
+	{
+		fActiveClients = (fActiveClients | 1024);
+		return (11);
+	}
+	else if (!(fActiveClients & 2048))
+	{
+		fActiveClients = (fActiveClients | 2048);
+		return(12);
+	}
+	else if (!(fActiveClients & 4096))
+	{
+		fActiveClients = (fActiveClients | 4096);
+		return (13);
+	}
+	else if (!(fActiveClients & 8192))
+	{
+		fActiveClients = (fActiveClients | 8192);
+		return(14);
+	}
+	else if (!(fActiveClients & 16384))
+	{
+		fActiveClients = (fActiveClients | 16384);
+		return(15);
+	}
+	else if (!(fActiveClients & 32768))
+	{
+		fActiveClients = (fActiveClients | 32768);
+		return (16);
+	}
 	else
 	{
-		if (!(fActiveClients & WEAPON_ROCKET))
-		{
-			fActiveClients = (fActiveClients | 2);
-			return (2);
-		}
-		else
-		{
-			if (!(fActiveClients & WEAPON_SPIKES))
-			{
-				fActiveClients = (fActiveClients | 4);
-				return (3);
-			}
-			else
-			{
-				if (!(fActiveClients & WEAPON_BIG))
-				{
-					fActiveClients = (fActiveClients | 8);
-					return (4);
-				}
-				else
-				{
-					if (!(fActiveClients & 16))
-					{
-						fActiveClients = (fActiveClients | 16);
-						return(TE_LIGHTNING1);
-					}
-					else
-					{
-						if (!(fActiveClients & 32))
-						{
-							fActiveClients = (fActiveClients | 32);
-							return (6);
-						}
-						else
-						{
-							if (!(fActiveClients & 64))
-							{
-								fActiveClients = (fActiveClients | 64);
-								return (7);
-							}
-							else
-							{
-								if (!(fActiveClients & 128))
-								{
-									fActiveClients = (fActiveClients | 128);
-									return (8);
-								}
-								else
-								{
-									if (!(fActiveClients & 256))
-									{
-										fActiveClients = (fActiveClients | 256);
-										return (9);
-									}
-									else
-									{
-										if (!(fActiveClients & 512))
-										{
-											fActiveClients = (fActiveClients | 512);
-											return (10);
-										}
-										else
-										{
-											if (!(fActiveClients & 1024))
-											{
-												fActiveClients = (fActiveClients | 1024);
-												return (11);
-											}
-											else
-											{
-												if (!(fActiveClients & 2048))
-												{
-													fActiveClients = (fActiveClients | 2048);
-													return(12);
-												}
-												else
-												{
-													if (!(fActiveClients & 4096))
-													{
-														fActiveClients = (fActiveClients | 4096);
-														return (13);
-													}
-													else
-													{
-														if (!(fActiveClients & 8192))
-														{
-															fActiveClients = (fActiveClients | 8192);
-															return(MSG_UPDATEFRAGS);
-														}
-														else
-														{
-															if (!(fActiveClients & 16384))
-															{
-																fActiveClients = (fActiveClients | 16384);
-																return(15);
-															}
-															else
-															{
-																if (!(fActiveClients & INITLEVEL))
-																{
-																	fActiveClients = (fActiveClients | INITLEVEL);
-																	return (16);
-																}
-																else
-																{
-																	return (-1);
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+		return (-1);
 	}
+
 };
 
 void (float abba) MakeGood =
@@ -177,18 +133,15 @@ void (entity c) PrintClientScore =
 	{
 		bprint (" ");
 	}
-	else
+	else if (c.frags >= 0)
 	{
-		if (c.frags >= 0)
+		if (c.frags < 100)
 		{
-			if (c.frags < 100)
-			{
-				bprint (" ");
-			}
-			if (c.frags < 10)
-			{
-				bprint (" ");
-			}
+			bprint (" ");
+		}
+		if (c.frags < 10)
+		{
+			bprint (" ");
 		}
 	}
 };
@@ -228,17 +181,14 @@ void () DumpScore =
 						e.chain = world;
 						walk.chain = e;
 					}
+					else if (walk.chain.frags < e.frags)
+					{
+						e.chain = walk.chain;
+						walk.chain = e;
+					}
 					else
 					{
-						if (walk.chain.frags < e.frags)
-						{
-							e.chain = walk.chain;
-							walk.chain = e;
-						}
-						else
-						{
-							walk = walk.chain;
-						}
+						walk = walk.chain;
 					}
 				} while (walk.chain != e);
 			}
@@ -644,8 +594,32 @@ bprint(" )\n");}
 	}
 //	self.bot_item_touch();
 	self.pk_touch();
-	if (e) e.classname = "pk*bot";
+	if (e)
+	{
+		if (e.think == player_run) e.think = e.th_run;
+		if (e.think == player_stand1) e.think = e.th_stand;
+		e.classname = "pk*bot";
+if (0) {
+bprint("hi, code base here, bot touched item ( ");
+bprint(self.classname);
+bprint(" , ");
+bprint(self.netname);
+if (self.solid == SOLID_NOT) bprint(") and collected it.\n");
+else bprint(" )\n");}
+	}
 };
+
+// backpack setup special 
+void(entity e) bot_BackpackSetup =
+{
+//	e.bot_item_touch = e.touch;
+	e.pk_touch = e.touch;
+	e.touch = bot_touch;
+	e.classname = "Backpack"; // *bot backpack code follows
+	e.th_weight = backpackweight;
+	e.state = BOT_TOUCHED;
+	if (PK) e.touch = painkeep_touch; // *pk
+}
 
 // remove item hooks & put here - code diverts here from PlaceItem
 
@@ -667,6 +641,7 @@ bprint(" ) - already has .state set?\n");
 	{
 //		e.bot_item_touch = e.touch;
 		e.pk_touch = e.touch;
+		e.touch = bot_touch;
 	}
 // health items
 	if (e.classname == "item_health") // || e.model == "maps/b_bh10.bsp" / "maps/b_bh25.bsp / maps/b_bh100.bsp
@@ -679,7 +654,6 @@ bprint(" ) - already has .state set?\n");
 			e.th_cache = cachepowerup;
 			e.th_update = updatepowerup;	
 			e.state = BOT_TOUCHED_CACHE_ROUTE_TOUCH;
-			if (!PK) e.touch = bot_touch;
 		}
 		return;
 	}
@@ -692,7 +666,6 @@ bprint(" ) - already has .state set?\n");
 		e.th_cache = cachearmor;
 		e.th_update = updatearmor;
 		e.state = BOT_TOUCHED_CACHE_ROUTE_TOUCH;
-		if (!PK) e.touch = bot_touch;
 		return;
 	}
 
@@ -711,7 +684,6 @@ bprint(" ) - already has .state set?\n");
 		e.th_cache = cachenail;
 		e.th_update = updatenail;
 		e.state = CACHE_ROUTE_TOUCH;
-		if (!PK) e.touch = bot_touch;
 	}
 	else if (e.classname == "weapon_grenadelauncher")
 	{
@@ -719,7 +691,6 @@ bprint(" ) - already has .state set?\n");
 		e.th_cache = cachegrenade;
 		e.th_update = updategrenade;
 		e.state = CACHE_ROUTE_TOUCH;
-		if (!PK) e.touch = bot_touch;
 	}
 	else if (e.classname == "weapon_rocketlauncher")
 	{
@@ -727,7 +698,6 @@ bprint(" ) - already has .state set?\n");
 		e.th_cache = cacherocket;
 		e.th_update = updaterocket;
 		e.state = CACHE_ROUTE_TOUCH;
-		if (!PK) e.touch = bot_touch;
 	}
 	else if (e.classname == "weapon_lightning")
 	{
@@ -735,7 +705,6 @@ bprint(" ) - already has .state set?\n");
 		e.th_cache = cachelightning;
 		e.th_update = updatelightning;
 		e.state = CACHE_ROUTE_TOUCH;
-		if (!PK) e.touch = bot_touch;
 	}
 	if (e.touch == weapon_touch || e.pk_touch == weapon_touch) return;
 
@@ -773,7 +742,6 @@ bprint(" ) - already has .state set?\n");
 			e.th_cache = cachepowerup;
 			e.th_update = updatepowerup;
 			e.state = CACHE_ROUTE_TOUCH;
-			if (!PK) e.touch = bot_touch;
 		}
 		return;
 	}

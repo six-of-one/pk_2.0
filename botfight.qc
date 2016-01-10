@@ -79,7 +79,7 @@ vector () botaim =
 	else
 	{
 		src = self.origin;
-		if (self.weapon & ((IT_ROCKET_LAUNCHER + IT_SUPER_NAILGUN) + IT_NAILGUN))
+		if (self.weapon & (IT_ROCKET_LAUNCHER | IT_SUPER_NAILGUN | IT_NAILGUN))
 		{
 			src = (src + '0 0 16');
 		}

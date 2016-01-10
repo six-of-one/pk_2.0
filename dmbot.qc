@@ -547,30 +547,21 @@ void () BotDie =
 	{
 		bot_diea1 ();
 	}
+	else if (i == 2)
+	{
+		bot_dieb1 ();
+	}
+	else if (i == 3)
+	{
+		bot_diec1 ();
+	}
+	else if (i == 4)
+	{
+		bot_died1 ();
+	}
 	else
 	{
-		if (i == 2)
-		{
-			bot_dieb1 ();
-		}
-		else
-		{
-			if (i == 3)
-			{
-				bot_diec1 ();
-			}
-			else
-			{
-				if (i == 4)
-				{
-					bot_died1 ();
-				}
-				else
-				{
-					bot_diee1 ();
-				}
-			}
-		}
+		bot_diee1 ();
 	}
 };
 

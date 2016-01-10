@@ -299,6 +299,7 @@ float(float w, float w2) PK_RankForWeapon;
 void(float new, float new2) PK_Deathmatch_Weapon;
 void() PK_DropBackpack;
 void() PK_BackpackTouch;
+//void(entity e) PK_BackpackSetup;
 
 // player code
 void() bolt_fire;

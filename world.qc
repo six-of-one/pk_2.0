@@ -305,7 +305,7 @@ void () worldspawn =
 	precache_model ("progs/zom_gib.mdl");
 
 	precache_model ("progs/v_light.mdl");
-	setBotGravity ();
+	setBotGravity (); // *bot
 
 
 //

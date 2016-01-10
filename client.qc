@@ -1303,17 +1303,6 @@ void(entity targ, entity attacker) ClientObituary =
 			bprint ("\n");
 
 			attacker.owner.frags = attacker.owner.frags + 1;
-/*			if (attacker.owner.classname == "pk*bot")
-			{
-				TELEFRAGFLAG = 1;
-			}
-			countkill (attacker.owner,targ);
-			if (attacker.owner.classname == "pk*bot")
-			{
-				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
-				WriteByte (MSG_ALL,attacker.owner.id);
-				WriteShort (MSG_ALL,attacker.owner.frags);
-			}*/
 			return;
 		}
 
@@ -1324,29 +1313,15 @@ void(entity targ, entity attacker) ClientObituary =
 			bprint ("'s telefrag\n");
 
 			targ.frags = targ.frags - 1;
-/*			countkill (targ,targ);
-			if (targ.classname == "pk*bot")
-			{
-				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
-				WriteByte (MSG_ALL,targ.id);
-				WriteShort (MSG_ALL,targ.frags);
-			}*/
 			return;
 		}
 
-		if ((attacker.classname == "player") || (attacker.classname == "pk*bot"))
+		if (attacker.classname == "player")
 		{
 			if (targ == attacker)
 			{
 				// killed self
 				attacker.frags = attacker.frags - 1;
-/*				if (attacker.classname == "pk*bot")
-				{
-					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
-					WriteByte (MSG_ALL,attacker.id);
-					WriteShort (MSG_ALL,attacker.frags);
-				}
-				countkill (attacker,attacker);*/
 				bprint (targ.netname);
 				
 				if (targ.weapon == 64 && targ.waterlevel > 1)
@@ -1378,13 +1353,7 @@ void(entity targ, entity attacker) ClientObituary =
 			else
 			{
 				attacker.frags = attacker.frags + 1;
-/*				if (attacker.classname == "pk*bot")
-				{
-					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
-					WriteByte (MSG_ALL,attacker.id);
-					WriteShort (MSG_ALL,attacker.frags);
-				}
-				countkill (attacker,targ);*/
+
 				rnum = attacker.weapon;
 				if (rnum == IT_AXE)
 				{
@@ -1449,7 +1418,6 @@ void(entity targ, entity attacker) ClientObituary =
 		else
 		{
 			targ.frags = targ.frags - 1;
-//			countkill (targ,targ);
 			bprint (targ.netname);
 
 			// killed by a montser?

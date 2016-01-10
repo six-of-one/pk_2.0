@@ -38,6 +38,7 @@ void(entity targ, entity attacker) bot_kill;
 
 // item links
 void(entity e) bot_item_linx;
+void(entity e) bot_BackpackSetup;
 
 // takeover, solves print to bot issues
 // inactive while installed with frikbot code, which was adapted

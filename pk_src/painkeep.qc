@@ -161,7 +161,7 @@ void() PK_precache =
 	if (chaos == DARKPLACES_ENGINE)
 	{
 		registercvar("sv_pk_mode", "0");
-		pk_mode = cvar("sv_pk_mode");
+		pk_mode = cvar("sv_pk_mode") & 3;
 	}
 	else
 	{
@@ -273,6 +273,7 @@ void() PK_precache =
 
 // called from many places - handles pk_mode 0 where map sets whether or not we use PK stuff
 
+// really sound(), mod for frikbot code
 void(entity e, float chan, string samp, float vol, float atten) pk_sound = 
 {
 	local string psamp;
@@ -286,6 +287,7 @@ void(entity e, float chan, string samp, float vol, float atten) pk_sound =
 		if (samp == "misc/secret.wav") psamp = "alt_sounds/misc/secret.wav";
 	}
 
+// pk_sound() - fn() here plays actual sound
 	frik_sound(e, chan, psamp, vol, atten);
 };
 
@@ -312,7 +314,7 @@ void(vector pos, string samp, float vol, float atten) ambientsound =
 		else if (samp == "ambience/hum1.wav") psamp = "alt_ambience/hum1.wav";
 		else if (psamp != samp) precache_sound(psamp);
 	}
-		pk_ambientsound(pos, psamp, vol, atten);
+	pk_ambientsound(pos, psamp, vol, atten);
 };
 
 // called from below

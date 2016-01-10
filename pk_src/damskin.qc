@@ -7,7 +7,7 @@
 
 void(entity targ)	pk_setDamageSkin =
 {
-	if (targ.classname == "player" || targ.classname == "dmbot")
+	if (targ.classname == "player" || targ.classname == "pk*bot")
 	{
 		if (targ.health > 75)
 	  {

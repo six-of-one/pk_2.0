@@ -116,6 +116,7 @@ void()	btf_2 =	[$bear03, btf ] {setmodel (self, "progs/bearbld.mdl");};
 
 void() beartrapTouch =
 {
+	if (other.classname != "pk*bot") // *pk - bots get bit
 	if (other.classname != "player")
 	  return;
 

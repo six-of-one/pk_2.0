@@ -387,7 +387,7 @@ void() hub_control_status =
 				str2 = first.map;
 			}
 
-			if (self.classname != "dmbot" && (!FRIKBOT ||self.ishuman))
+			if (self.classname != "pk*bot" && (!FRIKBOT ||self.ishuman))
 			{
 			if (self.map == string_null)
 			{
@@ -420,7 +420,7 @@ void() hub_control_status =
 				str2 = second.map;
 			}
 
-			if (self.classname != "dmbot" && (!FRIKBOT ||self.ishuman))
+			if (self.classname != "pk*bot" && (!FRIKBOT ||self.ishuman))
 			{
 			if (self.map == string_null)
 			{
@@ -922,7 +922,7 @@ void() WaitForVotesThink =
 				self.attack_state = 0;
 			}
 
-			if (self.classname != "dmbot" && self.ishuman)
+			if (self.classname != "pk*bot" && self.ishuman)
 			centerprint3(self, "You have just voted for ", self.map, ".\n\nPlease wait here while all other \nplayers finish voting.	Once all votes \nhave been cast, the winning \nlevel will start.\n");
 
 			return;

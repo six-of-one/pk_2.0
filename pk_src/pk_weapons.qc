@@ -126,6 +126,10 @@ void(float shots) W_FireShotgunExploder =
 	self.punchangle_x = -2 * shots;
 
 	self.currentammo = self.pk_explode_ammo = self.pk_explode_ammo - shots;
+
+	if (self.classname == "pk*bot")
+		dir = botaim ();
+	else
 	dir = aim (self, 100000);
 
 	if (shots == 1)

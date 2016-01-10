@@ -582,5 +582,5 @@ void () printIntro =
 	}
 };
 
-// Cataboligne - xreaper code implement
+// Cataboligne - xreaper add in code implement
 float XRP = 1; // if true xreap code will be used

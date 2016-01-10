@@ -338,6 +338,7 @@ bprint(" )\n");}
 		if (self.pk_touch == ammo_touch) self.pk_touch = pk_ammo_touch; // new fn for ammo collections
 
 		self.pk_touch();
+		if (self.solid == SOLID_NOT)
 		if (deathmatch == 3) // *pk - new dm mode settings
 		{
 			if (self.pk_touch == ammo_touch)
@@ -346,7 +347,19 @@ bprint(" )\n");}
 				self.nextthink = time + 20;
 		}
 
-		if (e) e.classname = "pk*bot";
+		if (e)
+		{
+			e.classname = "pk*bot";
+			if (e.think == player_run) e.think = e.th_run;
+			if (e.think == player_stand1) e.think = e.th_stand;
+if (0) {
+bprint("hi, code base here, in PK bot touched item ( ");
+bprint(self.classname);
+bprint(" , ");
+bprint(self.netname);
+if (self.solid == SOLID_NOT) bprint(") and collected it.\n");
+else bprint(" )\n");}
+		}
 		return;
 	}
 
@@ -663,6 +676,7 @@ void() PK_BackpackTouch =
 	local		entity	st1;
 	local	float	acount;
 
+//	if (other.classname != "pk*bot") // * bot
 	if (other.classname != "player") // pk - this is where the grap can grab stuff
 	{
 		grap_checkIfGrap();
@@ -670,6 +684,8 @@ void() PK_BackpackTouch =
 	}
 	if (other.health <= 0)
 		return;
+//	if (other.classname == "pk*bot") // *bot
+//		bot_toucheditem ();
 
 	acount = 0;
 	sprint (other, "You get ");
@@ -903,3 +919,4 @@ void() pk_placeitem =
 		self.netname = "Pulse Rifle";
 	}
 };
+

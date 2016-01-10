@@ -12,6 +12,7 @@
 
 
 void () AddAnotherBot;
+
 void () initBotLevel =
 {
 	local float num;
@@ -259,6 +260,7 @@ void () bot_run;
 void () bot_start;
 void () dmbot_melee;
 entity () botmovetarget;
+
 void () PutBotInServer =
 {
 	local entity spwn;
@@ -266,12 +268,12 @@ void () PutBotInServer =
 	local string tmp;
 	local float aimvar;
 	self.classname = "pk*bot";
-	self.health = MUST_HAVE;
+	self.health = 100;
 	self.takedamage = DAMAGE_AIM;
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 	self.show_hostile = 0;
-	self.max_health = MUST_HAVE;
+	self.max_health = 100;
 	self.air_finished = (time + 30);
 	self.dmg = 1;
 	self.super_damage_finished = 0;
@@ -353,6 +355,7 @@ void () PutBotInServer =
 	{
 		dprint ("Seems like sv_aim isn't 0.93\n");
 	}
+	if (PK) PK_CIS(); // *pk - set client pk elements
 };
 
 void () SpawnNewBot =
@@ -512,132 +515,91 @@ void () AddAnotherBot =
 		top = 1;
 		bottom = 6;
 	}
-	else
+	else if (NUMBOTS == 2)
 	{
-		if (NUMBOTS == 2)
-		{
-			newbot.netname = "Gamma";
-			top = 2;
-			bottom = 13;
-		}
-		else
-		{
-			if (NUMBOTS == 3)
-			{
-				newbot.netname = "Epsilon";
-				top = 4;
-				bottom = 11;
-			}
-			else
-			{
-				if (NUMBOTS == 4)
-				{
-					newbot.netname = "Delta";
-					top = NEVERTARGET;
-					bottom = 12;
-				}
-				else
-				{
-					if (NUMBOTS == 5)
-					{
-						newbot.netname = "Zeta";
-						top = 12;
-						bottom = 13;
-					}
-					else
-					{
-						if (NUMBOTS == 6)
-						{
-							newbot.netname = "Theta";
-							top = NAMEBOTS;
-							bottom = 4;
-						}
-						else
-						{
-							if (NUMBOTS == 7)
-							{
-								newbot.netname = "Lambda";
-								top = 1;
-								bottom = NEVERTARGET;
-							}
-							else
-							{
-								if (NUMBOTS == 8)
-								{
-									newbot.netname = "Omicron";
-									top = 4;
-									bottom = 9;
-								}
-								else
-								{
-									if (NUMBOTS == 9)
-									{
-										newbot.netname = "Xi";
-										top = NEVERTARGET;
-										bottom = 6;
-									}
-									else
-									{
-										if (NUMBOTS == 10)
-										{
-											newbot.netname = "Rho";
-											top = 11;
-											bottom = 10;
-										}
-										else
-										{
-											if (NUMBOTS == 11)
-											{
-												newbot.netname = "Sigma";
-												top = NAMEBOTS;
-												bottom = 13;
-											}
-											else
-											{
-												if (NUMBOTS == 12)
-												{
-													newbot.netname = "Tau";
-													top = 13;
-													bottom = 11;
-												}
-												else
-												{
-													if (NUMBOTS == 13)
-													{
-														newbot.netname = "Chi";
-														top = 12;
-														bottom = 11;
-													}
-													else
-													{
-														if (NUMBOTS == 14)
-														{
-															newbot.netname = "Psi";
-															top = 9;
-															bottom = 13;
-														}
-														else
-														{
-															if (NUMBOTS == 15)
-															{
-																newbot.netname = "Reaper";//Omega";
-																top = 10;
-																bottom = 9;
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+		newbot.netname = "Gamma";
+		top = 2;
+		bottom = 13;
 	}
+	else if (NUMBOTS == 3)
+	{
+		newbot.netname = "Epsilon";
+		top = 4;
+		bottom = 11;
+	}
+	else if (NUMBOTS == 4)
+	{
+		newbot.netname = "Delta";
+		top = 3;
+		bottom = 12;
+	}
+	else if (NUMBOTS == 5)
+	{
+		newbot.netname = "Zeta";
+		top = 12;
+		bottom = 13;
+	}
+	else if (NUMBOTS == 6)
+	{
+		newbot.netname = "Theta";
+		top = 0;
+		bottom = 4;
+	}
+	else if (NUMBOTS == 7)
+	{
+		newbot.netname = "Lambda";
+		top = 1;
+		bottom = 3;
+	}
+	else if (NUMBOTS == 8)
+	{
+		newbot.netname = "Omicron";
+		top = 4;
+		bottom = 9;
+	}
+	else if (NUMBOTS == 9)
+	{
+		newbot.netname = "Xi";
+		top = 3;
+		bottom = 6;
+	}
+	else if (NUMBOTS == 10)
+	{
+		newbot.netname = "Rho";
+		top = 11;
+		bottom = 10;
+	}
+	else if (NUMBOTS == 11)
+	{
+		newbot.netname = "Sigma";
+		top = NAMEBOTS;
+		bottom = 13;
+	}
+	else if (NUMBOTS == 12)
+	{
+		newbot.netname = "Tau";
+		top = 13;
+		bottom = 11;
+	}
+	else if (NUMBOTS == 13)
+	{
+		newbot.netname = "Chi";
+		top = 12;
+		bottom = 11;
+	}
+	else if (NUMBOTS == 14)
+	{
+		newbot.netname = "Psi";
+		top = 9;
+		bottom = 13;
+	}
+	else if (NUMBOTS == 15)
+	{
+		newbot.netname = "Pain*";
+		top = 10;
+		bottom = 9;
+	}
+
 	WriteByte (MSG_ALL,MSG_UPDATENAME);
 	WriteByte (MSG_ALL,newbot.id);
 	WriteString (MSG_ALL,newbot.netname);
@@ -666,23 +628,17 @@ void (entity ply, float n) addTeamBots =
 		{
 			newbot.netname = "[Bot0]";
 		}
+		else if (newbot.skil < 2)
+		{
+			newbot.netname = "[Bot1]";
+		}
+		else if (newbot.skil < 3)
+		{
+			newbot.netname = "[Bot2]";
+		}
 		else
 		{
-			if (newbot.skil < 2)
-			{
-				newbot.netname = "[Bot1]";
-			}
-			else
-			{
-				if (newbot.skil < 3)
-				{
-					newbot.netname = "[Bot2]";
-				}
-				else
-				{
-					newbot.netname = "[Bot3]";
-				}
-			}
+			newbot.netname = "[Bot3]";
 		}
 		i = (i - 1);
 	}
