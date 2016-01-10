@@ -171,7 +171,7 @@ void () health_touch =
 	local float amount;
 	local string s;
 
-	if ((other.classname != "player") && (other.classname != "dmbot"))
+	if ((other.classname != "player") && (other.classname != "pk*bot"))
 			return;
 
 	if (self.healtype == 2) // Megahealth?  Ignore max_health...
@@ -187,8 +187,8 @@ void () health_touch =
 			return ;
 	}
 
-	if (other.classname == "dmbot") // *bot
-		bot_toucheditem ();
+//	if (other.classname == "pk*bot") // *bot
+//		bot_toucheditem ();
 	sprint (other,"You receive ");
 	s = ftos (self.healamount);
 	sprint (other,s);
@@ -260,7 +260,7 @@ void () armor_touch =
 
 	if (other.health <= 0)
 		return;
-	if ((other.classname != "player") && (other.classname != "dmbot"))
+	if ((other.classname != "player") && (other.classname != "pk*bot"))
 			return;
 
 	if (self.classname == "item_armor1")
@@ -293,8 +293,8 @@ void () armor_touch =
   if (deathmatch == 1)
 		self.nextthink = time + 20;
 	self.think = SUB_regen;
-	if (other.classname == "dmbot") // *bot
-		bot_toucheditem ();
+//	if (other.classname == "pk*bot") // *bot
+//		bot_toucheditem ();
 
 	sprint(other, "You got armor\n");
 // armor touch sound
@@ -421,7 +421,7 @@ void () weapon_touch =
 	local entity stemp;
 	local float leave;
 
-	if ((other.classname != "player") && (other.classname != "dmbot"))
+	if ((other.classname != "player") && (other.classname != "pk*bot"))
 			return;
 
 // if the player was using his best weapon, change up to the new one if better
@@ -629,7 +629,7 @@ void () ammo_touch =
 	local entity stemp;
 	local float best;
 
-	if ((other.classname != "player") && (other.classname != "dmbot"))
+	if ((other.classname != "player") && (other.classname != "pk*bot"))
 			return ;
 	if (other.health <= 0)
 		return;
@@ -672,9 +672,8 @@ void () ammo_touch =
 			return ;
 		other.ammo_cells = other.ammo_cells + self.aflag;
 	}
-
-	if ( (other.classname == "dmbot") )
-		bot_toucheditem ();
+//	if ( (other.classname == "pk*bot") )
+//		bot_toucheditem ();
 
 	bound_other_ammo ();
 
@@ -904,7 +903,7 @@ void () key_touch =
 	local entity stemp;
 	local float best;
 
-	if ((other.classname != "player") && (other.classname != "dmbot"))
+	if ((other.classname != "player") && (other.classname != "pk*bot"))
 			return;
 	if (other.health <= 0)
 		return ;
@@ -1040,7 +1039,7 @@ void () sigil_touch =
 	local entity stemp;
 	local float best;
 
-	if ((other.classname != "player") && (other.classname != "dmbot"))
+	if ((other.classname != "player") && (other.classname != "pk*bot"))
 			return;
 	if (other.health <= 0)
 		return ;
@@ -1110,7 +1109,7 @@ void () powerup_touch =
 	local entity stemp;
 	local float best;
 
-	if ((other.classname != "player") && (other.classname != "dmbot"))
+	if ((other.classname != "player") && (other.classname != "pk*bot"))
 			return;
 	if (other.health <= 0)
 		return ;
@@ -1269,12 +1268,15 @@ void () BackpackTouch =
 	local entity stemp;
 	local float acount;
 
-	if ((other.classname != "player") && (other.classname != "dmbot")) // FIX ME - add to pk
-			return;
-	if (other.classname == "dmbot") // *bot
-		bot_toucheditem ();
+	if ((other.classname != "player") && (other.classname != "pk*bot")) // FIX ME - add to pk
+	{
+		grap_checkIfGrap ();
+		return;
+	}
 	if (other.health <= 0)
 		return ;
+	if (other.classname == "pk*bot") // *bot
+		bot_toucheditem ();
 
 	acount = 0;
 	sprint (other,"You get ");

@@ -233,11 +233,18 @@ void() pk_ammo_touch =
 //	cells
 	if (self.weapon == 4)
 	{
-		if (other.ammo_cells >= 100)
+		if (other.ammo_cells >= 200)
 			return;
 		other.ammo_cells = other.ammo_cells + self.aflag;
 	}
 
+	if (self.weapon == 5) // *pk exploding shells
+	{
+		if (other.pk_explode_ammo >= PK_EXPLODEAMMO_MAX)
+			return;
+		other.pk_explode_ammo = other.pk_explode_ammo + self.aflag;
+	}	
+	
 	bound_other_ammo ();
 
 	sprint (other, "You got the ");
@@ -284,15 +291,39 @@ void() painkeep_touch =
 {
 	local entity stm2;
 
-	if (self.state == CACHE_ROUTE_TOUCH) // *bot code - patch in cacheRoute for bot code - routes here because this is PK master touch fn()
+	local entity e;
+	e = world;
+	if (other.classname == "pk*bot") // *bot
+	{
+		if (self.state == BOT_TOUCHED || self.state == BOT_TOUCHED_CACHE_ROUTE_TOUCH) // *bot code - patch in bot_toucheditem for bots - routes here because this is PK master touch fn()
+		{
+			bot_toucheditem ();
+if (0) {
+bprint("hi, code base here, ran PK bot_toucheditem for item ( ");
+bprint(self.classname);
+bprint(" , ");
+bprint(self.netname);
+bprint(" )\n");}
+		}
+		if (self.pk_touch != painkeep_touch)
+		{
+			e = other;
+			e.classname = "player";
+		}
+	}
+
+	if (other.classname == "player") // *bot
+	if (self.pk_touch != painkeep_touch)
+	if (self.state == CACHE_ROUTE_TOUCH || self.state == BOT_TOUCHED_CACHE_ROUTE_TOUCH) // *bot code - patch in cacheRoute for bot code - routes here because this is PK master touch fn()
 	{
 		if (other.movetarget.movetarget){
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
+if (0) {
 bprint("hi, code base here, ran PK cacheRoute for item ( ");
 bprint(self.classname);
 bprint(" , ");
 bprint(self.netname);
-bprint(" )\n");
+bprint(" )\n");}
 }
 	}
 
@@ -305,24 +336,6 @@ bprint(" )\n");
 	if (self.pk_touch != painkeep_touch) // all items route through here - handle special cases, other touch fns & return
 	{
 		if (self.pk_touch == ammo_touch) self.pk_touch = pk_ammo_touch; // new fn for ammo collections
-		if (self.pk_touch == pk_ammo_touch) // new & different ammo conditions
-		{
-//	cells
-			if (self.weapon == 4 || self.weapon == -4)
-			{
-				if (other.ammo_cells >= 200)
-					return;
-				other.ammo_cells = other.ammo_cells + self.aflag;
-				self.weapon = -4; // dont catch 100 cell limit in ammo_touch, always handle this here
-			}
-
-			if (self.weapon == 5) // *pk exploding shells
-			{
-				if (other.pk_explode_ammo >= PK_EXPLODEAMMO_MAX)
-					return;
-				other.pk_explode_ammo = other.pk_explode_ammo + self.aflag;
-			}	
-		}
 
 		self.pk_touch();
 		if (deathmatch == 3) // *pk - new dm mode settings
@@ -333,6 +346,7 @@ bprint(" )\n");
 				self.nextthink = time + 20;
 		}
 
+		if (e) e.classname = "pk*bot";
 		return;
 	}
 

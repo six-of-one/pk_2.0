@@ -50,7 +50,7 @@ void () W_FireAxe =
 
 	makevectors (self.v_angle);
 	source = self.origin + '0 0 16';
-	if (self.classname == "dmbot")
+	if (self.classname == "pk*bot")
 	{
 		source = botaim ();
 	}
@@ -292,7 +292,7 @@ void () W_FireShotgun =
 
 		self.currentammo =self.ammo_shells = self.ammo_shells - 1;
 		dir = aim (self,100000);
-		if (self.classname == "dmbot")
+		if (self.classname == "pk*bot")
 		{
 			dir = botaim ();
 		}
@@ -327,7 +327,7 @@ void () W_FireSuperShotgun =
 	
 		self.currentammo = self.ammo_shells = self.ammo_shells - 2;
 		dir = aim (self,100000);
-		if (self.classname == "dmbot")
+		if (self.classname == "pk*bot")
 		{
 			dir = botaim ();
 		}
@@ -426,7 +426,7 @@ void () W_FireRocket =
 
 	makevectors (self.v_angle);
 	missile.velocity = aim (self,1000);
-	if (self.classname == "dmbot")
+	if (self.classname == "pk*bot")
 	{
 		missile.velocity = botaim ();
 		bfwd = botaim ();
@@ -443,7 +443,7 @@ void () W_FireRocket =
 
 	setmodel (missile,"progs/missile.mdl");
 	setsize (missile, '0 0 0', '0 0 0');
-	if (self.classname == "dmbot")
+	if (self.classname == "pk*bot")
 	{
 		setorigin (missile,((self.origin + (bfwd * 8)) + '0 0 16'));
 	}
@@ -486,9 +486,9 @@ void (vector p1, vector p2, entity from, float damage) LightningDamage =
 	{
 		particle (trace_endpos, '0 0 100', 225, damage*4);
 		T_Damage (trace_ent,from,from,damage);
-		if ((self.classname == "player") || (self.classname == "dmbot"))
+		if ((self.classname == "player") || (self.classname == "pk*bot"))
 		{
-			if ((other.classname == "player") || (other.classname == "dmbot"))
+			if ((other.classname == "player") || (other.classname == "pk*bot"))
 				trace_ent.velocity_z = trace_ent.velocity_z + 400;
 		}
 	}
@@ -523,7 +523,7 @@ void () W_FireLightning =
 		self.weapon = W_BestWeapon ();
 		if (PK) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
 		W_SetCurrentAmmo ();
-		if (self.classname == "dmbot")
+		if (self.classname == "pk*bot")
 		{
 			self.think = self.th_run;
 		}
@@ -531,7 +531,7 @@ void () W_FireLightning =
 	}
 
 // explode if under water
-	if (self.classname == "dmbot")
+	if (self.classname == "pk*bot")
 	{
 		wlevel = CheckWaterLevel ();
 		if (wlevel > 1)
@@ -565,7 +565,7 @@ void () W_FireLightning =
 
 	org = self.origin + '0 0 16';
 
-	if (self.classname == "dmbot")
+	if (self.classname == "pk*bot")
 	{
 		dir = botaim ();
 		traceline (org,(org + (dir * 600)),TRUE,self);
@@ -648,7 +648,7 @@ void () W_FireGrenade =
 		missile.velocity = v_forward*600 + v_up * 200 + crandom()*v_right*10 + crandom()*v_up*10;
 	else
 	{
-		if (self.classname == "dmbot")
+		if (self.classname == "pk*bot")
 		{
 			missile.velocity = botaim ();
 			missile.velocity = (missile.velocity * 600);
@@ -722,7 +722,7 @@ void () W_FireSuperSpikes =
 	self.attack_finished = time + 0.2;
 	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
 	dir = aim (self,1000);
-	if (self.classname == "dmbot")
+	if (self.classname == "pk*bot")
 	{
 		dir = botaim ();
 	}
@@ -751,7 +751,7 @@ void(float ox) W_FireSpikes =
 		self.weapon = W_BestWeapon ();
 		if (PK) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
 		W_SetCurrentAmmo ();
-		if (self.classname == "dmbot")
+		if (self.classname == "pk*bot")
 		{
 			self.think = self.th_run;
 		}

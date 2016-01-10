@@ -265,7 +265,7 @@ void () PutBotInServer =
 	local vector spot;
 	local string tmp;
 	local float aimvar;
-	self.classname = "dmbot";
+	self.classname = "pk*bot";
 	self.health = MUST_HAVE;
 	self.takedamage = DAMAGE_AIM;
 	self.solid = SOLID_SLIDEBOX;
@@ -693,12 +693,12 @@ void (entity ply, float n) removeTeamBots =
 	local float i;
 	local entity e;
 	i = n;
-	e = find (world,classname,"dmbot");
+	e = find (world,classname,"pk*bot");
 	while (i > 0)
 	{
 		while ((e != world) && (e.team != ply.team))
 		{
-			e = find (e,classname,"dmbot");
+			e = find (e,classname,"pk*bot");
 		}
 		if (!e)
 		{
@@ -718,7 +718,7 @@ void (entity ply, float n) removeTeamBots =
 void () removeAllBots =
 {
 	local entity e;
-	e = find (world,classname,"dmbot");
+	e = find (world,classname,"pk*bot");
 	while (e)
 	{
 		if (!e)
@@ -732,7 +732,7 @@ void () removeAllBots =
 		remove (e.movetarget);
 		remove (e.goalentity);
 		remove (e);
-		e = find (e,classname,"dmbot");
+		e = find (e,classname,"pk*bot");
 	}
 	NUMBOTS = 0;
 	bprint ("All bots removed.\n");
@@ -804,14 +804,14 @@ void (float n) SetTeamBots =
 void () UpdateTeamColors =
 {
 	local entity e;
-	e = find (world,classname,"dmbot");
+	e = find (world,classname,"pk*bot");
 	while (e)
 	{
 		if (e.colormap == self.colormap)
 		{
 			e.team = self.team;
 		}
-		e = find (e,classname,"dmbot");
+		e = find (e,classname,"pk*bot");
 	}
 };
 

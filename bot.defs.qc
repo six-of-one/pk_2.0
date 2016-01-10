@@ -8,6 +8,11 @@ float MSG_UPDATECOLORS		= 17;
 
 // if .state ==, call cacheRoute when touching this item
 float CACHE_ROUTE_TOUCH		= -1559742;
+// if .state ==, call  bot_toucheditem when touching this item
+float BOT_TOUCHED				= -2479551;
+// do both
+float BOT_TOUCHED_CACHE_ROUTE_TOUCH	= -4039293;
+
 // do item touch bot checks - disabled because PK has its own master touch
 //.void() bot_item_touch; 
 

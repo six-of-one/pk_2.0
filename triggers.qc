@@ -52,7 +52,7 @@ void () multi_trigger =
 
 	if (self.classname == "trigger_secret")
 	{
-	if (self.enemy.classname != "dmbot")
+	if (self.enemy.classname != "pk*bot")
 	if (self.enemy.classname != "player")
 		return ;
 		found_secrets = found_secrets + 1;
@@ -67,7 +67,7 @@ void () multi_trigger =
 
 	activator = self.enemy;
 
-	if (activator.classname == "dmbot")
+	if (activator.classname == "pk*bot")
 		bot_triggered (activator);
 	SUB_UseTargets ();
 
@@ -99,11 +99,11 @@ void () multi_use =
 
 void () multi_touch =
 {
-	if (other.classname != "dmbot")
+	if (other.classname != "pk*bot")
 	if (other.classname != "player")
 		return ;
 
-	if (other.classname == "dmbot")
+	if (other.classname == "pk*bot")
 	{
 		self.enemy = other;
 		bot_touched ();
@@ -359,11 +359,11 @@ void () tdeath_touch =
 		return ;
 
 // frag anyone who teleports in on top of an invincible player
-	if ((other.classname == "player") || (other.classname == "dmbot"))
+	if ((other.classname == "player") || (other.classname == "pk*bot"))
 	{
 		if (other.invincible_finished > time)
 			self.classname = "teledeath2";
-		if (self.owner.classname != "dmbot")
+		if (self.owner.classname != "pk*bot")
 		if (self.owner.classname != "player")
 		{	// other monsters explode themselves
 			T_Damage (self.owner,self,self,50000);
@@ -419,7 +419,7 @@ void () teleport_touch =
 
 	if (self.spawnflags & PLAYER_ONLY)
 	{
-		if (other.classname != "dmbot")
+		if (other.classname != "pk*bot")
 		if (other.classname != "player")
 			return ;
 	}
@@ -447,7 +447,7 @@ void () teleport_touch =
 	spawn_tfog (org);
 	spawn_tdeath (t.origin,other);
 
-	if (other.enemy.classname == "dmbot")
+	if (other.enemy.classname == "pk*bot")
 	{
 		enemy_touched ();
 	}
@@ -466,11 +466,11 @@ void () teleport_touch =
 		addTarget (other.movetarget.movetarget,self);
 		other.movetarget.movetarget = self;
 	}
-	if (other.classname == "dmbot")
+	if (other.classname == "pk*bot")
 	{
 		bot_touched ();
 	}
-	if ((other.classname == "player") || (other.classname == "dmbot") || (other.classname == "peeper"))
+	if ((other.classname == "player") || (other.classname == "pk*bot") || (other.classname == "peeper"))
 	{
 		other.fixangle = 1;		// turn this way immediately
 		other.teleport_time = time + 0.7;
@@ -564,7 +564,7 @@ ONLY REGISTERED TRIGGERS
 
 void () trigger_onlyregistered_touch =
 {
-		if (other.classname != "dmbot")
+		if (other.classname != "pk*bot")
 		if (other.classname != "player")
 			return ;
 	if (self.attack_finished > time)
@@ -654,7 +654,7 @@ void () trigger_push_touch =
 		}
 		else
 		{
-			if (other.classname == "dmbot")
+			if (other.classname == "pk*bot")
 			{
 				if ((self.movedir_x < 0.1) && (self.movedir_y < 0.1))
 				{
@@ -668,7 +668,7 @@ void () trigger_push_touch =
 				}
 			}
 		}
-		if (other.enemy.classname == "dmbot")
+		if (other.enemy.classname == "pk*bot")
 		{
 			enemy_touched ();
 		}

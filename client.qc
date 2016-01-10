@@ -1293,7 +1293,7 @@ void(entity targ, entity attacker) ClientObituary =
 	local	string deathstring, deathstring2;
 	rnum = random();
 
-	if ((targ.classname == "player") || (targ.classname == "dmbot"))
+	if (targ.classname == "player")
 	{
 		if (attacker.classname == "teledeath")
 		{
@@ -1303,12 +1303,12 @@ void(entity targ, entity attacker) ClientObituary =
 			bprint ("\n");
 
 			attacker.owner.frags = attacker.owner.frags + 1;
-/*			if (attacker.owner.classname == "dmbot")
+/*			if (attacker.owner.classname == "pk*bot")
 			{
 				TELEFRAGFLAG = 1;
 			}
 			countkill (attacker.owner,targ);
-			if (attacker.owner.classname == "dmbot")
+			if (attacker.owner.classname == "pk*bot")
 			{
 				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 				WriteByte (MSG_ALL,attacker.owner.id);
@@ -1325,7 +1325,7 @@ void(entity targ, entity attacker) ClientObituary =
 
 			targ.frags = targ.frags - 1;
 /*			countkill (targ,targ);
-			if (targ.classname == "dmbot")
+			if (targ.classname == "pk*bot")
 			{
 				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 				WriteByte (MSG_ALL,targ.id);
@@ -1334,13 +1334,13 @@ void(entity targ, entity attacker) ClientObituary =
 			return;
 		}
 
-		if ((attacker.classname == "player") || (attacker.classname == "dmbot"))
+		if ((attacker.classname == "player") || (attacker.classname == "pk*bot"))
 		{
 			if (targ == attacker)
 			{
 				// killed self
 				attacker.frags = attacker.frags - 1;
-/*				if (attacker.classname == "dmbot")
+/*				if (attacker.classname == "pk*bot")
 				{
 					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 					WriteByte (MSG_ALL,attacker.id);
@@ -1378,7 +1378,7 @@ void(entity targ, entity attacker) ClientObituary =
 			else
 			{
 				attacker.frags = attacker.frags + 1;
-/*				if (attacker.classname == "dmbot")
+/*				if (attacker.classname == "pk*bot")
 				{
 					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 					WriteByte (MSG_ALL,attacker.id);

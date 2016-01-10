@@ -13,7 +13,7 @@
 
 void () t_botpath =
 {
-	if (other.classname != "dmbot")
+	if (other.classname != "pk*bot")
 	{
 		return ;
 	}
@@ -410,7 +410,7 @@ void (entity node, entity targ, float len, entity item) cacheRoute =
 {
 	RECURSEDEPTH = 1;
 	cacheRouteTarget (node,targ,len,item);
-	if (other.classname == "dmbot")
+	if (other.classname == "pk*bot")
 	{
 		if (other.rocketcache == item)
 		{

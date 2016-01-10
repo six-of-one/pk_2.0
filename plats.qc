@@ -95,7 +95,7 @@ void () plat_go_up =
 
 void () plat_center_touch =
 {
-	if (other.classname != "player" && other.classname != "dmbot")
+	if (other.classname != "player" && other.classname != "pk*bot")
 		return;
 
 	if (other.health <= 0)
@@ -104,14 +104,14 @@ void () plat_center_touch =
 	self = self.enemy;
 	if (self.state == STATE_BOTTOM)
 	{
-		if (other.classname == "dmbot")
+		if (other.classname == "pk*bot")
 		if (other.goalentity.goalentity == self)
 			other.search_time = (time + 6);
 		plat_go_up ();
 	}
 	else if (self.state == STATE_TOP)
 	{
-		if (other.classname == "dmbot")
+		if (other.classname == "pk*bot")
 		if (other.goalentity.goalentity == self)
 			other.search_time = time;
 			self.nextthink = self.ltime + 1;	// delay going down
@@ -120,7 +120,7 @@ void () plat_center_touch =
 
 void () plat_outside_touch =
 {
-	if (other.classname != "player" && other.classname != "dmbot")
+	if (other.classname != "player" && other.classname != "pk*bot")
 		return;
 
 	if (other.health <= 0)
@@ -130,7 +130,7 @@ void () plat_outside_touch =
 	self = self.enemy;
 	if (self.state == STATE_TOP)
 	{
-		if (other.classname == "dmbot")
+		if (other.classname == "pk*bot")
 		if (other.goalentity.goalentity == self)
 			other.search_time = (time + 6);
 		plat_go_down ();

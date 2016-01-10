@@ -343,7 +343,7 @@ void() bot_skinParms =
 	{
 		parm4 = ((parm4 + (self.skin * 512)) + (16384* SKINSMODE));
 	}
-	e = find (world,classname,"dmbot");
+	e = find (world,classname,"pk*bot");
 	offset = 1;
 	toffset = 1;
 	parm10 = 0;
@@ -378,7 +378,7 @@ void() bot_skinParms =
 				}
 			}
 		}
-		e = find (e,classname,"dmbot");
+		e = find (e,classname,"pk*bot");
 	}
 };
 
@@ -474,21 +474,38 @@ void(float con) bot_con =
 
 void(entity targ, entity attacker) bot_kill =
 {
-	local	float rnum;
-	local	string deathstring, deathstring2;
-	rnum = random();
+	local entity e, f;
 
-	if ((targ.classname == "player") || (targ.classname == "dmbot"))
+	e = f = world;
+	if (targ.classname == "pk*bot")
+	{
+		e = targ;
+		e.classname = "player"; // you can fool some of the code...
+	}
+	if (attacker.classname == "pk*bot")
+	{
+		f = attacker;
+		f.classname = "player";
+	}
+
+	if (PK) PK_ClientObituary(targ, damage_inflictor, attacker); // *pk - pk death handler
+	else
+	ClientObituary(targ, attacker);
+
+	if (e) e.classname = "pk*bot";
+	if (f) f.classname = "pk*bot";
+
+	if ((targ.classname == "player") || (targ.classname == "pk*bot"))
 	{
 		if (attacker.classname == "teledeath")
 		{
 //			attacker.owner.frags = attacker.owner.frags + 1;
-			if (attacker.owner.classname == "dmbot")
+			if (attacker.owner.classname == "pk*bot")
 			{
 				TELEFRAGFLAG = 1;
 			}
 			countkill (attacker.owner,targ);
-			if (attacker.owner.classname == "dmbot")
+			if (attacker.owner.classname == "pk*bot")
 			{
 				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 				WriteByte (MSG_ALL,attacker.owner.id);
@@ -501,7 +518,7 @@ void(entity targ, entity attacker) bot_kill =
 		{
 //			targ.frags = targ.frags - 1;
 			countkill (targ,targ);
-			if (targ.classname == "dmbot")
+			if (targ.classname == "pk*bot")
 			{
 				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 				WriteByte (MSG_ALL,targ.id);
@@ -510,13 +527,13 @@ void(entity targ, entity attacker) bot_kill =
 			return;
 		}
 
-		if ((attacker.classname == "player") || (attacker.classname == "dmbot"))
+		if ((attacker.classname == "player") || (attacker.classname == "pk*bot"))
 		{
 			if (targ == attacker)
 			{
 				// killed self
 //				attacker.frags = attacker.frags - 1;
-				if (attacker.classname == "dmbot")
+				if (attacker.classname == "pk*bot")
 				{
 					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 					WriteByte (MSG_ALL,attacker.id);
@@ -534,7 +551,7 @@ void(entity targ, entity attacker) bot_kill =
 			else
 			{
 //				attacker.frags = attacker.frags + 1;
-				if (attacker.classname == "dmbot")
+				if (attacker.classname == "pk*bot")
 				{
 					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 					WriteByte (MSG_ALL,attacker.id);
@@ -568,20 +585,20 @@ void(entity client, string s)	bot_centerprint = #73;
 
 void(entity	client, string s) stuffcmd =
 {
-	if (client.classname == "dmbot") return;
+	if (client.classname == "pk*bot") return;
 //	if (client.ishuman == 1)
 		bot_stuffcmd(client, s);
 };
 
 void(entity	client, string s) sprint =
 {
-	if (client.classname == "dmbot") return;
+	if (client.classname == "pk*bot") return;
 //	if (client.ishuman == 1)
 		bot_sprint(client, s);
 };
 void(entity	client, string s) centerprint =
 {
-	if (client.classname == "dmbot") return;
+	if (client.classname == "pk*bot") return;
 //	if (client.ishuman == 1)
 		bot_centerprint(client, s);
 };
@@ -591,20 +608,43 @@ void(entity	client, string s) centerprint =
 
 void() bot_touch =
 {
-	
-	if (self.state == CACHE_ROUTE_TOUCH)
+	local entity e;
+
+	e = world;
+
+	if (self.state == CACHE_ROUTE_TOUCH || self.state == BOT_TOUCHED_CACHE_ROUTE_TOUCH)
 	{
 		if (other.movetarget.movetarget){
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
+if (0) {
 bprint("hi, code base here, ran bot cacheRoute for item ( ");
 bprint(self.classname);
 bprint(" , ");
 bprint(self.netname);
-bprint(" )\n");
+bprint(" )\n");}
 }
+	}
+
+// NOTE: original code has bot call this after collecting item - this is slightly different as it calls it no matter what
+// also, the original code seems kind of borked in its intent - the announce goes out and >poof< the item is gone!
+	if (other.classname == "pk*bot")
+	{
+		if (self.state == BOT_TOUCHED || self.state == BOT_TOUCHED_CACHE_ROUTE_TOUCH)
+		{
+if (0) {
+bprint("hi, code base here, ran bot_toucheditem for item ( ");
+bprint(self.classname);
+bprint(" , ");
+bprint(self.netname);
+bprint(" )\n");}
+			bot_toucheditem ();
+		}
+		e = other;
+		e.classname = "player";
 	}
 //	self.bot_item_touch();
 	self.pk_touch();
+	if (e) e.classname = "pk*bot";
 };
 
 // remove item hooks & put here - code diverts here from PlaceItem
@@ -632,12 +672,13 @@ bprint(" ) - already has .state set?\n");
 	if (e.classname == "item_health") // || e.model == "maps/b_bh10.bsp" / "maps/b_bh25.bsp / maps/b_bh100.bsp
 	{
 //bprint("in bot item health\n");
+		e.state = BOT_TOUCHED;
 		e.th_weight = healthweight;
 		if (e.healtype == 2) // || e.model == "maps/b_bh100.bsp"
 		{
 			e.th_cache = cachepowerup;
 			e.th_update = updatepowerup;	
-			e.state = CACHE_ROUTE_TOUCH;
+			e.state = BOT_TOUCHED_CACHE_ROUTE_TOUCH;
 			if (!PK) e.touch = bot_touch;
 		}
 		return;
@@ -650,7 +691,7 @@ bprint(" ) - already has .state set?\n");
 		e.th_weight = armorweight;
 		e.th_cache = cachearmor;
 		e.th_update = updatearmor;
-		e.state = CACHE_ROUTE_TOUCH;
+		e.state = BOT_TOUCHED_CACHE_ROUTE_TOUCH;
 		if (!PK) e.touch = bot_touch;
 		return;
 	}
@@ -715,7 +756,11 @@ bprint(" ) - already has .state set?\n");
 	{
 		e.th_weight = cellweight;
 	}
-	if (e.touch == ammo_touch || e.pk_touch == ammo_touch) return;
+	if (e.touch == ammo_touch || e.pk_touch == ammo_touch)
+	{
+		e.state = BOT_TOUCHED;
+		return;
+	}
 
 // artifacts
 	if (e.touch == powerup_touch || e.pk_touch == powerup_touch)

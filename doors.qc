@@ -160,7 +160,7 @@ void () door_use =
 	local entity oself;
 
 	signalnoise (other,self);
-	if (other.classname == "dmbot")
+	if (other.classname == "pk*bot")
 	{
 		bot_touched ();
 	}
@@ -212,7 +212,7 @@ Prints messages and opens key doors
 */
 void () door_touch =
 {
-	if (other.classname != "dmbot")
+	if (other.classname != "pk*bot")
 	if (other.classname != "player")
 		return ;
 	if (self.owner.attack_finished > time)
@@ -226,9 +226,9 @@ void () door_touch =
 			centerprint (other,self.owner.message);
 		sound (other, CHAN_VOICE, "misc/talk.wav", 1, ATTN_NORM);
 	}
-	if (other.enemy.classname == "dmbot")
+	if (other.enemy.classname == "pk*bot")
 		enemy_touched ();
-	if (other.classname == "dmbot")
+	if (other.classname == "pk*bot")
 		bot_touched ();
 
 // key door stuff
@@ -713,7 +713,7 @@ Prints messages
 */
 void () secret_touch =
 {
-	if (other.classname != "dmbot")
+	if (other.classname != "pk*bot")
 	if (other.classname != "player")
 		return ;
 	if (self.attack_finished > time)
@@ -724,7 +724,7 @@ void () secret_touch =
 	if (self.message)
 	{
 //		if (other.classname == "player")
-			centerprint (other,self.message);
+		centerprint (other,self.message);
 		sound (other,CHAN_BODY,"misc/talk.wav", 1,ATTN_NORM);
 	}
 };

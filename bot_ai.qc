@@ -45,7 +45,7 @@ void () CallForHelp =
 	local entity tmp;
 	local float d;
 	HELPING = 1;
-	e = find (world,classname,"dmbot");
+	e = find (world,classname,"pk*bot");
 	while (e)
 	{
 		if (e != self)
@@ -84,7 +84,7 @@ void () CallForHelp =
 				}
 			}
 		}
-		e = find (e,classname,"dmbot");
+		e = find (e,classname,"pk*bot");
 	}
 	HELPING = 0;
 };
@@ -297,7 +297,7 @@ float () BotFoundTarget =
 		self.enemy = world;
 		return (0);
 	}
-	if ((self.enemy.classname != "player") && (self.enemy.classname != "dmbot"))
+	if ((self.enemy.classname != "player") && (self.enemy.classname != "pk*bot"))
 	{
 		self.enemy = world;
 		return (0);
@@ -346,7 +346,7 @@ float () BotfindBot =
 	local entity bots;
 	if (!self.lastbot)
 	{
-		self.lastbot = find (world,classname,"dmbot");
+		self.lastbot = find (world,classname,"pk*bot");
 	}
 	n = 4;
 	while (n > 0)
@@ -370,10 +370,10 @@ float () BotfindBot =
 				}
 			}
 		}
-		self.lastbot = find (bots,classname,"dmbot");
+		self.lastbot = find (bots,classname,"pk*bot");
 		if (!self.lastbot)
 		{
-			self.lastbot = find (world,classname,"dmbot");
+			self.lastbot = find (world,classname,"pk*bot");
 		}
 	}
 	return (0);

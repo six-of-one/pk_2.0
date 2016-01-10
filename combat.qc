@@ -91,10 +91,12 @@ void(entity targ, entity attacker) Killed =
 		WriteByte (MSG_ALL,SVC_KILLEDMONSTER);
 	}
 
+	if (self.classname == "pk*bot" || attacker.classname == "pk*bot") 
+		bot_kill(self, attacker); // *bot - tie in to count bot kills / deaths
+	else
 	if (PK) PK_ClientObituary(self, damage_inflictor, attacker);
 	else
 	ClientObituary(self, attacker);
-	bot_kill(self, attacker); // *bot - tie in to count bot kills / deaths
 
 	self.takedamage = DAMAGE_NO;
 	self.touch = SUB_Null;
@@ -163,7 +165,7 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	}
 
 // figure momentum add
-	if ((inflictor != world) && (targ.movetype == MOVETYPE_WALK || targ.classname == "dmbot"))
+	if ((inflictor != world) && (targ.movetype == MOVETYPE_WALK || targ.classname == "pk*bot"))
 	{
 		dir = targ.origin - (inflictor.absmin + inflictor.absmax) * 0.5;
 		dir = normalize (dir);
@@ -202,7 +204,7 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 // react to the damage
 	oldself = self;
 	self = targ;
-	if (self.classname == "dmbot")
+	if (self.classname == "pk*bot")
 	{
 		if (attacker != world && inflictor != world)
 			{

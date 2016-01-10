@@ -9,6 +9,7 @@
  * final qc
  *
  */
+// button and multiple button
 
 void() button_wait;
 void () button_return;
@@ -59,17 +60,17 @@ void () button_use =
 {
 	self.enemy = activator;
 
-	if (other.classname == "dmbot")
+	if (other.classname == "pk*bot")
 		bot_triggered (other);
 	button_fire ();
 };
 
 void () button_touch =
 {
-	if (other.classname != "player" && other.classname != "dmbot")
+	if (other.classname != "player" && other.classname != "pk*bot")
 		return;
 	self.enemy = other;
-	if (other.classname == "dmbot")
+	if (other.classname == "pk*bot")
 		bot_triggered (other);
 	button_fire ();
 };
@@ -79,7 +80,7 @@ void () button_killed =
 	self.enemy = damage_attacker;
 	self.health = self.max_health;
 	self.takedamage = DAMAGE_NO;	// wil be reset upon return
-	if (other.classname == "dmbot")
+	if (other.classname == "pk*bot")
 		bot_triggered (other);
 	button_fire ();
 };

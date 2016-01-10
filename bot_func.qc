@@ -36,11 +36,11 @@ void () fix_thud =
 void () fix_watertype_bug =
 {
 	local entity bot;
-	bot = find (world,classname,"dmbot");
+	bot = find (world,classname,"pk*bot");
 	while (bot)
 	{
 		bot.watertype = 0;
-		bot = find (bot,classname,"dmbot");
+		bot = find (bot,classname,"pk*bot");
 	}
 };
 
@@ -52,7 +52,7 @@ entity () find_bot =
 	local entity selected;
 	selected = world;
 	best_dist = 9999;
-	head = find (world,classname,"dmbot");
+	head = find (world,classname,"pk*bot");
 	while (head)
 	{
 		dist = vlen (self.origin - head.origin);
@@ -62,7 +62,7 @@ entity () find_bot =
 			best_dist = dist;
 			selected = head;
 		}
-		head = find (head,classname,"dmbot");
+		head = find (head,classname,"pk*bot");
 	}
 	return(selected);
 };

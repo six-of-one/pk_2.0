@@ -45,7 +45,7 @@ void (entity killer, entity killed) countkill =
 		killed.playerdeaths = (killed.playerdeaths + 1);
 		if (skill == 1)
 		{
-			if (killed.classname == "dmbot")
+			if (killed.classname == "pk*bot")
 			{
 				killed.skil = (killed.skil + (adj * random ()));
 				if (killed.skil > 3)
@@ -57,7 +57,7 @@ void (entity killer, entity killed) countkill =
 	}
 	else
 	{
-		if (killer.classname == "dmbot")
+		if (killer.classname == "pk*bot")
 		{
 			killed.botdeaths = (killed.botdeaths + 1);
 			if (skill == 1)
@@ -79,7 +79,7 @@ void (entity killer, entity killed) countkill =
 	}
 	else
 	{
-		if (killed.classname == "dmbot")
+		if (killed.classname == "pk*bot")
 		{
 			killer.botkills = (killer.botkills + 1);
 		}
@@ -207,7 +207,7 @@ entity (float scoretype) SortPlayers =
 		}
 		e = find (e,classname,"player");
 	}
-	e = find (world,classname,"dmbot");
+	e = find (world,classname,"pk*bot");
 	while (e)
 	{
 		if (!sort)
@@ -258,7 +258,7 @@ entity (float scoretype) SortPlayers =
 				} while (walk.chain != e);
 			}
 		}
-		e = find (e,classname,"dmbot");
+		e = find (e,classname,"pk*bot");
 	}
 	return(sort);
 };
