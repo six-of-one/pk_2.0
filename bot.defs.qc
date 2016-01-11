@@ -35,6 +35,7 @@ void() bot_skinDecode;
 void() set_initBotLevel;
 void(float con) bot_con;
 void(entity targ, entity attacker) bot_kill;
+void() bot_changeParms;
 
 // item links
 void(entity e) bot_item_linx;
@@ -42,6 +43,7 @@ void(entity e) bot_BackpackSetup;
 
 // takeover, solves print to bot issues
 // inactive while installed with frikbot code, which was adapted
+
 /*
 void(entity	client, string s) stuffcmd;
 void(entity	client, string s) sprint;

@@ -512,7 +512,7 @@ void() hub_control =
 //		timer.owner = self;
 
 		// let server override this time
-		temp1 = (cvar("temp1") & PK_TP_TIMEMASK) * 60;
+		temp1 = (pk_flags & PK_TP_TIMEMASK) * 60;
 		if (temp1 > 0)
 			hubStartTime = self.nextthink = time + temp1;
 //			timer.nextthink = time + temp1;

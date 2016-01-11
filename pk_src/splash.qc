@@ -110,7 +110,7 @@ void() CheckWaterLevels =
 	    }
 	    else
 	    {
-	      if (!(cvar("temp1") & PK_TP_SPARKSFLASH))
+	      if ( ! pk_flags & PK_TP_SPARKSFLASH)
 	        MakeSplash(e);
 
 	      e.inwater = pc;

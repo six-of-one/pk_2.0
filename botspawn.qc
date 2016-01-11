@@ -20,6 +20,7 @@ void () initBotLevel =
 	local float i;
 	local entity e;
 	local string tmp;
+
 	NOISEQUEUE = noisetarget ();
 	num = ((serverflags & BOTS) / 16);
 	serverflags = ((serverflags - (serverflags & BOTS)) - INITLEVEL);
@@ -32,7 +33,7 @@ void () initBotLevel =
 		num = (num - 1);
 		if ((NUMBOTS < 5) && !(serverflags & DEDICATED))
 		{
-			skill = ((0.1 * (parm10 & (offset * 31))) / offset);
+			skill = ((0.1 * (parm12 & (offset * 31))) / offset);
 		}
 		offset = (offset * 32);
 		AddAnotherBot ();
@@ -74,7 +75,7 @@ void () initBotLevel =
 			i = (i + 1);
 			if ((i < 6) && !(serverflags & DEDICATED))
 			{
-				skill = ((0.1 * (parm11 & (offset * 31))) / offset);
+				skill = ((0.1 * (parm13 & (offset * 31))) / offset);
 			}
 			offset = (offset * 32);
 			addTeamBots (e,TRUE);
@@ -445,6 +446,7 @@ void () AddAnotherBot =
 	newbot.id = FindGood ();
 	newbot.colormap = (newbot.id + 1);
 	newbot.colormap = 0;
+	newbot.team = 99;
 // CHECK: painkeep damageskins
 /*
 	if (teamplay)
@@ -468,7 +470,6 @@ void () AddAnotherBot =
 			}
 		}
 	}
-	newbot.team = 99;
 	if (NAMEBOTS)
 	{
 		newbot.teamname = self.netname;
@@ -572,7 +573,7 @@ void () AddAnotherBot =
 	else if (NUMBOTS == 11)
 	{
 		newbot.netname = "Sigma";
-		top = NAMEBOTS;
+		top = 0;
 		bottom = 13;
 	}
 	else if (NUMBOTS == 12)

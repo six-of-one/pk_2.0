@@ -865,12 +865,12 @@ void () W_SetCurrentAmmo =
 		PK_SetCurrentAmmo(); // *pk - handle ammo for all pk items
 		return;
 	}
-	if (self.classname == "player")
+	if (self.classname == "player") // *bot
 	player_run ();		// get out of any weapon firing states
 
 	self.items = self.items - (self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS));
 
-	signalnoise (self,self);
+	signalnoise (self,self); // *bot
 	if (self.weapon == IT_AXE)
 	{
 		self.currentammo = 0;
@@ -1370,7 +1370,7 @@ ImpulseCommands
 */
 void () ImpulseCommands =
 {
-	if (self.impulse > 98) botImpulseCommand ();
+	if (self.impulse > 98) botImpulseCommand (); // *bot
 
 	if (PK)
 	{
@@ -1408,10 +1408,9 @@ void () W_WeaponFrame =
 		return;
 
 	if (self.impulse)
-	{
 		ImpulseCommands ();
-	}
-	if (self.classname == "peeper")
+
+	if (self.classname == "peeper") // *bot
 		return;
 
 // check for attack
@@ -1441,4 +1440,5 @@ void () SuperDamageSound =
 	}
 	return ;
 };
+
 

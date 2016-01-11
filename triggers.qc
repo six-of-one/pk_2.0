@@ -344,7 +344,7 @@ void (vector org) spawn_tfog =
 	s.nextthink = time + 0.2;
 	s.think = play_teleport;
 
-	signalnoise (other,s);
+	signalnoise (other,s); // *bot
 	WriteByte (MSG_BROADCAST,SVC_TEMPENTITY);
 	WriteByte (MSG_BROADCAST,TE_TELEPORT);
 	WriteCoord (MSG_BROADCAST,org_x);

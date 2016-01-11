@@ -78,6 +78,7 @@ void () SetChangeParms =
 	parm8 = self.weapon;
 	parm9 = self.armortype * 100;
 	if (PK) PK_ChangeParms();
+	if (find(world,classname,"pk*bot")) bot_changeParms();
 //	bot_skinParms();
 };
 
@@ -162,7 +163,7 @@ string nextmap;
 void () GotoNextMap =
 {
 	if (PK)
-	if ((cvar("temp1") & PK_TP_USERMAPON))
+	if (pk_flags & PK_TP_USERMAPON)
 	{
 		if (!execed)
 		{
@@ -319,6 +320,7 @@ void () execute_changelevel =
 	}
 
 	WriteByte (MSG_ALL,SVC_INTERMISSION);
+	if (find(world,classname,"pk*bot")) serverflags = (serverflags | INITLEVEL); // *bot - reload bots on next level
 };
 
 
@@ -582,6 +584,7 @@ void () PutClientInServer =
 
 	spawn_tdeath (self.origin,self);
 	if (PK) PK_CIS(); // *pk - set client pk elements
+	self.admin = 0;
 	set_initBotLevel(); // *bot
 //	set_CarriedPath(); // *bot - deprecated into prev fn
 };
@@ -1186,6 +1189,7 @@ void () PlayerPostThink =
 		return ;
 
 	if (!(self.view_ofs == '0 0 0') && !self.deadflag)
+	if (find(world,classname,"pk*bot"))
 	if (CheckDropPath ()) // *bot
 	{
 		DropBotPath ();
@@ -1193,6 +1197,21 @@ void () PlayerPostThink =
 
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
+
+
+	if (PK_ADMIN) // *pk - run admin for both modes - any deactivation will 0 this
+	{
+//	if (deathmatch) // admin is debateable in SP, but there is a toggle option for DM
+		if (self.attack_finished < time)
+		if (self.admin < 0 || (self.impulse && (self.admin || self.impulse == pk_adminimp)))
+		{
+			if (self.admin == ADMIN_FAILED_LOGIN) admin_clear_failed(); // failed login - clear wait msg
+			else PK_AdminImpulse();
+		}
+		if (self.admin) return;
+
+		if (pk_admincode == SETCODE || pk_adminimp == SETCODE) PK_SetAdmin();
+	}
 
 	if (PK)
 	{
@@ -1246,7 +1265,7 @@ void () ClientConnect =
 	else
 					bprint (" entered the game\n");
 
-	bot_con(TRUE); // *bot
+	bot_con(TRUE); // *bot - doesnt depend on active bots, must always happen
 // a client connecting during an intermission can cause problems
 	if (intermission_running)
 		ExitIntermission ();

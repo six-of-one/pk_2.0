@@ -51,7 +51,7 @@ void() monster_zombie2 =
 	precache_sound ("misc/zombie/swing_2.wav");
 	precache_sound ("misc/zombie/swing_3.wav");
 
-	if ((cvar("temp1") & PK_TP_SPARKSFLASH))
+	if (pk_flags & PK_TP_SPARKSFLASH)
 		remove(self);
 
 	self.solid = SOLID_NOT;
@@ -88,7 +88,7 @@ void() zombie_twist =
 
 void() monster_zombie3 =
 {
-	if ((cvar("temp1") & PK_TP_SPARKSFLASH))
+	if (pk_flags & PK_TP_SPARKSFLASH)
 		remove(self);
 	  
 	precache_model ("progs/zombie3.mdl");

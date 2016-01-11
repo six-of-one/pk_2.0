@@ -291,6 +291,8 @@ void() painkeep_touch =
 {
 	local entity stm2;
 
+	if (other.admin) return; // *pk - admin - no collecting stuff
+
 	local entity e;
 	e = world;
 	if (other.classname == "pk*bot") // *bot

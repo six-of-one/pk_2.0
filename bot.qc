@@ -277,30 +277,29 @@ float () getrandombotskin =
 };
 
 
-void() bot_skinParms =
-{
-
 //	*bot skin code - not sure to include - requiers parm mod
 
-	local float offset;
-	local float toffset;
-	local float team1;
-	local float nb;
-	local float nt;
-	local entity e;
-
+void() bot_skinParms =
+{
 	if (SKINSMODE)
 	{
 		parm4 = ((parm4 + (self.skin * 512)) + (16384* SKINSMODE));
 	}
-	e = find (world,classname,"pk*bot");
-	offset = 1;
-	toffset = 1;
-	parm10 = 0;
-	parm11 = 0;
+};
+
+//encode bot details for level change
+
+void() bot_changeParms =
+{
+	local float offset, toffset, team1;
+	local float nb, nt;
+	local entity e;
+
+	e = find(world,classname,"pk*bot");
+	offset = toffset = 1;
+	parm12 = parm13 = 0; // tuned for painkeep merge
 	team1 = 100;
-	nb = 0;
-	nt = 0;
+	nb = nt = 0;
 	while (e)
 	{
 		if (e.team == 99)
@@ -308,7 +307,7 @@ void() bot_skinParms =
 			nb = (nb + 1);
 			if (nb < 6)
 			{
-				parm10 = (parm10 + (((offset * e.skil) * 10) & (offset * 31)));
+				parm12 = (parm12 + (((offset * e.skil) * 10) & (offset * 31)));
 				offset = (offset * 32);
 			}
 		}
@@ -323,7 +322,7 @@ void() bot_skinParms =
 				nt = (nt + 1);
 				if (nt < 6)
 				{
-					parm11 = (parm11 + (((toffset * e.skil) * 10) & (toffset * 31)));
+				parm13 = (parm13 + (((toffset * e.skil) * 10) & (toffset * 31)));
 					toffset = (toffset * 32);
 				}
 			}
@@ -383,7 +382,7 @@ void() set_initBotLevel =
 		initBotLevel ();
 	}
 
-// from prev fn()
+// from prev fn() - set_CarriedPath
 	if (self.movetarget == world)
 	{
 		NewCarriedPath ();

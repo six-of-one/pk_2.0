@@ -1,20 +1,30 @@
 
 // constants
+
+// ADMIN section
 // dev - only enable this for painkeep maps or force pk mode (sv_ control) - any maps that loads a pk item / func
 float PK; // if set true painkeep code is enabled
-float PK_MAP					= 0; // bits 1 & 2 = FALSE -- map sets painkeep mode - PK = TRUE if: any pk*.bsp loaded, start.bsp loaded and message == "hub", a map loads any painkeep map item, PK = FALSE otherwise
-float PK_ALWAYS				= 1; // bit 1	= TRUE --- always in painkeep mode - PK = TRUE;
-float PK_NEVER				= 2; // bit 2	= TRUE --- never in painkeep mode - PK = FALSE;
-float PK_DYNAMIC				= 4; // bit 4	= TRUE --- when always in painkeep mode & not on a PK map, dynamically load pk items if they are not present
-											// items include - bear trap, can o' beans, gravity well, harpoon, turret, airfist, chain thunderbolt, exploding shot, pulse nailgun
-float PK_SPIKER				= 8; // bit 8	= TRUE --- allow spike traps, set to false for original pk treatment of spike shooters - they are removed
-float PK_XSOUND				= 16;// bit 16 = TRUE --- use extra pk sound set
+float PK_MAP					= 0;		// bits 1 & 2 = FALSE -- map sets painkeep mode - PK = TRUE if: any pk*.bsp loaded, start.bsp loaded and message == "hub", a map loads any painkeep map item, PK = FALSE otherwise
+float PK_ALWAYS				= 1;		// bit 1	= TRUE --- always in painkeep mode - PK = TRUE;
+float PK_NEVER				= 2;		// bit 2	= TRUE --- never in painkeep mode - PK = FALSE;
+float PK_DYNAMIC				= 4;		// bit 4	= TRUE --- when always in painkeep mode & not on a PK map, dynamically load pk items if they are not present
+												// items include - bear trap, can o' beans, gravity well, harpoon, turret, airfist, chain thunderbolt, exploding shot, pulse nailgun
+float PK_SPIKER				= 8;		// bit 8	= TRUE --- allow spike traps, set to false for original pk treatment of spike shooters - they are removed
+float PK_XSOUND				= 16;		// bit 16 = TRUE --- use extra pk sound set
+float PK_MODEMASK			= 31;		// mask of mode bits
 
-float pk_mode; // set bits to determin state of PK above, if darkplaces engine can be detected, this will load from cvar("sv_pk_mode"), otherwise first 5 bits of cvar("temp2")
-float pk_xsound; // set to state of PK_XSOUND bit for sound code toggle
+float pk_flags;							// replaces old usage of temp1, temp1 still stores if not in dp
+float pk_mode;							// set bits to determin state of PK above, if darkplaces engine can be detected, this will load from cvar("sv_pk_mode"), otherwise first 5 bits of cvar("temp2")
+float pk_xsound;							// set to state of PK_XSOUND bit for sound code toggle
 
-float DARKPLACES_ENGINE	= 3275; // for detecting darkplaces - modded engine sets cvar("chaos") to this value
+float DARKPLACES_ENGINE	= 3275;	// for detecting darkplaces - modded engine sets cvar("chaos") to this value
 float chaos;
+
+float PK_ADMIN;							// allow admin - set this to 0 to completely disable all admin
+float pk_adminimp;						// impulse set in admin.cfg to access admin commands, defaults to 255
+float pk_admincode;						// code you must enter to access admin commands - set by admin.cfg, defaults to -1
+float SETCODE					= -8726545; // set the code after delay
+float ADMIN_FAILED_LOGIN	= -777;	// login didnt succeed
 
 // **************************************
 // painkeep protos
@@ -59,15 +69,15 @@ void(entity client, string s, string s1, string s2, string s3, string s4, string
 .float pk_currentitem;
 
 // Items used in impulse 1
-float PK_IT_AXE	       = 1;
-float	PK_IT_GRAVITYWELL	= 2;
-float	PK_IT_TURRET			= 4;
-float	PK_IT_CANPAB			= 8;
-float PK_IT_GRAPGUN	   = 16;
-float PK_IT_AIRGUN	    = 32;
-float	PK_IT_CLIGHT	  	= 64;
+float PK_IT_AXE				= 1;
+float PK_IT_GRAVITYWELL	= 2;
+float PK_IT_TURRET			= 4;
+float PK_IT_CANPAB			= 8;
+float PK_IT_GRAPGUN			= 16;
+float PK_IT_AIRGUN			= 32;
+float PK_IT_CLIGHT			= 64;
 float PK_IT_BEARTRAP		= 128;
-float PK_IT_EXTRADISP	 = 256;
+float PK_IT_EXTRADISP		= 256;
 /*
 Impulse 1 will toggle between Axe, Bear Trap, CoPB, AS, and GW.
 
@@ -88,16 +98,16 @@ Impulse 38 - Axe (just to do complete)
 .float pk_gravitywellammo, pk_turretammo, pk_canpabammo, pk_beartrapammo;
 
 // Ammo Max'S
-float PK_GRAVITYWELLAMMO_MAX = 1;
-float PK_TURRETAMMO_MAX = 3;
-float PK_CANPABAMMO_MAX = 1;
-float PK_BEARTRAPAMMO_MAX = 3;
+float PK_GRAVITYWELLAMMO_MAX	= 1;
+float PK_TURRETAMMO_MAX		= 3;
+float PK_CANPABAMMO_MAX		= 1;
+float PK_BEARTRAPAMMO_MAX		= 3;
 
 // The current inventory item
 .float pk_currentInventory;
 
 // new gibs
-entity	damage_inflictor;	// set by T_Damage
+entity damage_inflictor;	// set by T_Damage
 
 // Variables used for the air gun.
 
@@ -110,11 +120,11 @@ entity	damage_inflictor;	// set by T_Damage
 // Constant used on the AIRG_Flags to specifiy that we have converted this
 // flying monsters movetype from MOVETYPE_STEP to MOVETYPE_FLY (see horn.qc for
 // more info).
-float AIRG_STEPCONVERTEDTOFLY = 2;
+float AIRG_STEPCONVERTEDTOFLY	= 2;
 
 // Air Gun flag constants.
 // Setting an entity's AIRG_Flags excludes it from harm
-float AIRG_EXCLUDEENTITY = 1;
+float AIRG_EXCLUDEENTITY	= 1;
 
 // At the moment the AIRG_Flags variable is used only for the exclusion routine
 // but this may change.
@@ -125,7 +135,7 @@ float AIRG_EXCLUDEENTITY = 1;
 
 
 // Airblast timeout variable.	Tracks how long the "blast" affects monsters...
-.float AIRG_BlastTimeout;	// Airblast origin, & viewing angle
+.float AIRG_BlastTimeout;				// Airblast origin, & viewing angle
 .vector AIRG_BlastOrigin;
 .vector AIRG_BlastAngle;
 
@@ -135,44 +145,44 @@ void(float firstBlast) horn_airblast;
 
 
 // chain thunder bolt
-.entity bolt_target;	    // current player firing at ...
-.entity bolt_targetNext;	// next target in the chain...
-.float bolt_targetTimeout; // used to timeout the bolt_target...
-.float bolt_targetNextTimeout; // used to timeout the bolt_targetNext...
+.entity bolt_target;	    				// current player firing at ...
+.entity bolt_targetNext;				// next target in the chain...
+.float bolt_targetTimeout; 			// used to timeout the bolt_target...
+.float bolt_targetNextTimeout; 		// used to timeout the bolt_targetNext...
 
-.entity bolt_targetTimeoutEntity; // Entity timeout, used just for the nextthink!
+.entity bolt_targetTimeoutEntity; 	// Entity timeout, used just for the nextthink!
 
-.float bolt_conduitTimeout; // Entity conduit timeout if the entity handles it...
+.float bolt_conduitTimeout;			// Entity conduit timeout if the entity handles it...
 
-//float	FL_GIBCONDUIT	= 8192;	// set if it's the first conduit entity
+//float	FL_GIBCONDUIT	= 8192;		// set if it's the first conduit entity
 
-.float bolt_changeModelTimeout; // used to change the view weapon modal timeout.
+.float bolt_changeModelTimeout;		// used to change the view weapon modal timeout.
 
 // Used as the lightning fire source entity so that the "player" can fire lightning himeself
 .entity bolt_lightningFire;
 
 
 // harpoon
-.entity grap_cornerchainNext; // next in the rope corner chain.
-.entity grap_ropechainPrev;		// prev in the rope chain.
-.entity grap_owner; 				// Can't use owner cas the object can't see the owner!
+.entity grap_cornerchainNext; 		// next in the rope corner chain.
+.entity grap_ropechainPrev;			// prev in the rope chain.
+.entity grap_owner; 						// Can't use owner cas the object can't see the owner!
 .entity grap_pull;
 .float grap_checkTimeout;
 .float grap_state;
 .float grap_length;
-.vector grep_offset;				// harpoon target offset for bringing back to owner
+.vector grep_offset;						// harpoon target offset for bringing back to owner
 .float grap_firetest;
 
-float GRAP_IDEAL = 0; 			// Going nothing
-float GRAP_OUT = 1; 			// It's outing out
-float GRAP_IN = 2; 				// It's comming back to the owner
-float GRAP_TOHARPOON = 3; 	// lengthen rope
-float GRAP_FIXED = 4; 			// The length is fixed.
-float GRAP_ROPESHORTEN = 5; 	// shorten rope
-float GRAP_ROPELENGTHEN = 6;	// lengthen rope
-float GRAP_HARPOON = 7;
-float GRAP_CORNER = 8;
-float GRAP_ROPE = 9;
+float GRAP_IDEAL				= 0; 		// Going nothing
+float GRAP_OUT				= 1; 		// It's outing out
+float GRAP_IN					= 2; 		// It's comming back to the owner
+float GRAP_TOHARPOON		= 3; 		// lengthen rope
+float GRAP_FIXED				= 4; 		// The length is fixed.
+float GRAP_ROPESHORTEN		= 5; 		// shorten rope
+float GRAP_ROPELENGTHEN	= 6;		// lengthen rope
+float GRAP_HARPOON			= 7;
+float GRAP_CORNER			= 8;
+float GRAP_ROPE				= 9;
 
 
 // can o p&b
@@ -183,43 +193,44 @@ float GRAP_ROPE = 9;
 .vector ip_orgOrigin;
 
 // the timeout (in mins) where items move back to there original position...
-float ip_timeout = 2;
+float ip_timeout				= 2;
 
 
 // exploding ammo for shotgun
 .float pk_explode_ammo;
-float PK_EXPLODEAMMO_MAX = 10;
+float PK_EXPLODEAMMO_MAX	= 10;
 
 // For Drowning Ignoring armor
 float ignorearmor;
 
 // hub ops
-float PK_SF_HUB = 16;
-float PK_TP_TIMEMASK = 63;
+//float PK_SF_HUB = 16;
+float PK_SF_HUB				= 65536;	// *bot - flag passed all bot parms in serverflags
+float PK_TP_TIMEMASK		= 63;
 float inHubMap;
 .float voteIntermission;
 
 // MOTD
-float MOTDTIME = 70;			// The amount of "frames" for the motd message (minimum should be 20)
-float DONTALLOWBOTS = 1;		// If we want to show anti bots messages at startup
+float MOTDTIME				= 70;		// The amount of "frames" for the motd message (minimum should be 20)
+float DONTALLOWBOTS			= 1;		// If we want to show anti bots messages at startup
 .float msgcount;
 void() updateStatusDisplay;
 
-.float laststattime;			// time of last status update
+.float laststattime;					// time of last status update
 
 
 .float beartrap_time;
 .float bt_immune_time;
-float BT_BUFFER = 2;	  		// The nuber of secs people are immune to beartraps after spawning
+float BT_BUFFER				= 2;	  	// The nuber of secs people are immune to beartraps after spawning
 
 // Quake Packet Message
-float	SVC_CENTERPRINT		= 26;
+float	SVC_CENTERPRINT	= 26;
 
 .float disconnectPlayer;
 
 // If the SFX are enabled or not
 //float sparkFlashOff;
-float PK_TP_SPARKSFLASH = 64;
+float PK_TP_SPARKSFLASH	= 64;
 
 // Last weapon stuff
 .float lastweapon;
@@ -235,17 +246,20 @@ void(float to, float f) WriteBFloat;
 
 // duty checks
 .float pk_dutychecking;
-float PK_TP_DUTYON = 128;
+float PK_TP_DUTYON			= 128;
 
 // admin
-void() AdminCommands;
-void() CheckAdmin;
+void() PK_SetAdmin;
+void() PK_AdminImpulse;
+void() admin_clear_failed;
+//void() AdminCommands;
+//void() CheckAdmin;
 .float admin;
 .float indata;
 .float kick;
 .entity kicker;
 
-float PK_TP_STATUSON = 256;
+float PK_TP_STATUSON		= 256;
 .float hubstartupmessage;
 .float messagetimeout;
 
@@ -253,7 +267,7 @@ float PK_TP_STATUSON = 256;
 
 // For the level sequences, if the exec file has been run yet.
 float execed;
-float PK_TP_USERMAPON = 512;
+float PK_TP_USERMAPON		= 512;
 
 // **************************************
 // Cataboligne relocated from many places
@@ -315,7 +329,7 @@ void() PK_DeathSound;
 //void(float sec) pk_player_sound;
 
 // weapons
-.entity theowner; // .owner replacement pulse nailgun
+.entity theowner; 						// .owner replacement pulse nailgun
 void() turret_dropTurret;
 void() beartrap_dropBearTrap;
 void() drop_gravity;
@@ -343,7 +357,7 @@ void() PK_Attack;
 void(entity e) pk_missile_splash;
 
 // new features
-.void() pk_touch; // group all touch code mods here
+.void() pk_touch; 						// group all touch code mods here
 void() pk_placeitem;
 
 /*

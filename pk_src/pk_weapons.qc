@@ -1274,14 +1274,6 @@ void() PK_CheatCommand =
 
 void() PK_ImpulseCommands =
 {
-// PAINKEEP_ADMIN_START
-	if (self.admin != 3)
-		CheckAdmin();
-
-	if (self.admin == 3)
-		AdminCommands();
-// PAINKEEP_ADMIN_END
-
 	if (self.impulse >= 1 && self.impulse <= 8)
 		W_ChangeWeapon ();
 	else if (self.impulse == 9)
@@ -1324,32 +1316,32 @@ void() PK_ImpulseCommands =
 	}
 
 // SPARK_START
-	else if (self.admin == 3 && self.impulse == 253)
+	else if (self.admin == PK_ADMIN && self.impulse == 253)
 	{
-		local float temp1;
+//		local float temp1;
 		local string str;
 
-		temp1 = cvar("temp1");
+//		temp1 = cvar("temp1");
 
-		if ((temp1 & PK_TP_SPARKSFLASH))
+		if ((pk_flags & PK_TP_SPARKSFLASH))
 		{
 			bprint("SFX Enabled.\n");
 
-			temp1 = temp1 - PK_TP_SPARKSFLASH;
-			str = ftos(temp1);
-			cvar_set("temp1", str);
+			pk_flags = pk_flags - PK_TP_SPARKSFLASH;
+			str = ftos(pk_flags);
+			cvar_set("sv_pk_flags", str);
 		}
 		else
 		{
 			bprint("SFX Disabled.\n");
-			temp1 = temp1 | PK_TP_SPARKSFLASH;
-			str = ftos(temp1);
-			cvar_set("temp1", str);
+			pk_flags = pk_flags | PK_TP_SPARKSFLASH;
+			str = ftos(pk_flags);
+			cvar_set("sv_pk_flags", str);
 		}
 	}
 
 // PK_HUB_START
-	else if (self.admin == 3 && self.impulse == 200)
+	else if (self.admin == PK_ADMIN && self.impulse == 200)
 	{
 		if (serverflags & PK_SF_HUB)
 		{
@@ -1379,46 +1371,46 @@ void() PK_ImpulseCommands =
 	}
 
 // PK_DUTYCHECKING_START
-	else if (self.admin == 3 && self.impulse == 202)
+	else if (self.admin == PK_ADMIN && self.impulse == 202)
 	{
-		temp1 = cvar("temp1");
+//		temp1 = cvar("temp1");
 
-		if (temp1 & PK_TP_DUTYON)
+		if (pk_flags & PK_TP_DUTYON)
 		{
 			bprint("Duty Checking OFF\n");
-			temp1 = temp1 - PK_TP_DUTYON;
-			str = ftos(temp1);
-			cvar_set("temp1", str);
+			pk_flags = pk_flags - PK_TP_DUTYON;
+			str = ftos(pk_flags);
+			cvar_set("sv_pk_flags", str);
 		}
 		else
 		{
 			bprint("Duty Checking ON\n");
-			temp1 = temp1 | PK_TP_DUTYON;
-			str = ftos(temp1);
-			cvar_set("temp1", str);
+			pk_flags = pk_flags | PK_TP_DUTYON;
+			str = ftos(pk_flags);
+			cvar_set("sv_pk_flags", str);
 		}
 	}
 
 	else if (self.impulse == 225)
 	{
-		temp1 = cvar("temp1");
+//		temp1 = cvar("temp1");
 
-		if (temp1 & PK_TP_DUTYON)
+		if (pk_flags & PK_TP_DUTYON)
 			sprint(self, "Duty Checking On\n");
 		else
 			sprint(self, "Duty Checking Off\n");
 
-		if (!(temp1 & PK_TP_SPARKSFLASH))
+		if (!(pk_flags & PK_TP_SPARKSFLASH))
 			sprint(self, "SFX On\n");
 		else
 			sprint(self, "SFX Off\n");
 
-		if (temp1 & PK_TP_STATUSON)
+		if (pk_flags & PK_TP_STATUSON)
 			sprint(self, "Status On\n");
 		else
 			sprint(self, "Status Off\n");	 
 
-		if (temp1 & PK_TP_USERMAPON)
+		if (pk_flags & PK_TP_USERMAPON)
 			sprint(self, "Custom Maps On\n");
 		else
 			sprint(self, "Custom Maps Off\n");
@@ -1434,8 +1426,8 @@ void() PK_ImpulseCommands =
 
 void() PK_WeaponFrame =
 {
-	if (time < self.attack_finished)
-		return;
+//	if (time < self.attack_finished) // tested in post think
+//		return;
 
 	if (self.impulse)
 		ImpulseCommands ();

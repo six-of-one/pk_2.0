@@ -59,7 +59,7 @@ void () plat_hit_top =
 	self.state = STATE_TOP;
 	self.think = plat_go_down;
 	self.nextthink = self.ltime + 3;
-	if (self.lastbot.goalentity.goalentity == self)
+	if (self.lastbot.goalentity.goalentity == self) // *bot
 	if (self.lasttime > (time - 10))
 	{
 		self.lastbot.search_time = time;
@@ -71,7 +71,7 @@ void () plat_hit_bottom =
 {
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.state = STATE_BOTTOM;
-	if (self.lastbot.goalentity.goalentity == self)
+	if (self.lastbot.goalentity.goalentity == self) // *bot
 	if (self.lasttime > (time - 10))
 	{
 		self.lastbot.search_time = (time + 0.5);

@@ -51,7 +51,7 @@ If targeted, it will toggle between on or off.
 */
 void () light =
 {
-	self.classname = "light";
+	self.classname = "light"; // *bot
 	if (!self.targetname)
 	{	// inert light
 		remove (self);

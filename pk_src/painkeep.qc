@@ -14,6 +14,7 @@ void() PK_precache =
 // old ambient sounds for pk_mode not set to PK
 
 	precache_sound ("alt_ambience/windfly.wav");
+	precache_sound ("alt_ambience/hum1.wav");
 	precache_sound ("alt_sounds/items/r_item2.wav");
 	precache_sound ("alt_sounds/misc/secret.wav");
 
@@ -155,17 +156,44 @@ void() PK_precache =
 	precache_sound ("player/gib_2.wav");
 	precache_sound ("player/gib_3.wav");
 
-// set PK mode based on engine var | temp2
+// admin
+	PK_ADMIN = 3; // code sets allow admin here - can be disabled by admin menu, 3 is base menu set
+
+	if (PK_ADMIN)
+	{
+// access code first
+		localcmd ("setadmincode\n");
+		pk_admincode = SETCODE;
+		pk_adminimp = 0;
+
+		localcmd("noadmingamma\n"); // set gamma level
+		localcmd("noadmin_centertime\n");
+
+// set defaults not usually bound by quake
+		localcmd ("bind 9 \"impulse 9\"\n"); // 9 is cheat in sp - this could be annoying for SP
+		localcmd ("bind 0 \"impulse 10\"\n");
+		localcmd ("bind enter \"impulse 11\"\n");
+		localcmd ("bind backspace \"impulse 12\"\n");
+	}
+
+// set PK mode based on engine var | saved2
 
 	if (!chaos) chaos = cvar("chaos");
 	if (chaos == DARKPLACES_ENGINE)
 	{
+// flags sv var - temp1 in non dp
+		registercvar("sv_pk_flags", "0");
+//		localcmd ("setpkflags\n");
+		pk_flags = cvar("sv_pk_flags"); // NOTE: this doesnt work for the first map loaded
+// map mode sv var
 		registercvar("sv_pk_mode", "0");
-		pk_mode = cvar("sv_pk_mode") & 3;
+//		localcmd ("setpkmode\n");
+		pk_mode = cvar("sv_pk_mode");
 	}
 	else
 	{
-		pk_mode = cvar("temp2") & 3;
+		pk_flags = cvar("temp1");
+		pk_mode = cvar("saved2") & PK_MODEMASK;
 	}
 
 // got mode, set PK master switch
@@ -378,11 +406,14 @@ void(vector org) spawn_tfog2 =
 void() PK_ChangeParms =
 {
 	parm10 = self.pk_items;
-	parm11 = self.pk_gravitywellammo;
-	parm12 = self.pk_turretammo;
-	parm13 = self.pk_canpabammo;
-	parm14 = self.pk_beartrapammo;
-	parm15 = self.pk_explode_ammo;
+// recode so *bot can have vars for skill level save - provide max inventory of 15 for mod expansion, current max is 3
+// except explode ammo which is not bound
+	parm11 = self.pk_gravitywellammo + (self.pk_turretammo * 16) + (self.pk_canpabammo * 256) + (self.pk_beartrapammo * 4096) + (self.pk_explode_ammo * 65536);
+//	parm11 = self.pk_gravitywellammo;
+//	parm12 = self.pk_turretammo;
+//	parm13 = self.pk_canpabammo;
+//	parm14 = self.pk_beartrapammo;
+//	parm15 = self.pk_explode_ammo;
 	// do hub message.
 	parm16 = self.msgcount | 256;
 };
@@ -392,15 +423,11 @@ void() PK_ChangeParms =
 void() PK_SetNewParms =
 {
 	parm10 = PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP;
-	parm11 = 0;
-	parm12 = 0;
-	parm13 = 0;
-	parm14 = 0;
-	parm15 = 0;
+	parm11 = parm12 = parm13 = parm14 = parm15 = 0;
 // do hub message.
 	parm16 = 256;
 
-	if ((cvar("temp1") & PK_TP_STATUSON))
+	if (pk_flags & PK_TP_STATUSON)
 	{
 		parm10 = parm10 | PK_IT_EXTRADISP;
 	}
@@ -411,11 +438,15 @@ void() PK_SetNewParms =
 void() PK_DecodeLevelParms = 
 {
 	self.pk_items = parm10;
-	self.pk_gravitywellammo = parm11;
-	self.pk_turretammo = parm12;
-	self.pk_canpabammo = parm13;
-	self.pk_beartrapammo = parm14;
-	self.pk_explode_ammo = parm15;
+	self.pk_gravitywellammo = parm11 & 15;
+	self.pk_turretammo = floor(parm11 / 16) & 15;
+	self.pk_canpabammo = floor(parm11 / 256) & 15;
+	self.pk_beartrapammo = floor(parm11 / 4096) & 15;
+	self.pk_explode_ammo = floor(parm11 / 65536);// & 15; // unbound for now
+//	self.pk_turretammo = parm12;
+//	self.pk_canpabammo = parm13;
+//	self.pk_beartrapammo = parm14;
+//	self.pk_explode_ammo = parm15;
 	self.msgcount = (parm16 & 255);
 };
 
@@ -423,19 +454,11 @@ void() SetNewPKParms =
 {
 	parm1 = IT_SHOTGUN | IT_AXE;
 	parm2 = 100;
-	parm3 = 0;
+	parm3 = parm5 = parm6 = parm7 = parm9 = 0;
 	parm4 = 25;
-	parm5 = 0;
-	parm6 = 0;
-	parm7 = 0;
 	parm8 = 1;
-	parm9 = 0;
 	parm10 = PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP;
-	parm11 = 0;
-	parm12 = 0;
-	parm13 = 0;
-	parm14 = 0;
-	parm15 = 0;
+	parm11 = parm12 = parm13 = parm14 = parm15 = 0;
 	parm16 = MOTDTIME + 1;
 
 	if (self.pk_items & PK_IT_EXTRADISP)
@@ -753,7 +776,7 @@ void() pk_post_think =
 
 // do weapon stuff
 
-	PK_WeaponFrame ();
+	if (self.attack_finished < time) PK_WeaponFrame ();
 
 // check to see if player landed and play landing sound
 	if ((self.jump_flag < -300) && (self.flags & FL_ONGROUND) && (self.health > 0))
@@ -801,7 +824,7 @@ void() pk_post_think =
 			}
 		}
 
-		if ((cvar("temp1") & PK_TP_DUTYON))
+		if (pk_flags & PK_TP_DUTYON)
 		{
 			self.pk_dutychecking = time + 0.5;
 		}
@@ -823,7 +846,7 @@ void() pk_post_think =
 			}
 		}
 
-		if ((cvar("temp1") & PK_TP_DUTYON))
+		if (pk_flags & PK_TP_DUTYON)
 		{
 			self.pk_dutychecking = time + 0.5;
 		}
@@ -834,7 +857,7 @@ void() pk_post_think =
 	}
 	else
 	{
-		if (!(cvar("temp1") & PK_TP_DUTYON))
+		if (!(pk_flags & PK_TP_DUTYON))
 		{
 			self.pk_dutychecking = 0;
 		}
@@ -907,6 +930,15 @@ void() pk_clientdisconnect =
 		remove(self.bolt_lightningFire);
 	}
 	self.bolt_lightningFire = world;
+
+	if (chaos != DARKPLACES_ENGINE) // save these off, we hope
+	{
+		local string st;
+		st = ftos(pk_flags);
+		cvar_set("temp1", st);
+		st = ftos(pk_mode);
+		cvar_set("temp2", st);
+	}
 };
 
 // called from killed - updated client obit
