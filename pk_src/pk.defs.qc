@@ -23,6 +23,7 @@ float chaos;
 float PK_ADMIN;							// allow admin - set this to 0 to completely disable all admin
 float pk_adminimp;						// impulse set in admin.cfg to access admin commands, defaults to 255
 float pk_admincode;						// code you must enter to access admin commands - set by admin.cfg, defaults to -1
+float pk_adminpwdmask;					// if true password will be masked with *'s
 float SETCODE					= -8726545; // set the code after delay
 float ADMIN_FAILED_LOGIN	= -777;	// login didnt succeed
 
@@ -248,16 +249,12 @@ void(float to, float f) WriteBFloat;
 .float pk_dutychecking;
 float PK_TP_DUTYON			= 128;
 
-// admin
+// admin code
 void() PK_SetAdmin;
 void() PK_AdminImpulse;
 void() admin_clear_failed;
-//void() AdminCommands;
-//void() CheckAdmin;
+void() Admin_mainmenu;
 .float admin;
-.float indata;
-.float kick;
-.entity kicker;
 
 float PK_TP_STATUSON		= 256;
 .float hubstartupmessage;

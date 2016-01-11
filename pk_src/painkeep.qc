@@ -157,7 +157,7 @@ void() PK_precache =
 	precache_sound ("player/gib_3.wav");
 
 // admin
-	PK_ADMIN = 3; // code sets allow admin here - can be disabled by admin menu, 3 is base menu set
+	PK_ADMIN = 6; // code sets allow admin here - can be disabled by admin menu, 3 is base menu set
 
 	if (PK_ADMIN)
 	{
@@ -165,6 +165,7 @@ void() PK_precache =
 		localcmd ("setadmincode\n");
 		pk_admincode = SETCODE;
 		pk_adminimp = 0;
+		pk_adminpwdmask = TRUE;
 
 		localcmd("noadmingamma\n"); // set gamma level
 		localcmd("noadmin_centertime\n");
