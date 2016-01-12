@@ -161,10 +161,15 @@ void() PK_precache =
 
 	if (PK_ADMIN)
 	{
+		local entity e;
 // access code first
+		e = spawn();
+		e.nextthink = time + 0.2;
+		e.think = PK_SetAdmin;
+		e.classname = "admincode";
+
 		localcmd ("setadmincode\n");
-		pk_admincode = SETCODE;
-		pk_adminimp = 0;
+		pk_admincode = pk_adminimp = -1;
 		pk_adminpwdmask = TRUE;
 
 		localcmd("noadmingamma\n"); // set gamma level
@@ -179,23 +184,8 @@ void() PK_precache =
 
 // set PK mode based on engine var | saved2
 
-	if (!chaos) chaos = cvar("chaos");
-	if (chaos == DARKPLACES_ENGINE)
-	{
-// flags sv var - temp1 in non dp
-		registercvar("sv_pk_flags", "0");
-//		localcmd ("setpkflags\n");
-		pk_flags = cvar("sv_pk_flags"); // NOTE: this doesnt work for the first map loaded
-// map mode sv var
-		registercvar("sv_pk_mode", "0");
-//		localcmd ("setpkmode\n");
-		pk_mode = cvar("sv_pk_mode");
-	}
-	else
-	{
-		pk_flags = cvar("temp1");
-		pk_mode = cvar("saved2") & PK_MODEMASK;
-	}
+	pk_flags = pk_flags_ck = cvar("saved1");
+	pk_mode = pk_mode_ck = cvar("saved2") & PK_MODEMASK;
 
 // got mode, set PK master switch
 	PK = FALSE;
@@ -205,28 +195,7 @@ void() PK_precache =
 		PK = FALSE;
 	else // if (pk_mode == PK_MAP)
 	{
-		if (world.model == "maps/start.bsp" && world.message == "hub") PK = TRUE;
-		else if (world.model == "maps/pk0.bsp") PK = TRUE;
-		else if (world.model == "maps/pk1.bsp") PK = TRUE;
-		else if (world.model == "maps/pk2.bsp") PK = TRUE;
-		else if (world.model == "maps/pk3.bsp") PK = TRUE;
-		else if (world.model == "maps/pk4.bsp") PK = TRUE;
-		else if (world.model == "maps/pk5.bsp") PK = TRUE;
-		else if (world.model == "maps/pk6.bsp") PK = TRUE;
-		else if (world.model == "maps/pk7.bsp") PK = TRUE;
-		else if (world.model == "maps/pk8.bsp") PK = TRUE;
-		else if (world.model == "maps/pk9.bsp") PK = TRUE;
-		else if (world.model == "maps/pk10.bsp") PK = TRUE;
-		else if (world.model == "maps/pk11.bsp") PK = TRUE;
-		else if (world.model == "maps/pk12.bsp") PK = TRUE;
-		else if (world.model == "maps/pk13.bsp") PK = TRUE;
-		else if (world.model == "maps/pk14.bsp") PK = TRUE;
-		else if (world.model == "maps/pk15.bsp") PK = TRUE;
-		else if (world.model == "maps/pk16.bsp") PK = TRUE;
-		else if (world.model == "maps/pk17.bsp") PK = TRUE;
-		else if (world.model == "maps/pk18.bsp") PK = TRUE;
-		else if (world.model == "maps/painkeep.bsp") PK = TRUE;
-		else PK = FALSE; // can still be set by map items
+		PK = PK_mapmode(world.model);
 	}
 
 // extra sounds by...are apparently not supplied, except gib_?.wav
@@ -298,6 +267,39 @@ void() PK_precache =
  	precache_sound ("player/fall_2.wav");
 	}
 	*/
+};
+
+// set mode based on map name
+
+float(string mp) PK_mapmode =
+{
+	local float md;
+
+	md = FALSE;
+
+	if (mp == "maps/start.bsp" && world.message == "hub") md = TRUE; // NOTE: relies on loaded map
+	else if (mp == "maps/pk0.bsp") md = TRUE;
+	else if (mp == "maps/pk1.bsp") md = TRUE;
+	else if (mp == "maps/pk2.bsp") md = TRUE;
+	else if (mp == "maps/pk3.bsp") md = TRUE;
+	else if (mp == "maps/pk4.bsp") md = TRUE;
+	else if (mp == "maps/pk5.bsp") md = TRUE;
+	else if (mp == "maps/pk6.bsp") md = TRUE;
+	else if (mp == "maps/pk7.bsp") md = TRUE;
+	else if (mp == "maps/pk8.bsp") md = TRUE;
+	else if (mp == "maps/pk9.bsp") md = TRUE;
+	else if (mp == "maps/pk10.bsp") md = TRUE;
+	else if (mp == "maps/pk11.bsp") md = TRUE;
+	else if (mp == "maps/pk12.bsp") md = TRUE;
+	else if (mp == "maps/pk13.bsp") md = TRUE;
+	else if (mp == "maps/pk14.bsp") md = TRUE;
+	else if (mp == "maps/pk15.bsp") md = TRUE;
+	else if (mp == "maps/pk16.bsp") md = TRUE;
+	else if (mp == "maps/pk17.bsp") md = TRUE;
+	else if (mp == "maps/pk18.bsp") md = TRUE;
+	else if (mp == "maps/painkeep.bsp") md = TRUE;
+
+	return(md);
 };
 
 // called from many places - handles pk_mode 0 where map sets whether or not we use PK stuff
@@ -932,14 +934,7 @@ void() pk_clientdisconnect =
 	}
 	self.bolt_lightningFire = world;
 
-	if (chaos != DARKPLACES_ENGINE) // save these off, we hope
-	{
-		local string st;
-		st = ftos(pk_flags);
-		cvar_set("temp1", st);
-		st = ftos(pk_mode);
-		cvar_set("temp2", st);
-	}
+	admin_sv_cfg();
 };
 
 // called from killed - updated client obit

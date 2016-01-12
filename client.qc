@@ -1201,7 +1201,7 @@ void () PlayerPostThink =
 
 	if (PK_ADMIN) // *pk - run admin for both modes - any deactivation will 0 this
 	{
-//	if (deathmatch) // admin is debateable in SP, but there is a toggle option for DM
+//	if (deathmatch) // admin is debateable in SP, but...
 		if (self.attack_finished < time)
 		if (self.admin < 0 || (self.impulse && (self.admin || self.impulse == pk_adminimp)))
 		{
@@ -1209,8 +1209,6 @@ void () PlayerPostThink =
 			else PK_AdminImpulse();
 		}
 		if (self.admin) return;
-
-		if (pk_admincode == SETCODE || pk_adminimp == SETCODE) PK_SetAdmin();
 	}
 
 	if (PK)

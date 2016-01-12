@@ -672,6 +672,22 @@ void (entity ply, float n) removeTeamBots =
 	}
 };
 
+void(entity e) removeBot =
+{
+	local entity f;
+
+	f = e;
+	if (!f) f = find (world,classname,"pk*bot");
+	if (!f) return ;
+
+	if (f.pather) NUMPATHERS = (NUMPATHERS - 1);
+
+	remove (f.movetarget);
+	remove (f.goalentity);
+	remove (f);
+	NUMBOTS = NUMBOTS - 1;
+};
+
 void () removeAllBots =
 {
 	local entity e;
@@ -682,6 +698,8 @@ void () removeAllBots =
 		{
 			return ;
 		}
+		removeBot(e);
+/*
 		if (e.pather)
 		{
 			NUMPATHERS = (NUMPATHERS - 1);
@@ -689,6 +707,7 @@ void () removeAllBots =
 		remove (e.movetarget);
 		remove (e.goalentity);
 		remove (e);
+*/
 		e = find (e,classname,"pk*bot");
 	}
 	NUMBOTS = 0;

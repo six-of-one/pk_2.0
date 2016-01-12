@@ -1407,11 +1407,12 @@ void () W_WeaponFrame =
 	if (time < self.attack_finished)
 		return;
 
+	if (self.classname == "peeper") // *bot
+	if (self.impulse != 212)
+		return;
+
 	if (self.impulse)
 		ImpulseCommands ();
-
-	if (self.classname == "peeper") // *bot
-		return;
 
 // check for attack
 	if (self.button0)

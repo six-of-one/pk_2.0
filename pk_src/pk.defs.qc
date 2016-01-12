@@ -250,11 +250,14 @@ void(float to, float f) WriteBFloat;
 float PK_TP_DUTYON			= 128;
 
 // admin code
+.float admin;
+float(string mp) PK_mapmode;
 void() PK_SetAdmin;
 void() PK_AdminImpulse;
+void() admin_sv_cfg;
 void() admin_clear_failed;
 void() Admin_mainmenu;
-.float admin;
+float pk_flags_ck, pk_mode_ck;
 
 float PK_TP_STATUSON		= 256;
 .float hubstartupmessage;

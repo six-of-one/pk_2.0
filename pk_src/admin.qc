@@ -6,20 +6,23 @@
 // Rip on IRC/NetQuake
 // doug.keegan@tamu.edu
 
+// Cataboligne - advanced admin, 4.11.8
 
-// impulse constants. Change the A_CODEx constants to your 'secret' admin code
+/*  new admin features:
 
-// Renumber the impulses, remove the default codes, and change the level options
-// -1 for any of these codes means they are disabled
-//float   A_CODE1 = 2;
-//float   A_CODE2 = 4;
-//float   A_CODE3 = 2;
-//float   A_CODE4 = 6;
-//float   A_CODE5 = 7;
-// Cataboligne - time limit on admin password entry
+password - unlimited digits, stored in admin.cfg, masked entry
+access impulse - stored in admin.cfg
+
+menu driven - impulse independent - no longer will you have to keep notes or bind tons of keys
+controls bots
+
+*/
+
+// time limit on admin password entry
 float admin_time;
 float A_TIME = 10; // 10 secs for admin password - if this is not set, admin access attempt becomes free invulnerable state!
 float A_DELAY = 30; // time until you can do anything after failing the admin entry - no shooting, no admin!
+
 // Level impulses
 float   A_PKHUB  = 21;
 float   A_PAINKEEP = 20;
@@ -42,7 +45,7 @@ float   A_PK15  = 15;
 float   A_PK16  = 16;
 float   A_PK17  = 17;
 float   A_PK18  = 18;
-// End of level impulses
+
 // link codes
 float   A_DMT   = 01;
 float   A_TEAMT = 02;
@@ -58,12 +61,28 @@ float   A_GRAVD = 136;
 float   A_FRICU = 21;
 float   A_DMMAP = 22;
 float   A_BOTS  = 23;
+float   A_PKCON = 24;
 float   A_FRICD = 138;
 float   A_SKICK = 30;
-//float   A_YES   = 141;
-//float   A_NO    = 142;
+float   A_PKMOD = 60;
 
 
+// save flags & mode
+
+void() admin_sv_cfg =
+{
+	local string str;
+
+	str = ftos(pk_flags);
+	if (pk_flags != pk_flags_ck)//cvar("saved1"))
+		cvar_set("saved1", str);
+	pk_flags_ck = pk_flags;
+
+	str = ftos(pk_mode);
+	if (pk_mode != pk_mode_ck) //cvar("saved2"))
+		cvar_set("saved2", str);
+	pk_mode_ck = pk_mode;
+};
 
 /*
 ==========
@@ -402,7 +421,84 @@ void() Admin_kickmenu =
 						"\b+------------------------+\n"
 						"\b Enter code: ";
 
-	self.admin = 17;
+	self.admin = 15;
+};
+/*
+==========
+Bots
+==========
+*/
+
+// set skill for bot admin if parm >0 if parm = 0 increment skill by 1, loop after 3
+
+float(float sk) skill_add =
+{
+	local float skl;
+	if (sk) skl = sk;
+	else
+	{
+		skl = cvar("skill");
+		skl = skl + 1;
+	}
+	if (skl > 3) skl = 0;
+	localcmd("skill ");
+	localcmd(ftos(skl));
+	localcmd("\n");
+	return(skl);
+};
+
+void() Admin_botmenu =
+{
+	self.message =
+				       "\b     Admin Bot Menu:     \n"
+				       "\b+--------------------------+\n"
+							"    pk*bot       frikbot    \n"
+							" 01: add bot   11: add bot  \n"
+							" 02: remove 1  12: remove 1 \n"
+							" 03: add 4     13: add 4    \n"
+							" 04: 3 *skill  14: 3 *skill \n"
+							" - add 1 bot of each skill  \n"
+							" 05: verbose                \n"
+							" 06: update    20: +skill   \n"
+							" 07: restrict               \n"
+							" 08: superrestrict          \n"
+							" 09: observer mode          \n"
+							" 10: observer time          \n"
+							" 666:  main menu            \n"
+							"  admin impulse exits       \n"
+				       "\b+--------------------------+\n"
+						 "\b  Enter code: ";
+
+	self.wad = "";
+	self.admin = 18;
+	self.lefty = 0;
+};
+
+/*
+==========
+Painkeep impulses
+==========
+*/
+void() Admin_pkmenu =
+{
+	self.message =
+				       "\b    Admin Painkeep Menu:    \n"
+				       "\b+--------------------------+\n"
+							"  01: SFX toggle            \n"
+							"  02: HUB mode toggle       \n"
+							"  03: Duty check toggle     \n"
+							"  04: settings list         \n"
+//							"  05: PK dynamic items      \n"
+							"  06: Spike traps           \n"
+//							"  07: Extra sound           \n"
+							" 666:  main menu            \n"
+							"  admin impulse exits       \n"
+				       "\b+--------------------------+\n"
+						 "\b  Enter code: ";
+
+	self.wad = "";
+	self.admin = 22;
+	self.lefty = 0;
 };
 
 /*
@@ -412,6 +508,8 @@ AdminCommands
 */
 void() Admin_mainmenu =
 {
+	if (PK) // menu with PK only entries
+	{
 	self.message = "\b   Administration Menu:   \n"
 						"\b+------------------------+\n"
 						"  01:  toggle deathmatch  \n"
@@ -420,17 +518,44 @@ void() Admin_mainmenu =
 						"  04:  toggle no exit     \n"
 						"  05:  goto next level    \n"
 						"  06:  reset level        \n"
-						"  07:  hub level / start  \n"
+						"  07:  hub map load       \n"
 						"  10:  frag limit         \n"
 						"  11:  time limit         \n"
 						"  20:  gravity control    \n"
 						"  21:  friction control   \n"
 						"  22:  map control        \n"
 						"  23:  bot control        \n"
+						"  24:  painkeep control   \n"
 						"  30:  kick players       \n"
+						"  60:  PK mode toggle     \n"
+						"  ---  PK mode = TRUE     \n"
 						"  admin impulse exits     \n"
 						"\b+------------------------+\n"
 						"\b Enter code: ";
+	}
+	else
+	{
+	self.message = "\b   Administration Menu:   \n"
+						"\b+------------------------+\n"
+						"  01:  toggle deathmatch  \n"
+						"  02:  toggle teamplay    \n"
+						"  03:  toggle coop        \n"
+						"  04:  toggle no exit     \n"
+						"  05:  goto next level    \n"
+						"  06:  reset level        \n"
+						"  07:  start map load     \n"
+						"  10:  frag limit         \n"
+						"  11:  time limit         \n"
+						"  20:  gravity control    \n"
+						"  21:  friction control   \n"
+						"  23:  bot control        \n"
+						"  30:  kick players       \n"
+						"  60:  PK mode toggle     \n"
+						"  ---  PK mode = FALSE    \n"
+						"  admin impulse exits     \n"
+						"\b+------------------------+\n"
+						"\b Enter code: ";
+	}
 
 	self.target = self.map = self.wad = "";
 	self.admin = 6;
@@ -439,7 +564,10 @@ void() Admin_mainmenu =
 
 void() AdminCommands =
 {
-	if (self.admin == 1)
+	local float f;
+	local string str;
+
+	if (self.admin == 1) // login
 	{
 		if (self.lefty != pk_admincode)
 		{
@@ -453,14 +581,97 @@ void() AdminCommands =
 		Admin_mainmenu();
 		return;
 	}
-	else if (self.admin < 6) self.admin = 6;
+	else if (self.admin < 6) // main menu
+	{
+		self.admin = 6;
+// main menu options
+		if (self.lefty == A_FRAGL)
+		{
+			self.wad = "\nEnter a new frag limit";
+			self.lefty = cvar("fraglimit");
+			self.admin = 10;
+			self.map = "fraglimit ";
+			self.target = "\nfraglimit changed...";
+//		self.indata = 1;
+//		sprint(self,"Fraglimit?\n");
+		}
+		else
+		if (self.lefty == A_TIMEL)
+		{
+			self.wad = "\nEnter a new time limit";
+			self.lefty = cvar("timelimit");
+			self.admin = 10;
+			self.map = "timelimit ";
+			self.target = "\ntimelimit changed...";
+//		self.indata = 1;
+//		sprint(self,"Fraglimit?\n");
+		}
+		else
+		if (self.lefty == A_TEAMT) TeamToggle(); else
+		if (self.lefty == A_DMT) DMToggle(); else
+		if (self.lefty == A_COOPT) CoopToggle(); else
+		if (self.lefty == A_JUMP) JumptoNext(); else
+		if (self.lefty == A_RESET) ResetLevel(); else
+		if (self.lefty == A_NOEX) ToggleNoExit(); else
+		if ((self.lefty == A_GRAVU) || (self.lefty == A_GRAVD)) GravToggle(); else
+		if ((self.lefty == A_FRICU) || (self.lefty == A_FRICD)) FricToggle(); else
+		if (self.lefty == A_START) MapStart(); else
+		if (self.lefty == A_DMMAP) Admin_dmmapmenu(); else
+		if (self.lefty == A_BOTS) Admin_botmenu(); else
+		if (self.lefty == A_PKCON) Admin_pkmenu(); else
+		if (self.lefty == A_PKMOD)
+		{
+			f = pk_mode & 3;
+			pk_mode = pk_mode - f;
+			f = f + 1;
+			if (f == 3)
+			{
+				f = 0;
+				PK = PK_mapmode(world.model);
+				str = "\nPainkeep mode = map\npainkeep code enabled for painkeep maps\nmap items will not change until reloaded";
+			}
+			else if (f == 1)
+			{
+				PK = 1;
+				str = "\nPainkeep mode = always\npainkeep code always enabled\nmap items will not change until reloaded";
+			}
+			else
+			{
+				PK = 0;
+				str = "\nPainkeep mode = never\npainkeep code never enabled\nmap items will not change until reloaded";
+			}
+
+			pk_mode = pk_mode | f;
+			admin_sv_cfg();
+			Admin_mainmenu();
+			self.wad = str;
+		}
+		else
+		if (self.lefty == A_SKICK)
+		{
+			self.target = "player";
+			self.enemy = world;
+			find_Kick();
+			if (self.enemy) Admin_kickmenu();
+		}
+		else
+			self.lefty = 0;
+	}
 	else if (self.admin == 9) // new server value
 	{
-		localcmd(self.map);
-		localcmd(ftos(self.lefty));
-		localcmd("\n");
+		if (self.map == "observer_time")
+		{
+			observer_time = self.lefty;
+			self.admin = 18;
+		}
+		else
+		{
+			localcmd(self.map);
+			localcmd(ftos(self.lefty));
+			localcmd("\n");
+			self.admin = 6;
+		}
 		self.wad = self.target;
-		self.admin = 6;
 		self.target = self.map = "";
 		self.lefty = 0;
 	}
@@ -472,10 +683,11 @@ void() AdminCommands =
 		{
 			if (MapDM()) return;
 			self.admin = 14;
+			self.lefty = 0;
 		}
 		self.wad = "\nNo map change.";
 	}
-	else if (self.admin == 17) // kick players
+	else if (self.admin == 15) // kick players
 	{
 		if (self.lefty == KICKCODE)
 		{
@@ -498,64 +710,213 @@ void() AdminCommands =
 			Admin_mainmenu();
 		else if (self.impulse == 1) Admin_kickmenu();
 		else if (self.impulse == 3) find_Kick();
-		else self.lefty = 0;
 	}
-/*
-	if (self.indata > 0)	// PAINKEEP: No need to check for impulse 0 here, this isn't called in that case
+	else if (self.admin == 17) // bots
 	{
-		if (self.indata == 1) ChangeFragL();
-		if (self.indata == 2) ChangeTimeL();
-		self.indata = 0;
-	}
-*/
-	if (self.lefty == A_FRAGL)
-	{
-		self.wad = "\nEnter a new frag limit";
-		self.lefty = cvar("fraglimit");
-		self.admin = 10;
-		self.map = "fraglimit ";
-		self.target = "\nfraglimit changed...";
+		self.admin = 18;
+		if (self.lefty == 666)
+			Admin_mainmenu();
+		else if (self.lefty == 1 || self.lefty == 3 || self.lefty == 4)
+		{
+			f = cvar("skill");
+			AddAnotherBot ();
+			self.wad = "\nLoaded a pk*bot on server.";
+			if (self.lefty != 1)
+			{
+				if (self.lefty == 4)
+				{
+					if (!f) skill_add(0);
+					skill_add(0);
+				}
+				AddAnotherBot ();
+				if (self.lefty == 4) skill_add(0);
+				AddAnotherBot ();
+				if (self.lefty == 4) skill_add(f);
+				else
+					AddAnotherBot ();
+				self.wad = "\nLoaded requested pk*bot(s) on server.";
+			}
+		}
+		else if (self.lefty == 11 || self.lefty == 13 || self.lefty == 14)
+		{
+			if (self.lefty == 14) f = 1;
+			else f = cvar("skill");
+			BotConnect(0, 0, f);
+			self.wad = "\nLoaded A frikbot on server.";
+			if (self.lefty != 11)
+			{
+				if (self.lefty == 14) f = f + 1;
+				BotConnect(0, 0, f);
+				if (self.lefty == 14) f = f + 1;
+				BotConnect(0, 0, f);
+				if (self.lefty != 14) BotConnect(0, 0, f);
+				self.wad = "\nLoaded requested frikbot(s) on server.";
+			}
+		}
+		else if (self.lefty == 2)
+		{
+			removeBot(world);
+			self.wad = "\nRemoved a pk*bot from server.";
+		}
+		else if (self.lefty == 12)
+		{
+			KickABot();
+			self.wad = "\nRemoved a frikbot from server.";
+		}
+		else if (self.lefty == 5)
+		{
+			setVerboseMode();
+			if (VERBOSEBOT)
+				self.wad = "\npk*bots will not be quiet.";
+			else
+				self.wad = "\ncats got pk*bots tongues.";
+		}
+		else if (self.lefty == 7)
+		{
+			if (serverflags & RESTRICT)
+			{
+				serverflags = (serverflags - RESTRICT);
+				self.wad = "\nBot restriction removed from server.";
+			}
+			else
+			{
+				serverflags = (serverflags | RESTRICT);
+				self.wad = "\nBot commands restricted on server.";
+			}
+		}
+		else if (self.lefty == 8)
+		{
+			if (serverflags & SUPERRESTRICT)
+			{
+				serverflags = (serverflags - SUPERRESTRICT);
+				self.wad = "\nSuper restriction removed from server.";
+			}
+			else
+			{
+				serverflags = (serverflags | SUPERRESTRICT);
+				self.wad = "\nBots super restricted on server.";
+			}
+		}
+		else if (self.lefty == 9)
+		{
+			if (serverflags & FL_OBSERVER)
+			{
+				serverflags = (serverflags - FL_OBSERVER);
+				self.wad = "\nAll players can observe.";
+			}
+			else
+			{
+				serverflags = (serverflags | FL_OBSERVER);
+				self.wad = "\nOnly admins can observe.";
+			}
+		}
+		if (self.lefty == 10)
+		{
+			self.wad = "\nEnter an observer time limit in seconds";
+			self.lefty = observer_time;
+			self.admin = 10;
+			self.map = "observer_time";
+			self.target = "\nObserver time limit changed...";
 //		self.indata = 1;
 //		sprint(self,"Fraglimit?\n");
+		}
+		else if (self.lefty == 20)
+		{
+			f = skill_add(0);
+			if (!f) self.wad = "\nSkill level is 0.";
+			else if (f == 1) self.wad = "\nSkill level is 1.";
+			else if (f == 2) self.wad = "\nSkill level is 2.";
+			else if (f == 3) self.wad = "\nSkill level is 3.";
+			else self.wad = "\nSkill level is UNKNOWN!.";
+		}
+		else
+			self.lefty = 0;
 	}
-	else
-	if (self.lefty == A_TIMEL)
+	else if (self.admin == 21) // painkeep specific items
 	{
-		self.wad = "\nEnter a new time limit";
-		self.lefty = cvar("timelimit");
-		self.admin = 10;
-		self.map = "timelimit ";
-		self.target = "\ntimelimit changed...";
-//		self.indata = 1;
-//		sprint(self,"Fraglimit?\n");
+		self.admin = 22;
+		if (self.lefty == 666)
+			Admin_mainmenu();
+		else if (self.lefty == 1)
+		{
+			if ((pk_flags & PK_TP_SPARKSFLASH))
+			{
+				self.wad = "\nSFX Enabled.";
+				pk_flags = pk_flags - PK_TP_SPARKSFLASH;
+			}
+			else
+			{
+				self.wad = "\nSFX Disabled.";
+				pk_flags = pk_flags | PK_TP_SPARKSFLASH;
+			}
+		}
+		else if (self.lefty == 2)
+		{
+			if (serverflags & PK_SF_HUB)
+			{
+				self.wad = "\nHub mode OFF";
+				serverflags = serverflags - PK_SF_HUB;
+			}
+			else
+			{
+				self.wad = "\nHub mode ON";
+				serverflags = serverflags | PK_SF_HUB;
+			}
+		}
+		else if (self.lefty == 3)
+		{
+			if (pk_flags & PK_TP_DUTYON)
+			{
+				self.wad = "\nDuty Checking OFF";
+				pk_flags = pk_flags - PK_TP_DUTYON;
+			}
+			else
+			{
+				self.wad = "\nDuty Checking ON";
+				pk_flags = pk_flags | PK_TP_DUTYON;
+			}
+		}
+		else if (self.lefty == 4)
+		{
+			self.wad = "\nSettings printed to console";
+			if (pk_flags & PK_TP_DUTYON)
+				sprint(self, "Duty Checking On\n");
+			else
+				sprint(self, "Duty Checking Off\n");
+
+			if (!(pk_flags & PK_TP_SPARKSFLASH))
+				sprint(self, "SFX On\n");
+			else
+				sprint(self, "SFX Off\n");
+
+			if (pk_flags & PK_TP_STATUSON)
+				sprint(self, "Status On\n");
+			else
+				sprint(self, "Status Off\n");	 
+
+			if (pk_flags & PK_TP_USERMAPON)
+				sprint(self, "Custom Maps On\n");
+			else
+				sprint(self, "Custom Maps Off\n");
+		}
+		else if (self.lefty == 6)
+		{
+			f = pk_mode & PK_SPIKER;
+			pk_mode = pk_mode - f;
+			f = (f + PK_SPIKER) & PK_SPIKER;
+			pk_mode = pk_mode | f;
+			if (f)
+				self.wad = "\nSpkike traps disabled in PK mode";
+			else
+				self.wad = "\nSpkike traps enabled in PK mode";
+		}
+		else
+			self.lefty = 0;
+
+		if (self.lefty) admin_sv_cfg();
 	}
-	else
 
-	if (self.lefty == A_TEAMT) TeamToggle(); else
-	if (self.lefty == A_DMT) DMToggle(); else
-	if (self.lefty == A_COOPT) CoopToggle(); else
-	if (self.lefty == A_JUMP) JumptoNext(); else
-	if (self.lefty == A_RESET) ResetLevel(); else
-	if (self.lefty == A_NOEX) ToggleNoExit(); else
-	if ((self.lefty == A_GRAVU) || (self.lefty == A_GRAVD)) GravToggle(); else
-	if ((self.lefty == A_FRICU) || (self.lefty == A_FRICD)) FricToggle(); else
-	if (self.lefty == A_START) MapStart(); else
-	if (self.lefty == A_DMMAP) Admin_dmmapmenu(); else
-	if (self.lefty == A_SKICK)
-	{
-		self.target = "player";
-		self.enemy = world;
-		find_Kick();
-		if (self.enemy) Admin_kickmenu();
-	}
-
-
-	//else
-//	if (self.impulse == A_YES) DoKick(); else
-//	if (self.impulse == A_NO) NextKick(); //else
-//	if (self.impulse == A_MENU) ShowMenu();
-//	self.lefty = 0;
-	if (self.admin == 17)
+	if (self.admin == 15)
 		centerprint3(self, self.message, self.enemy.netname, self.wad);
 	else
 		centerprint3(self, self.message, "->", self.wad);
@@ -579,33 +940,39 @@ Admin Impulse code
 
 void() PK_SetAdmin =
 {
-	if (admin_time > time) return;
-	else if (pk_admincode == SETCODE) 
+	local entity e;
+
+	e = spawn();
+	e.nextthink = time + 0.1;
+	e.think = PK_SetAdmin;
+
+	if (self.classname == "admincode") 
 	{
 		pk_admincode = cvar("saved3");
 		if ( ! pk_admincode) pk_admincode = -1;
 // access impulse now
 		localcmd ("setadminimpulse\n");
-		pk_adminimp = SETCODE;
-		self.impulse = self.admin = 0;
+		e.classname = "adminimp";
 		if (pk_admincode == -1) PK_ADMIN = 0;
 	}
-	else if (pk_adminimp == SETCODE) 
+	else if (self.classname == "adminimp") 
 	{
 		pk_adminimp = cvar("saved3");
 		if ( ! pk_adminimp) pk_adminimp = 255;
-		localcmd ("saved3 0\n");
-		self.admin = 0;
 		if (pk_adminimp == -1) PK_ADMIN = 0;
+		localcmd("saved3 0\n");
+		remove(e);
 if (1) {
 bprint("admin impulse: ");
 bprint(ftos(pk_adminimp));
 bprint(", code: ");
 bprint(ftos(pk_admincode));
-bprint("\n"); }
-
+bprint("<\n"); }
 	}
-	admin_time = time + 0.1;
+	else
+		remove(e);
+
+	remove(self);
 };
 
 void() PK_AdminImpulse =

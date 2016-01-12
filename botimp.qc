@@ -80,14 +80,40 @@ void () setSkinsMode =
 	}
 };
 
+void () NoPeeper;
+
+void() end_observer =
+{
+	bprint(self.enemy.netname);
+	bprint (", observer time ran out\n");
+	self.nextthink = time + 1;
+	self.think = SUB_Remove;
+	self = self.enemy;
+	NoPeeper();
+};
+
 void () Peeper =
 {
+	local entity e;
+
+	if (!self.admin)
+	{
+		if (serverflags & FL_OBSERVER) // restricted, only admins can observe
+			return;
+		if (observer_time) // can only observe for this long
+		{
+			e = spawn();
+			e.nextthink = time + observer_time;
+			e.think = end_observer;
+			e.enemy = self;
+		}
+	}
 	self.classname = "peeper";
 	self.frame = 0;
 	self.solid = SOLID_NOT;
 	self.movetype = MOVETYPE_FLY;
 	self.takedamage = DAMAGE_NO;
-	self.frags = NAMEBOTS;
+	self.frags = 0;
 	self.weaponmodel = "";
 	setmodel (self,string_null);
 	setsize (self,REBOUNDSPOT,REBOUNDSPOT);

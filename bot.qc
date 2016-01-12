@@ -612,6 +612,7 @@ else bprint(" )\n");}
 void(entity e) bot_BackpackSetup =
 {
 //	e.bot_item_touch = e.touch;
+	if (!e) return;
 	e.pk_touch = e.touch;
 	e.touch = bot_touch;
 	e.classname = "Backpack"; // *bot backpack code follows
