@@ -291,7 +291,10 @@ void() painkeep_touch =
 {
 	local entity stm2;
 
-	if (other.admin) return; // *pk - admin - no collecting stuff
+	if (other.admin)
+	if (other.admin != LIVE_ADMIN)
+	if (other.admin != USER_MENU)
+		return; // *pk - admin - no collecting stuff
 
 	local entity e;
 	e = world;
@@ -921,4 +924,3 @@ void() pk_placeitem =
 		self.netname = "Pulse Rifle";
 	}
 };
-

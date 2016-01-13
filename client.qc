@@ -526,7 +526,7 @@ void () PutClientInServer =
 	if (PK) spot = PK_SelectSpawnPoint (); // *pk - get a spawn point, pk style 
 	else
 	spot = SelectSpawnPoint ();
-	if (PK) ClearSpawnPoint(spot);
+	if (PK) ClearSpawnPoint(spot); // *pk
 
 	self.classname = "player";
 	self.health = 100;
@@ -917,7 +917,7 @@ void () WaterMove =
 		self.dmgtime = 0;
 	}
 
-	if (!PK)
+	if (!PK) // *pk - done elsewhere
 	if (! (self.flags & FL_WATERJUMP))
 		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
 };
@@ -1198,8 +1198,7 @@ void () PlayerPostThink =
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
 
-
-	if (PK_ADMIN) // *pk - run admin for both modes - any deactivation will 0 this
+	if (PK_ADMIN || self.admin == USER_MENU) // *pk - run admin for both modes - any deactivation will 0 this
 	if (self.admin || (self.impulse == pk_adminimp))
 	if (pk_adminframe != framecount)
 	if (admin_postthink()) return;

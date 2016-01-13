@@ -616,6 +616,12 @@ void() pk_special_impulse =
 	{
 		self.pk_currentInventory = self.pk_currentitem = PK_IT_AXE;
 	}
+	else if (self.impulse == USER_IMPULSE)
+	{
+		if (!self.admin)
+			self.admin = USER_MENU;
+		return;
+	}
 	else
 	{ // print the current inventory items out.
 		msg_entity = self;

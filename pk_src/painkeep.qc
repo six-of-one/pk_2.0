@@ -11,7 +11,7 @@ Cataboligne 3.29.8
 
 void() PK_precache =
 {
-// old ambient sounds for pk_flags not set to PK
+// old ambient sounds for pk_mode not set to PK
 
 	precache_sound ("alt_ambience/windfly.wav");
 	precache_sound ("alt_ambience/hum1.wav");
@@ -301,7 +301,7 @@ float(string mp) PK_mapmode =
 	return(md);
 };
 
-// called from many places - handles pk_flags 0 where map sets whether or not we use PK stuff
+// called from many places - handles pk_mode 0 where map sets whether or not we use PK stuff
 
 // really sound(), mod for frikbot code
 void(entity e, float chan, string samp, float vol, float atten) pk_sound = 

@@ -52,7 +52,10 @@ void() monster_zombie2 =
 	precache_sound ("misc/zombie/swing_3.wav");
 
 	if (pk_flags & PK_TP_SPARKSFLASH)
+	{
 		remove(self);
+		return;
+	}
 
 	self.solid = SOLID_NOT;
 	self.movetype = MOVETYPE_STEP;
@@ -88,10 +91,13 @@ void() zombie_twist =
 
 void() monster_zombie3 =
 {
-	if (pk_flags & PK_TP_SPARKSFLASH)
-		remove(self);
-	  
 	precache_model ("progs/zombie3.mdl");
+
+	if (pk_flags & PK_TP_SPARKSFLASH)
+	{
+		remove(self);
+		return;
+	}
 
 	self.solid = SOLID_NOT;
 	self.movetype = MOVETYPE_STEP;

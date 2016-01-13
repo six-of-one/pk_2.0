@@ -204,7 +204,7 @@ variable adjuster
 */
 void() Admin_varmenu =
 {
-	if (self.cnt == 0.01)
+	if (self.cnt < 0.1)
 	{
 	self.message =
 					 "\b   Administration Menu:    \n"
@@ -217,8 +217,9 @@ void() Admin_varmenu =
 						"     3:     1.0      :4    \n"
 						"          by value         \n"
 						" +-----------------------+ \n"
-						"   7: enter value          \n"
-						"   8: main menu            \n"
+						"   7: save modification    \n"
+						"   8: enter new value      \n"
+						"   9: main menu            \n"
 						" admin impulse: exit admin \n"
 					 "\b+-------------------------+\n"
 					 "\b Enter code: ";
@@ -289,7 +290,8 @@ void() Admin_dmmapmenu =
 	self.admin = 14;
 	self.lefty = 0;
 };
-// PAINKEEP_START Redone for pk
+
+
 float() MapDM =
 {
   local string mname;
@@ -325,7 +327,6 @@ float() MapDM =
   changelevel(mname);
   return(TRUE);
 };
-// PAINKEEP_END
 
 /*
 ==========
@@ -539,6 +540,30 @@ void() Admin_mainmenu =
 	self.lefty = 0;
 };
 
+// setup timer for closing menus
+
+// lt - light up admin if true
+// tm - timeout to use
+
+void(float lt, float tm) admin_timer =
+{
+	if (self.goalentity)
+	if (self.goalentity.classname == "admintimer") // 'e says they already got one
+		return;
+	self.goalentity = spawn();
+	if (!self.goalentity) return;
+	self.goalentity.classname = "admintimer";
+	self.goalentity.owner = self;
+	self.goalentity.think = PK_AdminImpulse;
+	self.goalentity.nextthink = time + tm;
+// if lt is true, this is a beacon light over an admins player
+	if (lt)
+	{
+		self.goalentity.effects = EF_DIMLIGHT;
+		setmodel(self.goalentity, "progs/s_light.spr"); // let everyone know this guy is in admin mode
+	}
+};
+
 void() AdminCommands =
 {
 	local float f;
@@ -550,7 +575,6 @@ void() AdminCommands =
 		{
 			self.attack_finished = time + A_DELAY; // penalty - cant use this for invulnerable state
 			self.admin = ADMIN_FAILED_LOGIN;
-			localcmd("noadmin_centertime\n");
 			centerprint3(self, "admin password entry failure, you must wait ",ftos(A_DELAY)," secs!\n");
 			return;
 		}
@@ -558,17 +582,7 @@ void() AdminCommands =
 		Admin_mainmenu();
 		if (pk_admintime > 0) // admin timeout
 		{
-			if (self.goalentity)
-			if (self.goalentity.classname == "admintimer") // 'e says they already got one
-				return;
-			self.goalentity = spawn();
-			if (!self.goalentity) return;
-			self.goalentity.classname = "admintimer";
-			self.goalentity.owner = self;
-			self.goalentity.effects = EF_DIMLIGHT;
-			self.goalentity.think = PK_AdminImpulse;
-			self.goalentity.nextthink = time + pk_admintime;
-			setmodel(self.goalentity, "progs/s_light.spr"); // let everyone know this guy is in admin mode
+			admin_timer(TRUE, pk_admintime);
 		}
 		return;
 	}
@@ -983,14 +997,17 @@ void() AdminCommands =
 		centerprint3(self, self.message, "->", self.wad);
 };
 
-// clear screen from failed login after wait
+// clear screen from admin - exit or failed login after wait
 
-void() admin_clear_failed =
+void() admin_clear =
 {
 	localcmd("noadmingamma\n");
+	localcmd("noadmin_centertime\n");
 	centerprint(self, "");
-	self.admin = 0;
+	self.impulse = self.admin = 0;
 	self.takedamage = DAMAGE_AIM;	
+	self.wad = self.message = self.map = self.target = "";
+	self.enemy = world;
 };
 
 /*
@@ -1029,7 +1046,7 @@ void() PK_SetAdmin =
 		pk_admintime = cvar("saved3");
 		localcmd("saved3 0\n");
 		remove(e);
-if (1) {
+if (0) {
 bprint("admin impulse: ");
 bprint(ftos(pk_adminimp));
 bprint(", code: ");
@@ -1044,15 +1061,146 @@ bprint("\n"); }
 	remove(self);
 };
 
+/*
+============
+User Menu
+============
+*/
+void() User_menu =
+{
+	self.message =
+					 "\b   Painkeep User Menu:   \n"
+					 "\b+------------------------+\n"
+						"  1: Chain Thunderbolt    \n"
+						"  2: Gravity Well         \n"
+						"  3: Auto Sentry          \n"
+						"  4: Harpoon              \n"
+						"  6: Air fist             \n"
+						"  7: Beartrap             \n"
+						"  8: Can o' Pork n' Beans \n"
+						"  9: Axe                  \n"
+						"  0: Inventory list       \n"
+						"  +--------------------+  \n"
+						"  5: release harpoon      \n\n"
+				"\b*** following are impulse links ***\n\n"
+
+						"  11: close combat wep    \n"
+						"  12: prev pk weapon      \n"
+						"  13: status display      \n"
+						"    any impulse exits     \n"
+					 "\b+------------------------+\n"
+					 "\b Enter code: ";
+
+	self.wad = "";
+};
+
+// set painkeep item from user menu
+
+void(float pki, float ci) user_menu_pkitem =
+{
+	if (ci) // ci - set current inventory too
+		self.pk_currentInventory = self.pk_currentitem = pki;
+	else
+		self.pk_currentitem = pki;
+
+	self.weapon = IT_AXE;
+	self.forcewchange = TRUE;
+	W_SetCurrentAmmo();
+};
+
 // fn(PK_AdminImpulse) - main admin input control routine
 
 void() PK_AdminImpulse =
 {
 	local string as;
+	local float f;
 
 	self.attack_finished = time + 0.1; // debounce - dont want this every frame
 
-	if (self.impulse == pk_adminimp || self.classname == "admintimer") // toggle admin state on security impulse
+	if (self.admin == USER_MENU) // process user menu (impulse 39) here
+	{
+		if (self.message == "")
+		{
+			localcmd("usergamma\n");
+			localcmd("admin_centertime\n");
+			User_menu();
+			admin_timer(FALSE, USER_TIMEOUT);
+			self.impulse = 0;
+		}
+		if (self.impulse == 6)
+		{
+			if (self.pk_items & PK_IT_AIRGUN)
+				user_menu_pkitem(PK_IT_AIRGUN, FALSE);
+		}
+		else if (self.impulse == 4)
+		{
+			if (self.pk_items & PK_IT_GRAPGUN)
+				user_menu_pkitem(PK_IT_GRAPGUN, FALSE);
+		}
+		else if (self.impulse == 1)
+		{
+			if (self.ammo_cells > 1 && self.pk_items & PK_IT_CLIGHT)
+				user_menu_pkitem(PK_IT_CLIGHT, FALSE);
+		}
+		else if (self.impulse == 2)
+		{
+			if (self.pk_gravitywellammo > 0)
+				user_menu_pkitem(PK_IT_GRAVITYWELL, TRUE);
+		}
+		else if (self.impulse == 7)
+		{
+			if (self.pk_beartrapammo > 0)
+				user_menu_pkitem(PK_IT_BEARTRAP, TRUE);
+		}
+		else if (self.impulse == 3)
+		{
+			if (self.pk_turretammo > 0)
+				user_menu_pkitem(PK_IT_TURRET, TRUE);
+		}
+		else if (self.impulse == 8)
+		{
+			if (self.pk_canpabammo > 0)
+				user_menu_pkitem(PK_IT_CANPAB, TRUE);
+		}
+		else if (self.impulse == 9)
+		{
+			user_menu_pkitem(PK_IT_AXE, TRUE);
+		}
+		else if (self.impulse == 5)
+			grap_releaseHarpoon();
+/*		else if (self.impulse == 11)
+		{
+			self.weapon = W_BestWeapon();
+			self.pk_currentitem = W_BestPKWeapon();
+			W_SetCurrentAmmo();
+		}
+		else if (self.impulse == 12)
+			if (CanSelect(self.lastweapon, self.pklastweapon))
+			{
+				self.weapon = self.lastweapon;
+				self.pk_currentitem = self.pklastweapon;
+				W_SetCurrentAmmo();
+			}
+*/
+		f = self.impulse;
+		centerprint3(self, self.message, "", "");
+		if (self.button0 || self.button1 || self.button2 || self.impulse)
+			admin_clear();
+
+// NOTE: if the impulses change - this code must change
+		if (f == 11) // admin enter
+			self.impulse = 46;
+		else if (f == 12) // admin backspace
+			self.impulse = 69;
+		else if (f == 13)
+			self.impulse = 201;
+		else if (f == 10) // admin 0
+			self.impulse = 38;
+		else
+			self.impulse = 0;
+		return;
+	}
+	else if (self.impulse == pk_adminimp || self.classname == "admintimer") // toggle admin state on security impulse
 	{
 		if (self.classname == "admintimer") // entry from a timeout remote
 		{
@@ -1077,7 +1225,6 @@ void() PK_AdminImpulse =
 			{
 				self.attack_finished = time + A_TIME; // penalty - cant use this for invulnerable state
 				self.admin = ADMIN_FAILED_LOGIN;
-				localcmd("noadmin_centertime\n");
 				centerprint3(self, "admin login escape, you must wait ",ftos(A_TIME)," secs!\n");
 			}
 			else
@@ -1087,12 +1234,8 @@ void() PK_AdminImpulse =
 				remove(self.goalentity);
 				self.goalentity = world;
 			}
-			self.wad = self.message = self.map = self.target = "";
-			self.enemy = world;
-			self.takedamage = DAMAGE_AIM;
-			self.impulse = 0;
-			localcmd("noadmingamma\n"); // set gamma level
-			localcmd("noadmin_centertime\n");
+			admin_clear();
+			self.attack_finished = time + 0.3; // clear keypress
 			return;
 		}
 		else
@@ -1104,7 +1247,7 @@ void() PK_AdminImpulse =
 			}
 			else // login
 			{
-				self.admin = -2; // enter access code
+				self.admin = ADMIN_LOGIN; // enter access code
 				admin_time = time + A_TIME; // 10 secs default - NOTE: this is 10 seconds of invulnerability
 			}
 			self.lefty = 0;
@@ -1113,7 +1256,8 @@ void() PK_AdminImpulse =
 			localcmd("admin_centertime\n");
 		}
 	}
-	else if (self.impulse && (self.admin < 0 || (self.admin & 3) == 2)) // enter codes for menu or login
+// code allows us to act like regular keypad entry, heh heh
+	else if (self.impulse && (self.admin < -1 || (self.admin & 3) == 2)) // enter codes for menu or login
 	{
 bprint("in numeric: ");
 bprint(ftos(self.admin));
@@ -1148,7 +1292,7 @@ bprint("\n");
 		AdminCommands();
 		self.impulse = 0;
 	}
-	else if (self.admin < 0) // processing login
+	else if (self.admin < -1) // processing login
 	{
 		if (admin_time < time) // timed out - force password check
 		{
@@ -1195,10 +1339,11 @@ float() admin_postthink =
 	{
 		if (self.admin != LIVE_ADMIN && (self.admin < 0 || (self.impulse && self.admin)))
 		{
-			if (self.admin == ADMIN_FAILED_LOGIN) admin_clear_failed(); // failed login - clear wait msg
+			if (self.admin == ADMIN_FAILED_LOGIN) admin_clear(); // failed login - clear wait msg
 			else PK_AdminImpulse();
 
 			if (pk_admintime > 0)
+			if (self.admin > 0)
 			if (self.goalentity)
 			if (self.goalentity.classname == "admintimer") // any input to admin menus resets timeout
 				self.goalentity.nextthink = time + pk_admintime;
@@ -1211,6 +1356,7 @@ float() admin_postthink =
 		if (pk_admintime > 0)
 		if (self.goalentity)
 		if (self.goalentity.classname == "admintimer")
+		if (self.goalentity.model != "")
 			setorigin(self.goalentity, self.origin + ' 0 0 60'); // track admin players
 
 		if (self.admin != LIVE_ADMIN) return(TRUE);

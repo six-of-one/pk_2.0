@@ -470,8 +470,11 @@ If crucified, stick the bounding box 12 pixels back into a wall to look right.
 void() monster_zombie =
 {
 // NEW_ZOMBIE_START
-	if ((cvar("temp1") & PK_TP_SPARKSFLASH))
+	if ( pk_flags & PK_TP_SPARKSFLASH)
+	{
 		remove(self);
+		return;
+	}
 
 	if (deathmatch && !(self.spawnflags & SPAWN_CRUCIFIED))
 // NEW_ZOMBIE_END

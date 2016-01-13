@@ -312,7 +312,7 @@ void () item_armor1 =
 	setmodel (self,"progs/armor.mdl");
 	self.skin = 0;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.armorvalue = 100;
+	self.armorvalue = 100; // * bot
 	StartItem ();
 };
 
@@ -326,7 +326,7 @@ void () item_armor2 =
 	setmodel (self,"progs/armor.mdl");
 	self.skin = 1;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.armorvalue = 150;
+	self.armorvalue = 150; // * bot
 	StartItem ();
 };
 
@@ -340,7 +340,7 @@ void () item_armorInv =
 	setmodel (self,"progs/armor.mdl");
 	self.skin = 2;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.armorvalue = 200;
+	self.armorvalue = 200; // * bot
 	StartItem ();
 };
 

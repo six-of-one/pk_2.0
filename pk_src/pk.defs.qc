@@ -25,6 +25,10 @@ float pk_adminpwdmask;					// if true password will be masked with *'s
 float pk_admintime;						// if > 0 - inactivity timer for admin mode
 float pk_adminframe;					// only do once per frame
 float LIVE_ADMIN				= 100;	// for being in game with admin privs - previous painkeep admin mode
+float ADMIN_LOGIN			= -2;		// .admin value for login
+float USER_MENU				= -1;		// .admin value that handles user menu
+float USER_TIMEOUT			= 5;		// timeout user menu in 5 secs
+float USER_IMPULSE			= 39;		// user menu impulse
 //float SETCODE					= -8726545; // set the code after delay
 float ADMIN_FAILED_LOGIN	= -777;	// login didnt succeed
 
@@ -256,7 +260,7 @@ float(string mp) PK_mapmode;
 void() PK_SetAdmin;
 void() PK_AdminImpulse;
 void() admin_sv_cfg;
-void() admin_clear_failed;
+void() admin_clear;
 void() Admin_mainmenu;
 float() admin_postthink;
 void() admin_resettimeout;
