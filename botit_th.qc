@@ -109,7 +109,6 @@ float TELEPORT				= 4;
 float BOTS						= 240;
 float TEAMBOTS				= 3840;
 float UNRESTRICTED				= 4096;
-float SUPERUNRESTRICTED			= 8192;
 float TEAMFLAG				= 16384;
 float INITLEVEL				= 32768;
 float DEDICATED				= 4194304;

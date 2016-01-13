@@ -217,13 +217,6 @@ void () botControl =
 		serverflags = serverflags - (serverflags & UNRESTRICTED);
 		bprint ("Unrestricted mode cleared\n");
 	}
-/*
-	else if (self.impulse == 219)
-	{
-		serverflags = (serverflags | SUPERUNRESTRICTED);
-		bprint ("Super Restricted mode set\n");
-	}
-*/
 };
 
 void () botImpulseCommand =
@@ -240,25 +233,25 @@ void () botImpulseCommand =
 	{
 		printIntro ();
 	}
-	else if (self.impulse == 210)
-	{
-		PrintScores (MYSCORE);
-	}
 	else if (self.impulse == 212)
 	{
 		setPeeperMode ();
+	}
+	else if (self.impulse == 210)
+	{
+		PrintScores (MYSCORE);
 	}
 	else if (self.impulse == 220)
 	{
 		PrintScores (NORMALSCORE);
 	}
-	else if (self.impulse == 221)
-	{
-		UpdateTeamColors ();
-	}
 	else if (self.impulse == 222)
 	{
 		PrintTopScores (0);
+	}
+	else if (self.impulse == 221)
+	{
+		UpdateTeamColors ();
 	}
 //	else if (self.impulse == 223)
 //	{
@@ -267,12 +260,5 @@ void () botImpulseCommand =
 //	}
 	else if (self.admin || (serverflags & UNRESTRICTED))
 		botControl();
-/*
-	else if (!(serverflags & SUPERUNRESTRICTED))
-	{
-		if (!(serverflags & UNRESTRICTED) || (self.colormap == 1))
-			botRestrictedCommand ();
-	}
-*/
 };
 

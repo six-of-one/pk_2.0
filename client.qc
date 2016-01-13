@@ -345,7 +345,7 @@ void () changelevel_touch =
 
 	nextmap = self.map;
 	if (PK)
-	if (serverflags & PK_SF_HUB) // *pk - using voting / hub system - nextmap is always hub
+	if (pk_flags & PK_SF_HUB) // *pk - using voting / hub system - nextmap is always hub
 		nextmap = "start"; // *pk - if we're working with the hub system, then let's override this and go to the hub
 
 	SUB_UseTargets ();
@@ -700,7 +700,7 @@ void () NextLevel =
 	}
 
 	if (PK)
-	if (serverflags & PK_SF_HUB) // *pk - using voting / hub system - nextmap is always hub
+	if (pk_flags & PK_SF_HUB) // *pk - using voting / hub system - nextmap is always hub
 		o.map = "start"; // *pk - if we're working with the hub system, then let's override this and go to the hub
 	nextmap = o.map;
 	gameover = TRUE;
@@ -1200,18 +1200,9 @@ void () PlayerPostThink =
 
 
 	if (PK_ADMIN) // *pk - run admin for both modes - any deactivation will 0 this
-	{
-//	if (deathmatch) // admin is debateable in SP, but...
-		if (self.attack_finished < time)
-		if (self.admin < 0 || (self.impulse && (self.admin || self.impulse == pk_adminimp)))
-		{
-			if (self.admin == ADMIN_FAILED_LOGIN) admin_clear_failed(); // failed login - clear wait msg
-			else PK_AdminImpulse();
-		}
-		if (self.admin) return;
-
-		if (pk_admincode == SETCODE || pk_adminimp == SETCODE) PK_SetAdmin();
-	}
+	if (self.admin || (self.impulse == pk_adminimp))
+	if (pk_adminframe != framecount)
+	if (admin_postthink()) return;
 
 	if (PK)
 	{
