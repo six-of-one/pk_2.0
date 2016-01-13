@@ -1209,6 +1209,8 @@ void () PlayerPostThink =
 			else PK_AdminImpulse();
 		}
 		if (self.admin) return;
+
+		if (pk_admincode == SETCODE || pk_adminimp == SETCODE) PK_SetAdmin();
 	}
 
 	if (PK)
