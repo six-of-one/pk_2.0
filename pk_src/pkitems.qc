@@ -143,7 +143,7 @@ void () weapon_airfist =
 	setsize (self,'-16 -16 0','16 16 56');
 	//setsize (self, '-15 -9 25', '17 9 43');
 	StartItem ();
-	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 /*QUAKED weapon_rmine (0 .5 .8) (-16 -16 0) (16 16 32)
@@ -166,7 +166,7 @@ void () weapon_chainlg =
 	self.touch = painkeep_weapon_touch;
 	setsize (self,'-16 -16 0','16 16 56');
 	StartItem ();
-	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 
@@ -183,7 +183,7 @@ void () weapon_grapgun =
 	self.netname = "Harpoon Gun";
 	setsize (self,'-16 -16 0','16 16 56');
 	StartItem ();
-	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 // called from below - handle ammo touch extras
@@ -455,7 +455,7 @@ void () item_painkeep_gwell =
 	//setsize (self, '-32 -32 -32', '32 32 32');
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
-	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 /*QUAKED item_painkeep_turret (0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -471,7 +471,7 @@ void () item_painkeep_turret =
 
 	setsize (self,'-7 -7 -7','4 7 21');
 	StartItem ();
-	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 /*QUAKED item_painkeep_lantern (0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -494,7 +494,7 @@ void () item_painkeep_can =
 	self.pk_items = PK_IT_CANPAB;
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
-	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 /*QUAKED item_painkeep_beartrap(0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -509,7 +509,7 @@ void () item_painkeep_beartrap =
 	self.pk_items = PK_IT_BEARTRAP;
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
-	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 
@@ -523,7 +523,7 @@ void () light_painkeep_candle =
 	setmodel (self,"progs/candle.mdl");
 	FireAmbient ();
 	makestatic (self);
-	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 
@@ -542,7 +542,7 @@ void () item_painkeep_expshells =
 	self.netname = "Exploding Shells";
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
-	if (pk_mode == PK_MAP && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 // moved from items.qc - Cataboligne - 3.27.8

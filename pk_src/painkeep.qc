@@ -11,7 +11,7 @@ Cataboligne 3.29.8
 
 void() PK_precache =
 {
-// old ambient sounds for pk_mode not set to PK
+// old ambient sounds for pk_flags not set to PK
 
 	precache_sound ("alt_ambience/windfly.wav");
 	precache_sound ("alt_ambience/hum1.wav");
@@ -168,11 +168,11 @@ void() PK_precache =
 		e.think = PK_SetAdmin;
 		e.classname = "admincode";
 
-		localcmd ("setadmincode\n");
+		localcmd ("admincode\n");
 		pk_admincode = pk_adminimp = -1;
 		pk_adminpwdmask = TRUE;
 
-		localcmd("noadmingamma\n"); // set gamma level
+		localcmd("noadmingamma\n"); // set gamma leWvel
 		localcmd("noadmin_centertime\n");
 
 // set defaults not usually bound by quake
@@ -184,23 +184,22 @@ void() PK_precache =
 
 // set PK mode based on engine var | saved2
 
-	pk_flags = pk_flags_ck = cvar("saved1");
-	pk_mode = pk_mode_ck = cvar("saved2") & PK_MODEMASK;
+	pk_flags = pk_flags_ck = cvar("savedgamecfg");
 
 // got mode, set PK master switch
 	PK = FALSE;
-	if (pk_mode & PK_ALWAYS)
+	if (pk_flags & PK_ALWAYS)
 		PK = TRUE;
-	else if (pk_mode & PK_NEVER)
+	else if (pk_flags & PK_NEVER)
 		PK = FALSE;
-	else // if (pk_mode == PK_MAP)
+	else // if (!pk_flags & PK_MAP)
 	{
 		PK = PK_mapmode(world.model);
 	}
 
 // extra sounds by...are apparently not supplied, except gib_?.wav
 
-	pk_xsound = (pk_mode & PK_XSOUND);
+	pk_xsound = (pk_flags & PK_XSOUND);
 	/*
 // extra player pain sounds
 	if (pk_xsound)
@@ -302,7 +301,7 @@ float(string mp) PK_mapmode =
 	return(md);
 };
 
-// called from many places - handles pk_mode 0 where map sets whether or not we use PK stuff
+// called from many places - handles pk_flags 0 where map sets whether or not we use PK stuff
 
 // really sound(), mod for frikbot code
 void(entity e, float chan, string samp, float vol, float atten) pk_sound = 

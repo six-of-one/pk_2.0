@@ -1335,16 +1335,17 @@ void() PK_ImpulseCommands =
 // PK_HUB_START
 	else if (self.admin > 0 && self.impulse == 200)
 	{
-		if (serverflags & PK_SF_HUB)
+		if (pk_flags & PK_SF_HUB)
 		{
 			bprint("Hub mode OFF\n");
-			serverflags = serverflags - PK_SF_HUB;
+			pk_flags = pk_flags - PK_SF_HUB;
 		}
 		else
 		{
 			bprint("Hub mode ON\n");
-			serverflags = serverflags | PK_SF_HUB;
+			pk_flags = pk_flags | PK_SF_HUB;
 		}
+		if (pk_admintime > 0) admin_resettimeout();
 	}
 
 // MOTD_START
@@ -1399,6 +1400,7 @@ void() PK_ImpulseCommands =
 			sprint(self, "Custom Maps On\n");
 		else
 			sprint(self, "Custom Maps Off\n");
+		if (pk_admintime > 0) admin_resettimeout();
 	}
 
 	else if (self.impulse == 255)

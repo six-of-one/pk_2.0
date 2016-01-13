@@ -4,17 +4,15 @@
 // ADMIN section
 // dev - only enable this for painkeep maps or force pk mode (sv_ control) - any maps that loads a pk item / func
 float PK; // if set true painkeep code is enabled
-float PK_MAP					= 0;		// bits 1 & 2 = FALSE -- map sets painkeep mode - PK = TRUE if: any pk*.bsp loaded, start.bsp loaded and message == "hub", a map loads any painkeep map item, PK = FALSE otherwise
-float PK_ALWAYS				= 1;		// bit 1	= TRUE --- always in painkeep mode - PK = TRUE;
-float PK_NEVER				= 2;		// bit 2	= TRUE --- never in painkeep mode - PK = FALSE;
-float PK_DYNAMIC				= 4;		// bit 4	= TRUE --- when always in painkeep mode & not on a PK map, dynamically load pk items if they are not present
-												// items include - bear trap, can o' beans, gravity well, harpoon, turret, airfist, chain thunderbolt, exploding shot, pulse nailgun
-float PK_SPIKER				= 8;		// bit 8	= TRUE --- allow spike traps, set to false for original pk treatment of spike shooters - they are removed
-float PK_XSOUND				= 16;		// bit 16 = TRUE --- use extra pk sound set
-float PK_MODEMASK			= 31;		// mask of mode bits
+float PK_MAP					= 6144;	// bit * = FALSE -- map sets painkeep mode  - PK = TRUE if: any pk*.bsp loaded, start.bsp loaded and message == "hub", a map loads any painkeep map item, PK = FALSE otherwise
+float PK_ALWAYS				= 2048;	// bit *	= TRUE --- always in painkeep mode - PK = TRUE;
+float PK_NEVER				= 4096;	// bit *	= TRUE --- never in painkeep mode  - PK = FALSE;
+float PK_DYNAMIC				= 8192;	// bit *	= TRUE --- when always in painkeep mode & not on a PK map, dynamically load pk items if they are not present
+												// items include  - bear trap, can o' beans, gravity well, harpoon, turret, airfist, chain thunderbolt, exploding shot, pulse nailgun
+float PK_SPIKER				= 16384;	// bit *	= FALSE -- allow spike traps, set to true for original pk treatment of spike shooters - they are removed
+float PK_XSOUND				= 32768;	// bit * = TRUE --- use extra pk sound set
 
-float pk_flags;							// replaces old usage of temp1, temp1 still stores if not in dp
-float pk_mode;							// set bits to determin state of PK above, if darkplaces engine can be detected, this will load from cvar("sv_pk_mode"), otherwise first 5 bits of cvar("temp2")
+float pk_flags;							// replaces old usage of temp1, savedgamecfg stores this
 float pk_xsound;							// set to state of PK_XSOUND bit for sound code toggle
 
 float DARKPLACES_ENGINE	= 3275;	// for detecting darkplaces - modded engine sets cvar("chaos") to this value
@@ -24,7 +22,10 @@ float PK_ADMIN;							// allow admin - set this to 0 to completely disable all a
 float pk_adminimp;						// impulse set in admin.cfg to access admin commands, defaults to 255
 float pk_admincode;						// code you must enter to access admin commands - set by admin.cfg, defaults to -1
 float pk_adminpwdmask;					// if true password will be masked with *'s
-float SETCODE					= -8726545; // set the code after delay
+float pk_admintime;						// if > 0 - inactivity timer for admin mode
+float pk_adminframe;					// only do once per frame
+float LIVE_ADMIN				= 100;	// for being in game with admin privs - previous painkeep admin mode
+//float SETCODE					= -8726545; // set the code after delay
 float ADMIN_FAILED_LOGIN	= -777;	// login didnt succeed
 
 // **************************************
@@ -206,7 +207,7 @@ float ignorearmor;
 
 // hub ops
 //float PK_SF_HUB = 16;
-float PK_SF_HUB				= 65536;	// *bot - flag passed all bot parms in serverflags
+float PK_SF_HUB				= 1024;	// moved to pk_flags
 float PK_TP_TIMEMASK		= 63;
 float inHubMap;
 .float voteIntermission;
@@ -257,7 +258,10 @@ void() PK_AdminImpulse;
 void() admin_sv_cfg;
 void() admin_clear_failed;
 void() Admin_mainmenu;
-float pk_flags_ck, pk_mode_ck;
+float() admin_postthink;
+void() admin_resettimeout;
+void () Peeper;
+float pk_flags_ck;
 
 float PK_TP_STATUSON		= 256;
 .float hubstartupmessage;

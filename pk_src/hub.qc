@@ -529,7 +529,7 @@ void() hub_control =
 //	self.nextthink = time + 30.0;
 
 	// so later levels know about it...
-	serverflags = serverflags | PK_SF_HUB;
+	pk_flags = pk_flags | PK_SF_HUB;
 	inHubMap = 1;
 };
 

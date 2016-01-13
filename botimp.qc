@@ -98,7 +98,7 @@ void () Peeper =
 
 	if (!self.admin)
 	{
-		if (serverflags & FL_OBSERVER) // restricted, only admins can observe
+		if (! serverflags & FL_OBSERVER) // restricted, only admins can observe
 			return;
 		if (observer_time) // can only observe for this long
 		{
@@ -147,7 +147,7 @@ void () setNamingMode =
 	NAMEBOTS = !NAMEBOTS;
 };
 
-void () botRestrictedCommand =
+void () botControl =
 {
 	local string tmp;
 	if (self.impulse == 202)
@@ -179,10 +179,6 @@ void () botRestrictedCommand =
 	else if (self.impulse == 211)
 	{
 		removeAllBots ();
-	}
-	else if (self.impulse == 212)
-	{
-		setPeeperMode ();
 	}
 	else if (self.impulse == 214)
 	{
@@ -218,14 +214,16 @@ void () botRestrictedCommand =
 	}
 	else if (self.impulse == 218)
 	{
-		serverflags = (serverflags | RESTRICT);
-		bprint ("Restricted mode set\n");
+		serverflags = serverflags - (serverflags & UNRESTRICTED);
+		bprint ("Unrestricted mode cleared\n");
 	}
+/*
 	else if (self.impulse == 219)
 	{
-		serverflags = (serverflags | SUPERRESTRICT);
+		serverflags = (serverflags | SUPERUNRESTRICTED);
 		bprint ("Super Restricted mode set\n");
 	}
+*/
 };
 
 void () botImpulseCommand =
@@ -246,6 +244,10 @@ void () botImpulseCommand =
 	{
 		PrintScores (MYSCORE);
 	}
+	else if (self.impulse == 212)
+	{
+		setPeeperMode ();
+	}
 	else if (self.impulse == 220)
 	{
 		PrintScores (NORMALSCORE);
@@ -258,15 +260,19 @@ void () botImpulseCommand =
 	{
 		PrintTopScores (0);
 	}
-	else if (self.impulse == 223)
+//	else if (self.impulse == 223)
+//	{
+//		self.items = (self.items | IT_INVULNERABILITY);
+//		self.invincible_finished = (time + 30);
+//	}
+	else if (self.admin || (serverflags & UNRESTRICTED))
+		botControl();
+/*
+	else if (!(serverflags & SUPERUNRESTRICTED))
 	{
-		self.items = (self.items | IT_INVULNERABILITY);
-		self.invincible_finished = (time + 30);
-	}
-	else if (!(serverflags & SUPERRESTRICT))
-	{
-		if (!(serverflags & RESTRICT) || (self.colormap == 1))
+		if (!(serverflags & UNRESTRICTED) || (self.colormap == 1))
 			botRestrictedCommand ();
 	}
+*/
 };
 
