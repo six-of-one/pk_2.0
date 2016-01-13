@@ -116,7 +116,7 @@ void () Peeper =
 	self.frags = 0;
 	self.weaponmodel = "";
 	setmodel (self,string_null);
-	setsize (self,REBOUNDSPOT,REBOUNDSPOT);
+	setsize (self, ' 0 0 0', ' 0 0 0');
 	bprint ("Observer mode activated\n");
 };
 

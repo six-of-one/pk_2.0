@@ -407,7 +407,7 @@ void(vector org) spawn_tfog2 =
 
 void() PK_ChangeParms =
 {
-	parm10 = self.pk_items;
+	parm10 = PK_IT_AXE | self.pk_items;
 // recode so *bot can have vars for skill level save - provide max inventory of 15 for mod expansion, current max is 3
 // except explode ammo which is not bound
 	parm11 = self.pk_gravitywellammo + (self.pk_turretammo * 16) + (self.pk_canpabammo * 256) + (self.pk_beartrapammo * 4096) + (self.pk_explode_ammo * 65536);
@@ -439,7 +439,7 @@ void() PK_SetNewParms =
 
 void() PK_DecodeLevelParms = 
 {
-	self.pk_items = parm10;
+	self.pk_items = PK_IT_AXE | parm10;
 	self.pk_gravitywellammo = parm11 & 15;
 	self.pk_turretammo = floor(parm11 / 16) & 15;
 	self.pk_canpabammo = floor(parm11 / 256) & 15;

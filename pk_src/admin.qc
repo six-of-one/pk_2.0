@@ -706,6 +706,7 @@ void() AdminCommands =
 			PK_AdminImpulse();
 			centerprint(self, "");
 			self.classname = "player";
+			setmodel(self, ""); // dont let body que make a copy of a live player
 			respawn ();
 			return;
 		}
@@ -1226,6 +1227,7 @@ void() PK_AdminImpulse =
 				self.attack_finished = time + A_TIME; // penalty - cant use this for invulnerable state
 				self.admin = ADMIN_FAILED_LOGIN;
 				centerprint3(self, "admin login escape, you must wait ",ftos(A_TIME)," secs!\n");
+				return;
 			}
 			else
 				self.admin = 0;

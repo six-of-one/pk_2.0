@@ -39,7 +39,7 @@ void () painkeep_weapon_touch =
 	local	entity	stm2;
 	local float leave;
 
-	if (other.classname != "player")
+	if (other.classname != "player") // *bot
 	{
 		grap_checkIfGrap ();
 		return ;

@@ -57,15 +57,6 @@ void() explodeAttack =
 	  i = i - 1;
 	}
 
-
-/*
-	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	WriteByte (MSG_BROADCAST, TE_EXPLOSION);
-	WriteCoord (MSG_BROADCAST, self.origin_x);
-	WriteCoord (MSG_BROADCAST, self.origin_y);
-	WriteCoord (MSG_BROADCAST, self.origin_z);
-*/
-
 	BecomeShellExplosion ();
 };
 
@@ -236,7 +227,7 @@ void(float ox) W_FirePulseSpikes =
 	newmis.theowner = self;
 	setmodel (newmis, "progs/pnail.mdl");
 	newmis.angles = vectoangles(dir);
-	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);
+	setsize (newmis, ' 0 0 0', ' 0 0 0');
 	self.punchangle_x = -2;
 
 	// time limit

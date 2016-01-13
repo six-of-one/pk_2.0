@@ -1198,7 +1198,8 @@ void () PlayerPostThink =
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
 
-	if (PK_ADMIN || self.admin == USER_MENU) // *pk - run admin for both modes - any deactivation will 0 this
+
+	if (PK_ADMIN || self.admin == USER_MENU) // *pk - run admin for both modes - any deactivation will 0 this || make sure user menu always works
 	if (self.admin || (self.impulse == pk_adminimp))
 	if (pk_adminframe != framecount)
 	if (admin_postthink()) return;

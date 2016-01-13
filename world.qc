@@ -380,9 +380,21 @@ void () bodyque =
 void () InitBodyQue =
 {
 	local entity e;
+	local float f;
 
-	bodyque_head = spawn ();
+	f = 15; // # of total visible dead bodies - 1 for players - silly way to do this
+	e = bodyque_head = spawn ();
 	bodyque_head.classname = "bodyque";
+
+	while (f > 0)
+	{
+		bodyque_head.owner = spawn ();
+		bodyque_head.owner.classname = "bodyque";
+		bodyque_head = bodyque_head.owner;
+		f = f - 1;
+	}
+	bodyque_head.owner = e; // close loop
+/*
 	bodyque_head.owner = spawn ();
 	bodyque_head.owner.classname = "bodyque";
 	bodyque_head.owner.owner = spawn ();
@@ -390,6 +402,7 @@ void () InitBodyQue =
 	bodyque_head.owner.owner.owner = spawn ();
 	bodyque_head.owner.owner.owner.classname = "bodyque";
 	bodyque_head.owner.owner.owner.owner = bodyque_head;
+*/
 };
 
 
