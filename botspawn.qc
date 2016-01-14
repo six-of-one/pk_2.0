@@ -418,11 +418,10 @@ float () numplayers =
 void (float skl) AddAnotherBot =
 {
 	local entity newbot;
-	local entity tmp;
-	local float n;
+	local float n, sf;
 	local string st;
-	local float top;
-	local float bottom;
+	local float top, bottom;
+
 	self.impulse = 0;
 	if (!teamplay)
 	{
@@ -519,101 +518,150 @@ void (float skl) AddAnotherBot =
 	{
 		serverflags = ((serverflags - (serverflags & BOTS)) + (16* NUMBOTS));
 	}
-	if (NUMBOTS == 1)
+
+	n = 1 + floor(random() * 14.4);
+	sf = 200;
+
+	while (sf > 0) // heh heh - select a random bot name / color set - old code was a dork and always went in order
 	{
-		newbot.netname = "Alpha";
+		sf = sf - 1;
+
+	if (n == 1)
+	{
 		top = 1;
 		bottom = 6;
+		if (c_skill > 2)
+		{
+			top = c_skill;
+			newbot.netname = "Pain [stinger]";
+		}
+		else
+			newbot.netname = "Pain [bringer]";
 	}
-	else if (NUMBOTS == 2)
+	else if (n == 2)
 	{
-		newbot.netname = "Gamma";
 		top = 2;
 		bottom = 13;
+		if (c_skill > 2)
+		{
+			top = c_skill + 1 + random();
+			newbot.netname = "Pain [special delivery]";
+		}
+		else
+			newbot.netname = "Pain [giver]";
 	}
-	else if (NUMBOTS == 3)
+	else if (n == 3)
 	{
-		newbot.netname = "Epsilon";
 		top = 4;
 		bottom = 11;
+		if (c_skill > 2)
+		{
+			top = c_skill * 2;
+			newbot.netname = "Pain [master]";
+		}
+		else
+			newbot.netname = "Pain [disciple]";
 	}
-	else if (NUMBOTS == 4)
+	else if (n == 4)
 	{
-		newbot.netname = "Delta";
 		top = 3;
 		bottom = 12;
+		if (c_skill > 2)
+		{
+			top = c_skill * 2 * random();
+			newbot.netname = "Clan LOLZ [|<e |<e]";
+		}
+		else
+			newbot.netname = "Clan LOLZ [w00ps]";
 	}
-	else if (NUMBOTS == 5)
+	else if (n == 5)
 	{
-		newbot.netname = "Zeta";
 		top = 12;
 		bottom = 13;
+		if (c_skill > 2)
+		{
+			top = c_skill * 3 * random();
+			newbot.netname = "Clan LOLZ [u-r-ded]";
+		}
+		else
+			newbot.netname = "Clan LOLZ [d(_)(_)fy]";
 	}
-	else if (NUMBOTS == 6)
+	else if (n == 6)
 	{
-		newbot.netname = "Theta";
-		top = 0;
-		bottom = 4;
+		newbot.netname = "Codename: blizzard";
+		top = 0 + random() + random();
+		bottom = 4 + random() + random();
 	}
-	else if (NUMBOTS == 7)
+	else if (n == 7)
 	{
-		newbot.netname = "Lambda";
+		newbot.netname = "Rex Felis";
 		top = 1;
-		bottom = 3;
+		bottom = 3 * c_skill * random();
 	}
-	else if (NUMBOTS == 8)
+	else if (n == 8)
 	{
-		newbot.netname = "Omicron";
-		top = 4;
-		bottom = 9;
+		newbot.netname = "r00ST3R";
+		top = 4 + random() + random() + random();
+		bottom = 9 + random();
 	}
-	else if (NUMBOTS == 9)
+	else if (n == 9)
 	{
-		newbot.netname = "Xi";
+		newbot.netname = "M*nstAr";
 		top = 3;
-		bottom = 6;
+		bottom = 6 + random() + random() + random() + random();
 	}
-	else if (NUMBOTS == 10)
+	else if (n == 10)
 	{
-		newbot.netname = "Rho";
-		top = 11;
-		bottom = 10;
+		newbot.netname = "Yesman";
+		top = n;
+		bottom = n;
 	}
-	else if (NUMBOTS == 11)
+	else if (n == 11)
 	{
-		newbot.netname = "Sigma";
-		top = 0;
-		bottom = 13;
+		newbot.netname = "Hard_ware";
+		top = 0 + random();
+		bottom = 13 + random() + random();
 	}
-	else if (NUMBOTS == 12)
+	else if (n == 12)
 	{
-		newbot.netname = "Tau";
+		newbot.netname = "Ray ---=>";
 		top = 13;
 		bottom = 11;
 	}
-	else if (NUMBOTS == 13)
+	else if (n == 13)
 	{
-		newbot.netname = "Chi";
-		top = 12;
-		bottom = 11;
+		newbot.netname = "Kill=death+die-dead";
+		top = 12 + random() + random() + random();
+		bottom = 11 + random() + random() + random();
 	}
-	else if (NUMBOTS == 14)
+	else if (n == 14)
 	{
-		newbot.netname = "Psi";
-		top = 9;
+		top = 9 + random() + random();
 		bottom = 13;
+		if (c_skill > 2)
+		{
+			top = c_skill * 2.2 * random() + random() + random();
+			newbot.netname = "Tweedle-dweeb";
+		}
+			newbot.netname = "Tweedle-dumb";
 	}
-	else if (NUMBOTS == 15)
+	else if (n >= 15)
 	{
-		newbot.netname = "Pain*";
-		top = 10;
-		bottom = 9;
+		newbot.netname = "Pain (*) ----";
+		top = 15 * random();
+		bottom = 15 * random();
+	}
+
+		if (find(world,netname,newbot.netname)) // see if name is taken
+			n = 1 + floor(random() * 14.4);
+		else
+			sf = 0;
 	}
 
 // merge with frikbot - using frik vars
 	newbot.b_clientno = newbot.id;
-	newbot.b_shirt = top;
-	newbot.b_pants = bottom;
+	newbot.b_shirt = rint(top);
+	newbot.b_pants = rint(bottom);
 	UpdateClient(newbot);
 /*
 	WriteByte (MSG_ALL,MSG_UPDATENAME);

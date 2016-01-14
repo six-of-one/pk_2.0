@@ -46,13 +46,9 @@ void () SetChangeParms =
 {
 	if (self.health <= 0)
 	{
-		if (PK)
-		{
-			SetNewPKParms ();
-			parm16 = parm16 | 256; // *pk - do hub message.
-		}
-		else
 		SetNewParms ();
+		if (PK)
+			SetNewPKParms ();
 		return ;
 	}
 
@@ -431,7 +427,6 @@ void () ClientKill =
 	set_suicide_frame ();
 	self.modelindex = modelindex_player;
 	self.frags = self.frags - 2;	// extra penalty
-//	countkill (self,self);
 	respawn ();
 };
 

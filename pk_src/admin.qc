@@ -74,16 +74,21 @@ void() admin_resettimeout =
 		self.goalentity.nextthink = time + pk_admintime;
 };
 
-// save flags & mode
+// save flags & mode, item overrides
 
 void() admin_sv_cfg =
 {
 	local string str;
 
 	str = ftos(pk_flags);
-	if (pk_flags != pk_flags_ck)//cvar("saved1"))
+	if (pk_flags != pk_flags_ck)
 		cvar_set("savedgamecfg", str);
 	pk_flags_ck = pk_flags;
+
+	str = ftos(pk_itemovr);
+	if (pk_itemovr != pk_itemovr_ck)
+		cvar_set("saved3", str);
+	pk_itemovr_ck = pk_itemovr;
 
 	if (pk_admintime > 0) admin_resettimeout();
 };
@@ -467,15 +472,15 @@ void() Admin_itemmenu =
 							"  06: Lightning gun         \n"
 							"  07: Painkeep items        \n"
 							"  +------ artifacts -----+  \n"
-							"  10: Quad damage           \n"
-							"  11: Invulnerability       \n"
-							"  12: Radiation suit        \n"
-							"  13: Ring of shadows       \n"
+							"  08: Quad damage           \n"
+							"  09: Invulnerability       \n"
+							"  10: Radiation suit        \n"
+							"  11: Ring of shadows       \n"
 							"  +------- toggles ------+  \n"
-							"  20: Only these items      \n"
-							"  21: None of these items   \n"
-							"  22: Substitute removed    \n"
-							"  23: Infinite ammo         \n"
+							"  12: Only these items      \n"
+							"  13: None of these items   \n"
+							"  14: Substitute removed    \n"
+							"  15: Infinite ammo         \n"
 							" 666:  main menu            \n"
 							" admin impulse: exit admin  \n"
 				       "\b+--------------------------+\n"
@@ -590,22 +595,25 @@ void() Admin_mainmenu =
 
 void(float lt, float tm) admin_timer =
 {
-	if (self.goalentity)
-	if (self.goalentity.classname == "admintimer") // 'e says they already got one
-		return;
+	if (self.goalentity && self.goalentity.classname == "admintimer") // 'e says they already got one
+	{
+		remove(self.goalentity);
+//		return; // fix - if we retime from user menu to admin we need to light up admin
+	}
+
 	self.goalentity = spawn();
 	if (!self.goalentity) return;
 	self.goalentity.classname = "admintimer";
 	self.goalentity.owner = self;
 	self.goalentity.think = PK_AdminImpulse;
 	self.goalentity.nextthink = time + tm;
+
 // if lt is true, this is a beacon light over an admin player
 	if (lt)
 	{
 		self.goalentity.effects = EF_DIMLIGHT;
 		setmodel(self.goalentity, "progs/s_light.spr"); // let everyone know this guy is in admin mode
 	}
-bprint("set admin timer\n");
 };
 
 void() AdminCommands =
@@ -1039,6 +1047,25 @@ void() AdminCommands =
 
 		if (self.lefty) admin_sv_cfg();
 	}
+	else if (self.admin == 25)														// item overrides
+	{
+		self.admin = 26;
+		if (self.lefty == 666)
+			Admin_mainmenu();
+		if (self.lefty > 0 && self.lefty < 16)
+		{
+			self.lefty = self.lefty - 1;
+			f = ClientBitFlag(self.lefty); // hijack - really should be a seperate fn()
+			if (pk_itemovr & f)
+				pk_itemovr = pk_itemovr - (pk_itemovr & f);
+			else
+				pk_itemovr = pk_itemovr | f;
+			if (pk_itemovr != pk_itemovr_ck)
+				self.wad = "Bit toggled for selected item";
+			admin_sv_cfg();
+			self.lefty = self.lefty + 1;
+		}
+	}
 
 	if (self.admin == 15)
 		centerprint3(self, self.message, self.enemy.netname, self.wad);
@@ -1080,7 +1107,7 @@ void() PK_SetAdmin =
 
 	if (self.classname == "admincode") 
 	{
-		pk_admincode = cvar("saved3");
+		pk_admincode = cvar("saved2");
 		if ( ! pk_admincode) pk_admincode = -1;
 // access impulse now
 		localcmd(ADMINIMPULSE);
@@ -1089,7 +1116,7 @@ void() PK_SetAdmin =
 	}
 	else if (self.classname == "adminimp") 
 	{
-		pk_adminimp = cvar("saved3");
+		pk_adminimp = cvar("saved2");
 		if ( ! pk_adminimp) pk_adminimp = 255;
 		if (pk_adminimp == -1) PK_ADMIN = 0;
 		localcmd(ADMINTIME);
@@ -1097,8 +1124,8 @@ void() PK_SetAdmin =
 	}
 	else if (self.classname == "admintime") 
 	{
-		pk_admintime = cvar("saved3");
-		localcmd("saved3 0\n");
+		pk_admintime = cvar("saved2");
+		localcmd("saved2 0\n");
 		remove(e);
 if (0) {
 bprint("admin impulse: ");
@@ -1120,6 +1147,9 @@ bprint("\n"); }
 User Menu
 ============
 */
+
+// build menu for user
+
 void() User_menu =
 {
 	string head, ln1, ln2, ln3, ln4, ln5, foot;
@@ -1396,8 +1426,9 @@ void() PK_AdminImpulse =
 //bprint("in numeric: "); // track input
 //bprint(ftos(self.admin));
 //bprint (" - out = ");
-		if (self.impulse == 10) self.impulse = 0; // translate 0
-		if (self.impulse < 10) self.lefty = (self.lefty * 10) + self.impulse; // build code
+		f = self.impulse; // cant change impulse to 0 - need to * password below
+		if (f == 10) f = 0; // translate 0
+		if (f < 10) self.lefty = (self.lefty * 10) + f; // build code
 		else if (self.impulse == 12) self.lefty = floor(self.lefty / 10); // backspace
 		if (self.impulse == 11 || self.button0) self.admin = fabs(self.admin) - 1; // enter (accept fire button here) - done
 //		if (self.impulse == 11 && self.lefty) self.admin = fabs(self.admin) - 1; // enter - done

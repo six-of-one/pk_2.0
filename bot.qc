@@ -340,7 +340,7 @@ void() bot_changelevel =
 	serverflags = (serverflags | INITLEVEL); // reload bots on next level
 };
 
-// count bot kills & deaths for scoreboard - extract from ClientObituary, called after ClientObit divert
+// count bot kills & deaths for scoreboard - extract from ClientObituary, called for ClientObit divert in killed
 
 void(entity targ, entity attacker) bot_kill =
 {
@@ -359,11 +359,28 @@ void(entity targ, entity attacker) bot_kill =
 	}
 
 	if (PK) PK_ClientObituary(targ, damage_inflictor, attacker); // *pk - pk death handler
-	else
-	ClientObituary(targ, attacker);
+	else ClientObituary(targ, attacker);
 
 	if (e) e.classname = "pk*bot";
 	if (f) f.classname = "pk*bot";
+
+	if (attacker.classname == "pk*bot")
+		Update_Frags(attacker);
+	if (targ.classname == "pk*bot")
+		Update_Frags(targ);
+
+	if ((targ.classname == "player") || (targ.classname == "pk*bot"))
+	{
+		if (attacker.classname == "teledeath")
+		if (attacker.owner.classname == "pk*bot")
+		{
+			TELEFRAGFLAG = 1;
+			Update_Frags(attacker.owner);
+		}
+	}
+
+/*
+this is really useless code, so we shall deprecate
 
 	if ((targ.classname == "player") || (targ.classname == "pk*bot"))
 	{
@@ -374,7 +391,6 @@ void(entity targ, entity attacker) bot_kill =
 			{
 				TELEFRAGFLAG = 1;
 			}
-//			countkill (attacker.owner,targ);
 			if (attacker.owner.classname == "pk*bot")
 				Update_Frags(attacker.owner);
 			return;
@@ -383,7 +399,6 @@ void(entity targ, entity attacker) bot_kill =
 		if (attacker.classname == "teledeath2")
 		{
 //			targ.frags = targ.frags - 1;
-//			countkill (targ,targ);
 			if (targ.classname == "pk*bot")
 				Update_Frags(targ);
 			return;
@@ -397,7 +412,6 @@ void(entity targ, entity attacker) bot_kill =
 //				attacker.frags = attacker.frags - 1;
 				if (targ.classname == "pk*bot")
 					Update_Frags(targ);
-//				countkill (targ,targ);
 			
 				return;
 			}
@@ -413,7 +427,6 @@ void(entity targ, entity attacker) bot_kill =
 //				attacker.frags = attacker.frags + 1;
 				if (attacker.classname == "pk*bot")
 					Update_Frags(attacker);
-//				countkill (attacker,targ);
 			}
 			return;
 		}
@@ -421,9 +434,9 @@ void(entity targ, entity attacker) bot_kill =
 		{
 			Update_Frags(targ);
 //			targ.frags = targ.frags - 1;
-//			countkill (targ,targ);
 		}
 	}
+*/
 };
 
 /*
@@ -701,7 +714,9 @@ bprint(" ) - fell through tests!\n");
 //	}
 };
 
+// intro when not in painkeep mode, which has its own intro
 // mod for frikbot merge
+
 void () printIntro =
 {
 	local float num;
@@ -722,11 +737,11 @@ void () printIntro =
 			addTeamBots (self,num);
 		}
 //		centerprint (self,"Server running team pk*bots v1.1\nand PainKeep v1.1");
-		centerprint (self,"Server running team pk*bots v1.1, frikbot 0.10.1\nand PainKeep v1.2");
+		centerprint (self,"Server running team pk*bots v1.1, frikbot 0.10.1");
 	}
 	else
 	{
 //		centerprint (self,"Server running pk*bots v1.1\nand PainKeep v1.1");
-		centerprint (self,"Server running pk*bots v1.1, frikbot 0.10.1\nand PainKeep v1.2");
+		centerprint (self,"Server running pk*bots v1.1, frikbot 0.10.1");
 	}
 };

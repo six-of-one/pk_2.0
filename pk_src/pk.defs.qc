@@ -14,6 +14,7 @@ float PK_XSOUND				= 32768;	// bit * = TRUE --- use extra pk sound set
 
 float pk_flags;							// replaces old usage of temp1, savedgamecfg stores this
 float pk_xsound;							// set to state of PK_XSOUND bit for sound code toggle
+float pk_itemovr;						// control items - admin override
 
 float DARKPLACES_ENGINE	= 3275;	// for detecting darkplaces - modded engine sets cvar("chaos") to this value
 float chaos;
@@ -270,6 +271,7 @@ float() admin_postthink;
 void() admin_resettimeout;
 void () observer; // *bot
 float pk_flags_ck;
+float pk_itemovr_ck;
 
 float PK_TP_STATUSON		= 256;
 .float hubstartupmessage;

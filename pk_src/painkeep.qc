@@ -184,6 +184,8 @@ void() PK_precache =
 		localcmd ("bind backspace \"impulse 12\"\n");
 	}
 
+	pk_itemovr = pk_itemovr_ck = cvar("saved3"); // admin override of map items
+
 // set PK mode based on engine var | saved2
 
 	pk_flags = pk_flags_ck = cvar("savedgamecfg");
@@ -441,7 +443,7 @@ void() PK_SetNewParms =
 
 void() PK_DecodeLevelParms = 
 {
-	self.pk_items = PK_IT_AXE | parm10;
+	self.pk_items = PK_IT_AXE | parm10 | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP; // fix PK mode false map to PK mode true map
 	self.pk_gravitywellammo = parm11 & 15;
 	self.pk_turretammo = floor(parm11 / 16) & 15;
 	self.pk_canpabammo = floor(parm11 / 256) & 15;
@@ -454,8 +456,11 @@ void() PK_DecodeLevelParms =
 	self.msgcount = (parm16 & 255);
 };
 
+// called from SetChangeParms with health < 0 - sets MOTD time in parm 16, & checks user enabled extra disp
+
 void() SetNewPKParms =
 {
+/* deprecated - new mode
 	parm1 = IT_SHOTGUN | IT_AXE;
 	parm2 = 100;
 	parm3 = parm5 = parm6 = parm7 = parm9 = 0;
@@ -463,7 +468,8 @@ void() SetNewPKParms =
 	parm8 = 1;
 	parm10 = PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP;
 	parm11 = parm12 = parm13 = parm14 = parm15 = 0;
-	parm16 = MOTDTIME + 1;
+*/
+	parm16 = (MOTDTIME + 1) | 256; // do hub message.
 
 	if (self.pk_items & PK_IT_EXTRADISP)
 	{
