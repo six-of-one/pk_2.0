@@ -291,11 +291,10 @@ void () W_FireShotgun =
 	self.punchangle_x = -2;
 
 		self.currentammo =self.ammo_shells = self.ammo_shells - 1;
-		dir = aim (self,100000);
 		if (self.classname == "pk*bot")
-		{
 			dir = botaim ();
-		}
+		else
+		dir = aim (self,100000);
 		FireBullets (6, dir, '0.04 0.04 0');
 };
 
@@ -326,11 +325,10 @@ void () W_FireSuperShotgun =
 	self.punchangle_x = -4;
 	
 		self.currentammo = self.ammo_shells = self.ammo_shells - 2;
-		dir = aim (self,100000);
 		if (self.classname == "pk*bot")
-		{
 			dir = botaim ();
-		}
+		else
+		dir = aim (self,100000);
 		FireBullets (14, dir, '0.14 0.08 0');
 };
 
@@ -425,13 +423,14 @@ void () W_FireRocket =
 // set missile speed
 
 	makevectors (self.v_angle);
-	missile.velocity = aim (self,1000);
 	if (self.classname == "pk*bot")
 	{
 		missile.velocity = botaim ();
 		bfwd = botaim ();
 		bfwd_z = 0;
 	}
+	else
+	missile.velocity = aim (self,1000);
 	missile.velocity = missile.velocity * 1000;
 	missile.angles = vectoangles (missile.velocity);
 
@@ -683,7 +682,6 @@ void () W_FireGrenade =
 
 void () spike_touch;
 void () superspike_touch;
-void () pulse_touch;
 
 /*
 ===============
@@ -721,11 +719,10 @@ void () W_FireSuperSpikes =
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
 	self.attack_finished = time + 0.2;
 	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
-	dir = aim (self,1000);
 	if (self.classname == "pk*bot")
-	{
 		dir = botaim ();
-	}
+	else
+	dir = aim (self,1000);
 	launch_spike (self.origin + '0 0 16', dir);
 	newmis.touch = superspike_touch;
 	setmodel (newmis,"progs/s_spike.mdl");
@@ -766,6 +763,9 @@ void(float ox) W_FireSpikes =
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
 	self.attack_finished = time + 0.2;
 	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
+	if (self.classname == "pk*bot")
+		dir = botaim ();
+	else
 	dir = aim (self, 1000);
 	launch_spike (self.origin + '0 0 16' + v_right*ox, dir);
 

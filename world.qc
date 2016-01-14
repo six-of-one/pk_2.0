@@ -382,7 +382,7 @@ void () InitBodyQue =
 	local entity e;
 	local float f;
 
-	f = 15; // # of total visible dead bodies - 1 for players - silly way to do this
+	f = 15; // # of total visible dead bodies (- 1) for players - silly way to do this
 	e = bodyque_head = spawn ();
 	bodyque_head.classname = "bodyque";
 

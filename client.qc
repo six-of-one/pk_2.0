@@ -586,7 +586,6 @@ void () PutClientInServer =
 	if (PK) PK_CIS(); // *pk - set client pk elements
 	self.admin = 0;
 	set_initBotLevel(); // *bot
-//	set_CarriedPath(); // *bot - deprecated into prev fn
 };
 
 
@@ -1197,7 +1196,6 @@ void () PlayerPostThink =
 
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
-
 
 	if (PK_ADMIN || self.admin == USER_MENU) // *pk - run admin for both modes - any deactivation will 0 this || make sure user menu always works
 	if (self.admin || (self.impulse == pk_adminimp))

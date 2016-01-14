@@ -309,6 +309,8 @@ void () PutBotInServer =
 	self.pathtype = NEVERTARGET;
 	self.deadflag = DEAD_NO;
 	self.pausetime = 0;
+	if (PK) spwn = PK_SelectSpawnPoint (); // *pk - get a spawn point, pk style
+	else
 	spwn = SelectSpawnPoint ();
 	spot = (spwn.origin + '0 0 1');
 	self.origin = spot;
@@ -444,8 +446,10 @@ void () AddAnotherBot =
   
 	newbot = AddBot ();
 	newbot.id = FindGood ();
+printtv(1, "bot - active clients", active_clients);
+printtv(1, "id", newbot.id);
 	newbot.colormap = (newbot.id + 1);
-	newbot.colormap = 0;
+//	newbot.colormap = 0; // causing *bot to always have players colors
 	newbot.team = 99;
 // CHECK: painkeep damageskins
 /*
@@ -611,6 +615,20 @@ void () AddAnotherBot =
 	WriteByte (MSG_ALL,newbot.id);
 	WriteShort (MSG_ALL,newbot.frags);
 };
+/*
+void(entity who) UpdateClient =
+{
+	WriteByte (MSG_ALL, SVC_UPDATENAME);
+	WriteByte (MSG_ALL, who.b_clientno);
+	WriteString (MSG_ALL, who.netname);
+	WriteByte (MSG_ALL, SVC_UPDATECOLORS);
+	WriteByte (MSG_ALL, who.b_clientno);
+	WriteByte (MSG_ALL, who.b_shirt * 16 + who.b_pants);
+	WriteByte (MSG_ALL, SVC_UPDATEFRAGS);
+	WriteByte (MSG_ALL, who.b_clientno);
+	WriteShort (MSG_ALL, who.frags);
+};
+*/
 
 void (entity ply, float n) addTeamBots =
 {

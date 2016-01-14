@@ -556,7 +556,7 @@ void(float lt, float tm) admin_timer =
 	self.goalentity.owner = self;
 	self.goalentity.think = PK_AdminImpulse;
 	self.goalentity.nextthink = time + tm;
-// if lt is true, this is a beacon light over an admins player
+// if lt is true, this is a beacon light over an admin player
 	if (lt)
 	{
 		self.goalentity.effects = EF_DIMLIGHT;
@@ -699,7 +699,12 @@ void() AdminCommands =
 			sprint(self,"Use admin impulse to return to menu mode.\n");
 			return;
 		}
-		else if (self.lefty == 98) Peeper();
+		else if (self.lefty == 98)
+		{
+			observer();
+			self.goalentity.effects = 0;
+			setmodel(self.goalentity, ""); // no light on admin observer
+		}
 		else if (self.lefty == 99)													// admin respawn - exits admin mode
 		{
 			self.impulse = pk_adminimp;
@@ -881,6 +886,7 @@ void() AdminCommands =
 			self.cnt = 0;
 			self.wad = self.noise = "";
 			Admin_mainmenu();
+			setBotGravity(); // *bots
 		}
 		else if (self.impulse == 8)
 		{
@@ -1261,13 +1267,13 @@ void() PK_AdminImpulse =
 // code allows us to act like regular keypad entry, heh heh
 	else if (self.impulse && (self.admin < -1 || (self.admin & 3) == 2)) // enter codes for menu or login
 	{
-bprint("in numeric: ");
-bprint(ftos(self.admin));
-bprint (" - out = ");
+//bprint("in numeric: "); // track input
+//bprint(ftos(self.admin));
+//bprint (" - out = ");
 		if (self.impulse == 10) self.impulse = 0; // translate 0
 		if (self.impulse < 10) self.lefty = (self.lefty * 10) + self.impulse; // build code
 		else if (self.impulse == 12) self.lefty = floor(self.lefty / 10); // backspace
-		if (self.impulse == 11) self.admin = fabs(self.admin) - 1; // enter - done
+		if (self.impulse == 11 || self.button0) self.admin = fabs(self.admin) - 1; // enter (accept fire button here) - done
 //		if (self.impulse == 11 && self.lefty) self.admin = fabs(self.admin) - 1; // enter - done
 		else if (self.admin > 0) // code for menu select go back now
 		{
@@ -1276,21 +1282,21 @@ bprint (" - out = ");
 			else if (self.admin < 9) self.wad = "";
 			if (self.admin < 9) centerprint3(self, self.message, as, "<");
 			else centerprint3(self, self.message, as, self.wad);
-bprint(ftos(self.impulse));
-bprint("\n");
+//bprint(ftos(self.impulse));
+//bprint("\n");
 			self.impulse = 0;
 			return;
 		}
-bprint(ftos(self.impulse));
-bprint("\n");
+//bprint(ftos(self.impulse));
+//bprint("\n");
 	}
 
 	if (self.admin > 0)
 	{
-bprint("admin: ");
-bprint(ftos(self.admin));
-//bprint(ftos(self.impulse));
-bprint("\n");
+//bprint("admin: ");
+//bprint(ftos(self.admin));
+////bprint(ftos(self.impulse));
+//bprint("\n");
 		AdminCommands();
 		self.impulse = 0;
 	}

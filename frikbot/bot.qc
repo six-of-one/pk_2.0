@@ -659,6 +659,8 @@ float () BotPostFrame =
 		if (waypoint_mode > WM_LOADED)
 			bot_menu_display();
 
+	if (self.admin || (serverflags & UNRESTRICTED)) // *pk - admin restriction on bot controls
+	if (self.impulse)
 		BotImpulses();
 
 		if (botcam())

@@ -569,7 +569,7 @@ void (entity e, vector min, vector max) setsize = #4;
 // #5 was removed
 void () break = #6; 
 float() random						= #7;		// returns 0 - 1
-//void (entity e, float chan, string samp, float vol, float atten) sound = #8; // frikbot takeover
+//void (entity e, float chan, string samp, float vol, float atten) sound = #8; // *frikbot takeover
 //void(entity e, float chan, string samp, float vol, float atten) sound = #8; // *pk - hijacked for pk_mode non pk map support
 vector (vector v) normalize = #9; 
 void (string e) error = #10; 
@@ -577,7 +577,6 @@ void (string e) objerror = #11;
 float (vector v) vlen = #12; 
 float (vector v) vectoyaw = #13; 
 entity () spawn = #14; 
-//void (entity e) realremove = #15; // bot dev code - deprecated 
 void (entity e) remove = #15;
 
 // sets trace_* globals
@@ -591,10 +590,10 @@ entity() checkclient				= #17;	// returns a client to look for
 entity (entity start, .string fld, string match) find = #18; 
 string (string s) precache_sound = #19; 
 string (string s) precache_model = #20; 
-//void (entity client, string s) stuffcmd = #21;  // frikbot takeover
+//void (entity client, string s) stuffcmd = #21;  // *frikbot takeover
 entity (vector org, float rad) findradius = #22; 
 void (string s) bprint = #23; 
-//void (entity client, string s) sprint = #24;  // frikbot takeover
+//void (entity client, string s) sprint = #24;  // *frikbot takeover
 void (string s) dprint = #25; 
 string (float f) ftos = #26; 
 string (vector v) vtos = #27; 
@@ -614,7 +613,7 @@ float(entity e) checkbottom			= #40;		// true if self is on ground
 float(vector v) pointcontents		= #41;		// returns a CONTENT_*
 // #42 was removed
 float (float f) fabs = #43; 
-//vector (entity e, float speed) aim = #44; // frikbot takeover
+//vector (entity e, float speed) aim = #44; // *frikbot takeover
 float(string s) cvar = #45;						// return cvar.value
 void(string s) localcmd = #46;					// put string into local que
 entity(entity e) nextent = #47;					// for looping through all ents
@@ -660,7 +659,7 @@ void (string s) changelevel = #70;
 
 void(string var, string val) cvar_set = #72;	// sets cvar.value
 
-//void(entity client, string s) centerprint = #73;	// sprint, but in middle   // frikbot takeover
+//void(entity client, string s) centerprint = #73;	// sprint, but in middle   // *frikbot takeover
 
 //void(vector pos, string samp, float vol, float atten) ambientsound = #74; // *pk - hijacked for pk_mode non pk map support
 
@@ -668,7 +667,7 @@ string(string s) precache_model2	= #75;		// registered version only
 string(string s) precache_sound2	= #76;		// registered version only
 string(string s) precache_file2		= #77;		// registered version only
 
-//void(entity e) setspawnparms		= #78;		// set parm1... to the   // frikbot takeover
+//void(entity e) setspawnparms		= #78;		// set parm1... to the   // *frikbot takeover
 												// values at level start
 												// for coop respawn
 
@@ -696,21 +695,6 @@ float (entity e, float healamount, float ignore) T_Heal; // health function
 
 float(entity targ, entity inflictor) CanDamage;
 
-
-/* code for this mod - developer stuff? we take out...
-void (entity e) remove =
-{
-	if (e.classname == "BotTarget")
-	{
-		eprint (e);
-	}
-	if (e.classname == "beartrap")
-	{
-		eprint (e);
-	}
-	realremove (e);
-};
-*/
 
 // moved here due to v106 tones
 

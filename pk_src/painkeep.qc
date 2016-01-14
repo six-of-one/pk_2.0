@@ -157,6 +157,8 @@ void() PK_precache =
 	precache_sound ("player/gib_3.wav");
 
 // admin
+	precache_model ("progs/s_light.spr");	// light up admin
+
 	PK_ADMIN = 6; // code sets allow admin here - can be disabled by admin menu, 3 is base menu set
 
 	if (PK_ADMIN)

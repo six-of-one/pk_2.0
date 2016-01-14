@@ -8,6 +8,7 @@ float MSG_UPDATECOLORS		= 17;
 
 float FL_OBSERVER		= 131072; // flag for observer restrict
 float observer_time;			// time limit for observer mode
+float UNRESTRICTED				= 4096; // admin - allow anyone to issue bot impulse commands
 
 // if .state ==, call cacheRoute when touching this item
 float CACHE_ROUTE_TOUCH		= -1559742;

@@ -1,3 +1,23 @@
+//TEST
+void(float go, string msg, float vl) printtv =
+{
+local entity e;
+if (go)
+{
+	e = spawn();
+	e.think = printtv;
+	e.nextthink = time + 0.2;
+	e.cnt = vl;
+	e.message = msg;
+	return;
+}
+
+bprint(self.message);
+bprint(" ");
+bprint(ftos(self.cnt));
+bprint("\n");
+remove(self);
+};
 
 // constants
 
@@ -46,7 +66,7 @@ float(string name, string value) registercvar = #93;
 
 // hijacked for pk_mode running non pk maps with non pk sounds
 //void(entity e, float chan, string samp, float vol, float atten) pk_sound = #8;
-void(entity e, float chan, string samp, float vol, float atten) pk_sound;
+void(entity e, float chan, string samp, float vol, float atten) pk_sound; // *frikbot
 void(vector pos, string samp, float vol, float atten) pk_ambientsound = #74;
 
 // from triggers
@@ -264,7 +284,7 @@ void() admin_clear;
 void() Admin_mainmenu;
 float() admin_postthink;
 void() admin_resettimeout;
-void () Peeper;
+void () observer; // *bot
 float pk_flags_ck;
 
 float PK_TP_STATUSON		= 256;

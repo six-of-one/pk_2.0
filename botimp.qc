@@ -80,7 +80,7 @@ void () setSkinsMode =
 	}
 };
 
-void () NoPeeper;
+void () observer_off;
 
 void() end_observer =
 {
@@ -89,10 +89,10 @@ void() end_observer =
 	self.nextthink = time + 1;
 	self.think = SUB_Remove;
 	self = self.enemy;
-	NoPeeper();
+	observer_off();
 };
 
-void () Peeper =
+void () observer =
 {
 	local entity e;
 
@@ -120,21 +120,21 @@ void () Peeper =
 	bprint ("Observer mode activated\n");
 };
 
-void () NoPeeper =
+void () observer_off =
 {
 	self.classname = "player";
 	respawn ();
 	bprint ("Observer mode turned off\n");
 };
 
-void () setPeeperMode =
+void () setobserverMode =
 {
 	if (self.classname == "peeper")
 	{
-		NoPeeper ();
+		observer_off ();
 		return ;
 	}
-	Peeper ();
+	observer ();
 };
 
 void () setVerboseMode =
@@ -178,15 +178,15 @@ void () botControl =
 	}
 	else if (self.impulse == 211)
 	{
-		removeAllBots ();
+		removeAllBots();
 	}
 	else if (self.impulse == 214)
 	{
-		setBotGravity ();
+		setBotGravity();
 	}
 	else if (self.impulse == 215)
 	{
-		setVerboseMode ();
+		setVerboseMode();
 	}
 	else if (self.impulse == 217)
 	{
@@ -235,7 +235,7 @@ void () botImpulseCommand =
 	}
 	else if (self.impulse == 212)
 	{
-		setPeeperMode ();
+		setobserverMode ();
 	}
 	else if (self.impulse == 210)
 	{

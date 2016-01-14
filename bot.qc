@@ -12,89 +12,154 @@
 
 // relocate from client.qc
 
+/*
 
+deprecated for same fn in frikbot
+
+float(float clientno) ClientBitFlag =
+{
+	// bigger, but faster
+	if (clientno == 0)
+		return 1;
+	else if (clientno == 1)
+		return 2;
+	else if (clientno == 2)
+		return 4;
+	else if (clientno == 3)
+		return 8;
+	else if (clientno == 4)
+		return 16;
+	else if (clientno == 5)
+		return 32;
+	else if (clientno == 6)
+		return 64;
+	else if (clientno == 7)
+		return 128;
+	else if (clientno == 8)
+		return 256;
+	else if (clientno == 9)
+		return 512;
+	else if (clientno == 10)
+		return 1024;
+	else if (clientno == 11)
+		return 2048;
+	else if (clientno == 12)
+		return 4096;
+	else if (clientno == 13)
+		return 8192;
+	else if (clientno == 14)
+		return 16384;
+	else if (clientno == 15)
+		return 32768;
+	return 0;
+};
+
+float() ClientNextAvailable =
+{
+	local float clientno, bbit;
+
+	clientno = max_clients;
+	while(clientno > 0)
+	{
+		clientno = clientno - 1;
+
+		bbit = ClientBitFlag(clientno);
+		if (!(active_clients & bbit))
+		{
+			fClientNo = (fClientNo + 1);
+			active_clients = (active_clients | bbit);
+			return clientno;
+		}
+	}
+
+	return -1;
+};
+same as below except setting flag - replace for extract
+*/
 
 float () FindGood =
 {
+//	fActiveClients = active_clients; // frikbot code merge - these need to be the same var
+
 	fClientNo = (fClientNo + 1);
-	if (!(fActiveClients & 1))
+	if (!(active_clients & 1))
 	{
-		fActiveClients = (fActiveClients | 1);
+		active_clients = (active_clients | 1);
 		return (1);
 	}
-	else if (!(fActiveClients & 2))
+	else if (!(active_clients & 2))
 	{
-		fActiveClients = (fActiveClients | 2);
+		active_clients = (active_clients | 2);
 		return (2);
 	}
-	else if (!(fActiveClients & 4))
+	else if (!(active_clients & 4))
 	{
-		fActiveClients = (fActiveClients | 4);
+		active_clients = (active_clients | 4);
 		return (3);
 	}
-	else if (!(fActiveClients & 8))
+	else if (!(active_clients & 8))
 	{
-		fActiveClients = (fActiveClients | 8);
+		active_clients = (active_clients | 8);
 		return (4);
 	}
-	else if (!(fActiveClients & 16))
+	else if (!(active_clients & 16))
 	{
-		fActiveClients = (fActiveClients | 16);
-		return(TE_LIGHTNING1);
+		active_clients = (active_clients | 16);
+		return(5);
 	}
-	else if (!(fActiveClients & 32))
+	else if (!(active_clients & 32))
 	{
-		fActiveClients = (fActiveClients | 32);
+		active_clients = (active_clients | 32);
 		return (6);
 	}
-	else if (!(fActiveClients & 64))
+	else if (!(active_clients & 64))
 	{
-		fActiveClients = (fActiveClients | 64);
+		active_clients = (active_clients | 64);
 		return (7);
 	}
-	else if (!(fActiveClients & 128))
+	else if (!(active_clients & 128))
 	{
-		fActiveClients = (fActiveClients | 128);
+		active_clients = (active_clients | 128);
 		return (8);
 	}
-	else if (!(fActiveClients & 256))
+	else if (!(active_clients & 256))
 	{
-		fActiveClients = (fActiveClients | 256);
+		active_clients = (active_clients | 256);
 		return (9);
 	}
-	else if (!(fActiveClients & 512))
+	else if (!(active_clients & 512))
 	{
-		fActiveClients = (fActiveClients | 512);
+		active_clients = (active_clients | 512);
 		return (10);
 	}
-	else if (!(fActiveClients & 1024))
+	else if (!(active_clients & 1024))
 	{
-		fActiveClients = (fActiveClients | 1024);
+		active_clients = (active_clients | 1024);
 		return (11);
 	}
-	else if (!(fActiveClients & 2048))
+	else if (!(active_clients & 2048))
 	{
-		fActiveClients = (fActiveClients | 2048);
+		active_clients = (active_clients | 2048);
 		return(12);
 	}
-	else if (!(fActiveClients & 4096))
+	else if (!(active_clients & 4096))
 	{
-		fActiveClients = (fActiveClients | 4096);
+		active_clients = (active_clients | 4096);
 		return (13);
 	}
-	else if (!(fActiveClients & 8192))
+	else if (!(active_clients & 8192))
 	{
-		fActiveClients = (fActiveClients | 8192);
+		active_clients = (active_clients | 8192);
 		return(14);
 	}
-	else if (!(fActiveClients & 16384))
+	else if (!(active_clients & 16384))
 	{
-		fActiveClients = (fActiveClients | 16384);
+		active_clients = (active_clients | 16384);
 		return(15);
 	}
-	else if (!(fActiveClients & 32768))
+	else if (!(active_clients & 32768))
 	{
-		fActiveClients = (fActiveClients | 32768);
+		active_clients = (active_clients | 32768);
 		return (16);
 	}
 	else
@@ -104,25 +169,33 @@ float () FindGood =
 
 };
 
-void (float abba) MakeGood =
+void (float botcnt) MakeGood =
 {
-	local float ackbar;
-	ackbar = WEAPON_SHOTGUN;
-	abba = (abba - 1);
-	while (abba > NAMEBOTS)
+// TEST
+	printtv(1,"*bot cnt: ",botcnt);
+	printtv(1,"frikbit: ",ClientBitFlag(botcnt));
+
+	local float botbit;
+	botbit = 1;
+	botcnt = (botcnt - 1);
+	while (botcnt > 0)
 	{
-		ackbar = (ackbar * 2);
-		abba = (abba - 1);
+		botbit = (botbit * 2);
+		botcnt = (botcnt - 1);
 	}
 	fClientNo = (fClientNo - 1);
-	fActiveClients = (fActiveClients - (fActiveClients & ackbar));
+	active_clients = (active_clients - (active_clients & botbit));
+
+// TEST
+	printtv(1,"botbit: ",botbit);
+
 };
 
-void (entity object) Update_Frags =
+void (entity e) Update_Frags =
 {
 	WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
-	WriteByte (MSG_ALL,object.id);
-	WriteShort (MSG_ALL,object.frags);
+	WriteByte (MSG_ALL,e.id);
+	WriteShort (MSG_ALL,e.frags);
 };
 
 
@@ -212,7 +285,7 @@ float () getrandombotskin =
 	botskin = random ();
 	if (botskin <= 0.066)
 	{
-		return(NAMEBOTS);
+		return(0);
 	}
 	if ((botskin > 0.066) && (botskin <= 0.132))
 	{
@@ -407,7 +480,11 @@ void(float con) bot_con =
 // connection
 	if (con)
 	{
-		self.id = FindGood ();
+//		if (!self.id) self.id = FindGood ();
+// *frikbot code already sets this!
+		self.id = self.b_clientno;
+printtv(1, "active clients", active_clients);
+printtv(1, "id", self.id);
 		self.impulse = 204; // printinit
 		randombotskin = getrandombotskin ();
 		initscore ();
@@ -455,11 +532,7 @@ void(entity targ, entity attacker) bot_kill =
 			}
 			countkill (attacker.owner,targ);
 			if (attacker.owner.classname == "pk*bot")
-			{
-				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
-				WriteByte (MSG_ALL,attacker.owner.id);
-				WriteShort (MSG_ALL,attacker.owner.frags);
-			}
+				Update_Frags(attacker.owner);
 			return;
 		}
 
@@ -468,11 +541,7 @@ void(entity targ, entity attacker) bot_kill =
 //			targ.frags = targ.frags - 1;
 			countkill (targ,targ);
 			if (targ.classname == "pk*bot")
-			{
-				WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
-				WriteByte (MSG_ALL,targ.id);
-				WriteShort (MSG_ALL,targ.frags);
-			}
+				Update_Frags(targ);
 			return;
 		}
 
@@ -482,36 +551,31 @@ void(entity targ, entity attacker) bot_kill =
 			{
 				// killed self
 //				attacker.frags = attacker.frags - 1;
-				if (attacker.classname == "pk*bot")
-				{
-					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
-					WriteByte (MSG_ALL,attacker.id);
-					WriteShort (MSG_ALL,attacker.frags);
-				}
-				countkill (attacker,attacker);
+				if (targ.classname == "pk*bot")
+					Update_Frags(targ);
+				countkill (targ,targ);
 			
 				return;
 			}
 			else if ((teamplay == 2) && (targ.team > 0)&&(targ.team == attacker.team))
 			{
 //				attacker.frags = attacker.frags - 1;
+				if (attacker.classname == "pk*bot")
+					Update_Frags(attacker);
 				return;
 			}
 			else
 			{
 //				attacker.frags = attacker.frags + 1;
 				if (attacker.classname == "pk*bot")
-				{
-					WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
-					WriteByte (MSG_ALL,attacker.id);
-					WriteShort (MSG_ALL,attacker.frags);
-				}
+					Update_Frags(attacker);
 				countkill (attacker,targ);
 			}
 			return;
 		}
 		else
 		{
+			Update_Frags(targ);
 //			targ.frags = targ.frags - 1;
 			countkill (targ,targ);
 		}

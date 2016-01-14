@@ -96,7 +96,7 @@ void()	player_stand1 =[	$axstnd1,	player_stand1	]
 	if (self.velocity_x || self.velocity_y)
 	{
 		self.walkframe=0;
-		player_run();
+		self.think = player_run; // *fix - run / stand loop
 		return;
 	}
 
@@ -130,7 +130,7 @@ void()	player_run =[	$rockrun1,	player_run	]
 	if (!self.velocity_x && !self.velocity_y)
 	{
 		self.walkframe=0;
-		player_stand1();
+		self.think = player_stand1; // *fix - run / stand loop
 		return;
 	}
 

@@ -221,8 +221,11 @@ void(float ox) W_FirePulseSpikes =
 	sound (self, CHAN_WEAPON, "weapons/pulse/pulse_1.wav", 1, ATTN_NORM);
 	//self.attack_finished = time + 0.4;
 	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
+	if (self.classname == "pk*bot")
+		dir = botaim ();
+	else
 	dir = aim (self, 1000);
-	launch_spike (self.origin + '0 0 16' + v_right*ox, dir);
+	launch_spike (self.origin + ' 0 0 16' + v_right*ox, dir);
 	newmis.touch = pulse_touch;
 	newmis.theowner = self;
 	setmodel (newmis, "progs/pnail.mdl");
