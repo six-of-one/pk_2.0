@@ -921,3 +921,235 @@ void() pk_placeitem =
 		self.netname = "Pulse Rifle";
 	}
 };
+
+// fn(item_repm) - replace / remove all items matching with a new item
+// fn(item_bit) - provide item classname string by bit
+// fn(item_call) - make item call based on string
+// fn(item_down) - item (self) is removed from play for this map till admin overrides removal or new map is loaded
+// fn(item_loop) - run loop making changes per pk_itemovr
+// rep - item classname to replace
+// cls - new classname
+// op - save original classname in .wad so we can restore if mode is turned off
+
+string (float bt) item_by_bit =
+{
+	if (bt == WEP_SSHOT) return("weapon_supershotgun");
+	if (bt == WEP_NAILGUN) return("weapon_nailgun");
+	if (bt == WEP_PERF) return("weapon_supernailgun");
+	if (bt == WEP_GREN) return("weapon_grenadelauncher");
+	if (bt == WEP_ROCKET) return("weapon_rocketlauncher");
+	if (bt == WEP_THUNDER) return("weapon_lightning");
+	if (bt == ART_INV) return("item_artifact_invulnerability");
+	if (bt == ART_RAD) return("item_artifact_envirosuit");
+	if (bt == ART_RING) return("item_artifact_invisibility");
+	if (bt == ART_QUAD) return("item_artifact_super_damage");
+	if (bt == ARM_GRN) return("item_armor1");
+	if (bt == ARM_YEL) return("item_armor2");
+	if (bt == ARM_RED) return("item_armorInv");
+	if (bt == HEAL_15) return("item_health_15");
+	if (bt == HEAL_25) return("item_health_25");
+	if (bt == HEAL_100) return("item_health_mega");
+
+	return("");
+};
+
+// ammo for a given wep
+
+string (float bt) ammo_by_bit =
+{
+	if (bt == WEP_SSHOT) return("item_shells");
+	if (bt == WEP_NAILGUN) return("item_spikes");
+	if (bt == WEP_PERF) return("item_spikes");
+	if (bt == WEP_GREN) return("item_rockets");
+	if (bt == WEP_ROCKET) return("item_rockets");
+	if (bt == WEP_THUNDER) return("item_cells");
+	return("");
+};
+
+void(string cls) item_call =
+{
+	if (cls == "weapon_supershotgun") weapon_supershotgun();
+	else if (cls == "weapon_nailgun") weapon_nailgun();
+	else if (cls == "weapon_supernailgun") weapon_supernailgun();
+	else if (cls == "weapon_grenadelauncher") weapon_grenadelauncher();
+	else if (cls == "weapon_rocketlauncher") weapon_rocketlauncher();
+	else if (cls == "weapon_lightning")
+	{
+		if (PK) weapon_chainlg();
+		else weapon_lightning();
+	}
+	else if (cls == "item_shells") item_shells();
+	else if (cls == "item_spikes") item_spikes();
+	else if (cls == "item_rockets") item_rockets();
+	else if (cls == "item_cells") item_cells();
+	else if (cls == "item_artifact_invulnerability") item_artifact_invulnerability();
+	else if (cls == "item_artifact_super_damage") item_artifact_super_damage();
+	else if (cls == "item_artifact_envirosuit") item_artifact_envirosuit();
+	else if (cls == "item_artifact_invisibility") item_artifact_invisibility();
+	else if (cls == "item_armor1") item_armor1();
+	else if (cls == "item_armor2") item_armor2();
+	else if (cls == "item_armorInv") item_armorInv();
+	else if (cls == "item_health_15") item_health();
+	else if (cls == "item_health_25") item_health();
+	else if (cls == "item_health_mega") item_health();
+	else return;
+	self.classname = cls;
+	self.mdl = self.model;
+//	self.model = string_null;
+	self.solid = SOLID_NOT;
+	self.think = SUB_regen; // dont go thru place_item - use regen method
+	self.nextthink = time + 1 + 3 * random(); // spread em out
+};
+
+void() item_down =
+{
+	self.model = "";
+	self.touch = SUB_Null;
+	self.solid = SOLID_NOT;
+};
+
+void(string cls, string rep, string am, string ram) item_repm =
+{
+	local entity e, sv;
+
+	e = find(world,wad,rep);
+	if (!e)
+	{
+		e = find(world,classname,rep);
+		if (!e) return;
+		while (e)
+		{
+			e.wad = e.classname;
+			e = find(e,classname,rep);
+		}
+		e = world;
+	}
+bprint("repm set: ");
+bprint(cls);
+bprint(" for: ");
+bprint(rep);
+if (ram != "" && ram != am){
+bprint(" ammo set: ");
+bprint(am);
+bprint(" for: ");
+bprint(ram);}
+bprint("\n");
+
+	sv = self;
+	e = find(world,wad,rep);
+	while (e)
+	{
+		self = e;
+		if (cls == "rest")
+		{
+			item_call(rep);
+			if (ram != "") item_repm("rest", ram, "", "");
+		}
+		else if (cls == "")
+		{
+			item_down();
+			if (ram != "")
+			if (ram != am)	item_repm(am, ram, "", "");
+		}
+		else
+		{
+			item_call(cls);
+			if (ram != "")
+			if (ram != am)	item_repm(am, ram, "", "");
+		}
+		e = find(e,wad,rep);
+	}
+	self = sv;
+};
+
+
+void() item_loop =
+{
+	local float f, e, d, pko, sf, lvl, lvls;
+	local string cl;
+
+	lvls = f = 1;
+	e = lvl = WEP_STOP;
+	while (f != CON_STOP)
+	{
+		pko = pk_itemovr;
+		if (pko & CON_SUBS) // find a valid substitute code
+		{
+			e = floor(e / 2);
+			if (e < lvls) e = lvl / 2;
+			sf = 7;
+			while ((e & pko) && e >= lvls && sf > 0)
+			{
+				e = floor(e / 2);
+				sf = sf - 1;
+			}
+			if (e < lvls || sf < 1) pko = pko - (pko & CON_SUBS); // cant sub if no sub item - can this happen?
+if (pko & CON_SUBS) {
+bprint("replacement item set: ");
+bprint(item_by_bit(e));}
+else
+bprint("NONE AVAILABLE!");
+bprint("\n");
+		}
+
+		if (! (pko & CON_RUN))
+		{
+			item_repm("rest", item_by_bit(f), "", ammo_by_bit(f)); // restore
+//			return;
+		}
+		else if (f & pko) // bit active
+		{
+			if (pko & CON_ONLY)
+			{
+//bprint("only item: ");
+//bprint(item_by_bit(f));
+				for (e = lvls;e < lvl; e = e * 2)
+				{
+					cl = item_by_bit(f);
+					if (e != f)//{
+						item_repm(cl, item_by_bit(e), ammo_by_bit(f), ammo_by_bit(e));
+//bprint(", tko: ");
+//bprint(item_by_bit(e));}
+
+				}
+//bprint("\n");
+			}
+			else if (pko & CON_NONE)
+			{
+bprint("remove item: ");
+bprint(item_by_bit(f));
+				cl = item_by_bit(e);
+				if (pko & CON_SUBS) item_repm(cl, item_by_bit(f), ammo_by_bit(e), ammo_by_bit(f));
+				else item_repm("", item_by_bit(f), "", ammo_by_bit(f));
+if (pko & CON_SUBS) {bprint(", sub item: "); bprint(item_by_bit(e));}
+else bprint(", gone!");
+bprint("\n");
+			}
+		}
+		f = f * 2;
+		if (f == lvl)
+		{
+//			if (lvl < CON_STOP)
+//			{
+//				e = lvl = CON_STOP;
+//				f = lvls = ART_QUAD;
+//			}
+
+			if (lvl < ART_STOP)
+			{
+				e = lvl = ART_STOP;
+				f = lvls = ART_QUAD;
+			}
+			else if (lvl < ARM_STOP)
+			{
+				e = lvl = ARM_STOP;
+				f = lvls = ARM_GRN;
+			}
+//			else if (lvl < HEAL_STOP)
+//			{
+//				e = lvl = HEAL_STOP;
+//				f = lvls = HEAL_15;
+//			}
+		}
+	}
+};

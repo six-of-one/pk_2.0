@@ -62,6 +62,7 @@ float   A_FRICU = 13;
 float   A_DMMAP = 22;
 float   A_BOTS  = 23;
 float   A_PKCON = 24;
+float   A_ITEM  = 25;
 float   A_SKICK = 30;
 float   A_PKMOD = 60;
 
@@ -91,6 +92,23 @@ void() admin_sv_cfg =
 	pk_itemovr_ck = pk_itemovr;
 
 	if (pk_admintime > 0) admin_resettimeout();
+};
+
+// return 2^rl, bounded by 2^0 (lowest bit, 1) to 2^23 (highest bit, 8388608)
+
+float (float rl) AdminBitFlag =
+{
+	local float f, e;
+
+	f = floor(rl);
+	if (f < 0 || f > 23) return(0);
+	e = 1;
+	while (f > 0)
+	{
+		f = f - 1;
+		e = e * 2;
+	}
+	return(e);
 };
 
 /*
@@ -458,29 +476,79 @@ void() Admin_botmenu =
 Items menu admin
 ==========
 */
+void() Admin_itembits =
+{
+	local string adv, it;
+	local float f;
+
+	if (! pk_itemovr & CON_ANY)
+	{
+		self.wad = "\nNo bits are set in item override.";
+		return;
+	}
+	self.wad = "\nBits set in item override listed.";
+	bprint("--------------------------------\n");
+	f = 1;
+	adv = "Bit set";
+	if (pk_itemovr & CON_ONLY) adv = "Only";
+	else if (pk_itemovr & CON_NONE)
+	{
+		adv = "None of";
+		if (pk_itemovr & CON_SUBS) adv = "Subs for";
+	}
+	else if (pk_itemovr & CON_INF) adv = "Infinite ammo";
+
+	while (f != CON_STOP)
+	{
+		it = "";
+		if (f & pk_itemovr)
+			it = item_by_bit(f);
+		if (it != "")
+		{
+			bprint(adv);
+			bprint(": ");
+			bprint(it);
+			bprint("\n");
+		}
+		f = f * 2;
+	}
+	bprint("--------------------------------\n");
+};
+
 void() Admin_itemmenu =
 {
 	self.message =
 				       "\b     Admin Items Menu:     \n"
 				       "\b+--------------------------+\n"
 							"  +------- weapons ------+  \n"
-							"  01: Double shotgun        \n"
-							"  02: Nailgun               \n"
-							"  03: Preforator            \n"
-							"  04: Grenade launcher      \n"
-							"  05: Rocket launcher       \n"
-							"  06: Lightning gun         \n"
-							"  07: Painkeep items        \n"
-							"  +------ artifacts -----+  \n"
-							"  08: Quad damage           \n"
-							"  09: Invulnerability       \n"
-							"  10: Radiation suit        \n"
-							"  11: Ring of shadows       \n"
-							"  +------- toggles ------+  \n"
-							"  12: Only these items      \n"
-							"  13: None of these items   \n"
-							"  14: Substitute removed    \n"
-							"  15: Infinite ammo         \n"
+							"  01: Double shotgun        \n" // 1
+							"  02: Nailgun               \n" // 2
+							"  03: Preforator            \n" // 4
+							"  04: Grenade launcher      \n" // 8
+							"  05: Rocket launcher       \n" // 16
+							"  06: Lightning gun         \n" // 32
+							"  07: Painkeep items        \n" // 64
+							"  +------ artifacts -----+  \n" 
+							"  08: Quad damage           \n" // 128
+							"  09: Invulnerability       \n" // 256
+							"  10: Radiation suit        \n" // 512
+							"  11: Ring of shadows       \n" // 1024
+							"  +-------- armor -------+  \n" 
+							"  12: Green Armor           \n" // 2048
+							"  13: Yellow Armor          \n" // 4096
+							"  14: Red Armor             \n" // 8192
+//							"  +------- health -------+  \n" 
+//							"  15: 15 Health             \n" // 16384
+//							"  16: 25 Health             \n" // 32768
+//							"  17: Mega Health           \n" // 65536
+							"  +------ controls ------+  \n" 
+							"  18: Only these items      \n" // 131072
+							"  19: None of these items   \n" // 262144
+							"  20: Substitute removed    \n" // 542288
+							"  21: Infinite ammo         \n" // 1048576
+							"  22: Cycle selected items  \n" // 2097152
+							"  30: Show item bits        \n" 
+							"  31: Update map now        \n"
 							" 666:  main menu            \n"
 							" admin impulse: exit admin  \n"
 				       "\b+--------------------------+\n"
@@ -544,6 +612,7 @@ void() Admin_mainmenu =
 						"  22:  map control         \n"
 						"  23:  bot control         \n"
 						"  24:  painkeep control    \n"
+						"  25:  item control        \n"
 						"  30:  kick players        \n"
 						"  60:  PK mode toggle      \n"
 						"  ---  PK mode = TRUE      \n"
@@ -572,6 +641,7 @@ void() Admin_mainmenu =
 						"  13:  server friction     \n"
 						"  22:  map control         \n"
 						"  23:  bot control         \n"
+						"  25:  item control        \n"
 						"  30:  kick players        \n"
 						"  60:  PK mode toggle      \n"
 						"  ---  PK mode = FALSE     \n"
@@ -618,6 +688,7 @@ void(float lt, float tm) admin_timer =
 
 void() AdminCommands =
 {
+	local entity z;
 	local float e, f;
 	local string str;
 
@@ -690,6 +761,7 @@ void() AdminCommands =
 		if (self.lefty == A_DMMAP) Admin_dmmapmenu(); else
 		if (self.lefty == A_BOTS) Admin_botmenu(); else
 		if (self.lefty == A_PKCON) Admin_pkmenu(); else
+		if (self.lefty == A_ITEM) Admin_itemmenu(); else
 		if (self.lefty == A_PKMOD)
 		{
 			f = pk_flags & PK_MAP;
@@ -1052,19 +1124,35 @@ void() AdminCommands =
 		self.admin = 26;
 		if (self.lefty == 666)
 			Admin_mainmenu();
-		if (self.lefty > 0 && self.lefty < 16)
+		else if (self.lefty == 30)
+			Admin_itembits();
+		else if (self.lefty == 31)
+		{
+			z = spawn();
+			if (z)
+			{
+				z.think = item_loop;
+				z.nextthink = time + 0.1;
+			}
+		}
+		else if (self.lefty > 0 && self.lefty < 23)
 		{
 			self.lefty = self.lefty - 1;
-			f = ClientBitFlag(self.lefty); // hijack - really should be a seperate fn()
+			f = AdminBitFlag(self.lefty);
 			if (pk_itemovr & f)
 				pk_itemovr = pk_itemovr - (pk_itemovr & f);
 			else
 				pk_itemovr = pk_itemovr | f;
 			if (pk_itemovr != pk_itemovr_ck)
-				self.wad = "Bit toggled for selected item";
-			admin_sv_cfg();
-			self.lefty = self.lefty + 1;
+			{
+				if (pk_itemovr & f)
+					self.wad = "\nBit toggled on for selected item";
+				else
+					self.wad = "\nBit toggled off for selected item";
+				admin_sv_cfg();
+			}
 		}
+		self.lefty = 0; //self.lefty + 1;
 	}
 
 	if (self.admin == 15)

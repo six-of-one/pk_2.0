@@ -161,9 +161,10 @@ void() PK_precache =
 
 	PK_ADMIN = 6; // code sets allow admin here - can be disabled by admin menu, 3 is base menu set
 
+	local entity e;
+
 	if (PK_ADMIN)
 	{
-		local entity e;
 // access code first
 		e = spawn();
 		e.nextthink = time + 0.2;
@@ -185,6 +186,17 @@ void() PK_precache =
 	}
 
 	pk_itemovr = pk_itemovr_ck = cvar("saved3"); // admin override of map items
+
+	if (FALSE) // test - disabled
+	if (pk_itemovr & CON_RUN) // change some items - admin override
+	{
+		e = spawn();
+		if (e)
+		{
+			e.think = item_loop;
+			e.nextthink = time + 1; // do this well after items spawn
+		}
+	}
 
 // set PK mode based on engine var | saved2
 

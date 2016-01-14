@@ -36,6 +36,48 @@ string ADMINCODE				= "float1\n"; // local command that loads admin security pas
 string ADMINIMPULSE			= "float2\n"; // load the impulse
 string ADMINTIME				= "float3\n"; // load the time out
 
+// item admin
+float WEP_SSHOT				= 1; 	 // admin of super shotgun
+float WEP_NAILGUN			= 2; 	 // admin of nailgun
+float WEP_PERF				= 4; 	 // admin of super nailgun
+float WEP_GREN				= 8; 	 // admin of grenade
+float WEP_ROCKET				= 16;  // admin of rocket
+float WEP_THUNDER			= 32;  // admin of thunderbolt
+float WEP_PKI					= 64;  // admin of pain keep items
+float WEP_WEPSQ				= 63;  // all q weps									= 111111000000
+float WEP_WEPSA				= 127; // incl pk items?							= 111111100000
+float WEP_STOP				= 64;
+
+float ART_QUAD				= 128;  // admin of quad
+float ART_INV					= 256;  // admin of invulnerable
+float ART_RAD					= 512;  // admin of rad suit
+float ART_RING				= 1024; // admin of ring
+float ART_ARTS				= 1920; // all art bits								= 000000011110
+float ART_STOP				= 2048;
+
+float ARM_GRN					= 2048;  // admin of green armor
+float ARM_YEL					= 4096;  // admin of yellow armor
+float ARM_RED					= 8192;  // admin of red armor
+float ARM_ARMS				= 14336; // all armor bits							= 000000000000111
+float ARM_STOP				= 16384;
+
+// TDO: item admin over health requires a remap of classnames for this code to work
+float HEAL_15					= 16384;  // admin of heal 15
+float HEAL_25					= 32768;  // admin of heal 25
+float HEAL_100				= 65536;  // admin of heal 100
+float HEAL_HEALS				= 114688; // all health bits						= 000000000000000111
+float HEAL_STOP				= 131072;
+
+float CON_ANY					= 2097087; // any bit set in this mask	- any above + controls (all bits - 64)
+float CON_STOP				= 16384; //131072;  // stop replace / remove cycle here
+// CON_* entries
+float CON_ONLY				= 131072;  // only the selected items will be loaded
+float CON_NONE				= 262144;  // none of the selected items will be loaded
+float CON_SUBS				= 524288;  // substitute something for removed items
+float CON_INF					= 1048576; // infinite ammo weps 
+float CON_RUN					= 1966080; // any control bit CON_* entries above - used by autorun
+void() item_loop;
+
 // **************************************
 // painkeep protos
 
