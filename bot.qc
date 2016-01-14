@@ -373,10 +373,11 @@ void() bot_changeParms =
 		if (e.team == 99)
 		{
 			nb = (nb + 1);
-			if (nb < 6)
+			if (nb < BOT_SAVE_SKILL)
 			{
-				parm12 = (parm12 + (((offset * e.skil) * 10) & (offset * 31)));
-				offset = (offset * 32);
+//				parm12 = (parm12 + (((offset * e.skil) * 10) & (offset * 31)));
+				parm12 = (parm12 + ((offset * e.skil) & (offset * 3)));
+				offset = (offset * 4);
 			}
 		}
 		else
@@ -388,10 +389,11 @@ void() bot_changeParms =
 			if (e.team == team1)
 			{
 				nt = (nt + 1);
-				if (nt < 6)
+				if (nt < BOT_SAVE_SKILL)
 				{
-				parm13 = (parm13 + (((toffset * e.skil) * 10) & (toffset * 31)));
-					toffset = (toffset * 32);
+//				parm13 = (parm13 + (((toffset * e.skil) * 10) & (toffset * 31)));
+				parm13 = (parm13 + ((offset * e.skil) & (offset * 3)));
+				toffset = (offset * 4);
 				}
 			}
 		}
@@ -453,6 +455,8 @@ void() set_initBotLevel =
 		e.think = initBotLevel;
 		e.nextthink = time + 2; // give players time to start
 		e.classname = "initBotLevel";
+		e.cnt = parm12; // should be bot skill for up to 6 bots
+		e.count = parm13;
 	}
 
 // from prev fn() - set_CarriedPath
@@ -906,6 +910,7 @@ void () printIntro =
 		num = ((serverflags & TEAMBOTS) / 256);
 		if (num > 0)
 		{
+			c_skill = skill;
 			addTeamBots (self,num);
 		}
 //		centerprint (self,"Server running team pk*bots v1.1\nand PainKeep v1.1");

@@ -211,6 +211,7 @@ float ignorearmor;
 
 // hub ops
 //float PK_SF_HUB = 16;
+string CL_BOBAMT                          = "cl_bob 0.02\n"; // val for turning view bob back on when not exited hub
 float PK_SF_HUB				= 1024;	// moved to pk_flags
 float PK_TP_TIMEMASK		= 63;
 float inHubMap;

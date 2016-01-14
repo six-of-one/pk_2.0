@@ -33,7 +33,7 @@ void() hub_teleport_touch =
 	local string str;
 
 	// make sure the thing is the player
-	if (other.classname != "player")
+	if (other.classname != "player" && other.classname != "pk*bot") // *bot
 		return;
 
 	// make sure we don't gib the last player!!!
@@ -113,6 +113,9 @@ void() hub_teleport =
 
 	InitTrigger ();
 	self.touch = hub_teleport_touch;
+
+	self.th_weight = triggerweight; // *bot
+	self.istrigger = 1;
 
 	// no votes
 	self.cnt = 0;
@@ -361,7 +364,7 @@ void() hub_control_status =
 	// print some information
 	getHighestScores();
 
-	local string str1, str2, str3;
+	local string str1, str2, str3, srch;
 	local float timemins, timedef, votecast, maxplayers;
 	local entity pl;
 
@@ -454,6 +457,7 @@ void() hub_control_status =
 		}
 
 		// count the numbeer of votes cast
+		srch = "player"; // *bot
 		pl = find(world, classname, "player");
 		maxplayers = votecast = 0;
 		while (pl != world)
@@ -466,7 +470,13 @@ void() hub_control_status =
 				maxplayers = maxplayers + 1;
 			}
 
-			pl = find(pl, classname, "player");
+			pl = find(pl, classname, srch);
+			if (!pl)
+			if (srch != "pk*bot") // *bot - search out bots too
+			{
+				srch = "pk*bot";
+				pl = find(pl, classname, srch);
+			}
 		}
 
 		playerVotesTimeLeft(maxplayers, votecast, timemins, timedef);
@@ -912,6 +922,8 @@ void() WaitForVotesThink =
 
 	// next think
 	self.nextthink = time + 0.1;
+
+	localcmd("cl_bob 0\n"); // stop bob so voted view isnt borked
 
 	if (self.messagetimeout < time)
 	{

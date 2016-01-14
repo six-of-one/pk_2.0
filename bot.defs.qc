@@ -6,7 +6,7 @@ float MSG_UPDATENAME		= 13;
 float MSG_UPDATEFRAGS		= 14;
 float MSG_UPDATECOLORS		= 17;
 
-float FL_OBSERVER			= 131072; // flag for observer restrict
+float FL_OBSERVER			= 65536; // flag for observer restrict
 float observer_time;			// time limit for observer mode
 float UNRESTRICTED			= 4096; // admin - allow anyone to issue bot impulse commands
 
@@ -16,6 +16,8 @@ float CACHE_ROUTE_TOUCH	= -1559742;
 float BOT_TOUCHED			= -2479551;
 // do both
 float BOT_TOUCHED_CACHE_ROUTE_TOUCH	= -4039293;
+
+float BOT_SAVE_SKILL		= 12; // number of bots that can save skill between levels for 1 players parms
 
 // orig
 float NORMALSCORE			= 1;

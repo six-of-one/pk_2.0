@@ -161,6 +161,7 @@ void() JumptoNext =
 	else
 	{
 		bprint("Admin executed next level command...\n");
+		bot_changelevel(); // *bot - reload bots on next level, handle intermission
 		changelevel(ot.map);
 	}
 };
@@ -173,6 +174,7 @@ JumptoNext
 void() ResetLevel =
 {
 	bprint("Admin executed reset level command...\n");
+	bot_changelevel(); // *bot - reload bots on next level, handle intermission
 	changelevel(mapname);
 };
 
@@ -257,6 +259,7 @@ MapStart
 void() MapStart =
 {
 	bprint("Admin loaded hub / start map...\n");
+	bot_changelevel(); // *bot - reload bots on next level, handle intermission
 	changelevel("start");
 };
 
@@ -294,38 +297,39 @@ void() Admin_dmmapmenu =
 
 float() MapDM =
 {
-  local string mname;
+	local string mname;
 
-  if (self.lefty == A_PAINKEEP) mname = "painkeep";
-  else if (self.lefty == A_PK0) mname = "pk0";
-  else if (self.lefty == A_PK1) mname = "pk1";
-  else if (self.lefty == A_PK2) mname = "pk2";
-  else if (self.lefty == A_PK3) mname = "pk3";
-  else if (self.lefty == A_PK4) mname = "pk4";
-  else if (self.lefty == A_PK5) mname = "pk5";
-  else if (self.lefty == A_PK6) mname = "pk6";
-  else if (self.lefty == A_PK7) mname = "pk7";
-  else if (self.lefty == A_PK8) mname = "pk8";
-  else if (self.lefty == A_PK9) mname = "pk9";
-  else if (self.lefty == A_PK10) mname = "pk10";
-  else if (self.lefty == A_PK11) mname = "pk11";
-  else if (self.lefty == A_PK12) mname = "pk12";
-  else if (self.lefty == A_PK13) mname = "pk13";
-  else if (self.lefty == A_PK14) mname = "pk14";
-  else if (self.lefty == A_PK15) mname = "pk15";
-  else if (self.lefty == A_PK16) mname = "pk16";
-  else if (self.lefty == A_PK17) mname = "pk17";
-  else if (self.lefty == A_PK18) mname = "pk18";
-  else if (self.lefty == A_PKHUB) mname = "start";
-  else
-    return(FALSE);
+	if (self.lefty == A_PAINKEEP) mname = "painkeep";
+	else if (self.lefty == A_PK0) mname = "pk0";
+	else if (self.lefty == A_PK1) mname = "pk1";
+	else if (self.lefty == A_PK2) mname = "pk2";
+	else if (self.lefty == A_PK3) mname = "pk3";
+	else if (self.lefty == A_PK4) mname = "pk4";
+	else if (self.lefty == A_PK5) mname = "pk5";
+	else if (self.lefty == A_PK6) mname = "pk6";
+	else if (self.lefty == A_PK7) mname = "pk7";
+	else if (self.lefty == A_PK8) mname = "pk8";
+	else if (self.lefty == A_PK9) mname = "pk9";
+	else if (self.lefty == A_PK10) mname = "pk10";
+	else if (self.lefty == A_PK11) mname = "pk11";
+	else if (self.lefty == A_PK12) mname = "pk12";
+	else if (self.lefty == A_PK13) mname = "pk13";
+	else if (self.lefty == A_PK14) mname = "pk14";
+	else if (self.lefty == A_PK15) mname = "pk15";
+	else if (self.lefty == A_PK16) mname = "pk16";
+	else if (self.lefty == A_PK17) mname = "pk17";
+	else if (self.lefty == A_PK18) mname = "pk18";
+	else if (self.lefty == A_PKHUB) mname = "start";
+	else
+		return(FALSE);
 
-  bprint("Admin changing map to ");
-  bprint(mname);
-  bprint("\n");
+	bprint("Admin changing map to ");
+	bprint(mname);
+	bprint("\n");
 
-  changelevel(mname);
-  return(TRUE);
+	bot_changelevel(); // *bot - reload bots on next level, handle intermission
+	changelevel(mname);
+	return(TRUE);
 };
 
 /*
@@ -441,6 +445,44 @@ void() Admin_botmenu =
 
 	self.wad = "";
 	self.admin = 18;
+	self.lefty = 0;
+};
+
+/*
+==========
+Items menu admin
+==========
+*/
+void() Admin_itemmenu =
+{
+	self.message =
+				       "\b     Admin Items Menu:     \n"
+				       "\b+--------------------------+\n"
+							"  +------- weapons ------+  \n"
+							"  01: Double shotgun        \n"
+							"  02: Nailgun               \n"
+							"  03: Preforator            \n"
+							"  04: Grenade launcher      \n"
+							"  05: Rocket launcher       \n"
+							"  06: Lightning gun         \n"
+							"  07: Painkeep items        \n"
+							"  +------ artifacts -----+  \n"
+							"  10: Quad damage           \n"
+							"  11: Invulnerability       \n"
+							"  12: Radiation suit        \n"
+							"  13: Ring of shadows       \n"
+							"  +------- toggles ------+  \n"
+							"  20: Only these items      \n"
+							"  21: None of these items   \n"
+							"  22: Substitute removed    \n"
+							"  23: Infinite ammo         \n"
+							" 666:  main menu            \n"
+							" admin impulse: exit admin  \n"
+				       "\b+--------------------------+\n"
+						 "\b  Enter code: ";
+
+	self.wad = "";
+	self.admin = 26;
 	self.lefty = 0;
 };
 

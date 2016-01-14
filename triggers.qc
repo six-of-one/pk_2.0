@@ -157,7 +157,7 @@ void () trigger_multiple =
 		self.wait = 0.2;
 	self.use = multi_use;
 
-	self.th_weight = triggerweight; // *pkr
+	self.th_weight = triggerweight; // *bot
 	self.istrigger = 1;
 	InitTrigger ();
 
@@ -596,7 +596,7 @@ void () trigger_onlyregistered =
 	InitTrigger ();
 	self.touch = trigger_onlyregistered_touch;
 	self.istrigger = 1;
-	self.th_weight = triggerweight;
+	self.th_weight = triggerweight; // *bot
 };
 
 //============================================================================
@@ -687,7 +687,7 @@ void () trigger_push =
 	precache_sound ("ambience/windfly.wav");
 	self.touch = trigger_push_touch;
 	self.istrigger = 1;
-	self.th_weight = trigpushweight;
+	self.th_weight = trigpushweight; // *bot
 	if (!self.speed)
 		self.speed = 1000;
 };

@@ -225,35 +225,16 @@ void () botImpulseCommand =
 	}
 	else if (self.impulse == 204)
 	{
-		printIntro ();
+		if (!PK) printIntro ();
 	}
 	else if (self.impulse == 212)
 	{
 		setobserverMode ();
 	}
-/*
-	else if (self.impulse == 210)
-	{
-		PrintScores (MYSCORE);
-	}
-	else if (self.impulse == 220)
-	{
-		PrintScores (NORMALSCORE);
-	}
-	else if (self.impulse == 222)
-	{
-		PrintTopScores (0);
-	}
-*/
 	else if (self.impulse == 221)
 	{
 		UpdateTeamColors ();
 	}
-//	else if (self.impulse == 223)
-//	{
-//		self.items = (self.items | IT_INVULNERABILITY);
-//		self.invincible_finished = (time + 30);
-//	}
 	else if (self.admin || (serverflags & UNRESTRICTED))
 		botControl();
 };

@@ -638,6 +638,7 @@ void() PK_CIS =
 	// PAINKEEP Fix the velocity on respawn bug
 	self.velocity = '0 0 0';
 
+	localcmd(CL_BOBAMT); // restore bobing - may have come from a hub vote
 };
 
 /*

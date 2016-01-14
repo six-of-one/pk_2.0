@@ -29,11 +29,13 @@ void () initBotLevel =
 	while (num > 0)
 	{
 		num = (num - 1);
-		if ((NUMBOTS < 5) && !(serverflags & DEDICATED))
+		c_skill = skill;
+		if ((NUMBOTS < (BOT_SAVE_SKILL - 1)) && !(serverflags & DEDICATED))
 		{
-			c_skill = ((0.1 * (parm12 & (offset * 31))) / offset);
+//			c_skill = ((0.1 * (parm12 & (offset * 31))) / offset);
+			c_skill = ((self.cnt & (offset * 3)) / offset);
 		}
-		offset = (offset * 32);
+		offset = (offset * 4);
 		AddAnotherBot(c_skill);
 	}
 	if (serverflags & TEAMFLAG)
@@ -71,11 +73,13 @@ void () initBotLevel =
 		while (i < num)
 		{
 			i = (i + 1);
-			if ((i < 6) && !(serverflags & DEDICATED))
+			c_skill = skill;
+			if ((i < BOT_SAVE_SKILL ) && !(serverflags & DEDICATED))
 			{
-				skill = ((0.1 * (parm13 & (offset * 31))) / offset);
+//				skill = ((0.1 * (parm13 & (offset * 31))) / offset);
+				c_skill = ((self.count & (offset * 3)) / offset);
 			}
-			offset = (offset * 32);
+			offset = (offset * 4);
 			addTeamBots (e,TRUE);
 		}
 		e = find (e,classname,"player");
@@ -367,7 +371,7 @@ void () SpawnNewBot =
 	bprint (self.teamname);
 	bprint (self.netname);
 	tmp = ftos (self.skil);
-	bprint (" (skill (");
+	bprint (" (skill = ");
 	bprint (tmp);
 	bprint (") entered the game.\n");
 };
@@ -641,7 +645,7 @@ void (entity ply, float n) addTeamBots =
 	i = n;
 	while (i > 0)
 	{
-		c_skill = skill;
+//		c_skill = skill; // already set
 		newbot = AddBot ();
 		newbot.colormap = ply.colormap;
 		newbot.team = ply.team;
@@ -774,6 +778,7 @@ void (float n) SetTeamBots =
 	{
 		e = find (world,classname,"player");
 		t = (n - t);
+		c_skill = skill;
 		while (e)
 		{
 			addTeamBots (e,t);
