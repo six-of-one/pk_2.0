@@ -317,6 +317,83 @@ void() Admin_dmmapmenu =
 	self.lefty = 0;
 };
 
+/* new pk maps in conv pack
+
+
+	self.message =
+					 "\b Painkeep DM map 2 Menu:\n"
+					 "\b+------------------------+\n"
+						"  01: pkts00   21: pkn1   \n"
+						"  02: pkts01   22: pkn2   \n"
+						"  03: pkts02   23: pkn3   \n"
+						"  04: pkts03   24: pkn4   \n"
+						"  05: pkts04   25: pkn5   \n"
+						"  06: pkts05   26: pkn6   \n"
+						"  07: pkts06   27: pkn7   \n"
+						"  08: pkts07   28: pkn8   \n"
+						"  09: pkts08   29: pkn9   \n"
+						"  10: pkts09   30: pkn10  \n"
+						"  11: pkts10   31: pkn11  \n"
+						"  12: pkts11   32: pkn12  \n"
+						"  13: pkts12   33: pkn13  \n"
+						"  14: pkts13   34: pkn14  \n"
+						"  15: pkts14   35: pkn15  \n"
+						"    :          36: pkn16  \n"
+						"    :          37: pkn17  \n"
+						"  18: hub2     38: pkn18  \n"
+						"  19: hub3     39: pkn19  \n"
+						"    :          40: pkn20  \n"
+						"  41: painkeep2           \n"
+						" 666: main menu           \n"
+						"  admin impulse exits     \n"
+					 "\b+------------------------+\n"
+					 "\b Enter code: ";
+
+	if (self.lefty == 41) mname = "painkeep2";
+	else if (self.lefty == 01) mname = "pkts00";
+	else if (self.lefty == 02) mname = "pkts01";
+	else if (self.lefty == 03) mname = "pkts02";
+	else if (self.lefty == 04) mname = "pkts03";
+	else if (self.lefty == 05) mname = "pkts04";
+	else if (self.lefty == 06) mname = "pkts05";
+	else if (self.lefty == 07) mname = "pkts06";
+	else if (self.lefty == 08) mname = "pkts07";
+	else if (self.lefty == 09) mname = "pkts08";
+	else if (self.lefty == 10) mname = "pkts09";
+	else if (self.lefty == 11) mname = "pkts10";
+	else if (self.lefty == 12) mname = "pkts11";
+	else if (self.lefty == 13) mname = "pkts12";
+	else if (self.lefty == 14) mname = "pkts13";
+	else if (self.lefty == 15) mname = "pkts14";
+//	else if (self.lefty == 16) mname = "pkts15";
+	else if (self.lefty == 21) mname = "pkn1";
+	else if (self.lefty == 22) mname = "pkn2";
+	else if (self.lefty == 23) mname = "pkn3";
+	else if (self.lefty == 24) mname = "pkn4";
+	else if (self.lefty == 25) mname = "pkn5";
+	else if (self.lefty == 26) mname = "pkn6";
+	else if (self.lefty == 27) mname = "pkn7";
+	else if (self.lefty == 28) mname = "pkn8";
+	else if (self.lefty == 29) mname = "pkn9";
+	else if (self.lefty == 30) mname = "pkn10";
+	else if (self.lefty == 31) mname = "pkn11";
+	else if (self.lefty == 32) mname = "pkn12";
+	else if (self.lefty == 33) mname = "pkn13";
+	else if (self.lefty == 34) mname = "pkn14";
+	else if (self.lefty == 35) mname = "pkn15";
+	else if (self.lefty == 36) mname = "pkn16";
+	else if (self.lefty == 37) mname = "pkn17";
+	else if (self.lefty == 38) mname = "pkn18";
+	else if (self.lefty == 39) mname = "pkn19";
+	else if (self.lefty == 40) mname = "pkn20";
+	else if (self.lefty == 18) mname = "hub2";
+	else if (self.lefty == 19) mname = "hub3";
+	else
+		return(FALSE);
+
+
+
+*/
 
 float() MapDM =
 {
@@ -490,7 +567,8 @@ void() Admin_itembits =
 	bprint("--------------------------------\n");
 	f = 1;
 	adv = "Bit set";
-	if (pk_itemovr & CON_ONLY) adv = "Only";
+	if (pk_itemovr & CON_CYC) adv = "Cycle";
+	else if (pk_itemovr & CON_ONLY) adv = "Only";
 	else if (pk_itemovr & CON_NONE)
 	{
 		adv = "None of";

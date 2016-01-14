@@ -989,13 +989,14 @@ void(string cls) item_call =
 	else if (cls == "item_armor1") item_armor1();
 	else if (cls == "item_armor2") item_armor2();
 	else if (cls == "item_armorInv") item_armorInv();
-	else if (cls == "item_health_15") item_health();
-	else if (cls == "item_health_25") item_health();
-	else if (cls == "item_health_mega") item_health();
+// note: these dont work as is
+//	else if (cls == "item_health_15") item_health();
+//	else if (cls == "item_health_25") item_health();
+//	else if (cls == "item_health_mega") item_health();
 	else return;
 	self.classname = cls;
 	self.mdl = self.model;
-//	self.model = string_null;
+	self.model = string_null;
 	self.solid = SOLID_NOT;
 	self.think = SUB_regen; // dont go thru place_item - use regen method
 	self.nextthink = time + 1 + 3 * random(); // spread em out
@@ -1012,18 +1013,17 @@ void(string cls, string rep, string am, string ram) item_repm =
 {
 	local entity e, sv;
 
-	e = find(world,wad,rep);
-	if (!e)
+	if (!find(world,wad,rep))
 	{
 		e = find(world,classname,rep);
 		if (!e) return;
 		while (e)
 		{
-			e.wad = e.classname;
+			if (e.wad == "") e.wad = e.classname;
 			e = find(e,classname,rep);
 		}
-		e = world;
 	}
+/*
 bprint("repm set: ");
 bprint(cls);
 bprint(" for: ");
@@ -1034,7 +1034,7 @@ bprint(am);
 bprint(" for: ");
 bprint(ram);}
 bprint("\n");
-
+*/
 	sv = self;
 	e = find(world,wad,rep);
 	while (e)
@@ -1065,15 +1065,46 @@ bprint("\n");
 
 void() item_loop =
 {
-	local float f, e, d, pko, sf, lvl, lvls;
+	local float f, e, d, pko, pks, sf, lvl, lvls, msk;
 	local string cl;
 
+	pks = 0;
 	lvls = f = 1;
 	e = lvl = WEP_STOP;
+
 	while (f != CON_STOP)
 	{
 		pko = pk_itemovr;
-		if (pko & CON_SUBS) // find a valid substitute code
+		if (pko & CON_CYC)
+		{
+			sf = 2;
+			msk = (lvl - 1) - (lvls - 1);
+			f = self.cnt = self.count & msk;
+			if (!f) f = self.cnt = lvls;
+			else f = self.cnt = self.cnt * 2;
+			if (f == lvl) f = self.cnt = lvls;
+			while (sf > 0 && !(f & pk_itemovr))
+			{
+				f = self.cnt = self.cnt * 2;
+				if (f == lvl) // loop once
+				{
+					f = self.cnt = lvls;
+					sf = sf - 1;
+				}
+			}
+			if (sf < 1) {f = lvl; bprint("cyc failed!\n ");}
+			else
+			{
+				pko = f | CON_ONLY | CON_CYC;// | pko - (pko & (CON_NONE | CON_SUBS));
+				pks = pks | f;
+//bprint("cyc item: ");
+//bprint(item_by_bit(f));
+//bprint(", #: ");
+//bprint(ftos(f));
+//bprint("\n");
+			}
+		}
+		else if (pko & CON_SUBS) // find a valid substitute code
 		{
 			e = floor(e / 2);
 			if (e < lvls) e = lvl / 2;
@@ -1092,6 +1123,8 @@ bprint("NONE AVAILABLE!");
 bprint("\n");
 		}
 
+	if (f != lvl)
+	{
 		if (! (pko & CON_RUN))
 		{
 			item_repm("rest", item_by_bit(f), "", ammo_by_bit(f)); // restore
@@ -1106,8 +1139,8 @@ bprint("\n");
 				for (e = lvls;e < lvl; e = e * 2)
 				{
 					cl = item_by_bit(f);
-					if (e != f)//{
-						item_repm(cl, item_by_bit(e), ammo_by_bit(f), ammo_by_bit(e));
+//					if (e != f)//{
+					item_repm(cl, item_by_bit(e), ammo_by_bit(f), ammo_by_bit(e));
 //bprint(", tko: ");
 //bprint(item_by_bit(e));}
 
@@ -1126,7 +1159,9 @@ else bprint(", gone!");
 bprint("\n");
 			}
 		}
-		f = f * 2;
+		if (pko & CON_CYC) f = lvl;
+		else f = f * 2;
+	}
 		if (f == lvl)
 		{
 //			if (lvl < CON_STOP)
@@ -1152,4 +1187,12 @@ bprint("\n");
 //			}
 		}
 	}
+	if (pk_itemovr & CON_CYC) // next item cycle
+	{
+		self.nextthink = time + CYC_TIME + crandom() * CYC_TIME;
+		self.count = pks; // next cycle starts at these items
+//bprint("set cyc time\n");
+	}
+	else
+		remove(self);
 };

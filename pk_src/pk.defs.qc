@@ -12,6 +12,11 @@ float PK_DYNAMIC				= 8192;	// bit *	= TRUE --- when always in painkeep mode & n
 float PK_SPIKER				= 16384;	// bit *	= FALSE -- allow spike traps, set to true for original pk treatment of spike shooters - they are removed
 float PK_XSOUND				= 32768;	// bit * = TRUE --- use extra pk sound set
 
+float PK_HUB2					= 131072; // bit if TRUE, using hub2 - reload at hub loads
+float PK_HUB3					= 262144; // bit if TRUE, using hub3 - reload at hub loads
+string st_hub2					= "hub2"; // map names for 2nd & 3rd hub
+string st_hub3					= "hub3";
+
 float pk_flags;							// replaces old usage of temp1, savedgamecfg stores this
 float pk_xsound;							// set to state of PK_XSOUND bit for sound code toggle
 float pk_itemovr;						// control items - admin override
@@ -74,8 +79,10 @@ float CON_STOP				= 16384; //131072;  // stop replace / remove cycle here
 float CON_ONLY				= 131072;  // only the selected items will be loaded
 float CON_NONE				= 262144;  // none of the selected items will be loaded
 float CON_SUBS				= 524288;  // substitute something for removed items
-float CON_INF					= 1048576; // infinite ammo weps 
-float CON_RUN					= 1966080; // any control bit CON_* entries above - used by autorun
+float CON_INF					= 1048576; // infinite ammo weps
+float CON_CYC					= 2097152; // cycle selected bits in thier group
+float CON_RUN					= 4063232; // any control bit CON_* entries above - used by autorun
+float CYC_TIME				= 60; // TEST - 240; // seconds for cycle base - 4 mins +|- 2 mins
 void() item_loop;
 
 // **************************************
