@@ -31,6 +31,10 @@ float USER_TIMEOUT			= 5;		// timeout user menu in 5 secs
 float USER_IMPULSE			= 39;		// user menu impulse
 //float SETCODE					= -8726545; // set the code after delay
 float ADMIN_FAILED_LOGIN	= -777;	// login didnt succeed
+string ADMINCODE				= "float1\n"; // local command that loads admin security password]
+													  //- obscured to keep anyone with casual console access from divining its true meaning
+string ADMINIMPULSE			= "float2\n"; // load the impyulse
+string ADMINTIME				= "float3\n"; // load the time out
 
 // **************************************
 // painkeep protos

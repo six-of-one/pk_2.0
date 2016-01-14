@@ -11,7 +11,7 @@ void() connectmessage =
 {
 	local string Line3;
 
-	Line3 = "Version 1.11\n";
+	Line3 = "Version 1.2\n";
 
 if (self.classname != "pk*bot" && (!FRIKBOT ||self.ishuman))
 {

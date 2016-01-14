@@ -1082,7 +1082,7 @@ void() PK_SetAdmin =
 		pk_admincode = cvar("saved3");
 		if ( ! pk_admincode) pk_admincode = -1;
 // access impulse now
-		localcmd ("adminimpulse\n");
+		localcmd(ADMINIMPULSE);
 		e.classname = "adminimp";
 		if (pk_admincode == -1) PK_ADMIN = 0;
 	}
@@ -1091,7 +1091,7 @@ void() PK_SetAdmin =
 		pk_adminimp = cvar("saved3");
 		if ( ! pk_adminimp) pk_adminimp = 255;
 		if (pk_adminimp == -1) PK_ADMIN = 0;
-		localcmd ("admintime\n");
+		localcmd(ADMINTIME);
 		e.classname = "admintime";
 	}
 	else if (self.classname == "admintime") 

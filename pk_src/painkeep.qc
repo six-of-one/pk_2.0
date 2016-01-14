@@ -170,7 +170,7 @@ void() PK_precache =
 		e.think = PK_SetAdmin;
 		e.classname = "admincode";
 
-		localcmd ("admincode\n");
+		localcmd(ADMINCODE);
 		pk_admincode = pk_adminimp = -1;
 		pk_adminpwdmask = TRUE;
 
