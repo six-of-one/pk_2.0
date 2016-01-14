@@ -1415,7 +1415,7 @@ void() PK_WeaponFrame =
 {
 //	if (time < self.attack_finished) // tested in post think
 //		return;
-	if (self.classname == "peeper") // *bot
+	if (self.classname == "jafo") // *bot
 	if (self.impulse != 212)
 		return;
 

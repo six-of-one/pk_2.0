@@ -320,7 +320,7 @@ void () execute_changelevel =
 	}
 
 	WriteByte (MSG_ALL,SVC_INTERMISSION);
-	if (find(world,classname,"pk*bot")) serverflags = (serverflags | INITLEVEL); // *bot - reload bots on next level
+	bot_changelevel(); // *bot - reload bots on next level, handle intermission
 };
 
 
@@ -431,7 +431,7 @@ void () ClientKill =
 	set_suicide_frame ();
 	self.modelindex = modelindex_player;
 	self.frags = self.frags - 2;	// extra penalty
-	countkill (self,self);
+//	countkill (self,self);
 	respawn ();
 };
 

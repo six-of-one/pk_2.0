@@ -204,7 +204,7 @@ variable adjuster
 */
 void() Admin_varmenu =
 {
-	if (self.cnt < 0.1)
+	if (self.cnt == 0.01)
 	{
 	self.message =
 					 "\b   Administration Menu:    \n"
@@ -340,12 +340,12 @@ void() find_Kick =
 	self.enemy = find(self.enemy, classname, self.target);
 	if (!self.enemy) // end of list - 1st switch
 	{
-		if (self.target == "player") self.target = "peeper";
+		if (self.target == "player") self.target = "jafo";
 		else self.target = "player";
 		self.enemy = find(world, classname, self.target);
 		if (!self.enemy) // 2nd list no good - try looping
 		{
-			if (self.target == "player") self.target = "peeper";
+			if (self.target == "player") self.target = "jafo";
 			else self.target = "player";
 			self.enemy = find(world, classname, self.target);
 		}
@@ -425,9 +425,10 @@ void() Admin_botmenu =
 							"    pk*bot       frikbot    \n"
 							" 01: add bot   11: add bot  \n"
 							" 02: remove 1  12: remove 1 \n"
-							" 03: add 4     13: add 4    \n"
-							" 04: 3 *skill  14: 3 *skill \n"
+							" 03: 3 *skill  13: 3 *skill \n"
 							" - add 1 bot of each skill  \n"
+							" 04: add 4     14: add 4    \n"
+							" - add 4 bots - same skill  \n"
 							" 05: verbose                \n"
 							" 06: update    20: +skill   \n"
 							" 07: unrestricted           \n"
@@ -566,7 +567,7 @@ void(float lt, float tm) admin_timer =
 
 void() AdminCommands =
 {
-	local float f;
+	local float e, f;
 	local string str;
 
 	if (self.admin == 1)																// login
@@ -612,8 +613,8 @@ void() AdminCommands =
 		else
 		if (self.lefty == A_GRAVU)
 		{
-			Admin_varmenu();
 			self.cnt = 1;
+			Admin_varmenu();
 			self.noise = "sv_gravity ";
 			self.wad = "\nadjusting sv_gravity";
 			self.lefty = cvar("sv_gravity");
@@ -621,8 +622,8 @@ void() AdminCommands =
 		else
 		if (self.lefty == A_FRICU)
 		{
-			Admin_varmenu();
 			self.cnt = 0.01;
+			Admin_varmenu();
 			self.noise = "sv_friction ";
 			self.wad = "\nadjusting sv_friction";
 			self.lefty = cvar("sv_friction");
@@ -778,50 +779,53 @@ void() AdminCommands =
 			Admin_mainmenu();
 		else if (self.lefty == 1 || self.lefty == 3 || self.lefty == 4)
 		{
-			f = cvar("skill");
-			AddAnotherBot ();
-			self.wad = "\nLoaded a pk*bot on server.";
+			self.wad = "\nCould NOT load pk*bot(s) on server.";
+			e = NUMBOTS;
+			if (self.lefty == 3) f = 1;
+			else f = -1;
+			AddAnotherBot (f);
+			if (e != NUMBOTS) self.wad = "\nLoaded a pk*bot on server.";
 			if (self.lefty != 1)
 			{
-				if (self.lefty == 4)
-				{
-					if (!f) skill_add(0);
-					skill_add(0);
-				}
-				AddAnotherBot ();
-				if (self.lefty == 4) skill_add(0);
-				AddAnotherBot ();
-				if (self.lefty == 4) skill_add(f);
-				else
-					AddAnotherBot ();
-				self.wad = "\nLoaded requested pk*bot(s) on server.";
+				e = NUMBOTS;
+				if (self.lefty == 3) f = f + 1;
+				AddAnotherBot (f);
+				if (self.lefty == 3) f = f + 1;
+				AddAnotherBot (f);
+				if (self.lefty != 3) AddAnotherBot (f);
+				if (e != NUMBOTS) self.wad = "\nLoaded requested pk*bot(s) on server.";
 			}
 		}
 		else if (self.lefty == 11 || self.lefty == 13 || self.lefty == 14)
 		{
-			if (self.lefty == 14) f = 1;
+			self.wad = "\nCould NOT load frikbot(s) on server.";
+			e = bot_count;
+			if (self.lefty == 13) f = 1;
 			else f = cvar("skill");
 			BotConnect(0, 0, f);
-			self.wad = "\nLoaded A frikbot on server.";
+			if (e != bot_count) self.wad = "\nLoaded A frikbot on server.";
 			if (self.lefty != 11)
 			{
-				if (self.lefty == 14) f = f + 1;
+				e = bot_count;
+				if (self.lefty == 13) f = f + 1;
 				BotConnect(0, 0, f);
-				if (self.lefty == 14) f = f + 1;
+				if (self.lefty == 13) f = f + 1;
 				BotConnect(0, 0, f);
-				if (self.lefty != 14) BotConnect(0, 0, f);
-				self.wad = "\nLoaded requested frikbot(s) on server.";
+				if (self.lefty != 13) BotConnect(0, 0, f);
+				if (e != bot_count) self.wad = "\nLoaded requested frikbot(s) on server.";
 			}
 		}
 		else if (self.lefty == 2)
 		{
+			e = NUMBOTS;
 			removeBot(world);
-			self.wad = "\nRemoved a pk*bot from server.";
+			if (e != NUMBOTS) self.wad = "\nRemoved a pk*bot from server.";
 		}
 		else if (self.lefty == 12)
 		{
+			e = bot_count;
 			KickABot();
-			self.wad = "\nRemoved a frikbot from server.";
+			if (e != bot_count) self.wad = "\nRemoved a frikbot from server.";
 		}
 		else if (self.lefty == 5)
 		{
@@ -836,12 +840,12 @@ void() AdminCommands =
 			if (serverflags & UNRESTRICTED)
 			{
 				serverflags = (serverflags - UNRESTRICTED);
-				self.wad = "\nBot restriction removed from server.";
+				self.wad = "\nBot commands restricted to admin.";
 			}
 			else
 			{
 				serverflags = (serverflags | UNRESTRICTED);
-				self.wad = "\nBot commands restricted on server.";
+				self.wad = "\nBot commands NOT restricted on server.\n\banyone can issue bot admin commands!";
 			}
 		}
 		else if (self.lefty == 8)
@@ -854,7 +858,7 @@ void() AdminCommands =
 			else
 			{
 				serverflags = (serverflags | FL_OBSERVER);
-				self.wad = "\nAll players can observe.";
+				self.wad = "\n\bAll players can observe.";
 			}
 		}
 		if (self.lefty == 9)

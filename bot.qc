@@ -54,34 +54,36 @@ float(float clientno) ClientBitFlag =
 	return 0;
 };
 
+// when putting this in without frikbots, max_cient will have to be set the same way in botinit routs
+
 float() ClientNextAvailable =
 {
-	local float clientno, bbit;
+	local float clientno;
 
 	clientno = max_clients;
 	while(clientno > 0)
 	{
 		clientno = clientno - 1;
 
-		bbit = ClientBitFlag(clientno);
-		if (!(active_clients & bbit))
-		{
-			fClientNo = (fClientNo + 1);
-			active_clients = (active_clients | bbit);
+		if (!(active_clients & ClientBitFlag(clientno)))
 			return clientno;
-		}
 	}
 
 	return -1;
 };
+
+
+
+
+
 same as below except setting flag - replace for extract
 */
-
+/*
 float () FindGood =
 {
 //	fActiveClients = active_clients; // frikbot code merge - these need to be the same var
 
-	fClientNo = (fClientNo + 1);
+//	fClientNo = (fClientNo + 1);
 	if (!(active_clients & 1))
 	{
 		active_clients = (active_clients | 1);
@@ -171,9 +173,6 @@ float () FindGood =
 
 void (float botcnt) MakeGood =
 {
-// TEST
-	printtv(1,"*bot cnt: ",botcnt);
-	printtv(1,"frikbit: ",ClientBitFlag(botcnt));
 
 	local float botbit;
 	botbit = 1;
@@ -183,14 +182,10 @@ void (float botcnt) MakeGood =
 		botbit = (botbit * 2);
 		botcnt = (botcnt - 1);
 	}
-	fClientNo = (fClientNo - 1);
+//	fClientNo = (fClientNo - 1);
 	active_clients = (active_clients - (active_clients & botbit));
-
-// TEST
-	printtv(1,"botbit: ",botbit);
-
 };
-
+*/
 void (entity e) Update_Frags =
 {
 	WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
@@ -199,7 +194,7 @@ void (entity e) Update_Frags =
 };
 
 
-
+/*
 void (entity c) PrintClientScore =
 {
 	if ((c.frags > -10) && (c.frags < 0))
@@ -276,7 +271,7 @@ void () DumpScore =
 	}
 	bprint ("\n");
 };
-
+*/
 
 
 float () getrandombotskin =
@@ -443,16 +438,21 @@ void() set_CarriedPath =
 void() set_initBotLevel =
 {
 	local float dedflags;
+	local entity e;
 
-  	dedflags = cvar ("temp2");
+  	dedflags = cvar ("temp1");
 	if (dedflags & DEDICATED)
 	{
 		serverflags = (dedflags | INITLEVEL);
-		cvar_set ("temp2","0");
+		cvar_set ("temp1","0");
 	}
 	if (serverflags & INITLEVEL)
+	if (!find(world,classname,"initBotLevel"))
 	{
-		initBotLevel ();
+		e = spawn();
+		e.think = initBotLevel;
+		e.nextthink = time + 2; // give players time to start
+		e.classname = "initBotLevel";
 	}
 
 // from prev fn() - set_CarriedPath
@@ -471,6 +471,23 @@ void() set_initBotLevel =
 
 // other init code
 	self.th_cache = cacheenemy;
+
+// init max count - merged with frikbot
+/*
+	local entity ent;
+	
+	// spawn entities for the physics
+	ent = nextent(world);
+	max_clients = 0;
+
+	while(ent != world)
+	{
+		max_clients = max_clients + 1;
+		ent = nextent(ent);
+	}
+	if (max_clients > 16)
+		max_clients = 16;
+*/
 };
 
 // client connect / disconnect handle for *bots
@@ -483,17 +500,32 @@ void(float con) bot_con =
 //		if (!self.id) self.id = FindGood ();
 // *frikbot code already sets this!
 		self.id = self.b_clientno;
-printtv(1, "active clients", active_clients);
-printtv(1, "id", self.id);
 		self.impulse = 204; // printinit
 		randombotskin = getrandombotskin ();
-		initscore ();
+//		initscore ();
 	}
 	else // disconnect
 	{
-		MakeGood (self.id);
+		active_clients = (active_clients - (active_clients & ClientBitFlag(self.id)));
+//		MakeGood (self.id);
 		self.classname = "nobody";
 	}
+};
+
+// changelevel happened - clear bots out, set reload
+
+void() bot_changelevel =
+{
+	local entity e;
+
+	e = find (world,classname,"pk*bot");
+	while (e)
+	{
+		e.nextthink = -1;
+		e.modelindex = 0;
+		e = find (e,classname,"pk*bot");
+	}
+	serverflags = (serverflags | INITLEVEL); // reload bots on next level
 };
 
 // count bot kills & deaths for scoreboard - extract from ClientObituary, called after ClientObit divert
@@ -530,7 +562,7 @@ void(entity targ, entity attacker) bot_kill =
 			{
 				TELEFRAGFLAG = 1;
 			}
-			countkill (attacker.owner,targ);
+//			countkill (attacker.owner,targ);
 			if (attacker.owner.classname == "pk*bot")
 				Update_Frags(attacker.owner);
 			return;
@@ -539,7 +571,7 @@ void(entity targ, entity attacker) bot_kill =
 		if (attacker.classname == "teledeath2")
 		{
 //			targ.frags = targ.frags - 1;
-			countkill (targ,targ);
+//			countkill (targ,targ);
 			if (targ.classname == "pk*bot")
 				Update_Frags(targ);
 			return;
@@ -553,7 +585,7 @@ void(entity targ, entity attacker) bot_kill =
 //				attacker.frags = attacker.frags - 1;
 				if (targ.classname == "pk*bot")
 					Update_Frags(targ);
-				countkill (targ,targ);
+//				countkill (targ,targ);
 			
 				return;
 			}
@@ -569,7 +601,7 @@ void(entity targ, entity attacker) bot_kill =
 //				attacker.frags = attacker.frags + 1;
 				if (attacker.classname == "pk*bot")
 					Update_Frags(attacker);
-				countkill (attacker,targ);
+//				countkill (attacker,targ);
 			}
 			return;
 		}
@@ -577,7 +609,7 @@ void(entity targ, entity attacker) bot_kill =
 		{
 			Update_Frags(targ);
 //			targ.frags = targ.frags - 1;
-			countkill (targ,targ);
+//			countkill (targ,targ);
 		}
 	}
 };
@@ -677,7 +709,7 @@ void(entity e) bot_BackpackSetup =
 {
 //	e.bot_item_touch = e.touch;
 	if (!e) return;
-	e.pk_touch = e.touch;
+	e.pk_touch = e.touch; // *pk
 	e.touch = bot_touch;
 	e.classname = "Backpack"; // *bot backpack code follows
 	e.th_weight = backpackweight;
@@ -704,7 +736,7 @@ bprint(" ) - already has .state set?\n");
 	if (!PK)
 	{
 //		e.bot_item_touch = e.touch;
-		e.pk_touch = e.touch;
+		e.pk_touch = e.touch; // *pk
 		e.touch = bot_touch;
 	}
 // health items
@@ -855,4 +887,33 @@ bprint(" ) - fell through tests!\n");
 //	{
 //
 //	}
+};
+
+// mod for frikbot merge
+void () printIntro =
+{
+	local float num;
+	local float skinno;
+	if (teamplay)
+	{
+		if (parm4 > 511)
+		{
+			SKINSMODE = ((parm4 & 49152) / 16384);
+			skinno = (parm4 & 7680);
+			parm4 = (parm4 & 511);
+			skinChange (self,skinno);
+		}
+		num = ((serverflags & TEAMBOTS) / 256);
+		if (num > 0)
+		{
+			addTeamBots (self,num);
+		}
+//		centerprint (self,"Server running team pk*bots v1.1\nand PainKeep v1.1");
+		centerprint (self,"Server running team pk*bots v1.1, frikbot 0.10.1\nand PainKeep v1.1");
+	}
+	else
+	{
+//		centerprint (self,"Server running pk*bots v1.1\nand PainKeep v1.1");
+		centerprint (self,"Server running pk*bots v1.1, frikbot 0.10.1\nand PainKeep v1.1");
+	}
 };

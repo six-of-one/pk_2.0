@@ -389,7 +389,7 @@ float () BotFindTarget =
 	{
 		return(BotfindBot ());
 	}
-	if (client.classname == "peeper")
+	if (client.classname == "jafo")
 	{
 		return(BotfindBot ());
 	}

@@ -4,6 +4,7 @@ defs.qc
 // painkeep code
 pk_src/pk.defs.qc
 bot.defs.qc
+bot_tally.qc
 
 frikbot/map_dm1.qc
 frikbot/map_dm2.qc
@@ -23,7 +24,6 @@ frikbot/bot_ed.qc
 pk_src/painkeep.qc
 pk_src/splash.qc
 
-botit_th.qc
 subs.qc
 
 // v106 quake code
@@ -92,7 +92,6 @@ bot_func.qc
 botfight.qc
 botthink.qc
 botspawn.qc
-botscore.qc
 botsignl.qc
 botmove.qc
 botnoise.qc

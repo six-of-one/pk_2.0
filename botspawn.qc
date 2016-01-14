@@ -11,8 +11,6 @@
  */
 
 
-void () AddAnotherBot;
-
 void () initBotLevel =
 {
 	local float num;
@@ -33,10 +31,10 @@ void () initBotLevel =
 		num = (num - 1);
 		if ((NUMBOTS < 5) && !(serverflags & DEDICATED))
 		{
-			skill = ((0.1 * (parm12 & (offset * 31))) / offset);
+			c_skill = ((0.1 * (parm12 & (offset * 31))) / offset);
 		}
 		offset = (offset * 32);
-		AddAnotherBot ();
+		AddAnotherBot(c_skill);
 	}
 	if (serverflags & TEAMFLAG)
 	{
@@ -86,6 +84,8 @@ void () initBotLevel =
 	{
 		serverflags = (serverflags - DEDICATED);
 	}
+	if (self.classname == "initBotLevel")
+		remove(self);
 };
 
 void () setBotGravity =
@@ -151,7 +151,7 @@ void () setBotGravity =
 
 void () PutBotInServer;
 float () numplayers;
-float (entity e) totalscore;
+//float (entity e) totalscore;
 void () respawnBot =
 {
 	local string m;
@@ -183,23 +183,17 @@ void () respawnBot =
 				{
 					m = ": I'm going to find a team server.\n";
 				}
+				else if (self.frags < -20) //totalscore (self) < 0)
+				{
+					m = ": I'm tired of getting fragged.  I'm off\n";
+				}
+				else if (self.frags > 100) //totalscore (self) > MUST_HAVE)
+				{
+					m = ": I'm going to find some real competition\n";
+				}
 				else
 				{
-					if (totalscore (self) < 0)
-					{
-						m = ": I'm tired of getting fragged.  I'm off\n";
-					}
-					else
-					{
-						if (totalscore (self) > MUST_HAVE)
-						{
-							m = ": I'm going to find some real competition\n";
-						}
-						else
-						{
-							m = ": This server's too crowded.  I'm off\n";
-						}
-					}
+						m = ": This server's too crowded.  I'm off\n";
 				}
 				bprint (self.teamname);
 				bprint (self.netname);
@@ -389,19 +383,16 @@ entity () AddBot =
 	self = newbot;
 	self.think = SpawnNewBot;
 	self.nextthink = (time + (12 * random ()));
-	self.skil = skill;
+	self.skil = c_skill;
 	if (self.skil < 0)
 	{
 		self.skil = 0;
 	}
-	else
+	else if (self.skil > 3)
 	{
-		if (self.skil > 3)
-		{
-			self.skil = 3;
-		}
+		self.skil = 3;
 	}
-	initscore ();
+//	initscore ();
 	self = oldself;
 	return(newbot);
 };
@@ -420,7 +411,7 @@ float () numplayers =
 	return(n);
 };
 
-void () AddAnotherBot =
+void (float skl) AddAnotherBot =
 {
 	local entity newbot;
 	local entity tmp;
@@ -441,13 +432,25 @@ void () AddAnotherBot =
 			}
 		}
 	}
-	if (fClientNo == 15)
+//	if (fClientNo == 15)
+//		return;
+
+	n = ClientNextAvailable(); // *frikbot tie in
+	if (n == -1)
+	{
+		bprint("Unable to connect a bot, server is full.\n");
 		return;
+	}
+//	fClientNo = (fClientNo + 1);
+	active_clients = (active_clients | ClientBitFlag(n));
   
+	if (skl < 0)
+		c_skill = skill;
+	else
+		c_skill = skl;
 	newbot = AddBot ();
-	newbot.id = FindGood ();
-printtv(1, "bot - active clients", active_clients);
-printtv(1, "id", newbot.id);
+	newbot.id = n;
+//	newbot.id = FindGood ();
 	newbot.colormap = (newbot.id + 1);
 //	newbot.colormap = 0; // causing *bot to always have players colors
 	newbot.team = 99;
@@ -638,6 +641,7 @@ void (entity ply, float n) addTeamBots =
 	i = n;
 	while (i > 0)
 	{
+		c_skill = skill;
 		newbot = AddBot ();
 		newbot.colormap = ply.colormap;
 		newbot.team = ply.team;
@@ -683,6 +687,8 @@ void (entity ply, float n) removeTeamBots =
 		{
 			NUMPATHERS = (NUMPATHERS - 1);
 		}
+		active_clients = (active_clients - (active_clients & ClientBitFlag(e.id)));
+
 		remove (e.movetarget);
 		remove (e.goalentity);
 		remove (e);
@@ -699,6 +705,8 @@ void(entity e) removeBot =
 	if (!f) return ;
 
 	if (f.pather) NUMPATHERS = (NUMPATHERS - 1);
+
+	active_clients = (active_clients - (active_clients & ClientBitFlag(f.id)));
 
 	remove (f.movetarget);
 	remove (f.goalentity);
@@ -717,15 +725,6 @@ void () removeAllBots =
 			return ;
 		}
 		removeBot(e);
-/*
-		if (e.pather)
-		{
-			NUMPATHERS = (NUMPATHERS - 1);
-		}
-		remove (e.movetarget);
-		remove (e.goalentity);
-		remove (e);
-*/
 		e = find (e,classname,"pk*bot");
 	}
 	NUMBOTS = 0;
@@ -750,7 +749,7 @@ void (float n) SetMaxBots =
 	t = numplayers ();
 	while ((NUMBOTS + t) < n)
 	{
-		AddAnotherBot ();
+		AddAnotherBot(-1);
 	}
 };
 

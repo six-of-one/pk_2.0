@@ -108,7 +108,7 @@ void () observer =
 			e.enemy = self;
 		}
 	}
-	self.classname = "peeper";
+	self.classname = "jafo";
 	self.frame = 0;
 	self.solid = SOLID_NOT;
 	self.movetype = MOVETYPE_FLY;
@@ -129,7 +129,7 @@ void () observer_off =
 
 void () setobserverMode =
 {
-	if (self.classname == "peeper")
+	if (self.classname == "jafo")
 	{
 		observer_off ();
 		return ;
@@ -156,7 +156,7 @@ void () botControl =
 	}
 	else if (self.impulse == 205)
 	{
-		AddAnotherBot ();
+		AddAnotherBot(-1);
 	}
 	else if ((self.impulse > 99) && (self.impulse < 116))
 	{
@@ -171,10 +171,10 @@ void () botControl =
 	}
 	else if (self.impulse == 208)
 	{
-		AddAnotherBot ();
-		AddAnotherBot ();
-		AddAnotherBot ();
-		AddAnotherBot ();
+		AddAnotherBot(-1);
+		AddAnotherBot(-1);
+		AddAnotherBot(-1);
+		AddAnotherBot(-1);
 	}
 	else if (self.impulse == 211)
 	{
@@ -193,21 +193,15 @@ void () botControl =
 		tmp = ftos (NUMPATHS);
 		dprint (tmp);
 		dprint (" botpaths placed\n");
-	}
-	else if (self.impulse == 117)
-	{
+
 		tmp = ftos (NUMPATHERS);
 		dprint (tmp);
 		dprint (" botpathers\n");
-	}
-	else if (self.impulse == 118)
-	{
+
 		tmp = ftos (NUMBOTS);
 		dprint (tmp);
 		dprint (" active bots\n");
-	}
-	else if (self.impulse == 119)
-	{
+
 		tmp = ftos (serverflags);
 		dprint (tmp);
 		dprint (" server flags\n");
@@ -237,6 +231,7 @@ void () botImpulseCommand =
 	{
 		setobserverMode ();
 	}
+/*
 	else if (self.impulse == 210)
 	{
 		PrintScores (MYSCORE);
@@ -249,6 +244,7 @@ void () botImpulseCommand =
 	{
 		PrintTopScores (0);
 	}
+*/
 	else if (self.impulse == 221)
 	{
 		UpdateTeamColors ();

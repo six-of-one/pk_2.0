@@ -1407,7 +1407,7 @@ void () W_WeaponFrame =
 	if (time < self.attack_finished)
 		return;
 
-	if (self.classname == "peeper") // *bot
+	if (self.classname == "jafo") // *bot
 	if (self.impulse != 212)
 		return;
 

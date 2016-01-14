@@ -1,23 +1,3 @@
-//TEST
-void(float go, string msg, float vl) printtv =
-{
-local entity e;
-if (go)
-{
-	e = spawn();
-	e.think = printtv;
-	e.nextthink = time + 0.2;
-	e.cnt = vl;
-	e.message = msg;
-	return;
-}
-
-bprint(self.message);
-bprint(" ");
-bprint(ftos(self.cnt));
-bprint("\n");
-remove(self);
-};
 
 // constants
 

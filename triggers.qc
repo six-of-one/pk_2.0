@@ -370,7 +370,7 @@ void () tdeath_touch =
 			return ;
 		}
 	}
-	if (other.classname == "peeper")
+	if (other.classname == "jafo")
 	{
 		other.takedamage = DAMAGE_AIM;
 
@@ -470,7 +470,7 @@ void () teleport_touch =
 	{
 		bot_touched ();
 	}
-	if ((other.classname == "player") || (other.classname == "pk*bot") || (other.classname == "peeper"))
+	if ((other.classname == "player") || (other.classname == "pk*bot") || (other.classname == "jafo"))
 	{
 		other.fixangle = 1;		// turn this way immediately
 		other.teleport_time = time + 0.7;
