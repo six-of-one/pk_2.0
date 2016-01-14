@@ -681,7 +681,6 @@ void() PK_BackpackTouch =
 	local		entity	st1;
 	local	float	acount;
 
-//	if (other.classname != "pk*bot") // * bot
 	if (other.classname != "player") // pk - this is where the grap can grab stuff
 	{
 		grap_checkIfGrap();
@@ -689,8 +688,6 @@ void() PK_BackpackTouch =
 	}
 	if (other.health <= 0)
 		return;
-//	if (other.classname == "pk*bot") // *bot
-//		bot_toucheditem ();
 
 	acount = 0;
 	sprint (other, "You get ");

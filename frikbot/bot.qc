@@ -769,17 +769,17 @@ void() BotInit =
 	// the bots return!
 	b_options = cvar("saved1");
 // TEST
-bprint("BotInit - read saved1\n");
+//bprint("\b***** BotInit - read saved1\n");
 	if (coop || (b_options & OPT_SAVEBOTS))
 	{
 // TEST
-bprint("BotInit - read scratch1-3\n");
+//bprint("\b***** BotInit - read scratch1-3\n");
 		saved_bots = cvar("scratch1");
 		saved_skills1 = cvar("scratch2");
 		saved_skills2 = cvar("scratch3");
 	}
 // TEST
-bprint("BotInit - set saved4\n");
+//bprint("\b***** BotInit - set saved4\n");
 	cvar_set ("saved4", "0");
 	if (max_clients > 1)
 	{
@@ -1117,7 +1117,7 @@ void() LoadWaypoint =
 
 	r = cvar("saved4");
 // TEST
-bprint("LoadWaypoint - read saved1-4\n");
+//bprint("\b***** LoadWaypoint - read saved1-4\n");
 
 	tep.b_aiflags = floor(r / 4);
 	tep.b_pants = cvar("scratch1");
@@ -1125,7 +1125,7 @@ bprint("LoadWaypoint - read saved1-4\n");
 	tep.b_shirt = cvar("scratch3");
 	tep.b_frags = cvar("scratch4");
 // TEST
-bprint("LoadWaypoint - read scratch1-4\n");
+//bprint("\b***** LoadWaypoint - read scratch1-4\n");
 };
 
 void() bot_return =
@@ -1178,7 +1178,7 @@ void() WaypointWatch =
 				FixWaypoints();
 				h = ftos(b_options);
 // TEST
-bprint("WaypointWatch - set saved1,4 scratch1\n");
+//bprint("\b***** WaypointWatch - set saved1,4 scratch1\n");
 				cvar_set("saved1", h);
 				cvar_set("saved4", "0");
 				cvar_set("scratch1", "0");
@@ -1188,7 +1188,7 @@ bprint("WaypointWatch - set saved1,4 scratch1\n");
 			LoadWaypoint();
 			waypoint_mode = WM_LOADING;
 // TEST
-bprint("WaypointWatch - set saved4\n");
+//bprint("\b***** WaypointWatch - set saved4\n");
 			cvar_set("saved4", "0");
 		}
 	}

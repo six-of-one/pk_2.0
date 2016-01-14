@@ -605,6 +605,7 @@ void(float lt, float tm) admin_timer =
 		self.goalentity.effects = EF_DIMLIGHT;
 		setmodel(self.goalentity, "progs/s_light.spr"); // let everyone know this guy is in admin mode
 	}
+bprint("set admin timer\n");
 };
 
 void() AdminCommands =
@@ -1121,6 +1122,83 @@ User Menu
 */
 void() User_menu =
 {
+	string head, ln1, ln2, ln3, ln4, ln5, foot;
+
+	ln1 = ln2 = ln3 = ln4 = ln5 = "";
+	if (self.ammo_cells > 1 && self.pk_items & PK_IT_CLIGHT)
+		head =
+					 "\b   Painkeep User Menu:   \n"
+					 "\b+------------------------+\n"
+						"  1: Chain Thunderbolt    \n";
+	else
+		head =
+					 "\b   Painkeep User Menu:   \n"
+					 "\b+------------------------+\n";
+
+	if (self.pk_gravitywellammo > 0)
+		ln1 =
+						"  2: Gravity Well         \n";
+	if (self.pk_turretammo > 0)
+		ln2 =
+						"  3: Auto Sentry          \n";
+	if (self.pk_items & PK_IT_GRAPGUN)
+	{
+		ln3 =
+						"  4: Harpoon              \n";
+		foot = 
+						"  5: release harpoon      \n\n"
+				"\b*** following are impulse links ***\n\n"
+
+						"  11: close combat wep    \n"
+						"  12: prev pk weapon      \n"
+						"  13: status display      \n"
+						"    any impulse exits     \n"
+					 "\b+------------------------+\n"
+					 "\b Enter code: ";
+	}
+	else
+	{
+	foot = 
+				"\b*** following are impulse links ***\n\n"
+
+						"  11: close combat wep    \n"
+						"  12: prev pk weapon      \n"
+						"  13: status display      \n"
+						"    any impulse exits     \n"
+					 "\b+------------------------+\n"
+					 "\b Enter code: ";
+	}
+	if (self.pk_items & PK_IT_AIRGUN)
+	{
+		if (self.pk_beartrapammo > 0)
+			ln4 =
+						"  6: Air fist             \n"
+						"  7: Beartrap             \n";
+		else
+			ln4 =
+						"  6: Air fist             \n";
+	}
+	else
+	{
+		if (self.pk_beartrapammo > 0)
+			ln4 =
+						"  7: Beartrap             \n";
+	}
+	if (self.pk_canpabammo > 0)
+		ln5 =
+						"  8: Can o' Pork n' Beans \n"
+						"  9: Axe                  \n"
+						"  0: Inventory list       \n"
+						"  +--------------------+  \n";
+	else
+		ln5 =
+						"  9: Axe                  \n"
+						"  0: Inventory list       \n"
+						"  +--------------------+  \n";
+
+/*
+	old menu - deprecated
+
 	self.message =
 					 "\b   Painkeep User Menu:   \n"
 					 "\b+------------------------+\n"
@@ -1143,8 +1221,9 @@ void() User_menu =
 						"    any impulse exits     \n"
 					 "\b+------------------------+\n"
 					 "\b Enter code: ";
-
+*/
 	self.wad = "";
+	centerprint7(self, head, ln1, ln2, ln3, ln4, ln5, foot);
 };
 
 // set painkeep item from user menu
@@ -1176,9 +1255,9 @@ void() PK_AdminImpulse =
 		{
 			localcmd("usergamma\n");
 			localcmd("admin_centertime\n");
-			User_menu();
 			admin_timer(FALSE, USER_TIMEOUT);
 			self.impulse = 0;
+			self.message = "USER_MENU";
 		}
 		if (self.impulse == 6)
 		{
@@ -1236,7 +1315,8 @@ void() PK_AdminImpulse =
 			}
 */
 		f = self.impulse;
-		centerprint3(self, self.message, "", "");
+		User_menu();
+//		centerprint3(self, self.message, "", "");
 		if (self.button0 || self.button1 || self.button2 || self.impulse)
 			admin_clear();
 

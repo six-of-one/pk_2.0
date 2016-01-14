@@ -3,7 +3,7 @@
 
 // ADMIN section
 // dev - only enable this for painkeep maps or force pk mode (sv_ control) - any maps that loads a pk item / func
-float PK; // if set true painkeep code is enabled
+float PK;									// if set true painkeep code is enabled
 float PK_MAP					= 6144;	// bit * = FALSE -- map sets painkeep mode  - PK = TRUE if: any pk*.bsp loaded, start.bsp loaded and message == "hub", a map loads any painkeep map item, PK = FALSE otherwise
 float PK_ALWAYS				= 2048;	// bit *	= TRUE --- always in painkeep mode - PK = TRUE;
 float PK_NEVER				= 4096;	// bit *	= TRUE --- never in painkeep mode  - PK = FALSE;
@@ -26,14 +26,13 @@ float pk_admintime;						// if > 0 - inactivity timer for admin mode
 float pk_adminframe;					// only do once per frame
 float LIVE_ADMIN				= 100;	// for being in game with admin privs - previous painkeep admin mode
 float ADMIN_LOGIN			= -2;		// .admin value for login
-float USER_MENU				= -1;		// .admin value that handles user menu
+float USER_MENU				= -1;		// .admin value that handles user menu - admin code set runs user menus
 float USER_TIMEOUT			= 5;		// timeout user menu in 5 secs
 float USER_IMPULSE			= 39;		// user menu impulse
-//float SETCODE					= -8726545; // set the code after delay
 float ADMIN_FAILED_LOGIN	= -777;	// login didnt succeed
-string ADMINCODE				= "float1\n"; // local command that loads admin security password]
+string ADMINCODE				= "float1\n"; // local command that loads admin security password
 													  //- obscured to keep anyone with casual console access from divining its true meaning
-string ADMINIMPULSE			= "float2\n"; // load the impyulse
+string ADMINIMPULSE			= "float2\n"; // load the impulse
 string ADMINTIME				= "float3\n"; // load the time out
 
 // **************************************

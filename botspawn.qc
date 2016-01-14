@@ -454,9 +454,7 @@ void (float skl) AddAnotherBot =
 		c_skill = skl;
 	newbot = AddBot ();
 	newbot.id = n;
-//	newbot.id = FindGood ();
 	newbot.colormap = (newbot.id + 1);
-//	newbot.colormap = 0; // causing *bot to always have players colors
 	newbot.team = 99;
 // CHECK: painkeep damageskins
 /*
@@ -612,6 +610,12 @@ void (float skl) AddAnotherBot =
 		bottom = 9;
 	}
 
+// merge with frikbot - using frik vars
+	newbot.b_clientno = newbot.id;
+	newbot.b_shirt = top;
+	newbot.b_pants = bottom;
+	UpdateClient(newbot);
+/*
 	WriteByte (MSG_ALL,MSG_UPDATENAME);
 	WriteByte (MSG_ALL,newbot.id);
 	WriteString (MSG_ALL,newbot.netname);
@@ -621,21 +625,8 @@ void (float skl) AddAnotherBot =
 	WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 	WriteByte (MSG_ALL,newbot.id);
 	WriteShort (MSG_ALL,newbot.frags);
-};
-/*
-void(entity who) UpdateClient =
-{
-	WriteByte (MSG_ALL, SVC_UPDATENAME);
-	WriteByte (MSG_ALL, who.b_clientno);
-	WriteString (MSG_ALL, who.netname);
-	WriteByte (MSG_ALL, SVC_UPDATECOLORS);
-	WriteByte (MSG_ALL, who.b_clientno);
-	WriteByte (MSG_ALL, who.b_shirt * 16 + who.b_pants);
-	WriteByte (MSG_ALL, SVC_UPDATEFRAGS);
-	WriteByte (MSG_ALL, who.b_clientno);
-	WriteShort (MSG_ALL, who.frags);
-};
 */
+};
 
 void (entity ply, float n) addTeamBots =
 {
@@ -671,6 +662,42 @@ void (entity ply, float n) addTeamBots =
 	}
 };
 
+void(entity e) removeBot =
+{
+	local entity f;
+
+	f = e;
+	if (!f) f = find (world,classname,"pk*bot");
+	if (!f) return ;
+
+	if (f.pather) NUMPATHERS = (NUMPATHERS - 1);
+
+	if (f.b_clientno != -1)
+	{
+// the bot's client number is not in use by a real player so we
+// must remove it's entry in the rankings
+// Quake engine sets all fields to 0, can only do the most important here
+		f.b_frags = f.frags = 0;
+		f.netname = "";
+		f.classname = "";
+		f.health = 0;
+		f.items = 0;
+		f.armorvalue = 0;
+		f.weaponmodel = "";
+		f.b_pants = 0;
+		f.b_shirt = 0;
+		f.ammo_shells = f.ammo_nails = f.ammo_rockets = f.ammo_cells = 0;
+		UpdateClient(f);
+		active_clients = active_clients - (active_clients & ClientBitFlag(f.b_clientno));
+		f.id = f.b_clientno = -1;
+	}
+
+	remove (f.movetarget);
+	remove (f.goalentity);
+	remove (f);
+	NUMBOTS = NUMBOTS - 1;
+};
+
 void (entity ply, float n) removeTeamBots =
 {
 	local float i;
@@ -687,35 +714,9 @@ void (entity ply, float n) removeTeamBots =
 		{
 			return ;
 		}
-		if (e.pather)
-		{
-			NUMPATHERS = (NUMPATHERS - 1);
-		}
-		active_clients = (active_clients - (active_clients & ClientBitFlag(e.id)));
-
-		remove (e.movetarget);
-		remove (e.goalentity);
-		remove (e);
+		removeBot(e);
 		i = (i - 1);
 	}
-};
-
-void(entity e) removeBot =
-{
-	local entity f;
-
-	f = e;
-	if (!f) f = find (world,classname,"pk*bot");
-	if (!f) return ;
-
-	if (f.pather) NUMPATHERS = (NUMPATHERS - 1);
-
-	active_clients = (active_clients - (active_clients & ClientBitFlag(f.id)));
-
-	remove (f.movetarget);
-	remove (f.goalentity);
-	remove (f);
-	NUMBOTS = NUMBOTS - 1;
 };
 
 void () removeAllBots =

@@ -78,200 +78,30 @@ float() ClientNextAvailable =
 
 same as below except setting flag - replace for extract
 */
+
 /*
-float () FindGood =
+merged with frikbot code
+
+void(entity who) UpdateClient =
 {
-//	fActiveClients = active_clients; // frikbot code merge - these need to be the same var
-
-//	fClientNo = (fClientNo + 1);
-	if (!(active_clients & 1))
-	{
-		active_clients = (active_clients | 1);
-		return (1);
-	}
-	else if (!(active_clients & 2))
-	{
-		active_clients = (active_clients | 2);
-		return (2);
-	}
-	else if (!(active_clients & 4))
-	{
-		active_clients = (active_clients | 4);
-		return (3);
-	}
-	else if (!(active_clients & 8))
-	{
-		active_clients = (active_clients | 8);
-		return (4);
-	}
-	else if (!(active_clients & 16))
-	{
-		active_clients = (active_clients | 16);
-		return(5);
-	}
-	else if (!(active_clients & 32))
-	{
-		active_clients = (active_clients | 32);
-		return (6);
-	}
-	else if (!(active_clients & 64))
-	{
-		active_clients = (active_clients | 64);
-		return (7);
-	}
-	else if (!(active_clients & 128))
-	{
-		active_clients = (active_clients | 128);
-		return (8);
-	}
-	else if (!(active_clients & 256))
-	{
-		active_clients = (active_clients | 256);
-		return (9);
-	}
-	else if (!(active_clients & 512))
-	{
-		active_clients = (active_clients | 512);
-		return (10);
-	}
-	else if (!(active_clients & 1024))
-	{
-		active_clients = (active_clients | 1024);
-		return (11);
-	}
-	else if (!(active_clients & 2048))
-	{
-		active_clients = (active_clients | 2048);
-		return(12);
-	}
-	else if (!(active_clients & 4096))
-	{
-		active_clients = (active_clients | 4096);
-		return (13);
-	}
-	else if (!(active_clients & 8192))
-	{
-		active_clients = (active_clients | 8192);
-		return(14);
-	}
-	else if (!(active_clients & 16384))
-	{
-		active_clients = (active_clients | 16384);
-		return(15);
-	}
-	else if (!(active_clients & 32768))
-	{
-		active_clients = (active_clients | 32768);
-		return (16);
-	}
-	else
-	{
-		return (-1);
-	}
-
-};
-
-void (float botcnt) MakeGood =
-{
-
-	local float botbit;
-	botbit = 1;
-	botcnt = (botcnt - 1);
-	while (botcnt > 0)
-	{
-		botbit = (botbit * 2);
-		botcnt = (botcnt - 1);
-	}
-//	fClientNo = (fClientNo - 1);
-	active_clients = (active_clients - (active_clients & botbit));
+	WriteByte (MSG_ALL, SVC_UPDATENAME);
+	WriteByte (MSG_ALL, who.b_clientno);
+	WriteString (MSG_ALL, who.netname);
+	WriteByte (MSG_ALL, SVC_UPDATECOLORS);
+	WriteByte (MSG_ALL, who.b_clientno);
+	WriteByte (MSG_ALL, who.b_shirt * 16 + who.b_pants);
+	WriteByte (MSG_ALL, SVC_UPDATEFRAGS);
+	WriteByte (MSG_ALL, who.b_clientno);
+	WriteShort (MSG_ALL, who.frags);
 };
 */
+
 void (entity e) Update_Frags =
 {
 	WriteByte (MSG_ALL,MSG_UPDATEFRAGS);
 	WriteByte (MSG_ALL,e.id);
 	WriteShort (MSG_ALL,e.frags);
 };
-
-
-/*
-void (entity c) PrintClientScore =
-{
-	if ((c.frags > -10) && (c.frags < 0))
-	{
-		bprint (" ");
-	}
-	else if (c.frags >= 0)
-	{
-		if (c.frags < 100)
-		{
-			bprint (" ");
-		}
-		if (c.frags < 10)
-		{
-			bprint (" ");
-		}
-	}
-};
-
-void () DumpScore =
-{
-	local entity e;
-	local entity sort;
-	local entity walk;
-	if (world.chain)
-	{
-		error ("DumpScore: world.chain is set");
-	}
-	e = find (world,classname,"player");
-	sort = world;
-	while (e)
-	{
-		if (!sort)
-		{
-			sort = e;
-			e.chain = world;
-		}
-		else
-		{
-			if (e.frags > sort.frags)
-			{
-				e.chain = sort;
-				sort = e;
-			}
-			else
-			{
-				walk = sort;
-				do
-				{
-					if (!walk.chain)
-					{
-						e.chain = world;
-						walk.chain = e;
-					}
-					else if (walk.chain.frags < e.frags)
-					{
-						e.chain = walk.chain;
-						walk.chain = e;
-					}
-					else
-					{
-						walk = walk.chain;
-					}
-				} while (walk.chain != e);
-			}
-		}
-		e = find (e,classname,"player");
-	}
-	bprint ("\n");
-	while (sort)
-	{
-		PrintClientScore (sort);
-		sort = sort.chain;
-	}
-	bprint ("\n");
-};
-*/
 
 
 float () getrandombotskin =
@@ -414,28 +244,6 @@ void() bot_skinDecode =
 	}
 };
 
-// deprecated into below
-/*
-void() set_CarriedPath =
-{
-	if (self.movetarget == world)
-	{
-		NewCarriedPath ();
-	}
-	setorigin (self.movetarget,self.origin);
-	self.movetarget.movetarget = world;
-	self.pathtype = NEVERTARGET;
-	if (!self.pather)
-	{
-		NUMPATHERS = (NUMPATHERS + 1);
-	}
-	self.pather = 1;
-
-// other init code
-	self.th_cache = cacheenemy;
-
-};
-*/
 
 void() set_initBotLevel =
 {
@@ -914,11 +722,11 @@ void () printIntro =
 			addTeamBots (self,num);
 		}
 //		centerprint (self,"Server running team pk*bots v1.1\nand PainKeep v1.1");
-		centerprint (self,"Server running team pk*bots v1.1, frikbot 0.10.1\nand PainKeep v1.1");
+		centerprint (self,"Server running team pk*bots v1.1, frikbot 0.10.1\nand PainKeep v1.2");
 	}
 	else
 	{
 //		centerprint (self,"Server running pk*bots v1.1\nand PainKeep v1.1");
-		centerprint (self,"Server running pk*bots v1.1, frikbot 0.10.1\nand PainKeep v1.1");
+		centerprint (self,"Server running pk*bots v1.1, frikbot 0.10.1\nand PainKeep v1.2");
 	}
 };
