@@ -20,6 +20,7 @@ string st_hub3					= "hub3";
 float pk_flags;							// replaces old usage of temp1, savedgamecfg stores this
 float pk_xsound;							// set to state of PK_XSOUND bit for sound code toggle
 float pk_itemovr;						// control items - admin override
+float pk_map;								// true if a painkeep map is loaded
 
 float DARKPLACES_ENGINE	= 3275;	// for detecting darkplaces - modded engine sets cvar("chaos") to this value
 float chaos;
@@ -53,6 +54,15 @@ float WEP_WEPSQ				= 63;  // all q weps									= 111111000000
 float WEP_WEPSA				= 127; // incl pk items?							= 111111100000
 float WEP_STOP				= 64;
 
+// pk items special - not in override var
+float WEP_GWELL				= 128;
+float WEP_TURRET				= 256;
+float WEP_BTRAP				= 512;
+float WEP_EXPSH				= 1024;
+float WEP_GRAP				= 2048;
+float WEP_AIRG				= 4096;
+float WEP_CPNB				= 8193;
+
 float ART_QUAD				= 128;  // admin of quad
 float ART_INV					= 256;  // admin of invulnerable
 float ART_RAD					= 512;  // admin of rad suit
@@ -84,6 +94,8 @@ float CON_CYC					= 2097152; // cycle selected bits in thier group
 float CON_RUN					= 4063232; // any control bit CON_* entries above - used by autorun
 float CYC_TIME				= 60; // TEST - 240; // seconds for cycle base - 4 mins +|- 2 mins
 void() item_loop;
+float ammo_frame;
+void() infinite_ammo;
 
 // **************************************
 // painkeep protos

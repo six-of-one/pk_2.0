@@ -1197,6 +1197,10 @@ void () PlayerPostThink =
 	if (pk_adminframe != framecount)
 	if (admin_postthink()) return;
 
+	if (pk_itemovr & CON_INF)
+	if (ammo_frame < framecount)
+		infinite_ammo();
+
 	if (PK)
 	{
 		pk_post_think();

@@ -143,7 +143,7 @@ void () weapon_airfist =
 	setsize (self,'-16 -16 0','16 16 56');
 	//setsize (self, '-15 -9 25', '17 9 43');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 /*QUAKED weapon_rmine (0 .5 .8) (-16 -16 0) (16 16 32)
@@ -166,7 +166,7 @@ void () weapon_chainlg =
 	self.touch = painkeep_weapon_touch;
 	setsize (self,'-16 -16 0','16 16 56');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 
@@ -183,7 +183,7 @@ void () weapon_grapgun =
 	self.netname = "Harpoon Gun";
 	setsize (self,'-16 -16 0','16 16 56');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 // called from below - handle ammo touch extras
@@ -458,7 +458,7 @@ void () item_painkeep_gwell =
 	//setsize (self, '-32 -32 -32', '32 32 32');
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 /*QUAKED item_painkeep_turret (0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -474,7 +474,7 @@ void () item_painkeep_turret =
 
 	setsize (self,'-7 -7 -7','4 7 21');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 /*QUAKED item_painkeep_lantern (0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -497,7 +497,7 @@ void () item_painkeep_can =
 	self.pk_items = PK_IT_CANPAB;
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 /*QUAKED item_painkeep_beartrap(0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -512,7 +512,7 @@ void () item_painkeep_beartrap =
 	self.pk_items = PK_IT_BEARTRAP;
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 
@@ -526,7 +526,7 @@ void () light_painkeep_candle =
 	setmodel (self,"progs/candle.mdl");
 	FireAmbient ();
 	makestatic (self);
-	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 
@@ -545,7 +545,7 @@ void () item_painkeep_expshells =
 	self.netname = "Exploding Shells";
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 // moved from items.qc - Cataboligne - 3.27.8
@@ -953,16 +953,26 @@ string (float bt) item_by_bit =
 	return("");
 };
 
-// ammo for a given wep
+// ammo for a given wep - used for replacements & pk items subs
 
 string (float bt) ammo_by_bit =
 {
+// wep ammo by bit
 	if (bt == WEP_SSHOT) return("item_shells");
 	if (bt == WEP_NAILGUN) return("item_spikes");
 	if (bt == WEP_PERF) return("item_spikes");
 	if (bt == WEP_GREN) return("item_rockets");
 	if (bt == WEP_ROCKET) return("item_rockets");
 	if (bt == WEP_THUNDER) return("item_cells");
+// pk item subs by special bits
+	if (bt == WEP_GWELL) return("item_painkeep_gwell");
+	if (bt == WEP_TURRET) return("item_painkeep_turret");
+	if (bt == WEP_BTRAP) return("item_painkeep_beartrap");
+	if (bt == WEP_EXPSH) return("item_painkeep_expshells");
+	if (bt == WEP_GRAP) return("weapon_grapgun");
+	if (bt == WEP_AIRG) return("weapon_airfist");
+	if (bt == WEP_CPNB) return("item_painkeep_can");
+
 	return("");
 };
 
@@ -993,8 +1003,16 @@ void(string cls) item_call =
 //	else if (cls == "item_health_15") item_health();
 //	else if (cls == "item_health_25") item_health();
 //	else if (cls == "item_health_mega") item_health();
+	else if (cls == "item_painkeep_gwell") item_painkeep_gwell();
+	else if (cls == "item_painkeep_turret") item_painkeep_turret();
+	else if (cls == "item_painkeep_beartrap") item_painkeep_beartrap();
+	else if (cls == "item_painkeep_expshells") item_painkeep_expshells();
+	else if (cls == "weapon_grapgun") weapon_grapgun();
+	else if (cls == "weapon_airfist") weapon_airfist();
+	else if (cls == "item_painkeep_can") item_painkeep_can();
 	else return;
 	self.classname = cls;
+	if (PK) pk_placeitem();
 	self.mdl = self.model;
 	self.model = string_null;
 	self.solid = SOLID_NOT;
@@ -1012,6 +1030,8 @@ void() item_down =
 void(string cls, string rep, string am, string ram) item_repm =
 {
 	local entity e, sv;
+	local string pam;
+	local float f;
 
 	if (!find(world,wad,rep))
 	{
@@ -1023,6 +1043,12 @@ void(string cls, string rep, string am, string ram) item_repm =
 			e = find(e,classname,rep);
 		}
 	}
+	pam = am;
+	if (pk_itemovr & CON_INF) pam = "rem"; // inf ammo
+	if (pk_itemovr & WEP_PKI) 
+		f = WEP_STOP * ceil(2 * random()) * ceil(2 * random()) * ceil(2 * random());
+	sv = self;
+	e = find(world,wad,rep);
 /*
 bprint("repm set: ");
 bprint(cls);
@@ -1034,28 +1060,37 @@ bprint(am);
 bprint(" for: ");
 bprint(ram);}
 bprint("\n");
-*/
-	sv = self;
-	e = find(world,wad,rep);
+//*/
 	while (e)
 	{
 		self = e;
 		if (cls == "rest")
 		{
 			item_call(rep);
-			if (ram != "") item_repm("rest", ram, "", "");
-		}
-		else if (cls == "")
-		{
-			item_down();
 			if (ram != "")
-			if (ram != am)	item_repm(am, ram, "", "");
+			{
+				if (pam == "rem") item_repm(pam, ram, "", "");
+				else item_repm("rest", ram, "", "");
+			}
+		}
+		else if (cls == "" || cls == "rem")
+		{
+			if ((pk_itemovr & WEP_PKI) && PK && cls == "rem")
+			{
+				f = f * 2;
+				if (f > WEP_CPNB) f = WEP_GWELL;
+				item_call(ammo_by_bit(f)); // TDO: finish item call
+			}
+			else
+				item_down();
+			if (ram != "")
+			if (ram != pam) item_repm(pam, ram, "", "");
 		}
 		else
 		{
 			item_call(cls);
 			if (ram != "")
-			if (ram != am)	item_repm(am, ram, "", "");
+			if (ram != pam) item_repm(pam, ram, "", "");
 		}
 		e = find(e,wad,rep);
 	}
@@ -1158,6 +1193,8 @@ if (pko & CON_SUBS) {bprint(", sub item: "); bprint(item_by_bit(e));}
 else bprint(", gone!");
 bprint("\n");
 			}
+			else if (pko & CON_INF)
+				item_repm("rest", item_by_bit(f), "", ammo_by_bit(f));
 		}
 		if (pko & CON_CYC) f = lvl;
 		else f = f * 2;
@@ -1195,4 +1232,41 @@ bprint("\n");
 	}
 	else
 		remove(self);
+};
+
+// fn(infinite_ammo) - admin set infinite flag - load everyone up
+
+void() infinite_ammo =
+{
+	local entity e;
+	local string src;
+
+	ammo_frame = framecount + 6; // not every frame
+	src = "player";
+	e = find(world,classname,src);
+	while (e)
+	{
+		if (e.health > 0)
+		{
+			if (e.items & IT_SUPER_SHOTGUN)
+			if (pk_itemovr & WEP_SSHOT) e.ammo_shells = 99;
+			if (e.items & IT_NAILGUN)
+			if (pk_itemovr & WEP_NAILGUN) e.ammo_nails = 99;
+			if (e.items & IT_SUPER_NAILGUN)
+			if (pk_itemovr & WEP_PERF) e.ammo_nails = 99;
+			if (e.items & IT_GRENADE_LAUNCHER)
+			if (pk_itemovr & WEP_GREN) e.ammo_rockets = 99;
+			if (e.items & IT_ROCKET_LAUNCHER)
+			if (pk_itemovr & WEP_ROCKET) e.ammo_rockets = 99;
+			if (e.items & IT_LIGHTNING)
+			if (pk_itemovr & WEP_THUNDER) e.ammo_cells = 99;
+		}
+		e = find(e, classname,src);
+		if (!e)
+		if (src != "pk*bot")
+		{
+			src = "pk*bot";
+			e = find(world, classname,src);
+		}
+	}
 };

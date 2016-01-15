@@ -201,6 +201,7 @@ void() PK_precache =
 // set PK mode based on engine var | saved2
 
 	pk_flags = pk_flags_ck = cvar("savedgamecfg");
+	pk_map = PK_mapmode(world.model);
 
 // got mode, set PK master switch
 	PK = FALSE;

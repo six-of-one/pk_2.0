@@ -629,7 +629,7 @@ Items menu admin
 */
 void() Admin_itembits =
 {
-	local string adv, it;
+	local string adv, it, ad2;
 	local float f;
 
 	if (! pk_itemovr & CON_ANY)
@@ -648,7 +648,7 @@ void() Admin_itembits =
 		adv = "None of";
 		if (pk_itemovr & CON_SUBS) adv = "Subs for";
 	}
-	else if (pk_itemovr & CON_INF) adv = "Infinite ammo";
+	if (pk_itemovr & CON_INF) ad2 = " - Infinite ammo";
 
 	while (f != CON_STOP)
 	{
@@ -660,6 +660,7 @@ void() Admin_itembits =
 			bprint(adv);
 			bprint(": ");
 			bprint(it);
+			if (f < WEP_STOP) bprint(ad2);
 			bprint("\n");
 		}
 		f = f * 2;
