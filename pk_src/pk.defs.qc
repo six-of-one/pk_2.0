@@ -52,7 +52,7 @@ float WEP_THUNDER			= 32;  // admin of thunderbolt
 float WEP_PKI					= 64;  // admin of pain keep items
 float WEP_WEPSQ				= 63;  // all q weps									= 111111000000
 float WEP_WEPSA				= 127; // incl pk items?							= 111111100000
-float WEP_STOP				= 64;
+float WEP_STOP				= 128;
 
 // pk items special - not in override var
 float WEP_GWELL				= 128;

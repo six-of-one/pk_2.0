@@ -939,6 +939,7 @@ string (float bt) item_by_bit =
 	if (bt == WEP_GREN) return("weapon_grenadelauncher");
 	if (bt == WEP_ROCKET) return("weapon_rocketlauncher");
 	if (bt == WEP_THUNDER) return("weapon_lightning");
+	if (bt == WEP_PKI) return("pki");
 	if (bt == ART_INV) return("item_artifact_invulnerability");
 	if (bt == ART_RAD) return("item_artifact_envirosuit");
 	if (bt == ART_RING) return("item_artifact_invisibility");
@@ -964,6 +965,7 @@ string (float bt) ammo_by_bit =
 	if (bt == WEP_GREN) return("item_rockets");
 	if (bt == WEP_ROCKET) return("item_rockets");
 	if (bt == WEP_THUNDER) return("item_cells");
+	if (bt == WEP_PKI) return("pki");
 // pk item subs by special bits
 	if (bt == WEP_GWELL) return("item_painkeep_gwell");
 	if (bt == WEP_TURRET) return("item_painkeep_turret");
@@ -1045,8 +1047,11 @@ void(string cls, string rep, string am, string ram) item_repm =
 	}
 	pam = am;
 	if (pk_itemovr & CON_INF) pam = "rem"; // inf ammo
-	if (pk_itemovr & WEP_PKI) 
+	if (pk_itemovr & WEP_PKI)
+	{
 		f = WEP_STOP * ceil(2 * random()) * ceil(2 * random()) * ceil(2 * random());
+		if (pk_itemovr & CON_INF) pam = "pki"; // inf ammo - pk item subs
+	}
 	sv = self;
 	e = find(world,wad,rep);
 /*
@@ -1069,13 +1074,13 @@ bprint("\n");
 			item_call(rep);
 			if (ram != "")
 			{
-				if (pam == "rem") item_repm(pam, ram, "", "");
+				if (pam == "rem" || pam == "pki") item_repm(pam, ram, "", "");
 				else item_repm("rest", ram, "", "");
 			}
 		}
-		else if (cls == "" || cls == "rem")
+		else if (cls == "" || cls == "pki" || cls == "rem")
 		{
-			if ((pk_itemovr & WEP_PKI) && PK && cls == "rem")
+			if ((pk_itemovr & WEP_PKI) && PK && cls == "pki")
 			{
 				f = f * 2;
 				if (f > WEP_CPNB) f = WEP_GWELL;
