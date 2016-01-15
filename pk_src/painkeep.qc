@@ -213,6 +213,12 @@ void() PK_precache =
 		PK = PK_mapmode(world.model);
 	}
 
+	if (world.model == "maps/start.bsp" && world.message == "hub")
+	{
+		pk_flags = pk_flags - (pk_flags & (PK_HUB2 | PK_HUB3));
+		admin_sv_cfg();
+	}
+
 // extra sounds by...are apparently not supplied, except gib_?.wav
 
 	pk_xsound = (pk_flags & PK_XSOUND);
@@ -284,6 +290,20 @@ void() PK_precache =
 	*/
 };
 
+// select hub map
+
+string() hub_select =
+{
+	local string mp;
+
+	mp = "start";
+	if (PK)
+	{
+		if (pk_flags & PK_HUB2) mp = "hub2";
+		else if (pk_flags & PK_HUB3) mp = "hub3";
+	}
+	return (mp);
+};
 // set mode based on map name
 
 float(string mp) PK_mapmode =

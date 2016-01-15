@@ -281,9 +281,12 @@ MapStart
 */
 void() MapStart =
 {
+	local string mp;
+
+	mp = hub_select();
 	bprint("Admin loaded hub / start map...\n");
 	bot_changelevel(); // *bot - reload bots on next level, handle intermission
-	changelevel("start");
+	changelevel(mp);
 };
 
 /*
@@ -291,37 +294,10 @@ void() MapStart =
 MapDM
 ==========
 */
-void() Admin_dmmapmenu =
+void() Admin_dmmapmenu2 =
 {
 	self.message =
-					 "\b  Painkeep DM map Menu:\n"
-					 "\b+------------------------+\n"
-						"    01:  pk1    11: pk11  \n"
-						"    02:  pk2    12: pk12  \n"
-						"    03:  pk3    13: pk13  \n"
-						"    04:  pk4    14: pk14  \n"
-						"    05:  pk5    15: pk15  \n"
-						"    06:  pk6    16: pk16  \n"
-						"    07:  pk7    17: pk17  \n"
-						"    08:  pk8    18: pk18  \n"
-						"    09:  pk9    19: pk0   \n"
-						"    10:  pk10   21: hub   \n"
-						"    20:  painkeep         \n"
-						"   666:  main menu        \n"
-						"  admin impulse exits     \n"
-					 "\b+------------------------+\n"
-					 "\b Enter code: ";
-
-	self.wad = "";
-	self.admin = 14;
-	self.lefty = 0;
-};
-
-/* new pk maps in conv pack
-
-
-	self.message =
-					 "\b Painkeep DM map 2 Menu:\n"
+					 "\b Painkeep DM map Menu 2:\n"
 					 "\b+------------------------+\n"
 						"  01: pkts00   21: pkn1   \n"
 						"  02: pkts01   22: pkn2   \n"
@@ -344,11 +320,48 @@ void() Admin_dmmapmenu =
 						"  19: hub3     39: pkn19  \n"
 						"    :          40: pkn20  \n"
 						"  41: painkeep2           \n"
+						"  60: original maps       \n"
 						" 666: main menu           \n"
 						"  admin impulse exits     \n"
 					 "\b+------------------------+\n"
 					 "\b Enter code: ";
+};
 
+void() Admin_dmmapmenu =
+{
+	self.message =
+					 "\b  Painkeep DM map Menu:\n"
+					 "\b+------------------------+\n"
+						"    01:  pk1    11: pk11  \n"
+						"    02:  pk2    12: pk12  \n"
+						"    03:  pk3    13: pk13  \n"
+						"    04:  pk4    14: pk14  \n"
+						"    05:  pk5    15: pk15  \n"
+						"    06:  pk6    16: pk16  \n"
+						"    07:  pk7    17: pk17  \n"
+						"    08:  pk8    18: pk18  \n"
+						"    09:  pk9    19: pk0   \n"
+						"    10:  pk10   21: hub   \n"
+						"    20:  painkeep         \n"
+						"    60:  new maps         \n"
+						"    61:  list hub links   \n"
+						"   666:  main menu        \n"
+						"  admin impulse exits     \n"
+					 "\b+------------------------+\n"
+					 "\b Enter code: ";
+
+	self.wad = "";
+	self.admin = 14;
+	self.lefty = 0;
+	if (self.cnt) Admin_dmmapmenu2();
+};
+
+// new pk maps in conv pack - return map name
+
+string() MapDM2 =
+{
+	local string mname;
+	mname = "";
 	if (self.lefty == 41) mname = "painkeep2";
 	else if (self.lefty == 01) mname = "pkts00";
 	else if (self.lefty == 02) mname = "pkts01";
@@ -386,20 +399,26 @@ void() Admin_dmmapmenu =
 	else if (self.lefty == 38) mname = "pkn18";
 	else if (self.lefty == 39) mname = "pkn19";
 	else if (self.lefty == 40) mname = "pkn20";
-	else if (self.lefty == 18) mname = "hub2";
-	else if (self.lefty == 19) mname = "hub3";
-	else
-		return(FALSE);
+	else if (self.lefty == 18)
+	{
+		mname = "hub2";
+		pk_flags = PK_HUB2 | pk_flags - (pk_flags & PK_HUB3);
+	}
+	else if (self.lefty == 19)
+	{
+		mname = "hub3";
+		pk_flags = PK_HUB3 | pk_flags - (pk_flags & PK_HUB2);
+	}
+	return(mname);
+};
 
-
-
-*/
 
 float() MapDM =
 {
 	local string mname;
 
-	if (self.lefty == A_PAINKEEP) mname = "painkeep";
+	if (self.cnt && self.lefty < 60) mname = MapDM2();
+	else if (self.lefty == A_PAINKEEP) mname = "painkeep";
 	else if (self.lefty == A_PK0) mname = "pk0";
 	else if (self.lefty == A_PK1) mname = "pk1";
 	else if (self.lefty == A_PK2) mname = "pk2";
@@ -419,14 +438,69 @@ float() MapDM =
 	else if (self.lefty == A_PK16) mname = "pk16";
 	else if (self.lefty == A_PK17) mname = "pk17";
 	else if (self.lefty == A_PK18) mname = "pk18";
-	else if (self.lefty == A_PKHUB) mname = "start";
+	else if (self.lefty == A_PKHUB)
+	{
+		mname = "start";
+		pk_flags = pk_flags - (pk_flags & (PK_HUB2 | PK_HUB3));
+	}
 	else
+	{
+		if (self.lefty == 60) // switch menus
+		{
+			self.cnt = ! self.cnt;
+			Admin_dmmapmenu();
+		}
+		else if (self.lefty == 61) // hub links
+		{
+			local entity e, f, b, c;
+			local float dx;
+			bprint("---------------------\nHub map set\n---------------------\n\n");
+			e = find(world, classname, "hub_teleport");
+			while (e)
+			{
+				bprint(e.map);
+				bprint(", trg: ");
+				b = world;
+				dx = 8001;
+				e.origin = (e.absmin + e.absmax) * 0.5;
+				f = findradius(e.origin, 8000);
+//bprint("\n");
+				while (f)
+				{
+					if (f.classname == "trigger_multiple")
+					if (f.message != "")
+					{
+						f.origin = (f.mins + f.maxs) * 0.5;
+//bprint(f.message);
+//bprint(", dist: ");
+//bprint(ftos(vlen(e.origin - f.origin)));
+//bprint("\n");
+						if (vlen(e.origin - f.origin) < dx)
+						{
+							c = b;
+							b = f;
+							dx = vlen(e.origin - f.origin);
+						}
+					}
+				f = f.chain;
+				}
+				if (!b) bprint("NO TRIGGER!");
+				else { bprint(b.message); if (fabs(b.origin_z - e.origin_z) > 25) { bprint(" : Z > 25");} }// bprint(c.message); }
+				bprint("\n");
+				e = find(e, classname, "hub_teleport");
+			}
+			bprint("\n---------------------\n");
+		}
+
 		return(FALSE);
+	}
+	if (mname == "") return(FALSE);
 
 	bprint("Admin changing map to ");
 	bprint(mname);
 	bprint("\n");
 
+	admin_sv_cfg();
 	bot_changelevel(); // *bot - reload bots on next level, handle intermission
 	changelevel(mname);
 	return(TRUE);
@@ -836,7 +910,12 @@ void() AdminCommands =
 		if (self.lefty == A_RESET) ResetLevel(); else
 		if (self.lefty == A_NOEX) ToggleNoExit(); else
 		if (self.lefty == A_START) MapStart(); else
-		if (self.lefty == A_DMMAP) Admin_dmmapmenu(); else
+		if (self.lefty == A_DMMAP)
+		{
+			self.cnt = pk_flags & (PK_HUB2 | PK_HUB3);
+			Admin_dmmapmenu();
+		}
+		else
 		if (self.lefty == A_BOTS) Admin_botmenu(); else
 		if (self.lefty == A_PKCON) Admin_pkmenu(); else
 		if (self.lefty == A_ITEM) Admin_itemmenu(); else
