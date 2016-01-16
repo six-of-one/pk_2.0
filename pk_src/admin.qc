@@ -726,7 +726,7 @@ void() Admin_pkmenu =
 							"  02: HUB mode toggle       \n"
 							"  03: Duty check toggle     \n"
 							"  04: settings list         \n"
-//							"  05: PK dynamic items      \n"
+							"  05: PK dynamic items      \n"
 							"  06: Spike traps           \n"
 //							"  07: Extra sound           \n"
 							" 666:  main menu            \n"
@@ -1258,6 +1258,34 @@ void() AdminCommands =
 				sprint(self, "Custom Maps On\n");
 			else
 				sprint(self, "Custom Maps Off\n");
+
+			if (pk_flags & PK_DYNAMIC)
+				sprint(self, "Dynamic Painkeep items On\n");
+			else
+				sprint(self, "Dynamic Painkeep items Off\n");
+		}
+		else if (self.lefty == 5)
+		{
+			if (pk_flags & PK_DYNAMIC)
+			{
+				self.wad = "\nDynamic Painkeep items OFF";
+				pk_flags = pk_flags - PK_DYNAMIC;
+			}
+			else
+			{
+				self.wad = "\nDynamic Painkeep items ON";
+				pk_flags = pk_flags | PK_DYNAMIC;
+				z = find(world,classname,"dyn_spawner");
+				if (!z)
+				{
+					z = spawn();
+					if (z)
+					{
+						z.think = dyn_item;
+						z.nextthink = time + 1; // do this well after items spawn
+					}
+				}
+			}
 		}
 		else if (self.lefty == 6)
 		{

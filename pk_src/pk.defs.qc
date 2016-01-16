@@ -6,23 +6,24 @@
 float PK;									// if set true painkeep code is enabled
 float PK_MAP					= 6144;	// bit * = FALSE -- map sets painkeep mode  - PK = TRUE if: any pk*.bsp loaded, start.bsp loaded and message == "hub", a map loads any painkeep map item, PK = FALSE otherwise
 float PK_ALWAYS				= 2048;	// bit *	= TRUE --- always in painkeep mode - PK = TRUE;
-float PK_NEVER				= 4096;	// bit *	= TRUE --- never in painkeep mode  - PK = FALSE;
+float PK_NEVER					= 4096;	// bit *	= TRUE --- never in painkeep mode  - PK = FALSE;
 float PK_DYNAMIC				= 8192;	// bit *	= TRUE --- when always in painkeep mode & not on a PK map, dynamically load pk items if they are not present
-												// items include  - bear trap, can o' beans, gravity well, harpoon, turret, airfist, chain thunderbolt, exploding shot, pulse nailgun
+												// items include  - bear trap, can o' beans, gravity well, harpoon, turret, airfist, exploding shot, XXX - chain thunderbolt, pulse nailgun
 float PK_SPIKER				= 16384;	// bit *	= FALSE -- allow spike traps, set to true for original pk treatment of spike shooters - they are removed
 float PK_XSOUND				= 32768;	// bit * = TRUE --- use extra pk sound set
 
 float PK_HUB2					= 131072; // bit if TRUE, using hub2 - reload at hub loads
 float PK_HUB3					= 262144; // bit if TRUE, using hub3 - reload at hub loads
+float PK_ADHUB					= 0;		 // set to 0 PK_mapmode will ignore new maps - item load will still set PK mode
 string st_hub2					= "hub2"; // map names for 2nd & 3rd hub
 string st_hub3					= "hub3";
 
 float pk_flags;							// replaces old usage of temp1, savedgamecfg stores this
 float pk_xsound;							// set to state of PK_XSOUND bit for sound code toggle
-float pk_itemovr;						// control items - admin override
+float pk_itemovr;							// control items - admin override
 float pk_map;								// true if a painkeep map is loaded
-
-float DARKPLACES_ENGINE	= 3275;	// for detecting darkplaces - modded engine sets cvar("chaos") to this value
+float pk_ditems;							// count painkeep items for dyn_items code
+float DARKPLACES_ENGINE		= 3275;	// for detecting darkplaces - modded engine sets cvar("chaos") to this value
 float chaos;
 
 float PK_ADMIN;							// allow admin - set this to 0 to completely disable all admin
@@ -30,9 +31,9 @@ float pk_adminimp;						// impulse set in admin.cfg to access admin commands, de
 float pk_admincode;						// code you must enter to access admin commands - set by admin.cfg, defaults to -1
 float pk_adminpwdmask;					// if true password will be masked with *'s
 float pk_admintime;						// if > 0 - inactivity timer for admin mode
-float pk_adminframe;					// only do once per frame
+float pk_adminframe;						// only do once per frame
 float LIVE_ADMIN				= 100;	// for being in game with admin privs - previous painkeep admin mode
-float ADMIN_LOGIN			= -2;		// .admin value for login
+float ADMIN_LOGIN				= -2;		// .admin value for login
 float USER_MENU				= -1;		// .admin value that handles user menu - admin code set runs user menus
 float USER_TIMEOUT			= 5;		// timeout user menu in 5 secs
 float USER_IMPULSE			= 39;		// user menu impulse
@@ -44,55 +45,55 @@ string ADMINTIME				= "float3\n"; // load the time out
 
 // item admin
 float WEP_SSHOT				= 1; 	 // admin of super shotgun
-float WEP_NAILGUN			= 2; 	 // admin of nailgun
-float WEP_PERF				= 4; 	 // admin of super nailgun
-float WEP_GREN				= 8; 	 // admin of grenade
+float WEP_NAILGUN				= 2; 	 // admin of nailgun
+float WEP_PERF					= 4; 	 // admin of super nailgun
+float WEP_GREN					= 8; 	 // admin of grenade
 float WEP_ROCKET				= 16;  // admin of rocket
-float WEP_THUNDER			= 32;  // admin of thunderbolt
+float WEP_THUNDER				= 32;  // admin of thunderbolt
 float WEP_PKI					= 64;  // admin of pain keep items
 float WEP_WEPSQ				= 63;  // all q weps									= 111111000000
 float WEP_WEPSA				= 127; // incl pk items?							= 111111100000
-float WEP_STOP				= 128;
+float WEP_STOP					= 128;
 
 // pk items special - not in override var
 float WEP_GWELL				= 128;
 float WEP_TURRET				= 256;
 float WEP_BTRAP				= 512;
 float WEP_EXPSH				= 1024;
-float WEP_GRAP				= 2048;
-float WEP_AIRG				= 4096;
-float WEP_CPNB				= 8193;
+float WEP_GRAP					= 2048;
+float WEP_AIRG					= 4096;
+float WEP_CPNB					= 8193;
 
-float ART_QUAD				= 128;  // admin of quad
+float ART_QUAD					= 128;  // admin of quad
 float ART_INV					= 256;  // admin of invulnerable
 float ART_RAD					= 512;  // admin of rad suit
-float ART_RING				= 1024; // admin of ring
-float ART_ARTS				= 1920; // all art bits								= 000000011110
-float ART_STOP				= 2048;
+float ART_RING					= 1024; // admin of ring
+float ART_ARTS					= 1920; // all art bits								= 000000011110
+float ART_STOP					= 2048;
 
 float ARM_GRN					= 2048;  // admin of green armor
 float ARM_YEL					= 4096;  // admin of yellow armor
 float ARM_RED					= 8192;  // admin of red armor
-float ARM_ARMS				= 14336; // all armor bits							= 000000000000111
-float ARM_STOP				= 16384;
+float ARM_ARMS					= 14336; // all armor bits							= 000000000000111
+float ARM_STOP					= 16384;
 
 // TDO: item admin over health requires a remap of classnames for this code to work
 float HEAL_15					= 16384;  // admin of heal 15
 float HEAL_25					= 32768;  // admin of heal 25
-float HEAL_100				= 65536;  // admin of heal 100
+float HEAL_100					= 65536;  // admin of heal 100
 float HEAL_HEALS				= 114688; // all health bits						= 000000000000000111
 float HEAL_STOP				= 131072;
 
 float CON_ANY					= 2097087; // any bit set in this mask	- any above + controls (all bits - 64)
-float CON_STOP				= 16384; //131072;  // stop replace / remove cycle here
+float CON_STOP					= 16384; //131072;  // stop replace / remove cycle here
 // CON_* entries
-float CON_ONLY				= 131072;  // only the selected items will be loaded
-float CON_NONE				= 262144;  // none of the selected items will be loaded
-float CON_SUBS				= 524288;  // substitute something for removed items
+float CON_ONLY					= 131072;  // only the selected items will be loaded
+float CON_NONE					= 262144;  // none of the selected items will be loaded
+float CON_SUBS					= 524288;  // substitute something for removed items
 float CON_INF					= 1048576; // infinite ammo weps
 float CON_CYC					= 2097152; // cycle selected bits in thier group
 float CON_RUN					= 4063232; // any control bit CON_* entries above - used by autorun
-float CYC_TIME				= 60; // TEST - 240; // seconds for cycle base - 4 mins +|- 2 mins
+float CYC_TIME					= 60; // TEST - 240; // seconds for cycle base - 4 mins +|- 2 mins
 void() item_loop;
 float ammo_frame;
 void() infinite_ammo;
@@ -141,13 +142,13 @@ void(entity client, string s, string s1, string s2, string s3, string s4, string
 
 // Items used in impulse 1
 float PK_IT_AXE				= 1;
-float PK_IT_GRAVITYWELL	= 2;
+float PK_IT_GRAVITYWELL		= 2;
 float PK_IT_TURRET			= 4;
 float PK_IT_CANPAB			= 8;
 float PK_IT_GRAPGUN			= 16;
 float PK_IT_AIRGUN			= 32;
 float PK_IT_CLIGHT			= 64;
-float PK_IT_BEARTRAP		= 128;
+float PK_IT_BEARTRAP			= 128;
 float PK_IT_EXTRADISP		= 256;
 /*
 Impulse 1 will toggle between Axe, Bear Trap, CoPB, AS, and GW.
@@ -170,8 +171,8 @@ Impulse 38 - Axe (just to do complete)
 
 // Ammo Max'S
 float PK_GRAVITYWELLAMMO_MAX	= 1;
-float PK_TURRETAMMO_MAX		= 3;
-float PK_CANPABAMMO_MAX		= 1;
+float PK_TURRETAMMO_MAX			= 3;
+float PK_CANPABAMMO_MAX			= 1;
 float PK_BEARTRAPAMMO_MAX		= 3;
 
 // The current inventory item
@@ -195,7 +196,7 @@ float AIRG_STEPCONVERTEDTOFLY	= 2;
 
 // Air Gun flag constants.
 // Setting an entity's AIRG_Flags excludes it from harm
-float AIRG_EXCLUDEENTITY	= 1;
+float AIRG_EXCLUDEENTITY		= 1;
 
 // At the moment the AIRG_Flags variable is used only for the exclusion routine
 // but this may change.
@@ -245,14 +246,14 @@ void(float firstBlast) horn_airblast;
 .float grap_firetest;
 
 float GRAP_IDEAL				= 0; 		// Going nothing
-float GRAP_OUT				= 1; 		// It's outing out
+float GRAP_OUT					= 1; 		// It's outing out
 float GRAP_IN					= 2; 		// It's comming back to the owner
-float GRAP_TOHARPOON		= 3; 		// lengthen rope
+float GRAP_TOHARPOON			= 3; 		// lengthen rope
 float GRAP_FIXED				= 4; 		// The length is fixed.
 float GRAP_ROPESHORTEN		= 5; 		// shorten rope
-float GRAP_ROPELENGTHEN	= 6;		// lengthen rope
+float GRAP_ROPELENGTHEN		= 6;		// lengthen rope
 float GRAP_HARPOON			= 7;
-float GRAP_CORNER			= 8;
+float GRAP_CORNER				= 8;
 float GRAP_ROPE				= 9;
 
 
@@ -278,12 +279,12 @@ float ignorearmor;
 //float PK_SF_HUB = 16;
 string CL_BOBAMT                          = "cl_bob 0.02\n"; // val for turning view bob back on when not exited hub
 float PK_SF_HUB				= 1024;	// moved to pk_flags
-float PK_TP_TIMEMASK		= 63;
+float PK_TP_TIMEMASK			= 63;
 float inHubMap;
 .float voteIntermission;
 
 // MOTD
-float MOTDTIME				= 70;		// The amount of "frames" for the motd message (minimum should be 20)
+float MOTDTIME					= 70;		// The amount of "frames" for the motd message (minimum should be 20)
 float DONTALLOWBOTS			= 1;		// If we want to show anti bots messages at startup
 .float msgcount;
 void() updateStatusDisplay;
@@ -296,13 +297,13 @@ void() updateStatusDisplay;
 float BT_BUFFER				= 2;	  	// The nuber of secs people are immune to beartraps after spawning
 
 // Quake Packet Message
-float	SVC_CENTERPRINT	= 26;
+float	SVC_CENTERPRINT		= 26;
 
 .float disconnectPlayer;
 
 // If the SFX are enabled or not
 //float sparkFlashOff;
-float PK_TP_SPARKSFLASH	= 64;
+float PK_TP_SPARKSFLASH		= 64;
 
 // Last weapon stuff
 .float lastweapon;
@@ -333,8 +334,10 @@ void() admin_resettimeout;
 void () observer; // *bot
 float pk_flags_ck;
 float pk_itemovr_ck;
+float (float rl) AdminBitFlag;
+void() dyn_item;
 
-float PK_TP_STATUSON		= 256;
+float PK_TP_STATUSON			= 256;
 .float hubstartupmessage;
 .float messagetimeout;
 

@@ -144,6 +144,7 @@ void () weapon_airfist =
 	//setsize (self, '-15 -9 25', '17 9 43');
 	StartItem ();
 	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	pk_ditems = pk_ditems + 1;
 };
 
 /*QUAKED weapon_rmine (0 .5 .8) (-16 -16 0) (16 16 32)
@@ -167,6 +168,7 @@ void () weapon_chainlg =
 	setsize (self,'-16 -16 0','16 16 56');
 	StartItem ();
 	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+//	pk_ditems = pk_ditems + 1;
 };
 
 
@@ -184,8 +186,17 @@ void () weapon_grapgun =
 	setsize (self,'-16 -16 0','16 16 56');
 	StartItem ();
 	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	pk_ditems = pk_ditems + 1;
 };
 
+// dynamic items go away when touched
+
+void() pk_dyn_touch =
+{
+	if (self.classname != "dyn_item") return;
+	remove(self);
+	pk_ditems = pk_ditems - 1;
+};
 // called from below - handle ammo touch extras
 
 void() pk_ammo_touch =
@@ -282,6 +293,7 @@ void() pk_ammo_touch =
 
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
+	if (pk_flags & PK_DYNAMIC) pk_dyn_touch();
 };
 
 
@@ -441,6 +453,7 @@ else bprint(" )\n");}
 
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
+	if (pk_flags & PK_DYNAMIC) pk_dyn_touch();
 };
 
 
@@ -459,6 +472,7 @@ void () item_painkeep_gwell =
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
 	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	pk_ditems = pk_ditems + 1;
 };
 
 /*QUAKED item_painkeep_turret (0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -475,6 +489,7 @@ void () item_painkeep_turret =
 	setsize (self,'-7 -7 -7','4 7 21');
 	StartItem ();
 	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	pk_ditems = pk_ditems + 1;
 };
 
 /*QUAKED item_painkeep_lantern (0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -498,6 +513,7 @@ void () item_painkeep_can =
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
 	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	pk_ditems = pk_ditems + 1;
 };
 
 /*QUAKED item_painkeep_beartrap(0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -513,6 +529,7 @@ void () item_painkeep_beartrap =
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
 	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	pk_ditems = pk_ditems + 1;
 };
 
 
@@ -546,6 +563,7 @@ void () item_painkeep_expshells =
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
 	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+	pk_ditems = pk_ditems + 1;
 };
 
 // moved from items.qc - Cataboligne - 3.27.8
@@ -590,6 +608,10 @@ void() pk_item_position =
 
 	self.think = ip_checkForMovement;
 	self.nextthink = time + 60;
+
+	if (self.classname == "dyn_item")
+bprint(" err: dyn in ip ");
+
 };
 
 // called from PlaceItem, starts position think checks
@@ -600,6 +622,10 @@ void() pk_item_position_init =
 
 	self.think = ip_checkForMovement;
 	self.nextthink = time + 60;
+
+	if (self.classname == "dyn_item")
+bprint(" err: dyn in ip ");
+
 };
 
 // called from bound_ammo - bounds for pk ammo
@@ -907,7 +933,17 @@ void() PK_DropBackpack =
 
 void() pk_placeitem =
 {
-	pk_item_position_init();
+	if (self.classname != "dyn_item")
+	{
+		pk_item_position_init();
+	}
+	else
+	{
+bprint(" placed ");
+		self.velocity_z = 300 + 100 * random();
+		self.velocity_x = -100 + (random() * 200);
+		self.velocity_y = -100 + (random() * 200);
+	}
 
 // handle extra item stuff
 	self.pk_touch = self.touch;
@@ -1013,13 +1049,16 @@ void(string cls) item_call =
 	else if (cls == "weapon_airfist") weapon_airfist();
 	else if (cls == "item_painkeep_can") item_painkeep_can();
 	else return;
-	self.classname = cls;
-	if (PK) pk_placeitem();
+	if (self.classname != "dyn_item") // dont do these for dyn items
+	{
+		self.classname = cls;
+		if (PK) pk_placeitem();
+		self.think = SUB_regen; // dont go thru place_item - use regen method
+		self.nextthink = time + 1 + 3 * random(); // spread em out
+	}
 	self.mdl = self.model;
 	self.model = string_null;
 	self.solid = SOLID_NOT;
-	self.think = SUB_regen; // dont go thru place_item - use regen method
-	self.nextthink = time + 1 + 3 * random(); // spread em out
 };
 
 void() item_down =
@@ -1263,7 +1302,7 @@ void() infinite_ammo =
 			if (pk_itemovr & WEP_GREN) e.ammo_rockets = 99;
 			if (e.items & IT_ROCKET_LAUNCHER)
 			if (pk_itemovr & WEP_ROCKET) e.ammo_rockets = 99;
-			if (e.items & IT_LIGHTNING)
+			if (e.items & IT_LIGHTNING || e.pk_items & PK_IT_CLIGHT)
 			if (pk_itemovr & WEP_THUNDER) e.ammo_cells = 99;
 		}
 		e = find(e, classname,src);
@@ -1273,5 +1312,90 @@ void() infinite_ammo =
 			src = "pk*bot";
 			e = find(world, classname,src);
 		}
+	}
+};
+
+// fn(dyn_spawn) - create an item
+
+void() dyn_spawn =
+{
+	local vector od;
+	local entity e;
+	local string src, lc;
+	float bt, sf;
+
+// get a random origin
+	sf = 500;
+	od = ' 0 0 0';
+	while (od == ' 0 0 0' && sf > 0)
+	{
+		bt = floor(16 * random());
+		src = item_by_bit(bt);
+		e = find(world,classname,src);
+		while (e)
+		{
+			if (random() < 0.25) { od = e.origin; lc = e.classname; } // just hope this is a good origin
+			e = find(e, classname,src);
+		}
+		sf = sf - 1;
+	}
+	if (od == ' 0 0 0') // failed ? - try a player
+	{
+		e = find(world,classname,"player");
+		if (!e)
+		{
+			remove(self);
+			return;
+		}
+		else { od = e.origin; lc = e.classname; }
+	}
+	self.origin = od + ' 0 0 16';
+bprint("dynamic spawning: ");
+bprint(self.wad);
+bprint(" at: ");
+bprint(vtos(self.origin));
+bprint(" - ");
+bprint(lc);
+	item_call(self.wad);
+	bprint("\n");
+};
+
+// think to handle dynamic item spawns if enabled
+
+void() dyn_item =
+{
+	float cd;
+	entity e;
+
+	if (self.classname != "dyn_spawner")
+	{
+bprint("*** dynamic items entry: ");
+bprint(ftos(pk_ditems));
+bprint(" items total\n");
+		self.classname = "dyn_spawner";
+		self.nextthink = time + 40 + 20 * crandom();
+		self.count = 4 + 4 * random();
+		if (pk_ditems > 6) remove(self);
+	}
+	else if (!pk_flags & PK_DYNAMIC) // got turned off go away
+		remove(self);
+	else if (pk_ditems < self.count)
+	{
+		cd = 1 + 2 * random();
+		while (cd > 0.2)
+		{
+			e = spawn();
+			if (e)
+			{
+				e.think = dyn_spawn;
+				e.nextthink = 3 + 12 * random(); // time spread
+				e.classname = "dyn_item";
+				e.cnt = AdminBitFlag(floor(7 + 6.4 * random())); // item to spawn
+				e.wad = ammo_by_bit(e.cnt); // classname to spawn
+//				pk_ditems = pk_ditems + 1; // done in spawn
+			}
+			cd = cd - 1;
+		}
+		self.nextthink = time + 40 + 20 * crandom();
 	}
 };

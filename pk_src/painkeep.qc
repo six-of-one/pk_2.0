@@ -187,7 +187,7 @@ void() PK_precache =
 
 	pk_itemovr = pk_itemovr_ck = cvar("saved3"); // admin override of map items
 
-	if (FALSE) // test - disabled
+	if (FALSE) // TEST - disabled
 	if (pk_itemovr & CON_RUN) // change some items - admin override
 	{
 		e = spawn();
@@ -220,6 +220,19 @@ void() PK_precache =
 		admin_sv_cfg();
 	}
 
+// setup dynamic items
+
+	if (PK)
+	if (pk_flags & PK_DYNAMIC)
+	{
+		pk_ditems = 0;
+		e = spawn();
+		if (e)
+		{
+			e.think = dyn_item;
+			e.nextthink = time + 1; // do this well after items spawn
+		}
+	}
 // extra sounds by...are apparently not supplied, except gib_?.wav
 
 	pk_xsound = (pk_flags & PK_XSOUND);
@@ -334,7 +347,48 @@ float(string mp) PK_mapmode =
 	else if (mp == "maps/pk17.bsp") md = TRUE;
 	else if (mp == "maps/pk18.bsp") md = TRUE;
 	else if (mp == "maps/painkeep.bsp") md = TRUE;
-
+	else if (PK_ADHUB)	// add on maps from painkeep updates
+	{
+		if (mp == "maps/hub2.bsp") md = TRUE;
+		else if (mp == "maps/hub3.bsp") md = TRUE; // renamed for 1.2 code to work with main hub (start.bsp)
+		else if (mp == "maps/painkeep2.bsp") md = TRUE;
+		else if (mp == "maps/pkts00.bsp") md = TRUE;
+		else if (mp == "maps/pkts01.bsp") md = TRUE;
+		else if (mp == "maps/pkts02.bsp") md = TRUE;
+		else if (mp == "maps/pkts03.bsp") md = TRUE;
+		else if (mp == "maps/pkts04.bsp") md = TRUE;
+		else if (mp == "maps/pkts05.bsp") md = TRUE;
+		else if (mp == "maps/pkts06.bsp") md = TRUE;
+		else if (mp == "maps/pkts07.bsp") md = TRUE;
+		else if (mp == "maps/pkts08.bsp") md = TRUE;
+		else if (mp == "maps/pkts09.bsp") md = TRUE;
+		else if (mp == "maps/pkts10.bsp") md = TRUE;
+		else if (mp == "maps/pkts11.bsp") md = TRUE;
+		else if (mp == "maps/pkts12.bsp") md = TRUE;
+		else if (mp == "maps/pkts13.bsp") md = TRUE;
+		else if (mp == "maps/pkts14.bsp") md = TRUE;
+	//	else if (mp == "maps/pkts15.bsp") md = TRUE;
+		else if (mp == "maps/pkn1.bsp") md = TRUE;
+		else if (mp == "maps/pkn2.bsp") md = TRUE;
+		else if (mp == "maps/pkn3.bsp") md = TRUE;
+		else if (mp == "maps/pkn4.bsp") md = TRUE;
+		else if (mp == "maps/pkn5.bsp") md = TRUE;
+		else if (mp == "maps/pkn6.bsp") md = TRUE;
+		else if (mp == "maps/pkn7.bsp") md = TRUE;
+		else if (mp == "maps/pkn8.bsp") md = TRUE;
+		else if (mp == "maps/pkn9.bsp") md = TRUE;
+		else if (mp == "maps/pkn10.bsp") md = TRUE;
+		else if (mp == "maps/pkn11.bsp") md = TRUE;
+		else if (mp == "maps/pkn12.bsp") md = TRUE;
+		else if (mp == "maps/pkn13.bsp") md = TRUE;
+		else if (mp == "maps/pkn14.bsp") md = TRUE;
+		else if (mp == "maps/pkn15.bsp") md = TRUE;
+		else if (mp == "maps/pkn16.bsp") md = TRUE;
+		else if (mp == "maps/pkn17.bsp") md = TRUE;
+		else if (mp == "maps/pkn18.bsp") md = TRUE;
+		else if (mp == "maps/pkn19.bsp") md = TRUE;
+		else if (mp == "maps/pkn20.bsp") md = TRUE;
+		}
 	return(md);
 };
 
