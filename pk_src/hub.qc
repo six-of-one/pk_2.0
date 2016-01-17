@@ -134,6 +134,25 @@ void() hub_teleport =
 		- later - add other PK customizations such as zombies, gfx, sfx, etc
 */
 
+// select hub map - back to plain old painkeep hub, check_custom_hub handles custom hubs now
+
+string() hub_select =
+{
+	return ("start");
+};
+
+// fn(check_custom_hub) - check for return to a custom hub when exiting or admin reseting hub
+
+void() check_custom_hub =
+{
+	if (custom_hub_loaded) //pk_flags & PK_HUB2)
+	{
+//		pk_flags = pk_flags - (pk_flags & PK_HUB2);
+//		admin_sv_cfg();
+		if (pk_flags & PK_SF_HUB) localcmd("hubmap\n");  // custom hub - use alias to reload
+	}
+};
+
 // fn(hub_custom) - implement the custom hub - portal
 
 void() hub_custom =
@@ -151,6 +170,8 @@ void() hub_custom =
 
 	self.classname = "hub_teleport";
 	hub_teleport(); // init hub portal
+
+	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 
 // set appearance - model has different frames & skins for variety
 // IDEA - set facing in cphub? - not for now, all portals should be "directionless"
@@ -394,6 +415,11 @@ void() hub_control_use =
 	self.think = execute_changelevel;
 	self.nextthink = time + 0.1;
 //	changelevel (highest.map);
+	if (custom_hub_loaded) // || self.map
+	{
+		pk_flags = PK_HUB2 | pk_flags; // return to custom hub after this map
+		admin_sv_cfg();
+	}
 };
 
 //void() hub_timer_think =
@@ -458,9 +484,6 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerVote
 	WriteBFloat(MSG_ONE, timesec);
 	WriteByte(MSG_ONE, 0);
 };
-
-
-
 
 
 
@@ -607,11 +630,11 @@ void() hub_control =
 
 	if (theHub)
 	{
-		objerror("Only 1 hub may be in existance.");
-// FIX - Cataboligne 10.2.8 - improvment:
+//		objerror("Only 1 hub may be in existance.");
+// Cataboligne 10.2.8 - improvment:
 // already have a hub - why not remove and continue?
-//		bprint("Map tried to create a second hub - removing.");
-//		remove(self);
+		bprint("Map tried to create a second hub - removing.");
+		remove(self);
 		return;
 	}
 	theHub = self;
@@ -622,8 +645,9 @@ void() hub_control =
 		self.use = hub_control_use;
 	}
 	// activated or timeout?
-	else if (self.wait) // FIX - Cataboligne - if no self.wait, why not just pick a default?
+	else 
 	{
+		if (!self.wait) self.wait = 120; // Cataboligne - if no self.wait, why not just pick a default?
 		self.think = hub_control_use;
 		// create timer
 //		timer = spawn();
@@ -640,19 +664,23 @@ void() hub_control =
 			hubStartTime = self.nextthink = time + self.wait;
 //			timer.nextthink = time + self.wait;
 	}
-	else
-	{
-		objerror("hub_control without targetname OR wait"); // FIX - lose this
-	}
 
 //	self.think = hub_control_status;
 //	self.nextthink = time + 30.0;
 
 // custom hub check - set alias if map is defined
+	if (world.model == "maps/hub2.bsp")
+	{
+		self.map = "hub2";
+	}
+	else if (world.model == "maps/hub3.bsp")
+	{
+		self.map = "hub3";
+	}
 	if (self.map)
 	{
-		pk_flags = PK_HUB2 | pk_flags;
-		localcmd("alias hubmap \"map ");
+		custom_hub_loaded = TRUE;
+		localcmd("alias hubmap \"changelevel ");
 		localcmd(self.map);
 		localcmd("\"\n");
 	}
@@ -660,6 +688,7 @@ void() hub_control =
 	// so later levels know about it...
 	pk_flags = pk_flags | PK_SF_HUB;
 	inHubMap = 1;
+	admin_sv_cfg();
 };
 
 void() GoBack =

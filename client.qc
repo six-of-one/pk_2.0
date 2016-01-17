@@ -340,7 +340,8 @@ void () changelevel_touch =
 	}
 
 	nextmap = self.map;
-	if (PK)
+	check_custom_hub();
+	if (PK || !PK_HUBEXIT)
 	if (pk_flags & PK_SF_HUB) // *pk - using voting / hub system - nextmap is always hub
 		nextmap = hub_select(); //"start"; // *pk - if we're working with the hub system, then let's override this and go to the hub
 
@@ -693,7 +694,8 @@ void () NextLevel =
 		}
 	}
 
-	if (PK)
+	check_custom_hub();
+	if (PK || !PK_HUBEXIT)
 	if (pk_flags & PK_SF_HUB) // *pk - using voting / hub system - nextmap is always hub
 		o.map = hub_select(); //"start"; // *pk - if we're working with the hub system, then let's override this and go to the hub
 	nextmap = o.map;

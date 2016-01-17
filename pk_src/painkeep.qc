@@ -191,7 +191,7 @@ void() PK_precache =
 
 // causes item overrides to happen on map load
 
-	if (FALSE) // TEST - disabled
+//	if (FALSE) // disabled
 	if (pk_itemovr & CON_RUN) // change some items - admin override
 	{
 		e = spawn();
@@ -218,10 +218,14 @@ void() PK_precache =
 		PK = PK_mapmode(world.model);
 	}
 
-	if (world.model == "maps/start.bsp" && world.message == "hub")
+	custom_hub_loaded = pk_flags & PK_HUB2; // see if we came from a custom hub
+// run this and a non PK map loaded with map command exits custom hub loop as with normal hub under v1.2
+	if (PK_HUBEXIT) pk_flags = pk_flags - (pk_flags & PK_HUB2);
+	admin_sv_cfg();
+	if (world.model == "maps/start.bsp" && world.message == "HUB")
 	{
-		pk_flags = pk_flags - (pk_flags & (PK_HUB2));
-		admin_sv_cfg();
+		custom_hub_loaded = FALSE;
+		localcmd("alias hubmap \"bf\"\n"); // always deactivate
 	}
 
 // setup dynamic items
@@ -308,19 +312,6 @@ void() PK_precache =
 	*/
 };
 
-// select hub map - now handles any custom map with alias cmd hubmap
-
-string() hub_select =
-{
-	local string mp;
-
-	mp = "start";
-	if (PK)
-	{
-		if (pk_flags & PK_HUB2) localcmd("hubmap\n");  // custom hub - use alias to reload
-	}
-	return (mp);
-};
 // set mode based on map name
 
 float(string mp) PK_mapmode =

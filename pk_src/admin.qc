@@ -283,9 +283,10 @@ void() MapStart =
 {
 	local string mp;
 
-	mp = hub_select();
-	bprint("Admin loaded hub / start map...\n");
 	bot_changelevel(); // *bot - reload bots on next level, handle intermission
+	bprint("Admin loaded hub / start map...\n");
+	check_custom_hub();
+	mp = hub_select();
 	changelevel(mp);
 };
 
@@ -297,7 +298,7 @@ MapDM
 void() Admin_dmmapmenu2 =
 {
 	self.message =
-					 "\b Painkeep DM map Menu 2:\n"
+					 "\b Painkeep map expansion:\n"
 					 "\b+------------------------+\n"
 						"  01: pkts00   21: pkn1   \n"
 						"  02: pkts01   22: pkn2   \n"
@@ -316,21 +317,26 @@ void() Admin_dmmapmenu2 =
 						"  15: pkts14   35: pkn15  \n"
 						"    :          36: pkn16  \n"
 						"    :          37: pkn17  \n"
-						"  18: hub2     38: pkn18  \n"
-						"  19: hub3     39: pkn19  \n"
+						"  18: hub2 *   38: pkn18  \n"
+						"  19: hub3 *   39: pkn19  \n"
 						"    :          40: pkn20  \n"
 						"  41: painkeep2           \n"
+						"  42: custom hub          \n"
 						"  60: original maps       \n"
+						"  61: list hub links      \n"
 						" 666: main menu           \n"
 						"  admin impulse exits     \n"
 					 "\b+------------------------+\n"
+					 "              * you must rename or link hub2 & hub3\n"
 					 "\b Enter code: ";
 };
 
 void() Admin_dmmapmenu =
 {
+	if (PK_ADHUB)
+	{
 	self.message =
-					 "\b  Painkeep DM map Menu:\n"
+					 "\b  Painkeep map Menu:\n"
 					 "\b+------------------------+\n"
 						"    01:  pk1    11: pk11  \n"
 						"    02:  pk2    12: pk12  \n"
@@ -349,11 +355,34 @@ void() Admin_dmmapmenu =
 						"  admin impulse exits     \n"
 					 "\b+------------------------+\n"
 					 "\b Enter code: ";
+	if (self.cnt) Admin_dmmapmenu2();
+	}
+	else
+	{
+	self.message =
+					 "\b  Painkeep DM map Menu:\n"
+					 "\b+------------------------+\n"
+						"    01:  pk1    11: pk11  \n"
+						"    02:  pk2    12: pk12  \n"
+						"    03:  pk3    13: pk13  \n"
+						"    04:  pk4    14: pk14  \n"
+						"    05:  pk5    15: pk15  \n"
+						"    06:  pk6    16: pk16  \n"
+						"    07:  pk7    17: pk17  \n"
+						"    08:  pk8    18: pk18  \n"
+						"    09:  pk9    19: pk0   \n"
+						"    10:  pk10   21: hub   \n"
+						"    20:  painkeep         \n"
+						"    61:  list hub links   \n"
+						"   666:  main menu        \n"
+						"  admin impulse exits     \n"
+					 "\b+------------------------+\n"
+					 "\b Enter code: ";
+	}
 
 	self.wad = "";
 	self.admin = 14;
 	self.lefty = 0;
-	if (self.cnt) Admin_dmmapmenu2();
 };
 
 // new pk maps in conv pack - return map name
@@ -399,31 +428,31 @@ string() MapDM2 =
 	else if (self.lefty == 38) mname = "pkn18";
 	else if (self.lefty == 39) mname = "pkn19";
 	else if (self.lefty == 40) mname = "pkn20";
+	else if (self.lefty == 42)
+	{
+		mname = "";
+		bot_changelevel(); // *bot - reload bots on next level, handle intermission
+		bprint("Admin loaded custom hub / start map...\n");
+		check_custom_hub(); 
+	}
 	else if (self.lefty == 18)
 	{
 		mname = "hub2";
-		pk_flags = PK_HUB2 | pk_flags;
-		localcmd("alias hubmap \"map ");
-		localcmd(mname);
-		localcmd("\"\n");
 	}
 	else if (self.lefty == 19)
 	{
 		mname = "hub3";
-		localcmd("alias hubmap \"map ");
-		localcmd(mname);
-		localcmd("\"\n");
-		pk_flags = PK_HUB2 | pk_flags;
 	}
 	return(mname);
 };
 
+// parse code for regular painkeep hub maps
 
 float() MapDM =
 {
 	local string mname;
 
-	if (self.cnt && self.lefty < 60) mname = MapDM2();
+	if (PK_ADHUB && self.cnt && self.lefty < 60) mname = MapDM2();
 	else if (self.lefty == A_PAINKEEP) mname = "painkeep";
 	else if (self.lefty == A_PK0) mname = "pk0";
 	else if (self.lefty == A_PK1) mname = "pk1";
@@ -447,7 +476,7 @@ float() MapDM =
 	else if (self.lefty == A_PKHUB)
 	{
 		mname = "start";
-		pk_flags = pk_flags - (pk_flags & (PK_HUB2));
+		pk_flags = pk_flags - (pk_flags & PK_HUB2); // just in case we were on a custom hub
 	}
 	else
 	{
@@ -466,11 +495,14 @@ float() MapDM =
 			{
 				bprint(e.map);
 				bprint(", trg: ");
-				b = world;
 				dx = 8001;
 				e.origin = (e.absmin + e.absmax) * 0.5;
 				f = findradius(e.origin, 8000);
 //bprint("\n");
+				b = e;
+			 if (b.model != "progs/hub_port.mdl")
+			  {
+				b = world;
 				while (f)
 				{
 					if (f.classname == "trigger_multiple")
@@ -490,6 +522,7 @@ float() MapDM =
 					}
 				f = f.chain;
 				}
+			  }
 				if (!b) bprint("NO TRIGGER!");
 				else { bprint(b.message); if (fabs(b.origin_z - e.origin_z) > 25) { bprint(" : Z > 25");} }// bprint(c.message); }
 				bprint("\n");
@@ -919,7 +952,7 @@ void() AdminCommands =
 		if (self.lefty == A_START) MapStart(); else
 		if (self.lefty == A_DMMAP)
 		{
-			self.cnt = pk_flags & (PK_HUB2);
+			self.cnt = custom_hub_loaded; // pk_flags & PK_HUB2;
 			Admin_dmmapmenu();
 		}
 		else

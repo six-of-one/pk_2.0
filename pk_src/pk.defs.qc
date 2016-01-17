@@ -12,14 +12,17 @@ float PK_DYNAMIC				= 8192;	// bit *	= TRUE --- when always in painkeep mode & n
 float PK_SPIKER				= 16384;	// bit *	= FALSE -- allow spike traps, set to true for original pk treatment of spike shooters - they are removed
 float PK_XSOUND				= 32768;	// bit * = TRUE --- use extra pk sound set
 
-float PK_HUB2					= 131072; // bit if TRUE, using custom hub - reload at hub loads via alias cmd hubmap
+float PK_HUB2					= 131072; // bit if TRUE, using custom hub - only used for level transtion from hub vote
 //float PK_HUB3					= 262144; // bit if TRUE, using hub3 - reload at hub loads - deprecated
-float PK_ADHUB					= 1;		 // set to 0 PK_mapmode will ignore new maps - item load can still set PK mode
+float PK_ADHUB					= 1;		// set to 0 PK_mapmode and admin menu will ignore new maps - item load can still set PK mode for any pk map
+float PK_HUBEXIT				= FALSE;	// TRUE - loading a non PK map while running a custom hub exits the hub loop, FALSE - always return to a custom hub from any map load
+
 string st_hub2					= "hub2"; // map names for 2nd & 3rd hub
 string st_hub3					= "hub3";
 
 float pk_flags;							// replaces old usage of temp1, savedgamecfg stores this
 float pk_xsound;							// set to state of PK_XSOUND bit for sound code toggle
+
 float pk_itemovr;							// control items - admin override
 float pk_map;								// true if a painkeep map is loaded
 float pk_ditems;							// count painkeep items for dyn_items code
@@ -46,6 +49,7 @@ string ADMINIMPULSE			= "float2\n"; // load the impulse
 string ADMINTIME				= "float3\n"; // load the time out
 
 // item admin
+
 float WEP_SSHOT				= 1; 	 // admin of super shotgun
 float WEP_NAILGUN				= 2; 	 // admin of nailgun
 float WEP_PERF					= 4; 	 // admin of super nailgun
@@ -283,7 +287,11 @@ string CL_BOBAMT                          = "cl_bob 0.02\n"; // val for turning 
 float PK_SF_HUB				= 1024;	// moved to pk_flags
 float PK_TP_TIMEMASK			= 63;
 float inHubMap;
+float custom_hub_loaded;				// if TRUE custom hub is used
+
 .float voteIntermission;
+string() hub_select;
+void() check_custom_hub;
 
 // MOTD
 float MOTDTIME					= 70;		// The amount of "frames" for the motd message (minimum should be 20)

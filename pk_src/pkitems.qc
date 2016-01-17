@@ -940,7 +940,6 @@ void() pk_placeitem =
 	}
 	else
 	{
-bprint(" placed ");
 		self.velocity_z = 300 + 100 * random();
 		self.velocity_x = -170 + (random() * 340);
 		self.velocity_y = -170 + (random() * 340);
@@ -1367,6 +1366,7 @@ void() dyn_spawn =
 	}
 	rseu = sv;
 	self.origin = sv.origin + ' 0 0 16';
+// give players notice
 bprint("dyn found ");
 bprint(ftos(ri));
 bprint(" -items, spawning: ");
@@ -1399,6 +1399,8 @@ bprint(" items total\n");
 		self.nextthink = time + 5;// TEST 40 + 20 * crandom();
 		self.count = 4 + 4 * random();
 		if (pk_ditems > 6) remove(self);
+		else
+			bprint("Dynamic items will spawn on this map - keep an eye out\n");
 	}
 	else if (!PK || !pk_flags & PK_DYNAMIC) // got turned off go away
 		remove(self);
