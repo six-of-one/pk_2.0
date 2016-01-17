@@ -1317,77 +1317,69 @@ void() infinite_ammo =
 };
 
 // fn(dyn_spawn) - create an item
+// fn(dyn_rem) - remove a dynamic item after a timeout
+
+void() dyn_rem =
+{
+	remove(self.enemy);
+	remove(self);
+	pk_ditems = pk_ditems - 1;
+}
+
+entity rseu; // random spawn ent origin used
 
 void() dyn_spawn =
 {
-	local vector od;
-	local entity e;
-	local string src, lc;
-	float bt, sf;
+	local entity e, sv;
+	local string src;
+	float ri, sf;
 
 // get a random origin
-	sf = 450;
-	od = ' 0 0 0';
-	if (random() < 0.8) // 70% these
-	while (od == ' 0 0 0' && sf > 0) // try a non wep first - armor, artifact, health
+	ri = sf = 0;
+	sv = e = find(world,classname,"player");
+	while (e)
 	{
-		bt = 7 + floor(9 * random());
-		if (bt & HEAL_HEALS)
-			src = "item_health";
-		else
-			src = item_by_bit(bt);
-		e = find(world,classname,src);
-		while (e)
-		{
-			if (random() < 0.33) { od = e.origin; lc = e.classname; } // just hope this is a good origin
-			e = find(e, classname,src);
-		}
+		sv = e;
+		e = find(e,classname,"player");
+	}
+	e = findradius(sv.origin, PK_DYNRAD);
+	if (!e) return; // nothing found!
+	sv = e;
+	while (e.chain)
+	{
+		if (!e.chain) e = world;
+		else if (e.chain.flags & FL_ITEM) { ri = ri + 1; e = e.chain; }
+		else if (e.chain.classname == "info_player_deathmatch") { ri = ri + 1; e = e.chain; }
+		else if (e.chain.classname == "info_teleport_destination") { ri = ri + 1; e = e.chain; }
+		else if (e.chain.classname == "path_corner") { ri = ri + 1; e = e.chain; }
+		else if (e.chain.classname == "hub_custom") { ri = ri + 1; e = e.chain; }
+//		else if (e.chain.classname == "") { ri = ri + 1; e = e.chain; }
+		else e.chain = e.chain.chain; // skipper!
+	}
+	e = sv;
+	sf = ri * random(); // pick a random ent from list - idea: prioritize away from weps?
+	while (sf > 0 && e)
+	{
+		if (rseu == e && ri > 2) { sf = sf - 1; e = e.chain; } // skipper!
+		if (e) sv = e;
+		e = e.chain;
 		sf = sf - 1;
 	}
-	sf = 250;
-	while (od == ' 0 0 0' && sf > 0) // not found - try ammo
-	{
-		bt = floor(5 * random());
-		src = ammo_by_bit(bt);
-		e = find(world,classname,src);
-		while (e)
-		{
-			if (random() < 0.33) { od = e.origin; lc = e.classname; }
-			e = find(e, classname,src);
-		}
-		sf = sf - 1;
-	}
-	sf = 250;
-	while (od == ' 0 0 0' && sf > 0) // not found - try weps
-	{
-		bt = floor(6 * random());
-		src = item_by_bit(bt);
-		e = find(world,classname,src);
-		while (e)
-		{
-			if (random() < 0.25) { od = e.origin; lc = e.classname; }
-			e = find(e, classname,src);
-		}
-		sf = sf - 1;
-	}
-	if (od == ' 0 0 0') // total search fail y/y? - try a player
-	{
-		e = find(world,classname,"player");
-		if (!e)
-		{
-			remove(self);
-			return;
-		}
-		else { od = e.origin; lc = e.classname; }
-	}
-	self.origin = od + ' 0 0 16';
-bprint("dynamic spawning: ");
+	rseu = sv;
+	self.origin = sv.origin + ' 0 0 16';
+bprint("dyn found ");
+bprint(ftos(ri));
+bprint(" -items, spawning: ");
 bprint(self.wad);
 bprint(" at: ");
 bprint(vtos(self.origin));
 bprint(" - ");
-bprint(lc);
+bprint(sv.classname);
 	item_call(self.wad);
+	sv = spawn();
+	sv.enemy = self;
+	sv.think = dyn_rem;
+	sv.nextthink = time + PK_DYNTO + crandom() * 55;
 	bprint("\n");
 };
 
@@ -1412,6 +1404,7 @@ bprint(" items total\n");
 		remove(self);
 	else
 	{
+	if (pk_ditems < 0) pk_ditems = 0;
 	if (pk_ditems < self.count)
 	 {
 		cd = 1 + 2 * random();

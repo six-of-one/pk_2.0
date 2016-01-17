@@ -1375,6 +1375,8 @@ void() admin_clear =
 ============
 Admin Impulse code
 ============
+
+a series of ents to think data from alias assignments.
 */
 
 void() PK_SetAdmin =

@@ -23,6 +23,8 @@ float pk_xsound;							// set to state of PK_XSOUND bit for sound code toggle
 float pk_itemovr;							// control items - admin override
 float pk_map;								// true if a painkeep map is loaded
 float pk_ditems;							// count painkeep items for dyn_items code
+float PK_DYNTO					= 120;	// timeout in 120 secs
+float PK_DYNRAD				= 8000;	// dynamic radius search 8000 units
 float DARKPLACES_ENGINE		= 3275;	// for detecting darkplaces - modded engine sets cvar("chaos") to this value
 float chaos;
 
