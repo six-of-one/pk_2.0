@@ -149,7 +149,11 @@ void() check_custom_hub =
 	{
 //		pk_flags = pk_flags - (pk_flags & PK_HUB2);
 //		admin_sv_cfg();
-		if (pk_flags & PK_SF_HUB) localcmd("hubmap\n");  // custom hub - use alias to reload
+		if (pk_flags & PK_SF_HUB)
+		{
+			bot_changelevel(); // *bot - reload bots on next level, handle intermission
+			localcmd("hubmap\n");  // custom hub - use alias to reload
+		}
 	}
 };
 
@@ -716,6 +720,10 @@ void() GoBack =
 
 void(string mapName) findAndPrintMapName =
 {
+	local entity e;
+	if (first.map == mapName) e = first;
+	else e = second;
+
 	if (mapName == "painkeep")
 	{
 		// 'PainKeep'
@@ -839,6 +847,22 @@ void(string mapName) findAndPrintMapName =
 		// 'pk20'
 		WriteB3(MSG_ONE, 3304304);
 		WriteB3(MSG_ONE, 48);
+	}
+	else if (e.model == "progs/hub_port.mdl")
+	{
+		if (e.mangle != ' 0 0 0')
+		{
+			WriteB3(MSG_ONE, e.mangle_x); // vector stored float for 9 char of map name
+			WriteB3(MSG_ONE, e.mangle_y);
+			WriteB3(MSG_ONE, e.mangle_z);
+			WriteB3(MSG_ONE, 32);
+		}
+		else
+		{
+			WriteB3(MSG_ONE, 7566691); // 'custom map' - hub admin didnt supply a vector xlate msg
+			WriteB3(MSG_ONE, 7171956);
+			WriteB3(MSG_ONE, 6384928);
+		}
 	}
 	else
 	{

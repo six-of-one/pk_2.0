@@ -770,14 +770,14 @@ void() BotInit =
 	b_options = cvar("saved1");
 // TEST
 //bprint("\b***** BotInit - read saved1\n");
-	if (coop || (b_options & OPT_SAVEBOTS))
-	{
+//	if (coop || (b_options & OPT_SAVEBOTS))
+//	{
 // TEST
 //bprint("\b***** BotInit - read scratch1-3\n");
 		saved_bots = cvar("scratch1");
 		saved_skills1 = cvar("scratch2");
 		saved_skills2 = cvar("scratch3");
-	}
+//	}
 // TEST
 //bprint("\b***** BotInit - set saved4\n");
 	cvar_set ("saved4", "0");

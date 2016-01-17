@@ -431,7 +431,7 @@ string() MapDM2 =
 	else if (self.lefty == 42)
 	{
 		mname = "";
-		bot_changelevel(); // *bot - reload bots on next level, handle intermission
+//		bot_changelevel(); // *bot - reload bots on next level, handle intermission
 		bprint("Admin loaded custom hub / start map...\n");
 		check_custom_hub(); 
 	}

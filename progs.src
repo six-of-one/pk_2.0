@@ -87,6 +87,10 @@ pk_src/admin.qc
 
 // pk_src/frames.qc - not in original progs.src
 
+// support for q3 maps in darkplaces
+pk_src/q3items.qc
+
+
 bot.qc
 bot_func.qc
 botfight.qc
