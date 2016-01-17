@@ -139,7 +139,7 @@ void() hub_teleport =
 void() hub_custom =
 {
 	local entity e;
-	local vector v,v2;
+	local vector v;
 
 	if (!self.map)
 	{
@@ -158,6 +158,8 @@ void() hub_custom =
 	setsize(self, self.mins, self.maxs);
 	self.frame = self.delay;
 	self.skin = self.wait;
+	if (self.style) self.effects = EF_DIMLIGHT; // lite er up
+//	if (self.frame) setorigin(self, self.origin + ' 0 0 -20'); // adjust on bprint
 
 // trigger for message
 	e = self;
@@ -191,23 +193,44 @@ void() pk_cphub =
 	if (pk_chubcon != 666) // print a hub control ent to start
 	{
 		bprint("{\n\"classname\" \"hub_control\"\n\"target\" \"votes\"\n\"wait\" \"180\"\n\"map\" \"start\"\n\"origin\" \"0 0 -10000\"\n}\n");
+		bprint("// hub model\n");
+		bprint("// delay = 0, ball with lightning\n");
+		bprint("//       = 1, capped column\n");
+		bprint("//       = 2, obelisk with base\n");
+		bprint("//       = 3, pyramid with base\n");
+		bprint("//       = 4, cube with base\n");
+		bprint("// hub skin\n");
+		bprint("// wait =  0, dark stone cap / base\n");
+		bprint("//      =  1, green stone cap / base\n");
+		bprint("//      =  2, red stone cap / base\n");
+		bprint("//      =  3, red cap / base\n");
+		bprint("//      =  4, blue cap / base\n");
+		bprint("//      =  5, yellow cap / base\n");
+		bprint("//      =  6, purple cap / base\n");
+		bprint("//      =  7, black cap / base\n");
+		bprint("//      =  8, red stone cap / base, yellow teleport\n");
+		bprint("//      =  9, red cap / base, yellow teleport\n");
+		bprint("//      = 10, yellow cap / base, red teleport\n");
+		bprint("//      = 11, black cap / base, red teleport\n");
 		pk_chubcon = 666;
 		if (cvar("saved1") != 482) bprint("// map MUST be set to your custom hub for reload!\n// change wait to set a different hub timeout\n");
 	}
 	if (cvar("saved1") != 482)
 	{
 		bprint("{\n\"classname\" \"hub_custom\"\n\"targetname\" \"votes\"\n\"map\" \"start\"          // change to custom map base filespec - exclude .bsp\n");
-		bprint("\"message\" \"Start Hub\"  // change to custom map message text\n\"delay\" \"0\"            // change to hub model custom frame number\n");
-		bprint("\"wait\" \"0\"             // change to hub model custom skin number\n\"origin\" \"");
+		bprint("\"message\" \"Start (hub)\"  // change to custom map message text\n\"delay\" \"0\"            // change to hub model custom frame number\n");
+		bprint("\"wait\" \"0\"             // change to hub model custom skin number\n");
+		bprint("\"style\" \"1\"            // change to 0 - remove light from hub\n\"origin\" \"");
 	}
 	else
 	{
 		bprint("{\n\"classname\" \"hub_custom\"\n\"targetname\" \"votes\"\n\"map\" \"start\"\n");
 		bprint("\"message\" \"Start Hub\"\n\"delay\" \"0\"\n");
-		bprint("\"wait\" \"0\"\n\"origin\" \"");
+		bprint("\"wait\" \"0\"\n\"style\" \"1\"\n\"origin\" \"");
 	}
-	bprint(vtos(self.origin));
+	bprint(vtos(self.origin + ' 0 0 -20'));
 	if (cvar("saved1") != 482) bprint("\"  // you must remove ' and ' from origin vector");
+	else bprint("\"");
 	bprint("\n}\n");
 };
 
