@@ -220,7 +220,6 @@ void() PK_precache =
 
 	if (world.model == "maps/start.bsp" && world.message == "hub")
 	{
-//		pk_flags = pk_flags - (pk_flags & (PK_HUB2 | PK_HUB3));
 		pk_flags = pk_flags - (pk_flags & (PK_HUB2));
 		admin_sv_cfg();
 	}
@@ -309,7 +308,7 @@ void() PK_precache =
 	*/
 };
 
-// select hub map
+// select hub map - now handles any custom map with alias cmd hubmap
 
 string() hub_select =
 {
@@ -319,8 +318,6 @@ string() hub_select =
 	if (PK)
 	{
 		if (pk_flags & PK_HUB2) localcmd("hubmap\n");  // custom hub - use alias to reload
-//		if (pk_flags & PK_HUB2) mp = "hub2";
-//		else if (pk_flags & PK_HUB3) mp = "hub3";
 	}
 	return (mp);
 };

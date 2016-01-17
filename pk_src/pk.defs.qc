@@ -12,8 +12,8 @@ float PK_DYNAMIC				= 8192;	// bit *	= TRUE --- when always in painkeep mode & n
 float PK_SPIKER				= 16384;	// bit *	= FALSE -- allow spike traps, set to true for original pk treatment of spike shooters - they are removed
 float PK_XSOUND				= 32768;	// bit * = TRUE --- use extra pk sound set
 
-float PK_HUB2					= 131072; // bit if TRUE, using hub2 - reload at hub loads
-//float PK_HUB3					= 262144; // bit if TRUE, using hub3 - reload at hub loads
+float PK_HUB2					= 131072; // bit if TRUE, using custom hub - reload at hub loads via alias cmd hubmap
+//float PK_HUB3					= 262144; // bit if TRUE, using hub3 - reload at hub loads - deprecated
 float PK_ADHUB					= 1;		 // set to 0 PK_mapmode will ignore new maps - item load can still set PK mode
 string st_hub2					= "hub2"; // map names for 2nd & 3rd hub
 string st_hub3					= "hub3";
