@@ -402,12 +402,20 @@ string() MapDM2 =
 	else if (self.lefty == 18)
 	{
 		mname = "hub2";
-		pk_flags = PK_HUB2 | pk_flags - (pk_flags & PK_HUB3);
+		pk_flags = PK_HUB2 | pk_flags;
+		localcmd("alias hubmap \"map ");
+		localcmd(mname);
+		localcmd("\"\n");
+//		pk_flags = PK_HUB2 | pk_flags - (pk_flags & PK_HUB3);
 	}
 	else if (self.lefty == 19)
 	{
 		mname = "hub3";
-		pk_flags = PK_HUB3 | pk_flags - (pk_flags & PK_HUB2);
+		localcmd("alias hubmap \"map ");
+		localcmd(mname);
+		localcmd("\"\n");
+		pk_flags = PK_HUB2 | pk_flags;
+//		pk_flags = PK_HUB3 | pk_flags - (pk_flags & PK_HUB2);
 	}
 	return(mname);
 };
@@ -441,7 +449,8 @@ float() MapDM =
 	else if (self.lefty == A_PKHUB)
 	{
 		mname = "start";
-		pk_flags = pk_flags - (pk_flags & (PK_HUB2 | PK_HUB3));
+//		pk_flags = pk_flags - (pk_flags & (PK_HUB2 | PK_HUB3));
+		pk_flags = pk_flags - (pk_flags & (PK_HUB2));
 	}
 	else
 	{
@@ -913,7 +922,8 @@ void() AdminCommands =
 		if (self.lefty == A_START) MapStart(); else
 		if (self.lefty == A_DMMAP)
 		{
-			self.cnt = pk_flags & (PK_HUB2 | PK_HUB3);
+//			self.cnt = pk_flags & (PK_HUB2 | PK_HUB3);
+			self.cnt = pk_flags & (PK_HUB2);
 			Admin_dmmapmenu();
 		}
 		else

@@ -129,6 +129,89 @@ void() hub_teleport =
 };
 
 /*
+	custom hubs
+		- allow user to make any map a hub thru hub_custom ent, either adding to bsp via quark or using .ent file with custom engines
+		- later - add other PK customizations such as zombies, gfx, sfx, etc
+*/
+
+// fn(hub_custom) - implement the custom hub - portal
+
+void() hub_custom =
+{
+	local entity e;
+	local vector v,v2;
+
+	if (!self.map)
+	{
+		bprint("*** Custom hub without map designation - setting = Hub.");
+		self.map = "start";
+		self.message = "Start Hub!";
+	}
+	if (!self.message) self.message = "Mystery Map"; // doh
+
+	self.classname = "hub_teleport";
+	hub_teleport(); // init hub portal
+
+// set appearance - model has different frames & skins for variety
+// IDEA - set facing in cphub? - not for now, all portals should be "directionless"
+	setmodel (self, "progs/hub_port.mdl");
+	setsize(self, self.mins, self.maxs);
+	self.frame = self.delay;
+	self.skin = self.wait;
+
+// trigger for message
+	e = self;
+	self = spawn();
+	if (self != e)
+	{
+		self.classname = "trigger_multiple";
+// bounds bigger than portal to give message
+		setorigin(self, e.origin);
+		setmodel(self, "progs/shambler.mdl"); // model is req. to have bounds - its never seen
+
+		self.message = e.message;
+		self.sounds = 4;
+		self.speed = 100;
+		self.wait = 4;
+		self.lip = self.dmg = self.delay =	self.health = 0;
+		self.style = 32;
+		trigger_multiple();
+	}
+};
+
+// fn(pk_cphub) - print custom hub portal info for current player location - just add a map descriptor, file name, model frame & skin
+// - bind key to impulse 35, get rid of all turrets and set saved1 = 482 or 483
+// - saved1 = 482, no comments on fields
+// - saved1 = 483, add in comments for fields that need edited to add custom maps
+
+float pk_chubcon;
+
+void() pk_cphub =
+{
+	if (pk_chubcon != 666) // print a hub control ent to start
+	{
+		bprint("{\n\"classname\" \"hub_control\"\n\"target\" \"votes\"\n\"wait\" \"180\"\n\"map\" \"start\"\n\"origin\" \"0 0 -10000\"\n}\n");
+		pk_chubcon = 666;
+		if (cvar("saved1") != 482) bprint("// map MUST be set to your custom hub for reload!\n// change wait to set a different hub timeout\n");
+	}
+	if (cvar("saved1") != 482)
+	{
+		bprint("{\n\"classname\" \"hub_custom\"\n\"targetname\" \"votes\"\n\"map\" \"start\"          // change to custom map base filespec - exclude .bsp\n");
+		bprint("\"message\" \"Start Hub\"  // change to custom map message text\n\"delay\" \"0\"            // change to hub model custom frame number\n");
+		bprint("\"wait\" \"0\"             // change to hub model custom skin number\n\"origin\" \"");
+	}
+	else
+	{
+		bprint("{\n\"classname\" \"hub_custom\"\n\"targetname\" \"votes\"\n\"map\" \"start\"\n");
+		bprint("\"message\" \"Start Hub\"\n\"delay\" \"0\"\n");
+		bprint("\"wait\" \"0\"\n\"origin\" \"");
+	}
+	bprint(vtos(self.origin));
+	if (cvar("saved1") != 482) bprint("\"  // you must remove ' and ' from origin vector");
+	bprint("\n}\n");
+};
+
+/*
 	hub_control
 */
 
@@ -502,6 +585,10 @@ void() hub_control =
 	if (theHub)
 	{
 		objerror("Only 1 hub may be in existance.");
+// FIX - Cataboligne 10.2.8 - improvment:
+// already have a hub - why not remove and continue?
+//		bprint("Map tried to create a second hub - removing.");
+//		remove(self);
 		return;
 	}
 	theHub = self;
@@ -512,7 +599,7 @@ void() hub_control =
 		self.use = hub_control_use;
 	}
 	// activated or timeout?
-	else if (self.wait)
+	else if (self.wait) // FIX - Cataboligne - if no self.wait, why not just pick a default?
 	{
 		self.think = hub_control_use;
 		// create timer
@@ -532,11 +619,20 @@ void() hub_control =
 	}
 	else
 	{
-		objerror("hub_control without targetname OR wait");
+		objerror("hub_control without targetname OR wait"); // FIX - lose this
 	}
 
 //	self.think = hub_control_status;
 //	self.nextthink = time + 30.0;
+
+// custom hub check - set alias if map is defined
+	if (self.map)
+	{
+		pk_flags = PK_HUB2 | pk_flags;
+		localcmd("alias hubmap \"map ");
+		localcmd(self.map);
+		localcmd("\"\n");
+	}
 
 	// so later levels know about it...
 	pk_flags = pk_flags | PK_SF_HUB;

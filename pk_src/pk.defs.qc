@@ -13,8 +13,8 @@ float PK_SPIKER				= 16384;	// bit *	= FALSE -- allow spike traps, set to true f
 float PK_XSOUND				= 32768;	// bit * = TRUE --- use extra pk sound set
 
 float PK_HUB2					= 131072; // bit if TRUE, using hub2 - reload at hub loads
-float PK_HUB3					= 262144; // bit if TRUE, using hub3 - reload at hub loads
-float PK_ADHUB					= 0;		 // set to 0 PK_mapmode will ignore new maps - item load will still set PK mode
+//float PK_HUB3					= 262144; // bit if TRUE, using hub3 - reload at hub loads
+float PK_ADHUB					= 1;		 // set to 0 PK_mapmode will ignore new maps - item load can still set PK mode
 string st_hub2					= "hub2"; // map names for 2nd & 3rd hub
 string st_hub3					= "hub3";
 
@@ -90,7 +90,7 @@ float CON_STOP					= 16384; //131072;  // stop replace / remove cycle here
 float CON_ONLY					= 131072;  // only the selected items will be loaded
 float CON_NONE					= 262144;  // none of the selected items will be loaded
 float CON_SUBS					= 524288;  // substitute something for removed items
-float CON_INF					= 1048576; // infinite ammo weps
+float CON_INF					= 1048576; // infinite ammo to all weps with bit set above - except carryables
 float CON_CYC					= 2097152; // cycle selected bits in thier group
 float CON_RUN					= 4063232; // any control bit CON_* entries above - used by autorun
 float CYC_TIME					= 60; // TEST - 240; // seconds for cycle base - 4 mins +|- 2 mins
@@ -336,6 +336,7 @@ float pk_flags_ck;
 float pk_itemovr_ck;
 float (float rl) AdminBitFlag;
 void() dyn_item;
+void() pk_cphub;
 
 float PK_TP_STATUSON			= 256;
 .float hubstartupmessage;

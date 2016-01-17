@@ -168,7 +168,7 @@ void () weapon_chainlg =
 	setsize (self,'-16 -16 0','16 16 56');
 	StartItem ();
 	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-//	pk_ditems = pk_ditems + 1;
+	pk_ditems = pk_ditems + 1;
 };
 
 
@@ -194,8 +194,8 @@ void () weapon_grapgun =
 void() pk_dyn_touch =
 {
 	if (self.classname != "dyn_item") return;
+	if (self.netname != "cells") pk_ditems = pk_ditems - 1;
 	remove(self);
-	pk_ditems = pk_ditems - 1;
 };
 // called from below - handle ammo touch extras
 
@@ -377,6 +377,7 @@ bprint(self.netname);
 if (self.solid == SOLID_NOT) bprint(") and collected it.\n");
 else bprint(" )\n");}
 		}
+		if (pk_flags & PK_DYNAMIC) pk_dyn_touch();
 		return;
 	}
 
@@ -941,8 +942,8 @@ void() pk_placeitem =
 	{
 bprint(" placed ");
 		self.velocity_z = 300 + 100 * random();
-		self.velocity_x = -100 + (random() * 200);
-		self.velocity_y = -100 + (random() * 200);
+		self.velocity_x = -170 + (random() * 340);
+		self.velocity_y = -170 + (random() * 340);
 	}
 
 // handle extra item stuff
@@ -1026,10 +1027,10 @@ void(string cls) item_call =
 		if (PK) weapon_chainlg();
 		else weapon_lightning();
 	}
-	else if (cls == "item_shells") item_shells();
-	else if (cls == "item_spikes") item_spikes();
-	else if (cls == "item_rockets") item_rockets();
-	else if (cls == "item_cells") item_cells();
+	else if (cls == "item_shells") { if (random() < 0.5) self.spawnflags = WEAPON_BIG2; item_shells(); }
+	else if (cls == "item_spikes") { if (random() < 0.4) self.spawnflags = WEAPON_BIG2; item_spikes(); }
+	else if (cls == "item_rockets") { if (random() < 0.2) self.spawnflags = WEAPON_BIG2; item_rockets(); }
+	else if (cls == "item_cells") { if (random() < 0.8) self.spawnflags = WEAPON_BIG2; item_cells(); }
 	else if (cls == "item_artifact_invulnerability") item_artifact_invulnerability();
 	else if (cls == "item_artifact_super_damage") item_artifact_super_damage();
 	else if (cls == "item_artifact_envirosuit") item_artifact_envirosuit();
@@ -1049,15 +1050,15 @@ void(string cls) item_call =
 	else if (cls == "weapon_airfist") weapon_airfist();
 	else if (cls == "item_painkeep_can") item_painkeep_can();
 	else return;
+	self.mdl = self.model;
 	if (self.classname != "dyn_item") // dont do these for dyn items
 	{
 		self.classname = cls;
 		if (PK) pk_placeitem();
 		self.think = SUB_regen; // dont go thru place_item - use regen method
 		self.nextthink = time + 1 + 3 * random(); // spread em out
+		self.model = string_null;
 	}
-	self.mdl = self.model;
-	self.model = string_null;
 	self.solid = SOLID_NOT;
 };
 
@@ -1325,21 +1326,51 @@ void() dyn_spawn =
 	float bt, sf;
 
 // get a random origin
-	sf = 500;
+	sf = 450;
 	od = ' 0 0 0';
-	while (od == ' 0 0 0' && sf > 0)
+	if (random() < 0.8) // 70% these
+	while (od == ' 0 0 0' && sf > 0) // try a non wep first - armor, artifact, health
 	{
-		bt = floor(16 * random());
-		src = item_by_bit(bt);
+		bt = 7 + floor(9 * random());
+		if (bt & HEAL_HEALS)
+			src = "item_health";
+		else
+			src = item_by_bit(bt);
 		e = find(world,classname,src);
 		while (e)
 		{
-			if (random() < 0.25) { od = e.origin; lc = e.classname; } // just hope this is a good origin
+			if (random() < 0.33) { od = e.origin; lc = e.classname; } // just hope this is a good origin
 			e = find(e, classname,src);
 		}
 		sf = sf - 1;
 	}
-	if (od == ' 0 0 0') // failed ? - try a player
+	sf = 250;
+	while (od == ' 0 0 0' && sf > 0) // not found - try ammo
+	{
+		bt = floor(5 * random());
+		src = ammo_by_bit(bt);
+		e = find(world,classname,src);
+		while (e)
+		{
+			if (random() < 0.33) { od = e.origin; lc = e.classname; }
+			e = find(e, classname,src);
+		}
+		sf = sf - 1;
+	}
+	sf = 250;
+	while (od == ' 0 0 0' && sf > 0) // not found - try weps
+	{
+		bt = floor(6 * random());
+		src = item_by_bit(bt);
+		e = find(world,classname,src);
+		while (e)
+		{
+			if (random() < 0.25) { od = e.origin; lc = e.classname; }
+			e = find(e, classname,src);
+		}
+		sf = sf - 1;
+	}
+	if (od == ' 0 0 0') // total search fail y/y? - try a player
 	{
 		e = find(world,classname,"player");
 		if (!e)
@@ -1369,19 +1400,26 @@ void() dyn_item =
 
 	if (self.classname != "dyn_spawner")
 	{
-bprint("*** dynamic items entry: ");
+bprint("* dynamic items entry: ");
 bprint(ftos(pk_ditems));
 bprint(" items total\n");
 		self.classname = "dyn_spawner";
-		self.nextthink = time + 40 + 20 * crandom();
+		self.nextthink = time + 5;// TEST 40 + 20 * crandom();
 		self.count = 4 + 4 * random();
 		if (pk_ditems > 6) remove(self);
 	}
-	else if (!pk_flags & PK_DYNAMIC) // got turned off go away
+	else if (!PK || !pk_flags & PK_DYNAMIC) // got turned off go away
 		remove(self);
-	else if (pk_ditems < self.count)
+	else
 	{
+	if (pk_ditems < self.count)
+	 {
 		cd = 1 + 2 * random();
+bprint("*** dynamic spawning: ");
+bprint(ftos(pk_ditems));
+bprint(" items total - add attempt: ");
+bprint(ftos(floor(cd)));
+bprint("\n");
 		while (cd > 0.2)
 		{
 			e = spawn();
@@ -1392,10 +1430,32 @@ bprint(" items total\n");
 				e.classname = "dyn_item";
 				e.cnt = AdminBitFlag(floor(7 + 6.4 * random())); // item to spawn
 				e.wad = ammo_by_bit(e.cnt); // classname to spawn
+				if (random() < 0.027)  // small chance of clg + ammo
+				{
+					e.wad = "weapon_lightning";
+					e = world;
+					e = spawn();
+					if (e)
+					{
+						e.think = dyn_spawn;
+						e.nextthink = 1 + 4 * random();
+						e.classname = "dyn_item";
+						e.wad = "item_cells";
+					}
+					e = spawn();
+					if (e)
+					{
+						e.think = dyn_spawn;
+						e.nextthink = 1 + 4 * random();
+						e.classname = "dyn_item";
+						e.wad = "item_cells";
+					}
+				}
 //				pk_ditems = pk_ditems + 1; // done in spawn
 			}
 			cd = cd - 1;
 		}
-		self.nextthink = time + 40 + 20 * crandom();
+	 }
+	self.nextthink = time + 40 + 20 * crandom();
 	}
 };

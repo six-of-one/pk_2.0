@@ -158,6 +158,8 @@ void() PK_precache =
 
 // admin
 	precache_model ("progs/s_light.spr");	// light up admin
+	precache_model ("progs/hub_port.mdl"); // custom hub levels
+	precache_model ("progs/shambler.mdl"); // custom hub levels
 
 	PK_ADMIN = 6; // code sets allow admin here - can be disabled by admin menu, 3 is base menu set
 
@@ -187,6 +189,8 @@ void() PK_precache =
 
 	pk_itemovr = pk_itemovr_ck = cvar("saved3"); // admin override of map items
 
+// causes item overrides to happen on map load
+
 	if (FALSE) // TEST - disabled
 	if (pk_itemovr & CON_RUN) // change some items - admin override
 	{
@@ -194,7 +198,7 @@ void() PK_precache =
 		if (e)
 		{
 			e.think = item_loop;
-			e.nextthink = time + 1; // do this well after items spawn
+			e.nextthink = time + 2; // do this well after items spawn
 		}
 	}
 
@@ -216,7 +220,8 @@ void() PK_precache =
 
 	if (world.model == "maps/start.bsp" && world.message == "hub")
 	{
-		pk_flags = pk_flags - (pk_flags & (PK_HUB2 | PK_HUB3));
+//		pk_flags = pk_flags - (pk_flags & (PK_HUB2 | PK_HUB3));
+		pk_flags = pk_flags - (pk_flags & (PK_HUB2));
 		admin_sv_cfg();
 	}
 
@@ -313,8 +318,9 @@ string() hub_select =
 	mp = "start";
 	if (PK)
 	{
-		if (pk_flags & PK_HUB2) mp = "hub2";
-		else if (pk_flags & PK_HUB3) mp = "hub3";
+		if (pk_flags & PK_HUB2) localcmd("hubmap\n");  // custom hub - use alias to reload
+//		if (pk_flags & PK_HUB2) mp = "hub2";
+//		else if (pk_flags & PK_HUB3) mp = "hub3";
 	}
 	return (mp);
 };

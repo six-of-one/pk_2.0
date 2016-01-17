@@ -595,7 +595,10 @@ void() pk_special_impulse =
 	else if (self.impulse == 35)
 	{
 		if (self.pk_turretammo < 1)
+		{
+			if (cvar("saved1") == 482 || cvar("saved1") == 483) pk_cphub(); // making a custom hub, 482 = hub
 			return;
+		}
 
 		self.pk_currentInventory = self.pk_currentitem = PK_IT_TURRET;
 	}
