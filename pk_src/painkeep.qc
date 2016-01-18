@@ -798,7 +798,11 @@ void() pk_liveupd =
 		master_item_control_loop("q3_item", f);
 	}
 	
-	if (Q_100) return;
+	if (Q_100)
+	{
+		XENV = FALSE;
+		return;
+	}
 
 // cam stuff
 	DCAMTO = cvar("sv_cam_timeout");
@@ -807,6 +811,8 @@ void() pk_liveupd =
 // viswep
 	VW = cvar("sv_vw");
 	VW_ARMOR = cvar("sv_vw_armor");
+
+	XENV = cvar("sv_c_xenv");
 
 	if (Q_99)
 	{
@@ -822,6 +828,7 @@ void() pk_liveupd =
 
 	if (PK_100)
 	{
+		XENV = FALSE;
 		PK_ART = FALSE;
 		return;
 	}
@@ -1023,7 +1030,6 @@ void() pk_srvcmd_load =
 	if (st_pk_duty != cvar("sv_pk_duty")) pk_bas_flags(PK_TP_DUTYON, st_pk_duty);
 
 // these all req. map reload for full effectiveness
-	PK_99 = cvar("sv_pk99");
 	PK_100 = cvar("sv_pk100");
 
 // q1
@@ -1041,10 +1047,10 @@ void() pk_srvcmd_set =
 	pk_srvcfg = 1;
 
 // pk control
-	PK_99 = FALSE; // new pk code, no extra env stuff
 	PK_100 = FALSE; // if true run 100% true to pk v1.11 - i n theory, dev purposes only
 	PK_100_OBJERR = FALSE;
-	ADMINLOCK = 0;
+	ADMINLOCK = FALSE;
+	XENV = FALSE;
 	WARNING = FALSE;
 	BOTFREEZE = 0;
 
@@ -1099,7 +1105,7 @@ void() pk_srvcmd_set =
 	TR_Q2 = 0;
 	TR_Q3 = 0;
 	TR_ALL = 0;
-	TR_NOT = 0;
+	TR_NOT = 2;
 
 	NO_PI = 0;
 
@@ -1197,6 +1203,7 @@ void() pk_srvcmd_set =
 		registercvar("sv_c_botfreeze", "0"); // for testing
 		registercvar("sv_c_warning", "0");
 		registercvar("sv_c_adminlock", "0"); // if true, admin menu is locked out
+		registercvar("sv_c_xenv", "0"); // if true extra env stuff stops
 // pk*bot server control - spawns bots on level changes
 		registercvar("sv_bot_pk", "0"); // bot count . skills non team - replaces parm12
 		registercvar("sv_bot_pktm", "0"); // bot count . skills - team - replaces parm13
@@ -1259,7 +1266,7 @@ void() pk_srvcmd_set =
 		registercvar("pk_tr_q2", "0");
 		registercvar("pk_tr_q3", "0");
 		registercvar("pk_tr_all", "0");
-		registercvar("pk_tr_not", "0"); // 0 - leave items with no translation, 1 - remove, 2 - best guess, 3 - randomize
+		registercvar("pk_tr_not", "2"); // 0 - leave items with no translation, 1 - remove, 2 - best guess, 3 - randomize
 		registercvar("pk_translate", "0");
 
 // pk items

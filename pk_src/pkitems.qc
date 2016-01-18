@@ -1109,7 +1109,7 @@ void() ip_checkForMovement =
 
 	if (self.solid != SOLID_NOT)
  {
-	if (self.map == "rune" && RUNES && e.classname == "item_sigil")// && self.delay > -1)  // !chaos
+	if (self.map == "rune" && RUNES && self.classname == "item_sigil")// && self.delay > -1)  // !chaos
 	{
 		self.cnt = self.cnt + 1;
 		self.delay = self.delay + 1;
@@ -1244,6 +1244,7 @@ void() pk_placeitem =
 		if (self.wad == "q1") master_item_control(self, 0);
 		else if ((TR_ALL || TR_WOLF) && self.class_select == "wolf_item")  master_item_control(self, TR_WOLF);
 		else if ((TR_ALL || TR_DOOM) && self.class_select == "doom_item")  master_item_control(self, TR_DOOM);
+		else if ((TR_ALL || TR_QUAKE) && self.class_select == "quake_item")  master_item_control(self, TR_QUAKE);
 		else if ((TR_ALL || TR_Q2) && self.class_select == "q2_item")  master_item_control(self, TR_Q2);
 		else if ((TR_ALL || TR_Q3) && self.class_select == "q3_item")  master_item_control(self, TR_Q3);
 	}

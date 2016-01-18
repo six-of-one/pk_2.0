@@ -578,6 +578,25 @@ void() viswep_post =
 		qld = grap_frame_adjust = gremlin_frame_adjust = vadd = 0;
 //		vofs = vhead.finaldest_x * normalize(vang) + vhead.finaldest_y * normalize(v_right);
 	//	vofs_z = vhead.finaldest_z;
+		if (dwep > 0)
+		if (vhead.weapon == dwep)
+		{
+			vhead.owner.eweapon = vhead.eweapon;
+
+			if ( !(self.cam_x & CHSCAM_ON))
+			{
+				if (vhead.owner.eweapon)
+				{
+					if (vhead.owner.eweapon.weaponmodel != vhead.owner.weaponmodel) PK_SetCurrentAmmo(); //vhead.owner.weaponmodel = vhead.owner.eweapon.weaponmodel;
+				}
+				else
+					if (ver_weaponmodel(vhead.owner.weaponmodel)) PK_SetCurrentAmmo();
+//							if (wm != vhead.owner.weaponmodel) vhead.owner.weaponmodel = wm;
+				if ((vhead.owner.prevweapon != vhead.owner.weapon) || (vhead.owner.pkprevweapon != vhead.owner.pk_currentitem) || (vhead.owner.forcewchange == 1)) PK_SetCurrentAmmo();
+			}
+			else	if ((vhead.owner.prevweapon != vhead.owner.weapon) || (vhead.owner.pkprevweapon != vhead.owner.pk_currentitem) || (vhead.owner.forcewchange == 1)) PK_SetCurrentAmmo();
+		}
+
 		if (vhead.owner.items & IT_INVISIBILITY) vhead.model = ""; // heh heh, player invisible
 		else
 		if (vhead.model == "" || (vhead.origin + vofs) != vhead.owner.origin || vhead.angles != vhead.owner.angles || vhead.weaponframe != vhead.owner.frame) // update track
@@ -603,24 +622,6 @@ void() viswep_post =
 			{
 				if ((vhead.weapon == dwep) && (dwep != IT_AXE)) qld = TRUE; // main weapon - not holstered
 				else if ((vhead.weapon == dwep) && (vhead.pk_currentitem == pkdwep)) qld = TRUE;
-
-				if (vhead.weapon == dwep)
-				{
-					vhead.owner.eweapon = vhead.eweapon;
-
-					if ( !(self.cam_x & CHSCAM_ON))
-					{
-						if (vhead.owner.eweapon)
-						{
-							if (vhead.owner.eweapon.weaponmodel != vhead.owner.weaponmodel) PK_SetCurrentAmmo(); //vhead.owner.weaponmodel = vhead.owner.eweapon.weaponmodel;
-						}
-						else
-							if (ver_weaponmodel(vhead.owner.weaponmodel)) PK_SetCurrentAmmo();
-//							if (wm != vhead.owner.weaponmodel) vhead.owner.weaponmodel = wm;
-						if ((vhead.owner.prevweapon != vhead.owner.weapon) || (vhead.owner.pkprevweapon != vhead.owner.pk_currentitem) || (vhead.owner.forcewchange == 1)) PK_SetCurrentAmmo();
-					}
-					else	if ((vhead.owner.prevweapon != vhead.owner.weapon) || (vhead.owner.pkprevweapon != vhead.owner.pk_currentitem) || (vhead.owner.forcewchange == 1)) PK_SetCurrentAmmo();
-				}
 			}
 
 			if (qld)

@@ -166,6 +166,12 @@ void(string cls) item_call =
 
 	else if (cls == "item_key1") item_key1();
 	else if (cls == "item_key2") item_key2();
+	else if (cls == "item_key1_0") item_keyX(10); // key num * 10 + wolrd num
+	else if (cls == "item_key1_1") item_keyX(11);
+	else if (cls == "item_key1_2") item_keyX(12);
+	else if (cls == "item_key2_0") item_keyX(20);
+	else if (cls == "item_key2_1") item_keyX(21);
+	else if (cls == "item_key2_2") item_keyX(22);
 	else if (cls == "misc_explobox")
 	{
 		misc_explobox();
@@ -475,8 +481,6 @@ void() item_loop =
 // cn - ammo count needing approval
 // e - gun carrier tested (player / bot)
 // op - for load check
-
-// NOTE: need to sw to inf ammo wep if ammo = 0
 
 float(float cn, entity e, string op) ammo_con =
 {

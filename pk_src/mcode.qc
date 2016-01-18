@@ -184,6 +184,8 @@ float(float mcv, entity e) bit_mcode =
 	if (!mc && e) mc = e.mcode;
 	if (!mc) return(0);
 	
+	if (mc == MC_AXE)														return(IT_AXE);
+	if (mc == MC_SHOTGUN)												return(IT_SHOTGUN);
 	if (mc == MC_SUPER_SHOTGUN)										return(IT_SUPER_SHOTGUN);
 	if (mc == MC_NAILGUN)												return(IT_NAILGUN);
 	if (mc == MC_SUPER_NAILGUN)										return(IT_SUPER_NAILGUN);
@@ -303,19 +305,26 @@ float(string sc, entity e) pk_mcode =
 // q1
 	if (e) // qualify ent
 	{
-	if ((tsc == "item_shells") && (e.spawnflags & 1))			return(MC_ASHELLS_LG);
-	if ((tsc == "item_spikes") && (e.spawnflags & 1))			return(MC_ANAILS_LG);
-	if ((tsc == "item_rockets") && (e.spawnflags & 1))			return(MC_AROCKETS_LG);
-	if ((tsc == "item_cells") && (e.spawnflags & 1))			return(MC_ACELLS_LG);
-	if ((tsc == "item_health") && (e.spawnflags & 1))			return(MC_HEALTHROT);
-	if ((tsc == "item_health") && (e.spawnflags & 2))			return(MC_HEALTHMEGA);
+		if ((tsc == "item_shells") && (e.spawnflags & 1))			return(MC_ASHELLS_LG);
+		if ((tsc == "item_spikes") && (e.spawnflags & 1))			return(MC_ANAILS_LG);
+		if ((tsc == "item_rockets") && (e.spawnflags & 1))			return(MC_AROCKETS_LG);
+		if ((tsc == "item_cells") && (e.spawnflags & 1))			return(MC_ACELLS_LG);
+		if ((tsc == "item_health") && (e.spawnflags & 1))			return(MC_HEALTHROT);
+		if ((tsc == "item_health") && (e.spawnflags & 2))			return(MC_HEALTHMEGA);
 
-	if ((tsc == "item_sigil") && (e.spawnflags & R_EARTH))	return(MC_SIGIL1);
-	if ((tsc == "item_sigil") && (e.spawnflags & R_BLACK))	return(MC_SIGIL2);
-	if ((tsc == "item_sigil") && (e.spawnflags & R_HELL))		return(MC_SIGIL4);
-	if ((tsc == "item_sigil") && (e.spawnflags & R_ELDER))	return(MC_SIGIL8);
+		if ((tsc == "item_sigil") && (e.spawnflags & R_EARTH))	return(MC_SIGIL1);
+		if ((tsc == "item_sigil") && (e.spawnflags & R_BLACK))	return(MC_SIGIL2);
+		if ((tsc == "item_sigil") && (e.spawnflags & R_HELL))		return(MC_SIGIL4);
+		if ((tsc == "item_sigil") && (e.spawnflags & R_ELDER))	return(MC_SIGIL8);
+		if (tsc == "item_keyX")
+		{
+			if (e.items == IT_KEY1)											return(MC_KEY1);
+			if (e.items == IT_KEY2)											return(MC_KEY2);
+		}
 	}
 
+	if (tsc == "weapon_axe")											return(MC_AXE);
+	if (tsc == "weapon_shotgun")										return(MC_SHOTGUN);
 	if (tsc == "weapon_supershotgun")								return(MC_SUPER_SHOTGUN);
 	if (tsc == "weapon_nailgun")										return(MC_NAILGUN);
 	if (tsc == "weapon_supernailgun")								return(MC_SUPER_NAILGUN);
@@ -427,119 +436,13 @@ float(string sc, entity e) pk_mcode =
 
 };
 
-// implement for upgrades
-
-void () painkeep_weapon_touch;
-
-/*QUAKED weapon_pulsenail (0 .5 .8) (-16 -16 0) (16 16 32)
-*/
-
-void () weapon_pulsenail =
-{
-	precache_model ("progs/g_fnail.mdl");
-	setmodel (self, "progs/g_fnail.mdl");
-	self.weapon = IT_NAILGUN;
-	self.netname = "Pulse Rifle";
-	self.touch = painkeep_weapon_touch;
-	setsize (self,'-16 -16 0','16 16 56');
-	StartItem ();
-};
-
-// axe attack - assumes player frames
-
-void() fire_axe =
-{
-	local float r;
-
-	sound (self, CHAN_WEAPON, self.noise1, 1, ATTN_NORM);
-	r = random();
-	if (r < 0.25)
-	  player_axe1 ();
-	else if (r<0.5)
-	  player_axeb1 ();
-	else if (r<0.75)
-	  player_axec1 ();
-	else
-	  player_axed1 ();
-};
-
-/*QUAKED weapon_axe (0 .5 .8) (-16 -16 0) (16 16 32)
-*/
-
-void () weapon_axe =
-{
-	self.touch = weapon_touch;
-	self._attack = SUB_Null;
-	self._fr_attack = fire_axe;
-
-	self.currentammo = 0;
-	self.items = IT_AXE;
-	self.weaponframe = AMMO_NONE;
-	self.attack_finished = 0.5;
-	self.dmg_save = 0;
-
-	self.netname = "War Axe";
-	precache_model ("progs/g_axe.mdl");
-	precache_model ("progs/v_axe.mdl");
-	precache_model ("progs/vw_axe.mdl");
-	setmodel (self,"progs/g_axe.mdl");
-	self.weaponmodel = "progs/v_axe.mdl";
-	self.vwepmdl = "progs/vw_axe.mdl";
-	self.noise1 = "weapons/ax1.wav"; // missed
-	self.noise3 = "player/axhit2.wav"; // hit wall &| solid
-//	self.noise4 = "zombie/z_hit.wav"; // hit flesh
-
-	setsize (self,'-16 -16 0','16 16 56');
-	StartItem ();
-};
-
-/*QUAKED weapon_shotgun (0 .5 .8) (-16 -16 0) (16 16 32)
-*/
-
-void () weapon_shotgun =
-{
-// CIC example - wont do anything for a bit
-	if (world.wad == "q2.wad")
-	{
-//		q2_weapon_shotgun();
-		return;
-	}
-	else if (world.wad == "") // TDO: q3_weapon_shotgun
-	{
-		self.classname = "weapon_supershotgun";
-		weapon_supershotgun(); 
-		if (self.spawnflags & 1) q3_suspend();
-		return;
-	}
-
-	self.touch = weapon_touch;
-	self._attack = W_FireShotgun;
-	self._fr_attack = player_shot1;
-
-	self.currentammo = 25;
-	self.items = IT_SHOTGUN;
-	self.weaponframe = AMMO_SHELLS;
-	self.attack_finished = 0.5;
-	self.dmg_save = 1;
-
-	self.netname = "Shotgun";
-	precache_model ("progs/shotgun.mdl");
-	precache_model ("progs/v2_shot.mdl");
-	precache_model ("progs/vw_shot.mdl");
-	setmodel (self, "progs/shotgun.mdl");
-	self.weaponmodel = "progs/v2_shot.mdl";
-	self.vwepmdl = "progs/vw_shot.mdl";
-//	self.noise1 = "weapons/ax1.wav"; // missed
-	self.noise3 = "weapons/guncock.wav"; 
-
-	setsize (self,'-16 -16 0','16 16 56');
-	StartItem ();
-};
 
 // fn(item_by_mcode) - given map code mc, return call string
 
 string (float mc) item_by_mcode =
 {
+	if (mc == MC_AXE)														return("weapon_axe");
+	if (mc == MC_SHOTGUN)												return("weapon_shotgun");
 	if (mc == MC_SUPER_SHOTGUN)										return("weapon_supershotgun");
 	if (mc == MC_NAILGUN)												return("weapon_nailgun");
 	if (mc == MC_SUPER_NAILGUN)										return("weapon_supernailgun");
@@ -658,6 +561,204 @@ string (float mc) item_by_mcode =
 
 	return("");
 };
+
+// implement for upgrades
+
+void () painkeep_weapon_touch;
+
+/*QUAKED weapon_pulsenail (0 .5 .8) (-16 -16 0) (16 16 32)
+*/
+
+void () weapon_pulsenail =
+{
+	precache_model ("progs/g_fnail.mdl");
+	setmodel (self, "progs/g_fnail.mdl");
+	self.weapon = IT_NAILGUN;
+	self.netname = "Pulse Rifle";
+	self.touch = painkeep_weapon_touch;
+	setsize (self,'-16 -16 0','16 16 56');
+	StartItem ();
+};
+
+// axe attack - assumes player frames
+
+void() fire_axe =
+{
+	local float r;
+
+	sound (self, CHAN_WEAPON, self.noise1, 1, ATTN_NORM);
+	r = random();
+	if (r < 0.25)
+	  player_axe1 ();
+	else if (r<0.5)
+	  player_axeb1 ();
+	else if (r<0.75)
+	  player_axec1 ();
+	else
+	  player_axed1 ();
+};
+
+/*QUAKED weapon_axe (0 .5 .8) (-16 -16 0) (16 16 32)
+*/
+
+void () weapon_axe =
+{
+	self.touch = weapon_touch;
+	self._attack = SUB_Null;
+	self._fr_attack = fire_axe;
+
+	self.currentammo = 0;
+	self.items = IT_AXE;
+	self.weaponframe = AMMO_NONE;
+	self.attack_finished = 0.5;
+	self.dmg_save = 0;
+
+	self.netname = "War Axe";
+	precache_model ("progs/g_axe.mdl");
+	precache_model ("progs/v_axe.mdl");
+	precache_model ("progs/vw_axe.mdl");
+	setmodel (self,"progs/g_axe.mdl");
+	self.weaponmodel = "progs/v_axe.mdl";
+	self.vwepmdl = "progs/vw_axe.mdl";
+	self.noise1 = "weapons/ax1.wav"; // missed
+	self.noise3 = "player/axhit2.wav"; // hit wall &| solid
+//	self.noise4 = "zombie/z_hit.wav"; // hit flesh
+
+	setsize (self,'-16 -16 0','16 16 56');
+	StartItem ();
+};
+
+/*QUAKED weapon_shotgun (0 .5 .8) (-16 -16 0) (16 16 32)
+*/
+
+void () weapon_shotgun =
+{
+// CIC example - wont do anything for a bit
+	if (world.wad == "q2.wad")
+	{
+//		q2_weapon_shotgun();
+		return;
+	}
+	else if (world.wad == "") // TDO: q3_weapon_shotgun
+	{
+		self.classname = "weapon_supershotgun";
+		weapon_supershotgun(); 
+		if (self.spawnflags & 1) q3_suspend();
+		return;
+	}
+
+	self.touch = weapon_touch;
+	self._attack = W_FireShotgun;
+	self._fr_attack = player_shot1;
+
+	self.currentammo = 25;
+	self.items = IT_SHOTGUN;
+	self.weaponframe = AMMO_SHELLS;
+	self.attack_finished = 0.5;
+	self.dmg_save = 1;
+
+	self.netname = "Shotgun";
+	precache_model ("progs/shotgun.mdl");
+	precache_model ("progs/v2_shot.mdl");
+	precache_model ("progs/vw_shot.mdl");
+	setmodel (self, "progs/shotgun.mdl");
+	self.weaponmodel = "progs/v2_shot.mdl";
+	self.vwepmdl = "progs/vw_shot.mdl";
+//	self.noise1 = "weapons/ax1.wav"; // missed
+	self.noise3 = "weapons/guncock.wav"; 
+
+	setsize (self,'-16 -16 0','16 16 56');
+	StartItem ();
+};
+
+// all quake 1 key load outs
+
+/*QUAKED item_keyX (0 .5 .8) (-16 -16 -24) (16 16 32)
+
+Any key on any map!
+
+cnt - key code
+
+GOLD key = 20
+SILVER key = 10
+
+		+
+
+0: medieval
+1: metal
+2: base
+*/
+
+void (float ksv) item_keyX =
+{
+	float ks;
+
+	ks = ksv;
+	if (self.cnt) ks = self.cnt;
+
+	if (ks == 10)
+	{
+		setmodel (self,"progs/w_s_key.mdl");
+		self.netname = "silver key";
+		self.items = IT_KEY1;
+	}
+	else if (ks == 11)
+	{
+		setmodel (self,"progs/m_s_key.mdl");
+		self.netname = "silver runekey";
+		self.items = IT_KEY1;
+	}
+	else if (ks == 12)
+	{
+		setmodel (self,"progs/b_s_key.mdl");
+		self.netname = "silver keycard";
+		self.items = IT_KEY1;
+	}
+	else if (ks == 20)
+	{
+		setmodel (self,"progs/w_g_key.mdl");
+		self.netname = "gold key";
+		self.items = IT_KEY2;
+	}
+	else if (ks == 21)
+	{
+		setmodel (self,"progs/m_g_key.mdl");
+		self.netname = "gold runekey";
+		self.items = IT_KEY2;
+	}
+	else if (ks == 22)
+	{
+		setmodel (self,"progs/b_g_key.mdl");
+		self.netname = "gold keycard";
+		self.items = IT_KEY2;
+	}
+	else
+	{
+		setmodel (self,"progs/w_s_key.mdl");
+		self.netname = "silver key";
+		self.items = IT_KEY1;
+	}
+	if (ks == 10 || ks == 20)
+	{
+		self.noise = "misc/medkey.wav";
+	}
+	else if (ks == 11 || ks == 21)
+	{
+		self.noise = "misc/runekey.wav";
+	}
+	else if (ks == 12 || ks == 22)
+	{
+		self.noise = "misc/basekey.wav";
+	}
+	else
+	{
+		self.noise = "misc/medkey.wav";
+	}
+	self.touch = key_touch;
+	setsize (self, '-16 -16 -24', '16 16 32');
+	StartItem ();
+};
+
 
 // TDO: expand fn - handle chaos items, non respawnables, provide location area
 

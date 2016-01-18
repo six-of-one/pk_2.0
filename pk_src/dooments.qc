@@ -95,14 +95,14 @@ void() doom_precache =
 	precache_model ("progs/vw_d_bfg.mdl");
 // wolfenstien
 	precache_model ("progs/w_armor.mdl");
-	precache_model ("progs/w_knife.mdl"); // NOTE: this a map item
-	precache_model ("progs/w_pistol.mdl"); // NOTE: this a map item
+	precache_model ("progs/w_knife.mdl");
+	precache_model ("progs/w_pistol.mdl");
 	precache_model ("progs/w_mgun.mdl");
 	precache_model ("progs/w_chaing.mdl");
 	precache_model ("progs/w_mortar.mdl");
 	precache_model ("progs/w_flamer.mdl");
 
-	precache_model ("progs/vw_w_knife.mdl"); // NOTE: this a map item
+	precache_model ("progs/vw_w_knife.mdl");
 	precache_model ("progs/vw_w_pistol.mdl");
 	precache_model ("progs/vw_w_mgun.mdl");
 	precache_model ("progs/vw_w_chaing.mdl");
@@ -214,7 +214,7 @@ void() d_item_spiritarmor =
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Spirit armor";
-	self.skin = 0;
+//	self.skin = 0;
 	self.state = D_ARM_TBLU;
 	self.currentammo = ARM_SPIRIT;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
@@ -226,6 +226,7 @@ void() d_item_armorgreen =
 {
 	item_armor1();
 	setmodel (self, "progs/d_armor.mdl");
+	self.skin = 0;
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Security armor";
@@ -238,6 +239,7 @@ void() d_item_armorblue =
 {
 	item_armor2();
 	setmodel (self, "progs/d_armor.mdl");
+	self.skin = 1;
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Combat armor";
@@ -429,13 +431,20 @@ void() d_weapon_pistol =
 	weapon_nailgun();
 	self.netname = "Pistol";
 
+// stats
+	self.currentammo = 25;
+	self.items = IT_NAILGUN; // IT_AXE; // testing
+	self.weaponframe = AMMO_BULLETS;
+	self.attack_finished = 0.4;
+	self.dmg = 120;
+	self.dmg_save = 1;
+
 	setmodel (self, "progs/d_pistol.mdl");
 	self.weaponmodel = "progs/v_d_pistol.mdl";
 	self.vwepmdl = "progs/vw_d_pistol.mdl";
 	self.noise3 = "doom/dspistol.wav";
 	self.noise = "doom/dswpnup.wav";
 	self.noise4 = "doom/dsitembk.wav";
-	self.currentammo = 25;
 	self.effects = self.effects | EF_FULLBRIGHT;
 //	self._attack = player_dchg1;
 	self.attack_finished = 0.4;
@@ -552,6 +561,7 @@ void() d_art_soulsphere =
 {
 	item_health();
 	setmodel(self, "progs/d_spheres.mdl");
+	self.skin = 0;
 	self.noise = "doom/dsgetpow.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Soul Sphere";
@@ -625,7 +635,7 @@ void() d_key_redskull =
 
 	self.noise = "doom/dsitemup.wav";
 	setmodel (self, "progs/d_skullkey.mdl");
-//	self.skin = 0;
+	self.skin = 0;
 	self.netname = "Red Skull key";
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 	if (self.class_select == "") self.class_select = "doom_item";
@@ -661,7 +671,7 @@ void() d_key_redcard =
 
 	self.noise = "doom/dsitemup.wav";
 	setmodel (self, "progs/d_cardkey.mdl");
-//	self.skin = 0;
+	self.skin = 0;
 	self.netname = "Red card key";
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 	if (self.class_select == "") self.class_select = "doom_item";

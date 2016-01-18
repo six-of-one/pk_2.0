@@ -254,6 +254,16 @@ void() PK_SetCurrentAmmo =
 
 	self.items = self.items - (self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS));
 
+	if (self.classname == OBSERVER)
+	{
+		self.currentammo = 0;
+		self.weapon = 0;
+		self.weaponframe = 0;
+		self.weaponmodel = "";
+		self.eweapon = world;
+		return;
+	}
+
 	// PAINKEEP_PREVWEAPON_START
 	if ((self.prevweapon != self.weapon) || (self.pkprevweapon != self.pk_currentitem) || (self.forcewchange == 1))
 	{
@@ -547,11 +557,20 @@ void() PK_SetCurrentAmmo =
 
 void() PK_SetCurrentAmmoOnly =
 {
-
 	if (self.classname == "player") // *bot - dont set run frames
 	player_run ();		// get out of any weapon firing states
 
 	self.items = self.items - (self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS));
+
+	if (self.classname == OBSERVER)
+	{
+		self.currentammo = 0;
+		self.weapon = 0;
+		self.weaponframe = 0;
+		self.weaponmodel = "";
+		self.eweapon = world;
+		return;
+	}
 
 	if (self.weapon == IT_AXE)
 	{

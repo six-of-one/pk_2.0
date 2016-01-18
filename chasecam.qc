@@ -301,8 +301,7 @@ void () cam_deathmove =
 	}
 	if (cvar("fov") != DCAM_FOV) stuffcmd( self.owner, DCAM_SET_FOV ); // I see short dead dudes - enforce crow vision
 
-	self.owner.weaponmodel = "";
-	self.owner.weapon = 0;
+	PK_SetCurrentAmmoOnly();
 	self.owner.flags = self.owner.flags | FL_ONGROUND;
 };
 
@@ -335,8 +334,8 @@ void () cam_deathview =
 		return;
 	}
 
-//	if (self.owner.classname != "pk*bot") // deprecated - bots will not come here
 	self.owner.classname = OBSERVER;
+	PK_SetCurrentAmmoOnly();
 
 	traceline( self.owner.origin, self.origin, TRUE, self.owner);
 
@@ -355,7 +354,6 @@ void () cam_deathview =
 	}
 
 	self.owner.health = 1;
-	self.owner.weaponmodel = "";
 };
 
 // fn(cam_startdeathview) - died and didnt have chasecam on

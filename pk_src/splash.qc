@@ -115,6 +115,7 @@ void() CheckWaterLevels =
 	    }
 	    else
 	    {
+			if (!XENV || PK_100)
 	      if ( ! pk_flags & PK_TP_SPARKSFLASH)
 	        MakeSplash(e);
 
@@ -176,8 +177,8 @@ void() CheckWaterLevels =
 						e.ip_orgOrigin_z = e.ip_orgOrigin_z + 3;
 						setorigin (e, e.ip_orgOrigin);
 						e.velocity = v0;
-						e.think = ip_checkForMovement;
-						e.nextthink = time + CFM_TIME;
+//						e.think = ip_checkForMovement;
+//						e.nextthink = time + CFM_TIME;
 						if (WARNING)
 						{
 							bprint("*** warning: falling item reset - ");

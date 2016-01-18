@@ -316,7 +316,7 @@ void() rune_maker =
 					{
 						if (WARNING) bprint("*** warning: rune_make could not find a rune that fit mask rules - giving up\n");
 						remove(self);
-						return; // crap - no location
+						return;
 					}
 				}
 				sf = sf - 1;

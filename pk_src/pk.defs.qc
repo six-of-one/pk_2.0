@@ -20,9 +20,9 @@ float PK_SPIKER				= 16384;	// bit *	= FALSE -- allow spike traps, set to true f
 float PK_XSOUND				= 32768;	// bit * = TRUE --- use extra pk sound set
 // compatability modes for the purists out there
 float PK_100;								// painkeep compatability mode - if true run 100% true to pk v1.11, no extras (has menus)
-float PK_99;							// painkeep 99% compatability mode - if true pk (main mod) works as pk but extra env effects are disabled
+float XENV;									// 99% compatability mode - if true (main mod) works but extra env effects are disabled
 float Q_100;								// quake 1 compatability mode - if true run 100% true to quake 1, why? just for kicks...
-float Q_99;								// quake 1 99% compatability mode - if true pk stuff is removed, but admin, item enhancements & env remain
+float Q_99;									// quake 1 99% compatability mode - if true pk stuff is removed, but admin, item enhancements & env remain
 
 												// many object errors are tweaked to simply remove the offending component - if these 2 vars are set true, and objerror will be generated
 float PK_100_OBJERR;						// if true objerr that would have exited game (and have since been fixed) will cause an objerr
@@ -58,7 +58,7 @@ float pk_admintime;						// if > 0 - inactivity timer for admin mode
 float pk_adminframe;						// only do once per frame
 float LIVE_ADMIN				= 100;	// for being in game with admin privs - previous painkeep admin mode
 float ADMIN_LOGIN				= -2;		// .admin value for login
-float ADMINLOCK;						// polled from sv_c_adminlock
+float ADMINLOCK;							// polled from sv_c_adminlock
 float USER_MENU				= -1;		// .admin value that handles user menu - admin code set runs user menus
 float USER_TIMEOUT			= 5;		// timeout user menu in 5 secs
 float USER_IMPULSE			= 39;		// user menu impulse
@@ -76,11 +76,11 @@ void() Admin_itembits;
 float(float msk) rnd_bit_mask;
 void(float msk, float bt) bit_print;
 
-float pk_mapcmd; 							// TOD: admin option later
-float pk_mapcfg; 							// TOD: admin option later
+float pk_mapcmd;
+float pk_mapcfg;
 //string ADMINSRVCMD			= "_srvcmd\n"; // server vars alias cmd
 //float pk_srvcmd				= 1; 		// TOD: admin option later
-float pk_srvcfg; 							// TOD: admin option later
+float pk_srvcfg;
 
 void() pk_srvcmd_set;
 
@@ -118,7 +118,7 @@ float RUNE_FLG_RS				= 1;
 float RUNE_FLG_DM				= 2;
 float RUNE_FLG_HS				= 4;
 float RUNE_FLG_RG				= 8;
-float RUNE_MASK_ALL			= 15; // because manual config must mask of bad bits
+float RUNE_MASK_ALL			= 15; // because manual config must have mask off for bad bits
 
 // item override admin
 float DYN_OVR;
@@ -342,11 +342,12 @@ float PK_TUR_SET; // set non 0 when vars loaded
 float pk_attack;		// bit 1 = can make a pk attack on any map, bit 2 = pk_artifacts attack
 void() use_pkitem; // bots using pk items
 
-float AMMO_NONE				= 100; // gun uses this ammo type
+float AMMO_NONE				= 100;
 float AMMO_SHELLS				= 101; // gun uses this ammo type
 float AMMO_NAILS				= 103;
 float AMMO_ROCKETS			= 105;
 float AMMO_CELLS				= 107;
+float AMMO_BULLETS			= 109;
 
 // viswep
 float qweps, pkweps; // inventory bit masks for weps
