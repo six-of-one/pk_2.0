@@ -35,6 +35,7 @@ float(entity ck) pk_art_actor_ck;
 string (float bt) pk_art_ammo_by_bit;
 float(string cls) pk_art_item_call;
 float(string mapNamed) pk_art_hubmapmsg;
+void () phone_teleport;
 
  // prototypes - from
  // splash.qc

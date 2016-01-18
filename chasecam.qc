@@ -57,6 +57,8 @@ void( float opt ) Remove_chase_cam;
 
 void(string bcm) cam_setbob =
 {
+	if (IROBOT(self)) return; // no cam for bots - no stuffcmd either
+
 	if (bcm == "")
 	{
 		if (cvar("cl_bob")) stuffcmd( self, "cl_bob 0\n" ); // dont bob view
@@ -102,6 +104,7 @@ void( entity cam_owner, vector vpos ) Start_chase_cam =
 	if (DARKPLACES || chaos)
 	{
 		NO_CAM = cvar("sv_cam_off"); // dp var disables cam
+		if (chaos)
 		if (cvar("cl_cam_off") != NO_CAM) NO_CAM = cvar("cl_cam_off");
 	}
 
@@ -221,33 +224,11 @@ void( float opt ) Remove_chase_cam =
 };
 
 
-// fn(bot_renew) - do button push for bots on think or call
-// because bots, like sandmen __ALWAYS__ go to carosel to renew.
-
-// NOTE: does this need to be in a bot file?
-
-void() bot_renew =
-{
-		self.owner.health = -1;
-		self.owner.deadflag = DEAD_RESPAWNABLE;
-		self.think = SUB_Remove;
-		self.nextthink = time + 0.2; // Cat - fixed 4.4.10 - these were not removing for frikbot
-
-	setorigin(self.owner, self.oldorigin);
-		self.owner.velocity = ' 0 0 0';
-		if (!intermission_running) 
-		{
-			self.owner.think = respawn;
-			self.owner.nextthink = time + 0.5;
-		}
-}
-
 // fn(cam_deathmove) - enable death move
 
 void () cam_deathmove =
 {
 	self.nextthink = time + 0.2;
-	local float cn, pn;
 
 	if (self.owner.solid != SOLID_NOT)
 	{
@@ -270,21 +251,8 @@ void () cam_deathmove =
 			self.owner.nextthink = time + 0.5;
 		}
 // fix - set viewport back if default no
-		if (!cvar("sv_cam_def") || NO_CAM || !cvar("cl_cam_def"))
-			set_viewport(self.owner, self.owner); // NOTE: this was already done, but test code anyway
-		return;
-	}
-	else if (self.owner.classname == "pk*bot" || ! self.owner.ishuman) // handle bots here
-	{
-		cn = cnt_ent(world, "classname", OBSERVER); // count observers
-		pn = cn + cnt_ent(world, "classname", "player") + cnt_ent(world, "classname", "pk*bot"); // count total players - need better way?
-		if ((pn > 4 && cn < 2) || (pn > 8 && cn < 3))
-		{
-			self.nextthink = time + 5 + random() * 20 + pn * 2 * random();
-			self.think = bot_renew;
-		}
-		else
-			bot_renew();
+//		if (!cvar("sv_cam_def") || NO_CAM || (chaos && !cvar("cl_cam_def")))
+//			set_viewport(self.owner, self.owner); // NOTE: not the fix we wanted?
 		return;
 	}
 	else if (DCAMTO && self.delay < time)
@@ -355,12 +323,16 @@ void () cam_deathview =
 
 	if (self.owner.solid != SOLID_NOT)
 	{
+
+// FIX - viewport restore here
+		set_viewport(self.owner, self.owner); // test this
+
 		remove( self);
 		return;
 	}
 
-	if (self.owner.classname != "pk*bot")
-		self.owner.classname = OBSERVER;
+//	if (self.owner.classname != "pk*bot") // deprecated - bots will not come here
+	self.owner.classname = OBSERVER;
 
 	traceline( self.owner.origin, self.origin, TRUE, self.owner);
 
@@ -750,6 +722,8 @@ void() Chase_cam_level_start =
 
 	local entity e;
 
+	if (IROBOT(self)) return; // no cam start for bots
+
 	e = spawn();
 	e.owner = self;
 	e.nextthink = time + 0.2;
@@ -836,15 +810,21 @@ void(float opt) Chase_cam_read_temp1 =
 
 // fn(cam_parms) - manage parms between levels
 
+// self must be player ent when this is called
+
 void(float sel) cam_parms =
 {
+	if (IROBOT(self)) return; // no cam for bots
+
 	CAM_DEF = 1; // compiled default for non dp engines
 	if (DARKPLACES || chaos)
 	{
 		CAM_DEF = cvar("sv_cam_def"); // dp var disables default cam
+		if (chaos)
 		if (cvar("cl_cam_def") != CAM_DEF) CAM_DEF = cvar("cl_cam_def");
 
 		NO_CAM = cvar("sv_cam_off"); // dp var disables cam
+		if (chaos)
 		if (cvar("cl_cam_off") != NO_CAM) NO_CAM = cvar("cl_cam_off");
 	}
 
@@ -874,6 +854,32 @@ void(float sel) cam_parms =
 };
 
 
+// fn(bot_renew) - do button push for bots on think or call
+// because bots, like sandmen __ALWAYS__ go to carosel to renew.
+
+// NOTE: does this need to be in a bot file?
+
+/*
+
+// deprecated - just respawn below because its no longer a cam op deal
+
+void() bot_renew =
+{
+		self.health = -1;
+		self.deadflag = DEAD_RESPAWNABLE;
+//		self.think = SUB_Remove;
+//		self.nextthink = time + 0.2; // Cat - fixed 4.4.10 - these were not removing for frikbot
+
+//	setorigin(self.owner, self.oldorigin);
+//		self.velocity = ' 0 0 0';
+		if (!intermission_running) 
+		{
+			self.think = respawn;
+			self.nextthink = time + 0.5 + random() * 5;
+		}
+}
+*/
+
 	// prevent internal C from tilting the view after
 	// QC has already initiated all death processes
 void () dead_cam_set =
@@ -883,10 +889,34 @@ void () dead_cam_set =
 //	if (DARKPLACES || chaos)
 //	{
 //		NO_CAM = cvar("sv_cam_off"); // dp var disables cam
+//		if (chaos)
 //		if (cvar("cl_cam_off") != NO_CAM) NO_CAM = cvar("cl_cam_off");
 //	}
 
 	if (Q_100 || PK_100) return; // || NO_CAM) return; // Cataboligne - 8.16.9 - quake compatability mode
+
+	if (IROBOT(self))  // no deadcam for bots
+	{
+/*
+
+// deprecated - bot code already handles respawn, so no reason to duplicate this - tweak bot code for more random return to action
+
+// the issue is that this steals bot die stuff causing wierdness - the frikbot zombie corpse deal
+
+		local float cn, pn;
+
+		cn = cnt_ent(world, "classname", OBSERVER); // count observers
+		pn = cn + cnt_ent(world, "classname", "player") + cnt_ent(world, "classname", "pk*bot"); // count total players - need better way?
+		if ((pn > 4 && cn < 2) || (pn > 8 && cn < 3))
+		{
+			self.nextthink = time + 5 + random() * 20 + pn * 2 * random();
+			self.think = respawn;
+		}
+		else
+			respawn();
+*/
+		return;
+	}
 
 // NOTE: wraith option still needs checked once we have chaos mod morph deal
 	
@@ -899,9 +929,15 @@ void () dead_cam_set =
 
 void () ccb_impulse_check =
 {
+
+//	else if (self.impulse == 231) LaserTargeterToggle( self );
+
+	if (IROBOT(self)) return; // no cam for bots - not sure how they would get here...
+
 	if (DARKPLACES || chaos)
 	{
 		NO_CAM = cvar("sv_cam_off"); // dp var disables cam
+		if (chaos)
 		if (cvar("cl_cam_off") != NO_CAM) NO_CAM = cvar("cl_cam_off");
 	}
 
@@ -909,7 +945,6 @@ void () ccb_impulse_check =
 
 //chase cam code
 	if (self.impulse == 230) Toggle_chase_cam();
-//	else if (self.impulse == 231) LaserTargeterToggle( self );
 
 	else if (self.impulse == 232) Chase_cam_change_zmult(0); // minus
 	else if (self.impulse == 233) Chase_cam_change_zmult(1); // plus

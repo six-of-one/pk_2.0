@@ -15,7 +15,31 @@
 .float grap_length;
 .vector grep_offset;	// harpoon target offset for bringing back to owner
 .float grap_firetest;
+
+float SAFE_LOOP = 300; // count of loop limit in case a grap test gets stuck somehow
+
 /*
+   put in SAFE_LOOP to fix this, which I have seen a few times;
+
+// dm4 pk code test of dyn items, item override, custom hub
+// in lava w/pent, fired grap up to ciel & sunk down to bot.
+
+server Profile:
+[CallCount] [Statements] [BuiltinCost]
+  3333410  36668276 103338686 grap_checkIfCanBeRemoved
+      821  40022120     27001 grap_checkCornerLines
+  3337285 ----- builtin ----- 
+     9618    312161    824122 CheckWaterLevels
+Host_Error: server runaway loop counter hit limit of 10000000 jumps
+tip: read above for list of most-executed functions
+
+*/
+
+
+
+/*
+// moved to pk.defs.qc
+
 float GRAP_IDEAL = 0; // Going nothing
 float GRAP_OUT = 1; // It's outing out
 float GRAP_IN = 2; // It's comming back to the owner
@@ -204,7 +228,7 @@ float() grap_maintainRope =
 	corner = self;
 	cornerOrigin = corner.origin + '0 0 16';
 
-	sf = 300;
+	sf = SAFE_LOOP;
 	while(corner.grap_cornerchainNext && sf > 0)
 	{
 		sf = sf - 1;
@@ -279,7 +303,7 @@ void(entity corner, vector cornerOrigin) grep_createCornerRope =
 
 
 
-		sf = 300;
+		sf = SAFE_LOOP;
 		while(sf > 0)
 		{
 			sf = sf - 1;
@@ -361,7 +385,7 @@ void(entity corner, vector cornerOrigin) grep_createCornerRope =
 	  ropeOwner = rope;
 
 
-		sf = 300;
+		sf = SAFE_LOOP;
 		while(sf > 0)
 		{
 			sf = sf - 1;
@@ -429,7 +453,7 @@ void() grap_touch =
 	self.touch = SUB_Null;
 
 	grapOwner = self.grap_owner;
-	sf = 300;
+	sf = SAFE_LOOP;
 	while(grapOwner.grap_state == GRAP_CORNER && sf > 0)
 	{
 		sf = sf - 1;
@@ -446,7 +470,7 @@ void() grap_touch =
 
 		// set the corner touch functions.
 		grapOwner = self.grap_owner;
-		sf = 300;
+		sf = SAFE_LOOP;
 		while(grapOwner.grap_state == GRAP_CORNER && sf > 0)
 		{
 			sf = sf - 1;
@@ -542,7 +566,7 @@ void() grap_touchOwner =
 
 	  // remove everything
 	  grapOwner = self.grap_owner;
-		sf = 300;
+		sf = SAFE_LOOP;
 		while(grapOwner.grap_state == GRAP_CORNER && sf > 0)
 		{
 			sf = sf - 1;
@@ -752,7 +776,7 @@ void(entity grapOwner) grap_remove =
 	local float sf;
 	e = grapOwner.grap_cornerchainNext;
 
-	sf = 300;
+	sf = SAFE_LOOP;
 	while(e && sf > 0)
 	{
 		sf = sf - 1;
@@ -790,7 +814,7 @@ void(entity grapOwner) grap_removeRope =
 	local float sf;
 	e = grapOwner.grap_ropechainPrev;
 
-	sf = 300;
+	sf = SAFE_LOOP;
 	while(e && sf > 0)
 	{
 		sf = sf - 1;
@@ -853,7 +877,7 @@ entity(entity start) grap_findHarpoon =
 {
 	local float sf;
 
-	sf = 300;
+	sf = SAFE_LOOP;
 	while(start.grap_cornerchainNext && sf > 0)
 	{
 		sf = sf - 1;
@@ -912,7 +936,7 @@ float() grap_checkCornerLines =
 	corner = self.grap_cornerchainNext;
 	cornerOrigin = self.origin + '0 0 16';
 
-	sf = 300;
+	sf = SAFE_LOOP;
 	while(corner && sf > 0)
 	{
 		sf = sf - 1;
@@ -1135,7 +1159,7 @@ void() grap_checkIfGrap =
 
 	  // and it's going out...
 	  grapOwner = other.grap_owner;
-		sf = 300;
+		sf = SAFE_LOOP;
 		while(grapOwner.grap_state == GRAP_CORNER && sf > 0)
 		{
 		sf = sf - 1;

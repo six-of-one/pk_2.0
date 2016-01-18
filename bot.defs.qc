@@ -147,6 +147,9 @@ float nearlight;
 //void (float scoretype) PrintScores;
 //float () FindGood;
 
+// id bots
+float(entity e) IROBOT;
+
 // client links
 float () getrandombotskin;
 void () NewCarriedPath;

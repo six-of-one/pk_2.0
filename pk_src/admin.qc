@@ -1462,6 +1462,7 @@ void() AdminCommands =
 				if (self.lefty != 3) AddAnotherBot (f);
 				if (e != NUMBOTS) self.wad = "\nLoaded requested pk*bot(s) on server.";
 			}
+			self.lefty = 0;
 		}
 		else if (self.lefty == 11 || self.lefty == 13 || self.lefty == 14)
 		{
@@ -1481,18 +1482,21 @@ void() AdminCommands =
 				if (self.lefty != 13) BotConnect(0, 0, f);
 				if (e != bot_count) self.wad = "\nLoaded requested frikbot(s) on server.";
 			}
+			self.lefty = 0;
 		}
 		else if (self.lefty == 2)
 		{
 			e = NUMBOTS;
 			removeBot(world);
 			if (e != NUMBOTS) self.wad = "\nRemoved a pk*bot from server.";
+			self.lefty = 0;
 		}
 		else if (self.lefty == 12)
 		{
 			e = bot_count;
 			KickABot();
 			if (e != bot_count) self.wad = "\nRemoved a frikbot from server.";
+			self.lefty = 0;
 		}
 		else if (self.lefty == 5)
 		{
@@ -1501,6 +1505,7 @@ void() AdminCommands =
 				self.wad = "\npk*bots will not be quiet.";
 			else
 				self.wad = "\ncats got pk*bots tongues.";
+			self.lefty = 0;
 		}
 		else if (self.lefty == 7)
 		{
@@ -1514,6 +1519,7 @@ void() AdminCommands =
 				serverflags = (serverflags | UNRESTRICTED);
 				self.wad = "\nBot commands NOT restricted on server.\n\banyone can issue bot admin commands!";
 			}
+			self.lefty = 0;
 		}
 		else if (self.lefty == 8)
 		{
@@ -1527,6 +1533,7 @@ void() AdminCommands =
 				serverflags = (serverflags | FL_OBSERVER);
 				self.wad = "\n\bAll players can observe.";
 			}
+			self.lefty = 0;
 		}
 		if (self.lefty == 9)
 		{
@@ -1545,6 +1552,7 @@ void() AdminCommands =
 			else if (f == 2) self.wad = "\nSkill level is 2.";
 			else if (f == 3) self.wad = "\nSkill level is 3.";
 			else self.wad = "\nSkill level is UNKNOWN!.";
+			self.lefty = 0;
 		}
 		else
 			self.lefty = 0;
@@ -2154,6 +2162,8 @@ void() PK_AdminImpulse =
 
 float() admin_postthink =
 {
+	if (IROBOT(self)) return(FALSE); // just incase a bot triggers user menu or admin entry...
+
 	pk_adminframe = framecount;
 //	if (deathmatch) // admin is debateable in SP, but...
 	if (self.attack_finished < time)
@@ -2183,4 +2193,20 @@ float() admin_postthink =
 		if (self.admin != LIVE_ADMIN) return(TRUE);
 	}
 	return(FALSE);
+};
+
+// get admin away from a telefrag area - because admin cant cause or get hit by telefrag
+
+void () tfragadmin_touch =
+{
+	if (other == self.owner)
+		return ;
+
+	if ((other.classname == "player") || (other.classname == "pk*bot"))
+	{
+		self.think = phone_teleport;
+		self.nextthink = (time + 0.5);
+		self.touch = SUB_Null;
+	}
+
 };

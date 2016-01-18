@@ -44,7 +44,7 @@ void () info_intermission =
 
 void () SetChangeParms =
 {
-	if (self.health <= 0)
+	if (self.health <= 0 || self.classname == OBSERVER) // Cataboligne - 5.3.10 - fix level change issue when in dead observer or admin observer
 	{
 		SetNewParms_PK();
 		if (PK || custom_hub_loaded) parm16 = parm16 | 256; // Cataboligne - 8.22.9 - pk orig oper

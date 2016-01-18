@@ -358,6 +358,20 @@ void () tdeath_touch =
 	if (other == self.owner)
 		return ;
 
+	if (other.admin)
+	if (other.admin != LIVE_ADMIN)
+	if (other.admin != USER_MENU) // Cataboligned - 5.4.10 - dont let admin be telefragged either
+	{
+		local entity e;
+
+		if (other.aiment) return;
+		other.aiment = e = spawn ();  // and get them out of here
+		e.owner = self;
+		e.think = phone_teleport;
+		e.nextthink = (time + 0.5);
+		return;
+	}
+
 // frag anyone who teleports in on top of an invincible player
 	if ((other.classname == "player") || (other.classname == "pk*bot"))
 	{
@@ -372,8 +386,8 @@ void () tdeath_touch =
 	}
 	if (other.classname == OBSERVER)
 	{
-		other.takedamage = DAMAGE_AIM;
-
+//		other.takedamage = DAMAGE_NO;
+		return;
 	}
 	if (other.classname == "beartrap") // *pk - dont telefrag beartraps
 		return;
@@ -402,6 +416,11 @@ void (vector org, entity death_owner) spawn_tdeath =
 	death.owner = death_owner;
 
 	force_retouch = 2;		// make sure even still objects get hit
+
+	if (other.admin)
+	if (other.admin != LIVE_ADMIN)
+	if (other.admin != USER_MENU) // dont let admin telefrag anyone
+		death.touch = tfragadmin_touch;
 };
 
 void () teleport_touch =

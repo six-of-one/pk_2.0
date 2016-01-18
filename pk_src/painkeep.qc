@@ -182,6 +182,7 @@ void() PK_precache =
 							 | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // pk plus weps
 
 	VW_ARMOR = FALSE; /// has issues - can be turned on in dp with sv_vw_armor 1 // TRUE; // should only ever be 1 or 0 - used in conditionals
+	VW = TRUE;
 
 // testing
 
@@ -203,7 +204,7 @@ void() PK_precache =
 	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake compatability mode starts here
 	{
 		if (!Q_99) PK_ADMIN = 0;
-//		else Q_100 = 0; // constant right now
+//		else Q_100 = 0; // these are exclusive - constant right now
 		PK_ART = PK_100 = 0;
 	}
 
@@ -429,8 +430,107 @@ float(string mp) PK_mapmode =
 };
 
 // fn(pk_srvcmd_set) - setup new server control vars & load from cfg or alias
+// fn(pk_srvcmd_load) - load new server control vars
+// fn(botmatch) - load bots for bot match
 
 // NOTE - only works under darkplaces for now
+
+void() botmatch =
+{
+	local float f, t, b;
+
+	if (bot_count > 0 || NUMBOTS > 0)
+	{
+		bprint("Bots already running - botmatch exiting\n");
+		remove(self);
+		return;
+	}		
+
+	bprint("Botmatch turned on, loading ");
+	bprint(ftos(self.cnt));
+	bprint(" bots!\n");
+
+	b = NUMBOTS;
+	
+	t = self.cnt / 2;
+
+	while (t > 0.33 && self.cnt > 0)
+	{
+		f = rint(random() * 3.3);
+		AddAnotherBot (f);
+		self.cnt = self.cnt - 1;
+		t = t - 1;
+	}
+
+	if (b != NUMBOTS)
+	{
+		bprint("---> loaded ");
+		bprint(ftos(NUMBOTS));
+		bprint(" pk*bots\n");
+	}
+	else
+	{
+		bprint("---> Error: bots not loaded, exiting - make sure this is a multiplayer server\n");
+		remove(self);
+		return;
+	}
+
+	b = bot_count;
+
+	if (self.cnt < 1)
+	{
+		remove(self);
+		return;
+	}
+
+	while (self.cnt > 0)
+	{
+		f = rint(random() * 3.3);
+		BotConnect(0, 0, f);
+		self.cnt = self.cnt - 1;
+	}
+
+	if (b != bot_count)
+	{
+		bprint("---> loaded ");
+		bprint(ftos(bot_count));
+		bprint(" frikbots\n");
+	}
+	else
+	{
+		bprint("---> Error: bots not loaded, exiting - make sure this is a multiplayer server\n");
+	}
+	remove(self);
+};
+
+void() pk_srvcmd_load =
+{
+	local entity e;
+
+	if (!DARKPLACES && !chaos) return;
+
+	VW = cvar("sv_vw");
+	VW_ARMOR = cvar("sv_vw_armor");
+	PK_100 = cvar("sv_pk100");
+	PK_ART_DEF  = cvar("sv_pk_art");
+
+// check for botmatch changes
+	if (cvar("sv_botmatch") != 0)
+	{
+		if (bot_count > 0 || NUMBOTS > 0) return; // have bots, go back
+
+		e = spawn();
+		if (e)
+		{
+			e.think = botmatch;
+			e.nextthink = time + 3 + 4 * random(); // make em wait a few secs, build suspense
+			e.cnt = cvar("sv_botmatch");
+			if (e.cnt == 1) e.cnt = 6; // default load = 6 bots
+			if (e.cnt < 0) e.cnt = 0 - e.cnt; // default load -{number} runs {number} bots
+		}
+	}
+
+};
 
 void() pk_srvcmd_set =
 {
@@ -439,13 +539,17 @@ void() pk_srvcmd_set =
 	if (!DARKPLACES && !chaos) return;
 
 // new server controls
+// NOTE: chaos eng mod will have to make all these
+
 	if (DARKPLACES) // reg under darkplaces - chaos engine has pre-reg
 	{
+		registercvar("sv_vw", "1");
 		registercvar("sv_vw_armor", "0");
 		registercvar("sv_pk100", "0");
 		registercvar("sv_pk_art", "1");
 		registercvar("sv_cam_off", "0"); // set to 1 to turn cam off entirely
 		registercvar("sv_cam_def", "1"); // set to 0 to default to no cam view
+		registercvar("sv_botmatch", "0"); // load bots without admin
 
 // new client controls
 		registercvar("cl_cam_off", "0"); // set to 1 to turn cam off entirely
@@ -470,10 +574,8 @@ void() pk_srvcmd_set =
 			localcmd(mapname);
 			localcmd("_server.cfg\n");
 		}
-	
-	VW_ARMOR = cvar("sv_vw_armor");
-	PK_100 = cvar("sv_pk100");
-	PK_ART_DEF  = cvar("sv_pk_art");
+
+	pk_srvcmd_load ();
 };
 
 // called from many places - handles pk_mode 0 where map sets whether or not we use PK stuff
@@ -594,6 +696,8 @@ void() SetNewParms_PK =
 	{
 		parm16 = parm16 | PK_IT_EXTRADISP;
 	}
+
+	cam_parms(2);
 };
 
 // called from SetChangeParms - saves off pk parms for level change

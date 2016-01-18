@@ -303,54 +303,175 @@ float () BotFoundTarget =
 	if (huntspeakchance <= 0.010)
 	{
 		bprint (self.netname);
-		bprint (": I'm gonna make you my bitch ");
-		bprint (self.enemy.netname);
-		bprint ("!\n");
+		if (self.netname == "M*nstAr") // 5.5.10 - Monstar mob msgs
+		{
+			bprint (": Prepare the transformation chamber Yesman!\n");
+		}
+		else if (self.netname == "Hard_ware")
+		{
+			bprint (": Right away boss...\n");
+		}
+		else if (self.netname == "Yesman")
+		{
+			bprint (": Chamber, Yes, transform, Yes, right away, Yes...\n");
+		}
+//		else if (self.netname == "")
+//		{
+//			bprint ("\n");
+//		}
+		else
+		{
+		if (self.netname == "Codename: blizzard")
+			{
+			bprint (": is it cold enough yet ");
+			bprint (self.enemy.netname);
+			bprint (" ?\n");
+			}
+		else if (self.netname == "Kill=death+die-dead")
+			{
+			bprint (": gonna solve your equation with 12, ");
+			bprint (self.enemy.netname);
+			bprint (" - 12 gauge that is!\n");
+			}
+		else
+			{
+			bprint (": I'm gonna make you my bitch ");
+			bprint (self.enemy.netname);
+			bprint ("!\n");
+			}
+		}
 	}
 	else if ((huntspeakchance <= 0.020) && (huntspeakchance > 0.010))
 	{
 		bprint (self.netname);
-		bprint (": Don't Fuck with Daddy ");
-		bprint (self.enemy.netname);
-		bprint ("!\n");
+		if (self.netname == "M*nstAr")
+		{
+			bprint (": I'll get you for this Silverhawks!\n");
+		}
+		else if (self.netname == "Hard_ware")
+		{
+			bprint (": Look boss - a super sky shadow.\n");
+		}
+		else if (self.netname == "Yesman")
+		{
+			bprint (": Ooh, Yes boss, sure thing boss.\n");
+		}
+		else
+		{
+		if (self.netname == "Ray ---=>")
+			{
+			bprint (": visiting the Volcano God again ");
+			bprint (self.enemy.netname);
+			bprint (" ?\n");
+			}
+		else
+			{
+			bprint (": Don't Fuck with Daddy ");
+			bprint (self.enemy.netname);
+			bprint ("!\n");
+			}
+		}
 	}
 	else if ((huntspeakchance <= 0.030) && (huntspeakchance > 0.020))
 	{
 		bprint (self.netname);
+		if (self.netname == "M*nstAr")
+		{
+			bprint (": Moonstar of Limbo, give me the muscles, the might, the menace of...M*NSTAR!\n");
+		}
+		else if (self.netname == "Hard_ware")
+		{
+			bprint (": The Silverhawks dont stand a chance, boss.\n");
+		}
+		else if (self.netname == "Yesman")
+		{
+			bprint (": Boss, we gotta get outa here.\n");
+		}
+		else
+		{
 		bprint (": Come meet my lil' friend ");
 		bprint (self.enemy.netname);
 		bprint ("!\n");
+		}
 	}
 	else if ((huntspeakchance <= 0.040) && (huntspeakchance > 0.030))
 	{
 		bprint (self.netname);
+		if (self.netname == "M*nstAr")
+		{
+			bprint (": Stargazer, I'll get you for this - no one puts M*nstar away...\n");
+		}
+		else if (self.netname == "Hard_ware")
+		{
+			bprint (": Its a freeze ray boss.\n");
+		}
+		else if (self.netname == "Yesman")
+		{
+			bprint (": No boss, er I mean Yes boss.\n");
+		}
+		else
+		{
 		bprint (": Looks like ");
 		bprint (self.enemy.netname);
 		if (random() < 0.4)
-			bprint (" just shit his pants!\n");
+			bprint (" just shat himself!\n");
 		else
-			bprint (" is an empty headed animal food trough wiper!\n"); // Cat - 4.5.10 - Python mods
+			if (random() < 0.5)
+				bprint (" is an empty headed animal food trough wiper!\n"); // Cat - 4.5.10 - Python mods
+			else
+				bprint (" will have to cut down the tallest tree in the forest with...a HERRING!\n"); // Cat - 5.5.10 - more python mods
+		}
 	}
 	else if ((huntspeakchance <= 0.050) && (huntspeakchance > 0.040))
 	{
 		bprint (self.netname);
+		if (self.netname == "M*nstAr")
+		{
+			bprint (": I'll make short work of you Silverhawks...\n");
+		}
+		else if (self.netname == "Hard_ware")
+		{
+			bprint (": I got it boss!\n");
+		}
+		else if (self.netname == "Yesman")
+		{
+			bprint (": It's super Yesman...Yes.\n");
+		}
+		else if (self.netname == "Ray ---=>")
+		{
+			bprint (": run faster ");
+			bprint (self.enemy.netname);
+			bprint ("!\n");
+		}
+		else
+		{
 		bprint (": ");
 		bprint (self.enemy.netname);
-		bprint (" has 5 seconds to beg for mercy, Times up!\n");
+		if (random() < 0.4)
+			bprint (" has 5 seconds to beg for mercy, Times up!\n");
+		else
+			bprint (" is going to be 6 feet under!\n");
+		}
 	}
 	else if ((huntspeakchance <= 0.060) && (huntspeakchance > 0.050)) // Cat - unk date - Python mods
 	{
 		bprint (self.netname);
 		bprint (": ");
 		bprint (self.enemy.netname);
-		bprint (" - Your mother was a hamster and your father smelt of elderberries!\n");
+		if (random() < 0.5)
+			bprint (" - Your mother was a hamster and your father smelt of elderberries!\n");
+		else
+			bprint (" - you got any cheese in that cheese shop?\n");
 	}
 	else if ((huntspeakchance <= 0.070) && (huntspeakchance > 0.060))
 	{
 		bprint (self.netname);
 		bprint (": ");
 		bprint (self.enemy.netname);
-		bprint (" has got two empy halves of coconuts and is banging them together!\n");
+		if (random() < 0.5)
+			bprint (" has got two empy halves of coconuts and is banging them together!\n");
+		else
+			bprint (" is the son of a silly person!\n");
 	}
 	if (self.enemy == world)
 	{

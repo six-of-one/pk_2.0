@@ -81,6 +81,7 @@ void () phone_teleport =
 	org = (phonedest.origin + (32 * v_forward));
 	spawn_tfog (org);
 	spawn_tdeath (phonedest.origin,self.owner);
+	self.owner.aiment = world; // Cataboligne - 5.4.10 - telefrag escape for admin, need to reset this
 	if ( !self.owner.health )
 	{
 		self.owner.origin = phonedest.origin;

@@ -33,7 +33,7 @@ void() hub_teleport_touch =
 	local string str;
 
 	// make sure the thing is the player
-	if (other.classname != "player" && other.classname != "pk*bot") // *bot
+	if (other.classname != "player" && other.classname != "pk*bot" && other.classname != OBSERVER) // *bot
 		return;
 
 	// make sure we don't gib the last player!!!
@@ -1180,6 +1180,8 @@ void() WaitForVotesThink =
 			}
 
 			// count the numbeer of votes cast
+			local string srch;
+			srch = "player";
 			pl = find(world, classname, "player");
 			maxplayers = votecast = 0;
 			while (pl != world)
@@ -1192,7 +1194,20 @@ void() WaitForVotesThink =
 					maxplayers = maxplayers + 1;
 				}
 
-				pl = find(pl, classname, "player");
+				pl = find(pl, classname, srch);
+
+				if (!pl)
+				if (srch != "pk*bot" && srch != OBSERVER) // *bot - search out bots too
+				{
+					srch = "pk*bot";
+					pl = find(world, classname, srch);
+				}
+				if (!pl)
+				if (srch == "pk*bot") // find jafo now
+				{
+					srch = OBSERVER;
+					pl = find(world, classname, srch);
+				}
 			}
 
 			playerIntermissionVotesTimeLeft(maxplayers, votecast, timemins, timedef);

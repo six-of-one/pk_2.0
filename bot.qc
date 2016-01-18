@@ -99,6 +99,21 @@ void(entity who) UpdateClient =
 };
 */
 
+// fn(IROBOT) - return true if passed ent is a bot - meant to be a bot catch all
+
+// e - ent to test
+
+float(entity e) IROBOT =
+{
+	float c;
+
+	if (!e.ishuman && e.classname == "player") c = TRUE; // frikbot found
+	else if (e.classname == "pk*bot") c = TRUE; // pk*bot found
+	else c = FALSE; // maybe human, maybe vegetable, maybe mineral, but not a bot
+
+	return(c);
+};
+
 void (entity e) Update_Frags =
 {
 	WriteByte (MSG_ALL,MSG_UPDATEFRAGS);

@@ -179,6 +179,7 @@ void() viswep_post;
 void() viswep_pre;
 void(entity vh, float cd) viswep_ld;
 void() player_nail3;
+float VW; // viswep support - set to 0 to return to generic gun / axe
 float VW_ARMOR; // viswep armor support - eventually admin controlled & cvar
 
 // Items used in impulse 1
@@ -388,7 +389,8 @@ float pk_itemovr_ck;
 float (float rl) AdminBitFlag;
 void() dyn_item;
 void() pk_cphub;
-void(entity e) pk_admincfg
+void(entity e) pk_admincfg;
+void () tfragadmin_touch;
 
 float PK_TP_STATUSON			= 256;
 .float hubstartupmessage;

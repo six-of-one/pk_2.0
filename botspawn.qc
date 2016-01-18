@@ -266,7 +266,6 @@ void () PutBotInServer =
 	local vector spot;
 	local string tmp;
 	local float aimvar;
-
 	self.classname = "pk*bot";
 	self.health = 100;
 	self.takedamage = DAMAGE_AIM;
