@@ -1252,7 +1252,7 @@ void() pk_placeitem =
 
 
 // Cataboligne - added check here because new mode (not permanently PK & loaded a PK map can set PK mode after nailguns get loaded on map
-	if (PK)
+	if (PK) // pulse nail replace
 	if (self.wad == "")
 	if (self.classname == "weapon_nailgun" || self.weapon == IT_NAILGUN)
 	if (self.model == "progs/g_nail.mdl")

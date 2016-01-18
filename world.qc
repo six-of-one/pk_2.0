@@ -412,7 +412,7 @@ void (entity ent) CopyToBodyQue =
 	bodyque_head.movetype = ent.movetype;
 	bodyque_head.velocity = ent.velocity;
 	bodyque_head.flags = 0;
-	if (PK) bodyque_head.skin = ent.skin; // *pk damage skins
+	if (!Q_100) bodyque_head.skin = ent.skin; // *pk damage skins
 	setorigin (bodyque_head,ent.origin);
 	setsize (bodyque_head,ent.mins,ent.maxs);
 	bodyque_head = bodyque_head.owner;

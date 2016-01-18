@@ -86,7 +86,7 @@ void(vector org, vector vec) LaunchLaser =
 	newmis.movetype = MOVETYPE_FLY;
 	newmis.solid = SOLID_BBOX;
 	newmis.effects = EF_DIMLIGHT;
-	if (PK) newmis.AIRG_Flags = AIRG_EXCLUDEENTITY; // *pk - This code excludes the Laser fire from enforcers as well as the laser fire from laser turrets as well from the affect of the AirGun. 
+	if (!Q_100) newmis.AIRG_Flags = AIRG_EXCLUDEENTITY; // *pk - This code excludes the Laser fire from enforcers as well as the laser fire from laser turrets as well from the affect of the AirGun. 
 
 	setmodel (newmis, "progs/laser.mdl");
 	setsize (newmis, '0 0 0', '0 0 0');		

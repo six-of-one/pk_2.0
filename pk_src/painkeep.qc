@@ -275,7 +275,6 @@ void() PK_precache =
 	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake compatability mode starts here
 	{
 		if (!Q_99) PK_ADMIN = 0;
-//		else Q_100 = 0; // these are exclusive - constant right now
 		PK_ART = PK_100 = 0;
 	}
 
@@ -322,14 +321,14 @@ void() PK_precache =
 // got mode, set PK master switch
 	PK = FALSE;
 
-  if (!Q_100 && !Q_99) // Cataboligne - 8.16.9 - quake compatability mode
+  if (!Q_100 && !Q_99) // server not cfg for quake compatibility - set pk mode based on map / admin
  {
 	if (PK_100) PK = TRUE;
 	else if (pk_flags & PK_ALWAYS)
 		PK = TRUE;
 	else if (pk_flags & PK_NEVER)
 		PK = FALSE;
-	else // if (!pk_flags & PK_MAP)
+	else
 	{
 		PK = PK_mapmode(world.model);
 	}
@@ -442,7 +441,7 @@ void() PK_precache =
 
 string (string s) precache_sound =
 {
-	if (time < DYN_START_TIME)
+	if (time < PIC_TO)
 		return(precache_sound__(s));
 };
 
@@ -472,74 +471,108 @@ string (string s) precache_model =
 
 float(string mp) PK_mapmode =
 {
-	local float md;
+//	local float md;
+//	md = FALSE;
 
-	md = FALSE;
-
-	if (mp == "maps/start.bsp" && world.message == "hub") md = TRUE; // NOTE: relies on loaded map
-	else if (mp == "maps/pk0.bsp") md = TRUE;
-	else if (mp == "maps/pk1.bsp") md = TRUE;
-	else if (mp == "maps/pk2.bsp") md = TRUE;
-	else if (mp == "maps/pk3.bsp") md = TRUE;
-	else if (mp == "maps/pk4.bsp") md = TRUE;
-	else if (mp == "maps/pk5.bsp") md = TRUE;
-	else if (mp == "maps/pk6.bsp") md = TRUE;
-	else if (mp == "maps/pk7.bsp") md = TRUE;
-	else if (mp == "maps/pk8.bsp") md = TRUE;
-	else if (mp == "maps/pk9.bsp") md = TRUE;
-	else if (mp == "maps/pk10.bsp") md = TRUE;
-	else if (mp == "maps/pk11.bsp") md = TRUE;
-	else if (mp == "maps/pk12.bsp") md = TRUE;
-	else if (mp == "maps/pk13.bsp") md = TRUE;
-	else if (mp == "maps/pk14.bsp") md = TRUE;
-	else if (mp == "maps/pk15.bsp") md = TRUE;
-	else if (mp == "maps/pk16.bsp") md = TRUE;
-	else if (mp == "maps/pk17.bsp") md = TRUE;
-	else if (mp == "maps/pk18.bsp") md = TRUE;
-	else if (mp == "maps/painkeep.bsp") md = TRUE;
+	if (mp == "maps/start.bsp" && world.message == "hub") return(TRUE); // NOTE: relies on loaded map
+	else if (mp == "maps/pk0.bsp") return(TRUE);
+	else if (mp == "maps/pk1.bsp") return(TRUE);
+	else if (mp == "maps/pk2.bsp") return(TRUE);
+	else if (mp == "maps/pk3.bsp") return(TRUE);
+	else if (mp == "maps/pk4.bsp") return(TRUE);
+	else if (mp == "maps/pk5.bsp") return(TRUE);
+	else if (mp == "maps/pk6.bsp") return(TRUE);
+	else if (mp == "maps/pk7.bsp") return(TRUE);
+	else if (mp == "maps/pk8.bsp") return(TRUE);
+	else if (mp == "maps/pk9.bsp") return(TRUE);
+	else if (mp == "maps/pk10.bsp") return(TRUE);
+	else if (mp == "maps/pk11.bsp") return(TRUE);
+	else if (mp == "maps/pk12.bsp") return(TRUE);
+	else if (mp == "maps/pk13.bsp") return(TRUE);
+	else if (mp == "maps/pk14.bsp") return(TRUE);
+	else if (mp == "maps/pk15.bsp") return(TRUE);
+	else if (mp == "maps/pk16.bsp") return(TRUE);
+	else if (mp == "maps/pk17.bsp") return(TRUE);
+	else if (mp == "maps/pk18.bsp") return(TRUE);
+	else if (mp == "maps/painkeep.bsp") return(TRUE);
 	else if (PK_ADHUB)	// add on maps from painkeep updates
 	{
-		if (mp == "maps/hub2.bsp") md = TRUE;
-		else if (mp == "maps/hub3.bsp") md = TRUE; // renamed for 1.2 code to work with main hub (start.bsp)
-		else if (mp == "maps/painkeep2.bsp") md = TRUE;
-		else if (mp == "maps/pkts00.bsp") md = TRUE;
-		else if (mp == "maps/pkts01.bsp") md = TRUE;
-		else if (mp == "maps/pkts02.bsp") md = TRUE;
-		else if (mp == "maps/pkts03.bsp") md = TRUE;
-		else if (mp == "maps/pkts04.bsp") md = TRUE;
-		else if (mp == "maps/pkts05.bsp") md = TRUE;
-		else if (mp == "maps/pkts06.bsp") md = TRUE;
-		else if (mp == "maps/pkts07.bsp") md = TRUE;
-		else if (mp == "maps/pkts08.bsp") md = TRUE;
-		else if (mp == "maps/pkts09.bsp") md = TRUE;
-		else if (mp == "maps/pkts10.bsp") md = TRUE;
-		else if (mp == "maps/pkts11.bsp") md = TRUE;
-		else if (mp == "maps/pkts12.bsp") md = TRUE;
-		else if (mp == "maps/pkts13.bsp") md = TRUE;
-		else if (mp == "maps/pkts14.bsp") md = TRUE;
-	//	else if (mp == "maps/pkts15.bsp") md = TRUE;
-		else if (mp == "maps/pkn1.bsp") md = TRUE;
-		else if (mp == "maps/pkn2.bsp") md = TRUE;
-		else if (mp == "maps/pkn3.bsp") md = TRUE;
-		else if (mp == "maps/pkn4.bsp") md = TRUE;
-		else if (mp == "maps/pkn5.bsp") md = TRUE;
-		else if (mp == "maps/pkn6.bsp") md = TRUE;
-		else if (mp == "maps/pkn7.bsp") md = TRUE;
-		else if (mp == "maps/pkn8.bsp") md = TRUE;
-		else if (mp == "maps/pkn9.bsp") md = TRUE;
-		else if (mp == "maps/pkn10.bsp") md = TRUE;
-		else if (mp == "maps/pkn11.bsp") md = TRUE;
-		else if (mp == "maps/pkn12.bsp") md = TRUE;
-		else if (mp == "maps/pkn13.bsp") md = TRUE;
-		else if (mp == "maps/pkn14.bsp") md = TRUE;
-		else if (mp == "maps/pkn15.bsp") md = TRUE;
-		else if (mp == "maps/pkn16.bsp") md = TRUE;
-		else if (mp == "maps/pkn17.bsp") md = TRUE;
-		else if (mp == "maps/pkn18.bsp") md = TRUE;
-		else if (mp == "maps/pkn19.bsp") md = TRUE;
-		else if (mp == "maps/pkn20.bsp") md = TRUE;
+		if (mp == "maps/hub2.bsp") return(TRUE);
+		else if (mp == "maps/hub3.bsp") return(TRUE); // renamed for 1.2 code to work with main hub (start.bsp)
+
+		else if (mp == "maps/pkn1.bsp") return(TRUE);
+		else if (mp == "maps/pkn2.bsp") return(TRUE);
+		else if (mp == "maps/pkn3.bsp") return(TRUE);
+		else if (mp == "maps/pkn4.bsp") return(TRUE);
+		else if (mp == "maps/pkn5.bsp") return(TRUE);
+		else if (mp == "maps/pkn6.bsp") return(TRUE);
+		else if (mp == "maps/pkn7.bsp") return(TRUE);
+		else if (mp == "maps/pkn8.bsp") return(TRUE);
+		else if (mp == "maps/pkn9.bsp") return(TRUE);
+		else if (mp == "maps/pkn10.bsp") return(TRUE);
+		else if (mp == "maps/pkn11.bsp") return(TRUE);
+		else if (mp == "maps/pkn12.bsp") return(TRUE);
+		else if (mp == "maps/pkn13.bsp") return(TRUE);
+		else if (mp == "maps/pkn14.bsp") return(TRUE);
+		else if (mp == "maps/pkn15.bsp") return(TRUE);
+		else if (mp == "maps/pkn16.bsp") return(TRUE);
+		else if (mp == "maps/pkn17.bsp") return(TRUE);
+		else if (mp == "maps/pkn18.bsp") return(TRUE);
+		else if (mp == "maps/pkn19.bsp") return(TRUE);
+		else if (mp == "maps/pkn20.bsp") return(TRUE);
+		else if (mp == "maps/pkts00.bsp") return(TRUE);
+		else if (mp == "maps/pkts01.bsp") return(TRUE);
+		else if (mp == "maps/pkts02.bsp") return(TRUE);
+		else if (mp == "maps/pkts03.bsp") return(TRUE);
+		else if (mp == "maps/pkts04.bsp") return(TRUE);
+		else if (mp == "maps/pkts05.bsp") return(TRUE);
+		else if (mp == "maps/pkts06.bsp") return(TRUE);
+		else if (mp == "maps/pkts07.bsp") return(TRUE);
+		else if (mp == "maps/pkts08.bsp") return(TRUE);
+		else if (mp == "maps/pkts09.bsp") return(TRUE);
+		else if (mp == "maps/pkts10.bsp") return(TRUE);
+		else if (mp == "maps/pkts11.bsp") return(TRUE);
+		else if (mp == "maps/pkts12.bsp") return(TRUE);
+		else if (mp == "maps/pkts13.bsp") return(TRUE);
+		else if (mp == "maps/pkts14.bsp") return(TRUE);
+		else if (mp == "maps/painkeep2.bsp") return(TRUE);
+
+		else if (mp == "maps/air2.bsp") return(TRUE);
+		else if (mp == "maps/air3.bsp") return(TRUE);
+		else if (mp == "maps/anomie.bsp") return(TRUE);
+		else if (mp == "maps/arena.bsp") return(TRUE);
+		else if (mp == "maps/bastion.bsp") return(TRUE);
+		else if (mp == "maps/blood2.bsp") return(TRUE);
+		else if (mp == "maps/blood3.bsp") return(TRUE);
+		else if (mp == "maps/campers-cove.bsp") return(TRUE);
+		else if (mp == "maps/castle2.bsp") return(TRUE);
+		else if (mp == "maps/chv_hub.bsp") return(TRUE);
+		else if (mp == "maps/city.bsp") return(TRUE);
+		else if (mp == "maps/court.bsp") return(TRUE);
+		else if (mp == "maps/crater.bsp") return(TRUE);
+		else if (mp == "maps/crater2.bsp") return(TRUE);
+		else if (mp == "maps/doom1_e1.bsp") return(TRUE);
+		else if (mp == "maps/egyptra.bsp") return(TRUE);
+		else if (mp == "maps/egyptra2.bsp") return(TRUE);
+		else if (mp == "maps/egyptra3.bsp") return(TRUE);
+		else if (mp == "maps/factory.bsp") return(TRUE);
+		else if (mp == "maps/factory2.bsp") return(TRUE);
+		else if (mp == "maps/factory3.bsp") return(TRUE);
+		else if (mp == "maps/fragtown.bsp") return(TRUE);
+		else if (mp == "maps/garden.bsp") return(TRUE);
+		else if (mp == "maps/giza2.bsp") return(TRUE);
+		else if (mp == "maps/haunted.bsp") return(TRUE);
+		else if (mp == "maps/platinum.bsp") return(TRUE);
+		else if (mp == "maps/platinum2.bsp") return(TRUE);
+		else if (mp == "maps/platinum3.bsp") return(TRUE);
+		else if (mp == "maps/q1edgepk.bsp") return(TRUE);
+		else if (mp == "maps/spine2.bsp") return(TRUE);
+		else if (mp == "maps/summerpk.bsp") return(TRUE);
+		else if (mp == "maps/toxic.bsp") return(TRUE);
+		else if (mp == "maps/toxic2.bsp") return(TRUE);
+		else if (mp == "maps/well.bsp") return(TRUE);
 	}
-	return(md);
+	return(FALSE);
 };
 
 // fn(q_startmap) - set q1 startmap name in single player
@@ -817,6 +850,16 @@ void() pk_liveupd =
 	{
 		PK_ART  = cvar("sv_pk_art");
 		pkplus_item_control_loop();
+		if (!PK_ART)
+		{
+			DYN_ART = FALSE;
+			DYN_ARTFR = FALSE;
+		}
+		else
+		{
+			DYN_ART = cvar("pk_dyn_art");
+			DYN_ARTFR = cvar("pk_dyn_art_force");
+		}
 	}
 
 // dynamic items
@@ -974,16 +1017,16 @@ void() pk_srvcmd_set =
 	pk_srvcfg = 1;
 
 // pk control
-	PK_99 = FALSE;
-	PK_100 = FALSE; // if true run 100% true to pk v1.11
+	PK_99 = FALSE; // new pk code, no extra env stuff
+	PK_100 = FALSE; // if true run 100% true to pk v1.11 - i n theory, dev purposes only
 	PK_100_OBJERR = FALSE;
 	ADMINLOCK = 0;
 	WARNING = FALSE;
 	BOTFREEZE = 0;
 
 // q1 control
-	Q_99 = FALSE;
-	Q_100 = FALSE;
+	Q_99 = FALSE; // quake mode with all env effects / extra weps
+	Q_100 = FALSE; // if true run 100% true to quake v106 - i n theory, dev purposes only
 	Q_100_OBJERR = FALSE;
 
 // runes

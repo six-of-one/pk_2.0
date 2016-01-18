@@ -85,25 +85,6 @@ float(entity ck, string prv) pk_art_movshot_ck =
 	return(ev);
 };
 
-// fn(pk_art_actor_ck) - check for pk artifacts actor
-
-// return TRUE if not an actor or not using pk art
-
-float(entity ck) pk_art_actor_ck =
-{
-	local float ev;
-
-	ev = TRUE;
-	if (!PK_ART) return(ev);
-
-	if (ck.pkplus_actortype == PKPLUS_ACTORQUAD)
-		ev = FALSE;
-
-//	if (self.pkplus_actortype == PKPLUS_ACTORPENT) // just quad for now
-//		ev = FALSE;
-
-	return(ev);
-};
 
 // fn(pk_art_prinv) - print pk artifacts inventory with rest of pk inventory of same nature
 

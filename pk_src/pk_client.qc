@@ -99,7 +99,6 @@ void() SetChangeParms =
 	parm11 = self.pk_explode_ammo + ((self.pk_turretammo & 3) * 16) + ((self.pk_canpabammo & 3) * 64) + ((self.pk_beartrapammo & 3) * 256) + ((self.pk_gravitywellammo & 3) * 1024)
 
 // Cataboligne 8.12.9 purify - pk artifacts
-//;	if (PK_ART) parm11 = parm11 
 	 + ((self.pkplus_egoammo & 3) * 4096) + ((self.pkplus_tombammo & 3) * 16384) + ((self.pkplus_actorammo & 3) * 65536) + ((self.pkplus_phoneammo & 3) * 262144);
 // end pk_art
 
@@ -178,13 +177,10 @@ void() DecodeLevelParms =
 	self.pk_gravitywellammo = floor(parm11 / 1024) & 3;
 
 // Cataboligne 8.12.9 purify - pk artifacts
-//	if (PK_ART)
-//	{
 	self.pkplus_egoammo = floor(parm11 / 4096) & 3;
 	self.pkplus_tombammo = floor(parm11 / 16384) & 3;
 	self.pkplus_actorammo = floor(parm11 / 65536) & 3;
 	self.pkplus_phoneammo = floor(parm11 / 262144) & 3;
-//	}
 // end pk_art
 
 	self.msgcount = (parm16 & 255);

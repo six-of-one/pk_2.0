@@ -154,7 +154,7 @@ void() ShalMissile =
 	missile.think = ShalHome;
 	missile.enemy = self.enemy;
 	missile.touch = ShalMissileTouch;
-	if (PK) AddToSplash(missile); // *pk - Make this entity splash
+	if (!Q_100) AddToSplash(missile); // *pk - Make this entity splash
 };
 
 void() ShalHome =

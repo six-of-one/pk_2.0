@@ -75,7 +75,7 @@ void(entity missile, float mspeed, float accuracy) LaunchMissile =
 // set missile duration
 	missile.nextthink = time + 5;
 	missile.think = SUB_Remove;
-	if (PK) AddToSplash(missile); // *pk - Make this entity splash
+	if (!Q_100) AddToSplash(missile); // *pk - Make this entity splash
 };
 
 
@@ -166,7 +166,7 @@ float()	WizardCheckAttack =
 WizardAttackFinished
 =================
 */
-void ()	WizardAttackFinished = // Cataboligne 9.17.3 - fix compiler warning
+void ()	WizardAttackFinished = // Cataboligne 9.17.3 - fixed this compiler warning
 {
 	if (enemy_range >= RANGE_MID || !enemy_vis)
 	{

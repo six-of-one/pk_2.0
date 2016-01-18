@@ -70,7 +70,6 @@ string (float bt) ammo_by_bit =
 	if (bt == WEP_AIRG) return("weapon_airfist");
 	if (bt == WEP_CPNB) return("item_painkeep_can");
 
-//	if (!PK_ART) return(""); // Cataboligne 8.12.9 purify - pk artifacts
 // pk art item subs by special bits
 	if (bt == WEP_EGO) return("item_pkplus_ego");
 	if (bt == WEP_TOMB) return("item_pkplus_tomb");
@@ -192,7 +191,7 @@ void(string cls) item_call =
 	else if (cls == "weapon_grapgun") weapon_grapgun();
 	else if (cls == "weapon_airfist") weapon_airfist();
 	else if (cls == "item_painkeep_can") item_painkeep_can();
-//	else if (!PK_ART) return; // Cataboligne 8.12.9 purify - pk artifacts
+
 	else if (cls == "item_pkplus_ego") item_pkplus_ego();
 	else if (cls == "item_pkplus_tomb") item_pkplus_tomb();
 	else if (cls == "item_pkplus_actor") item_pkplus_actor();
@@ -721,7 +720,7 @@ void() dyn_item =
 				e.classname = "dyn_item";
 				b = 7;
 				f = 6.4; // painkeep items bits (7 - 13) = 128 - 8192
-				if (DYN_ART || DYN_ARTFR) f = 10.4; // add in (14 - 17) 16384 - 131072
+				if (PK_ART && (DYN_ART || DYN_ARTFR)) f = 10.4; // add in (14 - 17) 16384 - 131072
 				if (DYN_ARTFR_ONLY) // only (14 - 17) 16384 - 131072
 				{
 					b = 14;
@@ -833,6 +832,7 @@ void() item_control_menu =
 // pk_dyn_func_stop - stop func_dynitem processing
 
 // TDO: no pk for q_99
+// CHK: what happens here when pk_art gets turned off on a live server
 
 void() func_dynitem =
 {

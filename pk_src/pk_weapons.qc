@@ -1909,5 +1909,5 @@ void() PK_ImpulseCommands =
 void(entity e) pk_missile_splash =
 {
 		AddToSplash(e); // *pk - Make this entity splash
-		e.weapon = self.weapon; // *pk - Correct death message info
+		e.weapon = self.weapon; // *pk - Correct death message info - CHECK: see grenade kill issue
 }

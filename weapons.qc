@@ -126,7 +126,7 @@ void (vector org, vector vel) SpawnMeatSpray =
 	setmodel (missile,"progs/zom_gib.mdl");
 	setsize (missile, '0 0 0', '0 0 0');
 	setorigin (missile,org);
-	if (PK) AddToSplash(missile); // *pk - Make this entity splash
+	if (!Q_100) pk_missile_splash(missile); // *pk - splash & message setup
 };
 
 /*
@@ -464,7 +464,7 @@ void () W_FireRocket =
 		else
 			setorigin (missile,self.origin + v_forward * VWX_ROCKETL + v_right * VWY_ROCKETL + v_up * VWZ_ROCKETL); // Cataboligne - 9.30.9 - true position fire point
 	}
-	if (PK) pk_missile_splash(missile); // *pk - splash & message setup
+	if (!Q_100) pk_missile_splash(missile); // *pk - splash & message setup
 };
 
 /*
@@ -698,7 +698,7 @@ void () W_FireGrenade =
 		setorigin (missile,self.origin);
 	else
 		setorigin (missile, self.origin + v_forward * VWX_GRENADEL + v_right * VWY_GRENADEL + v_up * VWZ_GRENADEL); // Cataboligne - 9.30.9 - true position fire point
-	if (PK) pk_missile_splash(missile); // *pk - splash & message setup
+	if (!Q_100) pk_missile_splash(missile); // *pk - splash & message setup
 };
 
 
@@ -735,7 +735,7 @@ void (vector org, vector dir) launch_spike =
 	if (!rune_haste(0.1))
 		newmis.velocity = dir * 1000 * 2;
 
-	if (PK) pk_missile_splash(newmis); // *pk - splash & message setup
+	if (!Q_100) pk_missile_splash(newmis); // *pk - splash & message setup
 };
 
 void () W_FireSuperSpikes =
@@ -936,40 +936,28 @@ void () W_SetCurrentAmmo =
 	else if (self.weapon == IT_NAILGUN)
 	{
 		self.currentammo = self.ammo_nails;
-		if (PK_100 || Q_100)
 			self.weaponmodel = "progs/v_nail.mdl";
-		else
-			self.weaponmodel = "progs/v2_nail.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
 	}
 	else if (self.weapon == IT_SUPER_NAILGUN)
 	{
 		self.currentammo = self.ammo_nails;
-		if (PK_100 || Q_100)
 			self.weaponmodel = "progs/v_nail2.mdl";
-		else
-			self.weaponmodel = "progs/v2_nail2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
 	}
 	else if (self.weapon == IT_GRENADE_LAUNCHER)
 	{
 		self.currentammo = self.ammo_rockets;
-		if (PK_100 || Q_100)
 			self.weaponmodel = "progs/v_rock.mdl";
-		else
-			self.weaponmodel = "progs/v2_rock.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
 	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
 		self.currentammo = self.ammo_rockets;
-		if (PK_100 || Q_100)
 			self.weaponmodel = "progs/v_rock2.mdl";
-		else
-			self.weaponmodel = "progs/v2_rock2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
 	}
@@ -985,12 +973,6 @@ void () W_SetCurrentAmmo =
 		self.currentammo = 0;
 		self.weaponmodel = "";
 		self.weaponframe = 0;
-	}
-	if (self.eweapon)
-	{
-	//	self.currentammo = self.eweapon.aflag;
-		self.weaponframe = 0;
-		self.weaponmodel = self.eweapon.weaponmodel;
 	}
 };
 
@@ -1066,11 +1048,6 @@ void () W_Attack =
 	makevectors	(self.v_angle);			// calculate forward angle for velocity
 	self.show_hostile = time + 1;	// wake monsters up
 
-	if (self.eweapon) // removed with !Q_100 full
-	{
-		e_weap_Attack();
-		return;
-	}
 	if (self.weapon == IT_AXE)
 	{
       sound (self, CHAN_WEAPON, "weapons/ax1.wav", 1, ATTN_NORM);
