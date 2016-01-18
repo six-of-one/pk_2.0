@@ -75,7 +75,10 @@ void() PK_precache =
 	precache_model ("progs/turtop.mdl");
 	precache_sound ("weapons/sentry/turrt_3.wav");
 	precache_sound ("weapons/sentry/turcl_2b.wav");
-
+		// new modes
+	precache_model ("progs/laser.mdl");
+	precache_sound ("enforcer/enfire.wav");
+ 
 	// GRAVITY Moved to here so the cheat command would work correctly
 	precache_model ("progs/cubsmall.mdl");
 	precache_model ("progs/cube.mdl");
@@ -168,7 +171,7 @@ void() PK_precache =
 	precache_model ("progs/beans.mdl");
 	precache_model ("progs/bearpick.mdl");
 	precache_model ("maps/b_eshel0.bsp");
-	precache_model ("progs/g_airgun.mdl");
+	precache_model ("progs/g_airgun2.mdl");
 	precache_model ("progs/g_clight.mdl");
 	precache_model ("progs/g_harp.mdl");
 
@@ -255,20 +258,7 @@ void() PK_precache =
 	pkweps = PK_IT_AXE | PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT	| PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB
 							 | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // pk plus weps
 
-	VW_ARMOR = FALSE; /// has issues - can be turned on with sv_vw_armor 1 // TRUE; // should only ever be 1 or 0 - used in conditionals
-	VW = TRUE;
-
-// testing
-
-//	Q_99 = TRUE;
-//	Q_100 = TRUE;
-//	PK_99 = TRUE;
-
-// PK_100 - fix - needs to be admin toggle
-
-	PK_100 = FALSE; // if true run 100% true to pk v1.11
-
-	pk_srvcmd_set(); // get this here
+	pk_srvcmd_set(); 	// set server controls for qc code
 
 	PK_ART = PK_ART_DEF & !PK_100; // Cataboligne - 8.12.9 - pk artifacts support init - FIX - needs to read admin var
 	if (PK_ART) pk_art_precache(); // Cataboligne 8.12.9 purify - pk artifacts
@@ -319,6 +309,9 @@ void() PK_precache =
 	pk_flags = pk_flags_ck = cvar("savedgamecfg");
 	pk_map = PK_mapmode(world.model);
 
+// single player hack - if hub flag is set and we forced dynamic items level exit returns to hub
+	if (!deathmatch && (pk_flags & PK_SF_HUB)) pk_flags = pk_flags - PK_SF_HUB;
+ 
 // got mode, set PK master switch
 	PK = FALSE;
 
@@ -360,6 +353,9 @@ void() PK_precache =
 			e.nextthink = time + DYN_START_TIME; // do this well after items spawn
 		}
 	}
+
+	pk_livent = 0; // nothing lives yet
+
 // extra sounds by...are apparently not supplied, except gib_?.wav
 
 	pk_xsound = (pk_flags & PK_XSOUND);
@@ -444,7 +440,7 @@ string (string s) precache_model =
 {
 /// moved here to simplify code (pkitems.qc)
 
-	if (s == "progs/g_airgun.mdl" || s == "progs/g_clight.mdl" || s == "progs/g_harp.mdl" || s == "progs/tpower.mdl" || s == "progs/beans.mdl" || s == "progs/bearpick.mdl" || s == "maps/b_eshel0.bsp" )
+	if (s == "progs/g_airgun.mdl" || s == "progs/g_airgun2.mdl" || s == "progs/g_clight.mdl" || s == "progs/g_harp.mdl" || s == "progs/tpower.mdl" || s == "progs/beans.mdl" || s == "progs/bearpick.mdl" || s == "maps/b_eshel0.bsp" )
 	{
 		if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 		pk_ditems = pk_ditems + 1;
@@ -534,6 +530,35 @@ float(string mp) PK_mapmode =
 	return(md);
 };
 
+// fn(q_startmap) - set q1 startmap name in single player
+
+void() q_startmap =
+{
+	if (self.map == "start") // trying to load start.bsp - fix/hack
+	{
+		if (world.model == "maps/e1m7.bsp" && world.message == "The House of Chthon") // qualify these - some custom load could have renamed maps to q1 names
+		{
+			self.map = "qstart";
+		}
+		else if (world.model == "maps/e2m6.bsp" && world.message == "the Dismal Oubliette")
+		{
+			self.map = "qstart";
+		}
+		else if (world.model == "maps/e3m6.bsp" && world.message == "Chambers of Torment")
+		{
+			self.map = "qstart";
+		}
+		else if (world.model == "maps/e4m7.bsp" && world.message == "Azure Agony")
+		{
+			self.map = "qstart";
+		}
+		else if (world.model == "maps/end.bsp" && world.message == "Shub-Niggurath's Pit")
+		{
+			self.map = "qstart";
+		}
+	}
+};
+
 // fn(pk_srvcmd_set) - setup new server control vars & load from cfg or alias
 // fn(pk_srvcmd_load) - load new server control vars
 // fn(botmatch) - load bots for bot match
@@ -543,6 +568,8 @@ float(string mp) PK_mapmode =
 void() botmatch =
 {
 	local float f, t, b;
+
+	cvar_set("saved1", "0"); // clear possible impulse entry
 
 	if (bot_count > 0 || NUMBOTS > 0)
 	{
@@ -559,6 +586,8 @@ void() botmatch =
 	
 	t = self.cnt / 2;
 
+ if (deathmatch) // pk*bots only in dm
+ {
 	while (t > 0.33 && self.cnt > 0)
 	{
 		f = rint(random() * 3.3);
@@ -579,6 +608,7 @@ void() botmatch =
 		remove(self);
 		return;
 	}
+ }
 
 	b = bot_count;
 
@@ -608,63 +638,134 @@ void() botmatch =
 	remove(self);
 };
 
-void() pk_srvcmd_load =
+// fn (b_launch) - launch botspawn call
+
+// b - true if done by impulse
+
+void(float b) b_launch =
 {
 	local entity e;
+	local float bcnt;
 
+	if (DARKPLACES || chaos)
+	{
+		bcnt = cvar("sv_botmatch");
+		cvar_set("sv_botmatch", "0");
+	}
+
+	if (b) bcnt = b;
+
+	if (bot_count > 0 || NUMBOTS > 0) return; // have bots, go back
+
+	e = spawn();
+	if (e)
+	{
+		e.think = botmatch;
+		e.nextthink = time + 3 + 4 * random(); // make em wait a few secs, build suspense
+		e.cnt = bcnt;
+		if (e.cnt == 1) e.cnt = 6; // default load = 6 bots
+		if (e.cnt < 0) e.cnt = 0 - e.cnt; // -{number} runs {number} bots
+		if (coop && fabs(e.cnt) > 3) e.cnt = 3;
+	}
+};
+
+void() pk_srvcmd_load =
+{
 	if (!DARKPLACES && !chaos) return;
 
 	VW = cvar("sv_vw");
 	VW_ARMOR = cvar("sv_vw_armor");
+	PK_99 = cvar("sv_pk99");
 	PK_100 = cvar("sv_pk100");
 	PK_ART_DEF  = cvar("sv_pk_art");
 	PK_100_OBJERR = cvar("sv_pk100_objerr");
+
+// item ammo levels
+	PK_GRAVITYWELLAMMO_MAX = cvar("pk_max_gravitywellammo");
+	PK_TURRETAMMO_MAX = cvar("pk_max_turretammo");
+	PK_CANPABAMMO_MAX = cvar("pk_max_canpabammo");
+	PK_BEARTRAPAMMO_MAX = cvar("pk_max_beartrapammo");
+
+	PK_EXPLODEAMMO_MAX = cvar("pk_max_explodeammo");
+// plus items
+	PKPLUS_EGOAMMO_MAX = cvar("pk_max_egoammo");
+	PKPLUS_TOMBAMMO_MAX = cvar("pk_max_tombammo");
+	PKPLUS_ACTORAMMO_MAX = cvar("pk_max_actorammo");
+	PKPLUS_PHONEAMMO_MAX = cvar("pk_max_phoneammo");
+
+	PK_MAX_LIVENT = cvar("pk_max_livent");
+
 // q1
+	Q_99 = cvar("sv_q99");
 	Q_100 = cvar("sv_q100");
 	Q_100_OBJERR = cvar("sv_q100_objerr");
 // dynamic items
-	DYN_OVR = cvar("sv_dyn_ovr");
-	DYN_ART = cvar("sv_dyn_art");
-	if (!DYN_OVR && !(pk_flags & PK_DYNAMIC)) DYN_FORCE = cvar("sv_dyn_force");
-	DYN_ARTFR = cvar("sv_dyn_art_force");
-	DYN_FORCE_CNT = cvar("sv_dyn_force_cnt");
+	DYN_OVR = cvar("pk_dyn_ovr");
+	DYN_ART = cvar("pk_dyn_art");
+	if (!DYN_OVR && !(pk_flags & PK_DYNAMIC)) DYN_FORCE = cvar("pk_dyn_force");
+	DYN_ARTFR = cvar("pk_dyn_art_force");
+	DYN_FORCE_CNT = cvar("pk_dyn_force_cnt");
+// cam stuff
+	DCAMTO = cvar("sv_cam_timeout");
+	DCAMTOACT = cvar("sv_cam_to_action");
 
 // check for botmatch changes
-	if (cvar("sv_botmatch") != 0)
-	{
-		local float bcnt;
-		bcnt = cvar("sv_botmatch");
-		cvar_set("sv_botmatch", "0");
-		if (bot_count > 0 || NUMBOTS > 0) return; // have bots, go back
-
-		e = spawn();
-		if (e)
-		{
-			e.think = botmatch;
-			e.nextthink = time + 3 + 4 * random(); // make em wait a few secs, build suspense
-			e.cnt = bcnt;
-			if (e.cnt == 1) e.cnt = 6; // default load = 6 bots
-			if (e.cnt < 0) e.cnt = 0 - e.cnt; // default load -{number} runs {number} bots
-		}
-	}
-
+	if (deathmatch || coop)
+	if (cvar("sv_botmatch") != 0) b_launch(0);
 };
 
 void() pk_srvcmd_set =
 {
-	PK_ART_DEF  = TRUE;
-// dynamic defaults
+// server controls, default on for full feature set
+	pk_mapcmd = 1;
+	pk_mapcfg = 1;
+	pk_srvcfg = 1;
+
+// pk control
+	PK_99 = FALSE;
+	PK_100 = FALSE; // if true run 100% true to pk v1.11
+	PK_100_OBJERR = FALSE;
+
+// q1 control
+	Q_99 = FALSE;
+	Q_100 = FALSE;
+	Q_100_OBJERR = FALSE;
+
+// cam controls
+	DCAMTO = 0; // FIX - final release should have 2 mins & respawn
+	DCAMTOACT = 0;
+
+// vw controls
+	VW_ARMOR = FALSE; /// has issues - can be turned on with sv_vw_armor 1 // TRUE; // should only ever be 1 or 0 - used in conditionals
+	VW = TRUE;
+
+// dynamic item defaults
 	DYN_OVR = FALSE;
 	DYN_ART = TRUE;
 	DYN_FORCE = FALSE;
 	DYN_ARTFR = FALSE;
 	DYN_FORCE_CNT = 6;
 
-	PK_100_OBJERR = FALSE;
+// item ammo levels
+	PK_GRAVITYWELLAMMO_MAX	= 1;
+	PK_TURRETAMMO_MAX				= 3;
+	PK_CANPABAMMO_MAX			= 1;
+	PK_BEARTRAPAMMO_MAX		= 3;
 
-	Q_100 = FALSE;
-	Q_100_OBJERR = FALSE;
-	
+	PK_EXPLODEAMMO_MAX	= 10;
+// plus items
+	PKPLUS_EGOAMMO_MAX			= 2;
+	PKPLUS_TOMBAMMO_MAX		= 3;
+	PKPLUS_ACTORAMMO_MAX	= 1;
+	PKPLUS_PHONEAMMO_MAX	= 1;
+
+	PKPLUS_TOMB_TIME = 90;  // MOVE to tomb.qc
+
+	PK_MAX_LIVENT = 256; // guessed - need research into where slowdown starts
+
+// user artifacts
+	PK_ART_DEF  = TRUE;
+
 	if (!DARKPLACES && !chaos) return;
 
 // new server controls
@@ -672,24 +773,61 @@ void() pk_srvcmd_set =
 
 	if (DARKPLACES) // reg under darkplaces - chaos engine has pre-reg
 	{
+// server controls
+		registercvar("sv_dmstart", "0");
+		registercvar("sv_c_mapcmd", "1");
+		registercvar("sv_c_mapcfg", "1");
+		registercvar("sv_c_srvcfg", "1");
+
 		registercvar("sv_vw", "1");
 		registercvar("sv_vw_armor", "0");
+// painkeep controls
+		registercvar("sv_pk99", "0");
 		registercvar("sv_pk100", "0");
 		registercvar("sv_pk100_objerr", "0");
 		registercvar("sv_pk_art", "1");
+// cam controls
 		registercvar("sv_cam_off", "0"); // set to 1 to turn cam off entirely
 		registercvar("sv_cam_def", "1"); // set to 0 to default to no cam view
+		registercvar("sv_cam_timeout", "0"); // set to # to timeout dead cam in # secs - limit on deadcam state
+		registercvar("sv_cam_to_action", "0"); // set to 1 - disconnect, 0 - respawn
+
 		registercvar("sv_botmatch", "0"); // load bots without admin
 // dynamic item controls
-		registercvar("sv_dyn_ovr", "0"); // if set over-ride bit in control flag - gets set by menu command
-		registercvar("sv_dyn_art", "1"); // add artifacts to dyn items
-		registercvar("sv_dyn_force", "0"); // force dynamic items on any map - must set PK true, has no effect if dyn already on
-		registercvar("sv_dyn_art_force", "0"); // force artifacts on map if no dynamic spawner, if spawner exists this is the same as sv_dyn_art
-		registercvar("sv_dyn_force_cnt", "6"); // max force cnt - because forcing can exceed load max for dyn items
+		registercvar("pk_dyn_ovr", "0"); // if set over-ride bit in control flag - gets set by menu command
+		registercvar("pk_dyn_art", "1"); // add artifacts to dyn items
+		registercvar("pk_dyn_force", "0"); // force dynamic items on any map - must set PK true, has no effect if dyn already on
+		registercvar("pk_dyn_art_force", "0"); // force artifacts on map if no dynamic spawner, if spawner exists this is the same as pk_dyn_art
+		registercvar("pk_dyn_force_cnt", "6"); // max force cnt - because forcing can exceed load max for dyn items
+// pk items
+		registercvar("pk_bt_time", "90"); // time for beartraps to live
+
+		registercvar("pk_tur_ammo","40");
+		registercvar("pk_tur_time","20");
+		registercvar("pk_tur_health","300");
+		registercvar("pk_tur_targetown","3");
+		registercvar("pk_tur_variety","1"); // 1 - orange kryptonite nails, 2 - lasers, 4 - pulse nails, 8 - lightning, 16 - rockets, 32 - railgun
+// item ammo levels
+		registercvar("pk_max_gravitywellammo", "1");
+		registercvar("pk_max_turretammo", "3");
+		registercvar("pk_max_canpabammo", "1");
+		registercvar("pk_max_beartrapammo", "3");
+		registercvar("pk_max_explodeammo", "10");
+//  items
+		registercvar("pk_max_egoammo", "2");
+		registercvar("pk_max_tombammo", "3");
+		registercvar("pk_max_actorammo", "1");
+		registercvar("pk_max_phoneammo", "1");
+
+		registercvar("pk_max_livent", "256");
 // q1
+		registercvar("sv_q99", "0");
 		registercvar("sv_q100", "0");
 		registercvar("sv_q100_objerr", "0");
-		
+		registercvar("sv_qstart", "0"); // allow single player cfg to load start map once per dp server run
+		registercvar("pk_sp_bt_noplayer", "0"); // single player - if true beartraps wont target players
+
+
 // new client controls
 		registercvar("cl_cam_off", "0"); // set to 1 to turn cam off entirely
 		registercvar("cl_cam_def", "1"); // set to 0 to default to no cam view
@@ -703,12 +841,30 @@ void() pk_srvcmd_set =
 			localcmd(ADMINSRVCMD);
 		}
 */
+
+// server controls - override immediately
+		pk_mapcmd = cvar("sv_c_mapcmd");
+		pk_mapcfg = cvar("sv_c_mapcfg");
+		pk_srvcfg = cvar("sv_c_srvcfg");
+
 // NOTE: chaos eng doesnt need to store defaults this way - they will save in config.cfg
 
+		if (!deathmatch)
+		{
+			if (!cvar("sv_qstart"))
+			{
+				localcmd("exec ");
+				localcmd("sp_server.cfg\n");
+			}
+		}
+		else
 		if (pk_srvcfg)
 		{
-			localcmd("exec ");
-			localcmd("d_server.cfg\n");
+			if (!cvar("sv_dmstart"))
+			{
+				localcmd("exec ");
+				localcmd("d_server.cfg\n");
+			}
 			localcmd("exec ");
 			localcmd(mapname);
 			localcmd("_server.cfg\n");
@@ -1036,12 +1192,12 @@ void() pk_plcfg =
 	if (self.ishuman)
 	{
 		pk_admincfg(self);
-		if (pk_mapcmd)
+		if (pk_mapcmd) // alias cmd
 		{
 			stuffcmd(self, mapname);
 			stuffcmd(self, ADMINMAPCMD);
 		}
-		if (pk_mapcfg)
+		if (pk_mapcfg) // cfg file cmd
 		{
 			stuffcmd(self, "exec ");
 			stuffcmd(self, mapname);

@@ -1508,8 +1508,7 @@ void() PK_ImpulseCommands =
 	}
 
 	else if (self.impulse == 255)
-//		QuadCheat ();
-		botmatch();			// TEST TEST REMOVE
+		QuadCheat ();
 
 	self.impulse = 0;
 };

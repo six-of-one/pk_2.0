@@ -687,6 +687,9 @@ void () bot_diee1;
 void () bot_die_ax1;
 void () BotDead =
 {
+	self.deadflag = DEAD_DEAD;
+
+// ISSUE - moving corpse to respawn point somehow !?
 	if (bot_vote(0.7)) return;
 
 	self.nextthink = ((time + 0.3) + ((random () * (NUMBOTS + 3)) * 0.1));
@@ -700,7 +703,6 @@ void () BotDead =
 		TELEFRAGFLAG = 0;
 	}
 	self.think = respawnBot;
-	self.deadflag = DEAD_DEAD;
 };
 
 void () BotDie =

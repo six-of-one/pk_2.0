@@ -149,8 +149,16 @@ void () weapon_airfist =
 		return;
 	}
 
-	precache_model ("progs/g_airgun.mdl");
-	setmodel (self,"progs/g_airgun.mdl");
+	if (PK_100)
+	{
+		precache_model ("progs/g_airgun.mdl");
+		setmodel (self,"progs/g_airgun.mdl");
+	}
+	else
+	{
+		precache_model ("progs/g_airgun2.mdl");
+		setmodel (self,"progs/g_airgun2.mdl");
+	}
 	self.pk_currentitem = PK_IT_AIRGUN;
 	self.netname = "AirFist";
 	self.touch = painkeep_weapon_touch;
@@ -1347,6 +1355,8 @@ void() dyn_spawn =
 	float ri, sf;
 
 // get a random origin
+  if (self.origin == v0)
+  {
 	ri = sf = 0;
 	sv = e = find(world,classname,"player");
 	while (e)
@@ -1379,11 +1389,21 @@ void() dyn_spawn =
 	}
 	rseu = sv;
 	self.origin = sv.origin + ' 0 0 16';
+  }
+  else
+  {
+	sv = findradius(self.origin, PK_DYNRAD);
+  }
 // give players notice
 	bprint("*** Dynamic item spawned: ");
 	bprint(self.wad);
-	bprint(" near: ");
-	bprint(sv.classname);
+	if (sv)
+	{
+		bprint(" near: ");
+		bprint(sv.classname);
+	}
+	else
+		bprint(" on the map");
 	bprint("\n");
 
 	item_call(self.wad);
@@ -1438,6 +1458,7 @@ void() dyn_item =
 		while (cd > 0.2)
 		{
 			e = spawn();
+			e.origin = v0; // use random locator
 			if (e)
 			{
 				e.think = dyn_spawn;
@@ -1480,5 +1501,135 @@ void() dyn_item =
 		}
 	 }
 	self.nextthink = time + 40 + 20 * crandom();
+	}
+};
+
+// fn(bit_cnt) - count available bits for random selection
+
+// fb - bits to count
+// rb - return a random bit from set
+
+float(float fb, float rb) bit_cnt =
+{
+	local float rs,f;
+
+	if (fb > 0)
+	{
+		f = 1;
+		while (f <= 8388608) // max float bits
+		{
+			if (f & fb) rs = rs + 1;
+			f = f * 2;
+		}
+	}
+	else
+		return(0); // error cond - no bits set!
+
+	if (!rb) return(rs);
+// pick a random bit
+	f = floor(random() * rs);
+	rs = f;
+
+	f = 1;
+	while (f <= 8388608 && rs > -1) // max float bits
+	{
+		if (f & fb) rs = rs - 1;
+		if (rs > -1) f = f * 2;
+	}
+
+	return(f);
+};
+
+// fn(func_dynitem) - map load dynamic item ent maker
+
+// wait - time between spawns in secs
+// delay - random deviation, neg (-) number uses crandom, randomize spawn time of item
+// lip - range from origin to spawn items in quake units
+// spawnflags & 1 - uses dyn spawn locator code
+// spawnflags & 2 - spawn random ammo for weps loaded by fn - uses dyn_spawn locator code
+// dest1 - weapon bit codes to select from
+// dest2 - item bit codes to select from
+
+// sv_kill_func_dynitem - stop func_dynitem processing
+
+void() func_dynitem =
+{
+	local float rv, sb;
+	local entity e;
+	local vector v1;
+
+	if (PK_100 || Q_100)
+	{
+	remove(self);
+	return;
+	}
+
+// clear any of this
+	self.solid = SOLID_NOT;
+	self.movetype = MOVETYPE_NONE;
+	self.modelindex = 0;
+
+// loop
+	if (rv < 0) rv = crandom() * self.delay;
+	else rv = random() * self.delay;
+
+	self.think = func_dynitem;
+	self.nextthink = time + self.wait + rv;
+
+// spawn an item
+	e = spawn();
+	if (e)
+	{
+		e.think = dyn_spawn;
+		e.nextthink = 1 + self.delay * random(); // time spread -- FIX - get rid of neg number
+		e.classname = "dyn_item";
+
+		if (self.spawnflags & 1) // cheat this - just use x,y coord
+		{
+			local float sf;
+			sf = 100;
+			v1_z = self.origin_z;
+			v1_x = self.origin_x + crandom() * self.lip;
+			v1_y = self.origin_y + crandom() * self.lip;
+			while (pointcontents(v1) == CONTENT_SOLID && sf > 0) // IDEA - check lava below?
+			{
+				sf = sf - 1;
+				v1_x = self.origin_x + crandom() * self.lip;
+				v1_y = self.origin_y + crandom() * self.lip;
+			}
+			if (sf < 0) v1 = self.origin;
+			setorigin(e, v1);
+		}
+		else
+			setorigin(e, self.origin);
+		if (self.dest1_x)
+		{
+			sb = e.cnt = bit_cnt(self.dest1_x, TRUE);
+			e.wad = item_by_bit(e.cnt); // classname to spawn
+			if ((self.spawnflags & 2) && (e.cnt & WEP_WEPSQ)) // make ammo for weps if spawnflags bit 2 set
+			{
+				rv = 1 + floor(random() * 3);
+				while (rv > 0)
+				{
+					rv = rv - 1;
+					e = world;
+					e = spawn();
+					if (e)
+					{
+						e.think = dyn_spawn;
+						e.nextthink = 1 + 4 * random();
+						e.classname = "dyn_item";
+						e.cnt = sb;
+						e.wad = ammo_by_bit(sb);
+						e.origin = v0; // these can be anywhere
+					}
+				}
+			}
+		}
+		else if (self.dest2_x)
+		{
+			e.cnt = bit_cnt(self.dest2_x, TRUE);
+			e.wad = ammo_by_bit(e.cnt); // classname to spawn
+		}
 	}
 };

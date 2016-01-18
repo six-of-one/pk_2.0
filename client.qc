@@ -106,8 +106,9 @@ void () DecodeLevelParms =
 	if (!PK)
 	if (serverflags)
 	{
-		if (world.model == "maps/start.bsp")
-		SetNewParms ();   // take away all stuff on starting new episode
+		if (world.model == "maps/start.bsp" || world.model == "maps/qstart.bsp") // Cataboligne - 5.19.10 - q1 SP hack for using forced dyn items
+			SetNewParms ();   // take away all stuff on starting new episode
+		if (world.model == "maps/qstart.bsp") PK_SetNewParms();
 	}
 //	bot_skinDecode();
 
@@ -360,6 +361,8 @@ void () changelevel_touch =
 		bprint (other.netname);
 		bprint (" exited the level\n");
 	}
+
+	q_startmap(); // Cataboligne - 5.19.10 - get start map name if in sp - pk hub is start.bsp for this mod
 
 	nextmap = self.map;
 
@@ -1260,6 +1263,19 @@ void () PlayerPostThink =
 
 	if (self.deadflag)
 		return;
+
+
+	if (chaos)
+		if (!(self.dest2_x & CHSCAM_ON))  // Cataboligne - 5.14.10 - cam purify - custom engine dont display vw_ for 1pv
+			{
+//			if (!(self.flags & FL_NDISMDL)) bprint("switching to not display vwep\n");
+			self.flags = self.flags | FL_NDISMDL; // old self.flags method, replacing with:
+			}
+		else
+			{
+//			if (self.flags & FL_NDISMDL) bprint("switching to display vwep\n");
+			self.flags = self.flags - (self.flags & FL_NDISMDL);
+			}
 
 // do weapon stuff
 

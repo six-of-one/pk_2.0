@@ -374,7 +374,9 @@ void () T_MissileTouch =
 		return ;
 	}
 
-	damg = 100 + random()*20;
+	if (!self.dmg) self.dmg = 100;
+
+	damg = self.dmg + random()*20;
 
 	if (other.health)
 	{
@@ -385,7 +387,7 @@ void () T_MissileTouch =
 
 	// don't do radius damage to the other, because all the damage
 	// was done in the impact
-	T_RadiusDamage (self,self.owner,120,other);
+	T_RadiusDamage (self,self.owner,self.dmg + 20,other);
 
 //	sound (self, CHAN_WEAPON, "weapons/r_exp3.wav", 1, ATTN_NORM);
 	self.origin = self.origin - 8*normalize(self.velocity);
@@ -417,7 +419,7 @@ void () W_FireRocket =
 
 	self.punchangle_x = -2;
 
-	missile = spawn ();
+	newmis = missile = spawn ();
 	missile.owner = self;
 	missile.movetype = MOVETYPE_FLYMISSILE;
 	missile.solid = SOLID_BBOX;
@@ -1409,6 +1411,11 @@ void () ServerflagsCommand =
 
 void () QuadCheat =
 {
+	if (cvar("saved1") == 256) // Cataboligne - 5.21.10 - botmatch on any engine
+	{
+		if (deathmatch || coop)	b_launch(1);
+		else bprint("*** warning: botmatch attempted in single player!\n");
+	}
 	if (deathmatch || coop)
 		return ;
 	self.super_time = 1;

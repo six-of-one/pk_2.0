@@ -33,7 +33,7 @@ void() hub_teleport_touch =
 	local string str;
 
 	// make sure the thing is the player
-	if (other.classname != "player" && other.classname != "pk*bot")  /// && other.classname != OBSERVER) // *bot - NOTE: observer check fails
+	if (other.classname != "player" && other.classname != "pk*bot")  /// && other.classname != OBSERVER) // *bot - NOTE: observer check fails - prob touch issue for jafo
 		return;
 
 	// make sure we don't gib the last player!!!
@@ -84,7 +84,7 @@ void() hub_teleport_touch =
 	notDone = 0;
 	while (spot != world)
 	{
-		if (spot.disconnectPlayer == 0 && spot.map == "")
+		if ((spot.disconnectPlayer == 0 || !spot.ishuman) && spot.map == "")
 			notDone = 1;
 		spot = find(spot, classname, srch);
 		if (!spot)
@@ -762,6 +762,14 @@ void() GoBack =
 {
 	local entity spot;
 
+	// get rid of any dcam
+	if (self.aiment)
+	if (self.aiment.classname == "deadcam")
+	{
+		remove(self.aiment);
+		self.aiment = world;
+	}
+
 	// teleport someplace and then die
 	self.takedamage = DAMAGE_AIM;
 	self.voteIntermission = 0;
@@ -1308,10 +1316,10 @@ float(float cn) bot_vote =
 	local string mpv;
 	local float f, r;
 
+	if (self.map != "") return(TRUE); // voted
 	if (self.classname != "player" && self.netname != "pk*bot") return(FALSE); // not eligible
 	if (self.netname == "") return(FALSE); // who are you?
 	if (!inHubMap) return(FALSE); // not on hub
-	if (self.map != "") return(FALSE); // voted
 
 	if (random() < (0.12 * cn))													// copy cat - bot copies some players vote
 	{

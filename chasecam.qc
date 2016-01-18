@@ -371,6 +371,7 @@ void() cam_startdeathview =
 
 	self.aiment = e = spawn();
 	e.owner = self;
+	e.classname = "deadcam";
 	e.solid = SOLID_NOT;
 	e.movetype = MOVETYPE_FLY;
 	e.angles = e.owner.angles;
@@ -435,6 +436,7 @@ void() Keep_cam_chasing_owner =
 			makevectors( self.angles);
 			self.dest = v_forward; // save forward direction, used in cam_deathview
 			self.think = cam_deathview;
+			self.classname = "deadcam";
 			if (self.skin) // temp disable flag is set
 			{
 				self.owner.view_ofs_z = -1;
@@ -450,12 +452,20 @@ void() Keep_cam_chasing_owner =
 		return;
 	}
 
+// because non transparent vised water blocks cam traces
 	if ( (CHSCAM_NO_WATER == TRUE) & (self.owner.waterlevel != 0) )
 	{
 		Remove_chase_cam( FALSE );
 		return;
 	}
-
+	/*
+	else if (self.owner.waterlevel != 0)
+	{
+		self.flags = self.flags | FL_WATERJUMP;
+	}
+	else
+		self.flags = self.flags - (self.flags & FL_WATERJUMP);
+	*/
 	owner_vec = self.owner.origin + '0 0 22';
 
 	// get player velocity relative to player's
@@ -470,14 +480,21 @@ void() Keep_cam_chasing_owner =
 	// pulling forward on a down aim
 	dir = v_forward;
 
-//   local string s;
-//   sprint( self.owner, "\n\n f_f = " );
-//   s = ftos( f_f );
-//   sprint( self.owner, s );
-//   sprint( self.owner, "\n f_r = " );
-//   s = ftos( f_r );
-//   sprint( self.owner, s );
-//   sprint( self.owner, "\n" );
+
+/*
+   bprint(  "cam org = " );
+   bprint(  vtos(self.origin) );
+   bprint(  "\n" );
+
+local string s1;
+   bprint(  "\n\n f_f = " );
+   s1 = ftos( f_f );
+   bprint(  s1 );
+   bprint(  " ------ c-o = " );
+   s1 = ftos( vlen(self.origin - self.owner.origin));
+   bprint(  s1 );
+   bprint(  "\n" );
+*/
 
 	// increment fade-back variable
 	self.ammo_shells = self.ammo_shells + 4.5;
@@ -919,6 +936,9 @@ void () dead_cam_set =
 */
 		return;
 	}
+
+	if (self.aiment)
+	if (self.aiment.classname == "deadcam") return; // dont make more than one - just in case
 
 // NOTE: wraith option still needs checked once we have chaos mod morph deal
 	

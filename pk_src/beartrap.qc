@@ -1,7 +1,9 @@
 /* beartrap */
 
-float PK_BT_TIMETOFOLLOW = 15;
+float PK_BT_TIMETOFOLLOW;
 float PK_BT_DMG = 2;
+float PK_BT_TIME;
+float PK_BT_SET;
 
 
 .entity beartrap_target;
@@ -67,9 +69,10 @@ $frame bear01 bear02 bear03
 void() beartrapFollow =
 {
 	// SWP: 14/05/97 - check if the player has "respawned" or dead.
-	if (!(self.beartrap_target.beartrap_time) || self.disconnectPlayer || self.beartrap_target.deadflag)
+	if (!(self.beartrap_target.beartrap_time) || self.disconnectPlayer || self.beartrap_target.deadflag || self.beartrap_target.health < 0) // Cataboligne - 5.20.10 - beartrap single player code - targeting monsters
 	{ // player is dead or respawned...
-		remove(self);
+//		remove(self);
+		beartrapDie(); // die when done instead of dissapearing
 		return;
 	}
 
@@ -118,6 +121,13 @@ void()	btf_2 =	[$bear03, btf ] {setmodel (self, "progs/bearbld.mdl");};
 
 void() beartrapTouch =
 {
+
+	if (!deathmatch) // Cataboligne - 5.20.10 - beartrap single player code - turn off player target, allow monster target
+	{
+		if (other.classname == "player" && cvar("sv_sp_bt_noplayer")) return;
+		else if (! other.flags & FL_MONSTER) return;
+	}
+	else
 	if (other.classname != "pk*bot") // *bot - bots get bit
 	if (other.classname != "player")
 	  return;
@@ -157,6 +167,20 @@ void() beartrap_dropBearTrap =
 	  return;
 	}
 
+	if (!PK_BT_SET)
+	{
+		PK_BT_SET = TRUE;
+
+		PK_BT_TIME = 90; // def
+		PK_BT_TIMETOFOLLOW = 15;
+
+		if (!PK_100)
+		if (DARKPLACES || chaos)
+		{
+			PK_BT_TIME = cvar("pk_bt_time");
+		}
+	}
+
 	bt = spawn();
 	bt.owner = self;
 	bt.movetype = MOVETYPE_TOSS;
@@ -174,9 +198,12 @@ void() beartrap_dropBearTrap =
 	// Used to give a few seconds go get away from the trap
 	bt.beartrap_time = time + 3;
 
+	if (PK_BT_TIME)
+	{
 	// Kill it after 90 secs if nobody walks over it
-	bt.think = beartrapDie;
-	bt.nextthink = time + 90;
+		bt.think = beartrapDie;
+		bt.nextthink = time + PK_BT_TIME;
+	}
 
 	setmodel (bt, "progs/beartrap.mdl");
 	setsize (bt, '-25 -24 -0', '25 25 8');

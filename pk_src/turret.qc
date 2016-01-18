@@ -2,6 +2,17 @@
 
 $frame gunsearch gunfire1 gunfire2 gunfire3 gunfire4 gunmisfire1 gunmisfire2
 
+float PK_TUR_AMMO; // base cells to fire, 0 = infinite
+float PK_TUR_TIME; // time to live, after which explode, 0 = no timeout
+float PK_TUR_HEAL; // health we get - base = 2/3 this, < 0 = no limit
+float PK_TUR_TARGOWN; // time after which turret shoots owner, 0 = dont target owner
+float PK_TUR_RELOAD; // chance turret will reload when low on ammo
+float PK_TUR_VARIETY; // a variety of turrets - 
+//															bits:		1 - orange kryptonite nails,	2 - lasers,	4 - pulse nails,	8 - lightning,	16 - rockets,	not done yet - 	32 - railgun,		64 - chaos
+//								fixed percentages:		60%													20%				10%						5%						4%														1%							0.5%
+float PK_TUR_LIMIT; // max turrets on a given server - used if inf detected
+float PK_TUR_SET; // set non 0 when vars loaded
+
 void() turret_searchForEnemy;
 void() turret_findTarget;
 float (entity e) turret_inFront;
@@ -14,6 +25,16 @@ void() turret_checkIfCanBeSolid;
 void(string gibname, float dm) turret_throwGib;
 void() turret_gibTouch;
 
+// so we can set infinite or unkillable turrets to destruct when certain things happen
+// allow players to kill server set indestructible / infinite ammo turrets
+
+// grav well pull, grapple hit
+
+void(entity e, float tm) turret_KillStraker =
+{
+	e.think = turret_deathAnim;	
+	e.nextthink = time + tm;
+};
 
 
 void() turret_dropTurret =
@@ -30,6 +51,30 @@ void() turret_dropTurret =
 	{
 		player_run ();
 	  return;
+	}
+
+	if (!PK_TUR_SET)
+	{
+		PK_TUR_SET = TRUE;
+// defs
+		PK_TUR_AMMO = 40;
+		PK_TUR_TIME = 20;
+		PK_TUR_HEAL = 300;
+		PK_TUR_TARGOWN = 3;
+		PK_TUR_RELOAD = 0.15; // not much chance
+		PK_TUR_VARIETY = 1; // regular orange nails
+
+		if (!PK_100)
+		if (DARKPLACES || chaos)
+		{
+			PK_TUR_AMMO = cvar("pk_tur_ammo");
+			PK_TUR_TIME = cvar("pk_tur_time");
+			if (PK_TUR_TIME < 0) PK_TUR_TIME = 20;
+			PK_TUR_HEAL = cvar("pk_tur_health");
+			PK_TUR_TARGOWN = cvar("pk_tur_targetown");
+			PK_TUR_VARIETY = cvar("pk_tur_variety");
+			if (!PK_TUR_VARIETY) PK_TUR_VARIETY = 1;
+		}
 	}
 
 	// check if near a wall
@@ -57,25 +102,63 @@ void() turret_dropTurret =
 	turret.solid = SOLID_NOT;
 	turret.classname = "turret";
 	turret.takedamage = TRUE;
-	turret.health = 300;
-	turret.th_die = turret_deathAnim;
-	turret.ammo_cells = 40;
+	turret.health = PK_TUR_HEAL;
+	if (PK_TUR_HEAL > 0) turret.th_die = turret_deathAnim;
+	else turret.th_die = turret_searchForEnemy;
+	turret.currentammo = turret.ammo_cells = PK_TUR_AMMO;
+// new stuff
+	turret.cnt = 0;
+	turret.AIRG_Flags = AIRG_EXCLUDEENTITY; // dont blow turret - just base
+	turret.dmg = 15;
+	if (!PK_100)
+	{
+		local float ri;
+		ri = random();
+		turret.state = 0;
+		if ((PK_TUR_VARIETY & 1) && ri < 0.6) turret.state = 1;
+		else if ((PK_TUR_VARIETY & 2) && ri < 0.8) turret.state = 2;
+		else if ((PK_TUR_VARIETY & 4) && ri < 0.9) turret.state = 4;
+		else if ((PK_TUR_VARIETY & 8) && ri < 0.95) turret.state = 8;
+		else if ((PK_TUR_VARIETY & 16) && ri < 0.99) turret.state = 16;
+
+		ri = 1;
+		if (!turret.state)
+		while (ri < 32 && !turret.state)
+		{
+			if (ri & PK_TUR_VARIETY) turret.state = ri;
+			ri = ri * 2;
+		}
+
+		if (turret.state == 2) turret.dmg = 25;
+		else if (turret.state == 4) turret.dmg = 27;
+		else if (turret.state == 8) turret.dmg = 30;
+		else if (turret.state == 16) turret.dmg = 33.3;
+	}
+
+// TEST - REMOVE
+//	turret.dmg = cvar("saved1");
 
 // set direction
 	turret.angles = self.angles;
 	turret.v_angle = self.v_angle;
 
 // set turret duration
-	turret.turret_timeout = time + 20;
+	if (!PK_TUR_TIME) turret.turret_timeout = 0;
+	else turret.turret_timeout = time + PK_TUR_TIME;
 
 // set when the turret can target the owner
-	turret.turret_ownertimeout = time + 3;
+	if (!PK_TUR_TARGOWN) turret.turret_ownertimeout = 0;
+	else turret.turret_ownertimeout = time + PK_TUR_TARGOWN;
 
 // look for enemy
 	turret.nextthink = time + 0.1;
 	turret.think = turret_searchForEnemy;
 
-	setmodel (turret, "progs/turtop.mdl");
+	if (PK_100)
+		setmodel (turret, "progs/turtop.mdl");
+	else
+		setmodel (turret, "progs/turtop2.mdl"); // removed orange barrel flare - looks wrong with variety
+
 	setsize (turret, '-15 -14 -18', '21 7 10');
 //	setorigin (turret, self.origin + self.view_ofs);
 	setorigin (turret, self.origin);
@@ -88,8 +171,9 @@ void() turret_dropTurret =
 	turret.turret_base.solid = SOLID_NOT;
 	turret.turret_base.classname = "turret_base";
 	turret.turret_base.takedamage = TRUE;
-	turret.turret_base.health = 200;
-	turret.turret_base.th_die = turret_deathAnimBase;
+	turret.turret_base.health = rint(PK_TUR_HEAL * 0.667);
+	if (PK_TUR_HEAL > 0) turret.turret_base.th_die = turret_deathAnimBase;
+	else turret.turret_base.th_die = SUB_Null;
 
 	// Throw away from you
 	makevectors (self.angles);
@@ -100,7 +184,7 @@ void() turret_dropTurret =
 	turret.turret_base.v_angle = self.v_angle;
 
 // set turret duration
-	turret.turret_timeout = time + 20;
+//	turret.turret_timeout = time + 20;
 
 // look for enemy
 	turret.nextthink = time + 0.1;
@@ -120,11 +204,14 @@ void() turret_dropTurret =
 
 void() turret_searchForEnemy =
 {
+	if (self.turret_timeout)
 	// check if the turret time is up
 	if (self.turret_timeout < time) {
 	  turret_deathAnim();
 	  return;
 	}
+
+	if (!self.currentammo && !self.turret_timeout && self.health < 1) self.delay = TRUE; // KillStraker candidate
 
 	// set the gun, so always lines up with the stand
 	setorigin(self, self.turret_base.origin);
@@ -174,7 +261,7 @@ void() turret_findTarget =
 		if (pk_art_movshot_ck(head, "turret")) // Cataboligne 8.12.9 purify - pk artifacts
 	  //if (!(head.classname == "turret"))
 	  //if (!(head.classname == "turret_base"))
-		if (self.turret_ownertimeout < time || head != self.owner)
+		if ((self.turret_ownertimeout > 0 && self.turret_ownertimeout < time) || head != self.owner)
 	 	if (head.classname != "player" || !(head.items & IT_INVISIBILITY))
 	  {
 	    tempDist = vlen(head.origin - self.origin);
@@ -194,10 +281,12 @@ void() turret_findTarget =
 	}
 
 	// Make the turning sound.
+	if (self.cnt < 61) // make noise for 30 secs - if timeout is longer or we are on ammo mode / inf
 	if (self.turret_soundtimeout < time)
 	{
 		sound (self, CHAN_WEAPON, "weapons/sentry/turrt_3.wav", 1, ATTN_NORM);
 		self.turret_soundtimeout = time + 0.5;
+		self.cnt = self.cnt + 1;
 	}
 
 	// target found
@@ -243,6 +332,7 @@ float (entity e) turret_inFront =
 
 void() turret_attackEnemy =
 {
+	if (self.turret_timeout)
 	// check if the turret time is up
 	if (self.turret_timeout < time) {
 	  turret_deathAnim();
@@ -258,7 +348,7 @@ void() turret_attackEnemy =
 		turret_checkIfCanBeSolid();
 	}
 
- 	if (self.ammo_cells > 0) {
+ 	if (self.ammo_cells > 0 || !self.currentammo) {
 		// attack frame's
 		self.frame = self.frame + 1;
 
@@ -270,7 +360,8 @@ void() turret_attackEnemy =
 	else
 	{
 	  // Not enough ammo
-
+		if (!PK_100 && random() < PK_TUR_RELOAD) self.ammo_cells = PK_TUR_AMMO + random() * PK_TUR_AMMO; // reloaded
+		else
 		if (self.frame != 5)
 	  {
 			self.frame = $gunmisfire1;
@@ -279,6 +370,11 @@ void() turret_attackEnemy =
 	  else
 	  {
 			self.frame = $gunmisfire2;
+			if (!self.turret_timeout) // no time - done when ammo runs out
+			{
+				turret_deathAnim();
+				return;
+			}
 	  }
 	}
 
@@ -298,6 +394,7 @@ void() turret_attackEnemy =
 	    {
 	      sound (self, CHAN_WEAPON, "weapons/sentry/turrt_3.wav", 1, ATTN_NORM);
 	      self.turret_soundtimeout = time + 0.5;
+			self.cnt = self.cnt + 1;
 	    }
 	  }
 
@@ -305,22 +402,23 @@ void() turret_attackEnemy =
 //	  if (self.attack_finished < time)
 		if (self.frame == 1 || self.frame == 3)
 	  {
-	  	if (self.ammo_cells > 0)
+	  	if (self.ammo_cells > 0 || !self.currentammo)
 	    { // is there enough ammo to fire?
 	    	local vector firePosition;
 				makevectors (self.angles);
 	      if (self.frame == 1)
 	      {
-	      	firePosition = self.origin + (v_forward * 21) - (v_right * 3);
+	      	firePosition = self.origin + (v_up * 2) + (v_forward * 29) - (v_right * 3);
 					turret_launchNail(firePosition, (self.enemy.origin + self.enemy.view_ofs) - firePosition);
 	      }
 	      else
 	      {
-	      	firePosition = self.origin + (v_forward * 21) + (v_right * 3);
+	      	firePosition = self.origin + (v_up * 2)  + (v_forward * 29) + (v_right * 3);
 					turret_launchNail(firePosition, self.enemy.origin - firePosition);
 	      }
 
 	      self.ammo_cells = self.ammo_cells - 1;
+			self.cnt = 0; // fired. restart sound count down
 	    }
 
 	    // when can I attack again
@@ -453,10 +551,75 @@ void() turret_gibTouch =
 };
 
 
+// fn(chaos_sentry_lt) - fire lightning bolts from sentrys
+
+void(vector org, vector vec) chaos_sentry_lt =
+{
+	if (self.t_width < time)
+	{
+		sound (self, CHAN_AUTO, "weapons/lhit.wav", 1, ATTN_NORM);
+		self.t_width = time + 0.6;
+	}
+
+	traceline (org, org + vec * 600, TRUE, self);
+//	beam4(org, trace_endpos, LT_NEG);
+	  WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
+	  WriteByte (MSG_BROADCAST, TE_LIGHTNING3);
+	  WriteEntity (MSG_BROADCAST, self);
+	  WriteCoord (MSG_BROADCAST, org_x);
+	  WriteCoord (MSG_BROADCAST, org_y);
+	  WriteCoord (MSG_BROADCAST, org_z);
+	  WriteCoord (MSG_BROADCAST, trace_endpos_x);
+	  WriteCoord (MSG_BROADCAST, trace_endpos_y);
+	  WriteCoord (MSG_BROADCAST, trace_endpos_z);
+
+	LightningDamage(org, trace_endpos + vec * 4, self, self.dmg);
+};
 
 void(vector org, vector vec) turret_launchNail =
 {
 //	local entity newmis;
+//															bits:		1 - orange kryptonite nails,	2 - lasers,	4 - pulse nails,	8 - lightning,	16 - rockets,	not done yet - 	32 - railgun,		64 - chaos
+
+	if (self.state == 2)
+	{
+		LaunchLaser(org, vec);
+		sound (self, CHAN_WEAPON, "enforcer/enfire.wav", 1, ATTN_NORM);
+		newmis.dmg = self.dmg;
+		return;
+	}
+	else if (self.state == 4)
+	{
+		if (self.attack_finished > time) return;
+	}
+	else if (self.state == 8)
+	{
+		if (self.attack_finished < time)
+		{
+			chaos_sentry_lt(org, vec);
+			self.attack_finished = time + 0.5;
+		}
+		return;
+	}
+	else if (self.state == 16)
+	{
+		if (self.attack_finished < time)
+		{
+			local float ca;
+			ca = self.currentammo;
+//			self.v_angle = org + vec; // we hope
+			W_FireRocket();
+			setorigin(newmis, org);
+			newmis.velocity = normalize((self.enemy.origin + self.enemy.view_ofs) - org);
+			newmis.velocity = newmis.velocity * 800;
+			newmis.angles = vectoangles (newmis.velocity);
+			newmis.dmg = self.dmg;
+			setorigin (newmis, org + v_forward * 31);
+			self.attack_finished = time + 0.75;
+			self.currentammo = ca;
+		}
+		return;
+	}
 
 	vec = normalize(vec);
 
@@ -478,6 +641,10 @@ void(vector org, vector vec) turret_launchNail =
 	newmis.think = SUB_Remove;
 	newmis.touch = turret_nailTouch;
 
+// new damage setting
+	newmis.dmg = self.dmg; // 15
+	if (random() < 0.03 && !PK_100) newmis.dmg = (self.dmg * 2) + random() * self.dmg; // some nails are "super", must be the orange kryptonite
+
 	// For the correct death messages
 	newmis.pk_currentitem = PK_IT_TURRET;
 	newmis.weapon = IT_AXE;
@@ -485,7 +652,17 @@ void(vector org, vector vec) turret_launchNail =
 	// PAINKEEP SPLASH Make this entity splash
 	AddToSplash(newmis);
 
-	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
+
+	if (self.state == 4)
+	{
+		sound (self, CHAN_WEAPON, "weapons/pulse/pulse_1.wav", 1, ATTN_NORM);
+		self.attack_finished = time + 0.35;
+		newmis.touch = pulse_touch;
+		newmis.theowner = self.owner;
+		setmodel (newmis, "progs/pnail.mdl");
+	}
+	else
+		sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
 };
 
 
@@ -509,8 +686,8 @@ void() turret_nailTouch =
 
 	if (other.health)
 	{
-		SpawnBlood (org, self.velocity * 0.2, 15);
-		T_Damage (other, self, self.owner, 15);
+		SpawnBlood (org, self.velocity * 0.2, self.dmg);
+		T_Damage (other, self, self.owner, self.dmg);
 	}
 	else
 	{

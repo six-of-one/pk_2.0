@@ -1,6 +1,6 @@
 // constants
 
-vector v0						= ' 0 0 0';
+vector v0						= ' 0 0 0'; // zero vector |dimension
 // ADMIN section
 // dev - only enable this for painkeep maps or force pk mode (sv_ control) - any maps that loads a pk item / func
 float PK;									// if set true painkeep code is enabled
@@ -13,15 +13,17 @@ float PK_SPIKER				= 16384;	// bit *	= FALSE -- allow spike traps, set to true f
 float PK_XSOUND				= 32768;	// bit * = TRUE --- use extra pk sound set
 // compatability modes for the purists out there
 float PK_100;								// painkeep compatability mode - if true run 100% true to pk v1.11, no extras (has menus)
-float PK_99						= FALSE;	// painkeep 99% compatability mode - if true pk (main mod) works as pk but extra env effects are disabled
+float PK_99;							// painkeep 99% compatability mode - if true pk (main mod) works as pk but extra env effects are disabled
 float Q_100;								// quake 1 compatability mode - if true run 100% true to quake 1, why? just for kicks...
-float Q_99						= FALSE;	// quake 1 99% compatability mode - if true pk stuff is removed, but admin, item enhancements & env remain
+float Q_99;								// quake 1 99% compatability mode - if true pk stuff is removed, but admin, item enhancements & env remain
 
 												// many object errors are tweaked to simply remove the offending component - if these 2 vars are set true, and objerror will be generated
 float PK_100_OBJERR;						// if true objerr that would have exited game (and have since been fixed) will cause an objerr
 float Q_100_OBJERR;						// if true objerr that would have exited game (and have since been fixed) will cause an objerr
 float MAP_OBSTR;							// object errors -> warnings that remove map items should set this. so map repair (tbd) can init an emergency exit
 float MAP_REPAIR;							// if true map repairs will execute
+void() q_startmap;						// fix start map issue for q single player
+
 
 float PK_HUB2					= 131072; // bit if TRUE, using custom hub - only used for level transtion from hub vote
 //float PK_HUB3					= 262144; // bit if TRUE, using hub3 - reload at hub loads - deprecated
@@ -43,7 +45,7 @@ float PK_DYNTO					= 120;	// timeout in 120 secs
 float PK_DYNRAD				= 8000;	// dynamic radius search 8000 units
 float DARKPLACES;							// for detecting darkplaces - modded engine sets cvar("chaos") to this value
 
-float CHAOS_ENG			= 10100010110111; // chaos engine id
+float CHAOS_ENG				= 10100010110111; // chaos engine id
 float chaos;
 
 float PK_ADMIN;							// allow admin - set this to 0 to completely disable all admin
@@ -63,11 +65,11 @@ string ADMINCODE				= "float1\n"; // local command that loads admin security pas
 string ADMINIMPULSE			= "float2\n"; // load the impulse
 string ADMINTIME				= "float3\n"; // load the time out
 string ADMINMAPCMD			= "_mapcmd\n"; // append to mapname for alias cmd
-float pk_mapcmd				= 1; // TOD: admin option later
-float pk_mapcfg				= 1; // TOD: admin option later
+float pk_mapcmd; 							// TOD: admin option later
+float pk_mapcfg; 							// TOD: admin option later
 //string ADMINSRVCMD			= "_srvcmd\n"; // server vars alias cmd
-//float pk_srvcmd				= 1; // TOD: admin option later
-float pk_srvcfg				= 1; // TOD: admin option later
+//float pk_srvcmd				= 1; 		// TOD: admin option later
+float pk_srvcfg; 							// TOD: admin option later
 
 void() pk_srvcmd_set;
 
@@ -151,7 +153,7 @@ float(string name, string value) registercvar = #93;
 //idea: id Software, LordHavoc (redesigned)
 //darkplaces implementation: LordHavoc
 //movetype definitions:
-float MOVETYPE_FOLLOW = 12;
+float MOVETYPE_FOLLOW		= 12;
 
 // relocated from defs.qc
 
@@ -234,10 +236,13 @@ Impulse 38 - Axe (just to do complete)
 .float pk_gravitywellammo, pk_turretammo, pk_canpabammo, pk_beartrapammo;
 
 // Ammo Max'S
-float PK_GRAVITYWELLAMMO_MAX	= 1;
-float PK_TURRETAMMO_MAX			= 3;
-float PK_CANPABAMMO_MAX			= 1;
-float PK_BEARTRAPAMMO_MAX		= 3;
+float PK_GRAVITYWELLAMMO_MAX;
+float PK_TURRETAMMO_MAX;
+float PK_CANPABAMMO_MAX;
+float PK_BEARTRAPAMMO_MAX;
+
+float PK_MAX_LIVENT; // max live ents (fire & forget) weapons a server allows
+float pk_livent; // current count
 
 // The current inventory item
 .float pk_currentInventory;
@@ -335,7 +340,7 @@ float ip_timeout				= 2;
 
 // exploding ammo for shotgun
 .float pk_explode_ammo;
-float PK_EXPLODEAMMO_MAX	= 10;
+float PK_EXPLODEAMMO_MAX;
 
 // For Drowning Ignoring armor
 float ignorearmor;
@@ -529,8 +534,8 @@ void() pk_placeitem;
 .vector cam; // all chase cam data
 void() cam_punch;						// return punchangle if passed parm - otherwise set self. var
 void() dead_cam_set;					// Cataboligne 9.11.3 purify proto - chase cam
-float DCAMTO					= 0;	// testing 120; // timeout for death cam 2 mins
-float DCAMTOACT				= 0;	// action after timeout 0 = respawn, 1 = disconnect
+float DCAMTO;							// timeout for death cam 2 mins
+float DCAMTOACT;						// action after timeout 0 = respawn, 1 = disconnect
 
 // cam vision field settings
 float DCAM_FOV					= 130; // dead cam crow vision
@@ -541,6 +546,8 @@ string CAM_FOV					= "fov 80\n"; // field for cam view
 // Cataboligne - projectile / cartridge fire(d) positioning - 9.30.9
 
 // really needed by viswep & chasecam which shows how bad original positioning looks
+
+float FL_NDISMDL				= 8388608; // flag to prevent display of viswep models
 
 // q weps
 // shotguns - cart eject - just an extra

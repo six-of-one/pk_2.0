@@ -1694,7 +1694,7 @@ void() AdminCommands =
 			{
 				self.wad = "\nDynamic Painkeep items OFF";
 				pk_flags = pk_flags - PK_DYNAMIC;
-				if (DARKPLACES || chaos) cvar_set("sv_dyn_ovr","0"); // set this var if it exists
+				if (DARKPLACES || chaos) cvar_set("pk_dyn_ovr","0"); // set this var if it exists
 			}
 			else
 			{
@@ -1710,7 +1710,7 @@ void() AdminCommands =
 						z.nextthink = time + 1; // do this well after items spawn
 					}
 				}
-				if (DARKPLACES || chaos) cvar_set("sv_dyn_ovr","1");
+				if (DARKPLACES || chaos) cvar_set("pk_dyn_ovr","1");
 			}
 		}
 		else if (self.lefty == 6 && !PK_100)
@@ -2097,6 +2097,7 @@ void() PK_AdminImpulse =
 			}
 			else
 				self.admin = 0;
+// IDEA: 5.19 exit - respawn here
 			if (self.goalentity.classname == "admintimer")
 			{
 				remove(self.goalentity);
@@ -2112,6 +2113,7 @@ void() PK_AdminImpulse =
 			{
 				self.admin = 6;
 				Admin_mainmenu();
+// IDEA: 5.19 go observer here, escape or fail dont go observer
 			}
 			else // login
 			{

@@ -18,7 +18,7 @@ void() use_pkitem =
 
 	drp = 0;
 
-	if (self.health < 30) drp = 1;		// hurt - always use item
+	if (self.health < 30) drp = 1;		// hurt - always use item - try most beneficial first
 
 	else if (self.health < 66)
 	{
@@ -36,14 +36,30 @@ void() use_pkitem =
 
 	if (drp)
 	{
-		if (self.pk_canpabammo > 0 && drp > 0.9)
+		if (self.pk_canpabammo > 0 && drp > 0.9) // heal or escape when health low
 		{
 			self.weapon = IT_AXE;
 			self.pk_currentitem = PK_IT_CANPAB;
 			PK_Attack();
 		}
+		else if (self.pkplus_phoneammo > 0 && drp > 0.9)
+		{
+			self.weapon = IT_AXE;
+			self.pk_currentitem = PKPLUS_IT_PHONE;
+			PK_Attack();
+		}
 		else if (self.pk_gravitywellammo > 0 && drp > 0.8)
 		{
+			if (coop)
+			{
+				local entity pl;
+				pl = find(world, classname, "player");
+				while (pl != world)
+				{
+					if (pl.ishuman && (vlen(self.origin - pl.origin) < 2000)) return; // dont fire one of these when real player is close by
+					pl = find(pl, classname, "player");
+				}
+			}
 			self.weapon = IT_AXE;
 			self.pk_currentitem = PK_IT_GRAVITYWELL;
 			PK_Attack();
@@ -60,13 +76,7 @@ void() use_pkitem =
 			self.pk_currentitem = PK_IT_BEARTRAP;
 			PK_Attack();
 		}
-		else if (self.pkplus_phoneammo > 0 && drp > 0.5) // Cataboligne - 5.8.10 - bots use pkplus artefacts items now - YAY!  (no Gir, thats bad...)
-		{
-			self.weapon = IT_AXE;
-			self.pk_currentitem = PKPLUS_IT_PHONE;
-			PK_Attack();
-		}
-		else if (self.pkplus_egoammo > 0 && drp > 0.4)
+		else if (self.pkplus_egoammo > 0 && drp > 0.4) // Cataboligne - 5.8.10 - bots use pkplus artefacts items now - YAY!  (no Gir, thats bad...)
 		{
 			self.weapon = IT_AXE;
 			self.pk_currentitem = PKPLUS_IT_EGO;

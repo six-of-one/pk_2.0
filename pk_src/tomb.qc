@@ -121,6 +121,13 @@ void () corpsefollow =
 void () tombtouch =
 {
 	local entity holdowner;
+	if (!deathmatch) // Cataboligne - 5.20.10 - tomb single player code - allow monster target
+	{
+//		if (other.classname == "player" && cvar("sv_sp_bt_noplayer")) return;
+//		else 
+		if (other.classname != "player" && ! other.flags & FL_MONSTER) return;
+	}
+	else
 	if (other.classname != "player" && other.classname != "pk*bot")
 	{
 		return ;
@@ -235,7 +242,7 @@ void () tomb_launch =
 	tomb.angles_z = 0;
 	tomb.v_angle = self.v_angle;
 	tomb.v_angle_z = 0;
-	tomb.tomb_death_time = (time + 90);
+	tomb.tomb_death_time = (time + PKPLUS_TOMB_TIME);
 	tomb.think = tomb_checkonground;
 	tomb.nextthink = (time + 0.5);
 	AddToSplash (tomb);
