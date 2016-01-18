@@ -308,6 +308,9 @@ void () BotPostThink =
 		return ;
 	}
 
+// fix get item issue with rndize
+	if (self.classname != "pk*bot")	self.classname = "pk*bot";
+
 // runes
 	if (self.rune_flag & RUNE_FLG_RG) rune_regen();
 };

@@ -98,41 +98,39 @@ float(entity e, float p) loop_next =
 void() loopcyc_think =
 {
 	local float f, rp, rn, dr, svm;
-	local entity e, sv;
+	local entity e;
 	local string mmc;
 
 	svm = cvar("pk_cyc_master");
-	sv = self;
-	f = cvar(sv.noise);
-	rp = cvar(sv.noise1);
-	sv.cnt = dr = rn = FALSE;
+	f = cvar(self.noise);
+	rp = cvar(self.noise1);
+	self.cnt = dr = rn = FALSE;
 
 	if (!f && !rp) // 1 & 0 are zeroed - restore items & remove
 	{
 		rn = TRUE;
 	}
 
-	if (svm && sv.wait != -666)
+	if (svm && self.wait != -666)
 	{
 		mmc = item_by_mcode(self.delay);
 		e = find( world, classname, mmc);
 	}
 	else
-		e = sv.theowner;
+		e = self.theowner;
 	while (e)
 	{
-		self = e;
 		if (!e.scode) e.scode = e.mcode;
-		if (!sv.cnt) sv.cnt = e.mcode;
+		if (!self.cnt) self.cnt = e.mcode;
 		if (cvar("pk_cyc_halt") || rn)
 		{
-			item_call(item_by_mcode(e.scode));
+			item_call_save(e, item_by_mcode(e.scode));
 		}
-		else if (e.classname == "dyn_item" && e.mcode != sv.cnt)
+		else if (e.classname == "dyn_item" && e.mcode != self.cnt)
 			dr = TRUE;
 		else
 		{
-			f = loop_next(sv, 0); // check all 0's
+			f = loop_next(self, 0); // check all 0's
 			if (!f) // keep these ents gone
 			{
 				e.model = "";
@@ -141,15 +139,15 @@ void() loopcyc_think =
 			}
 			else // cycle according to rules
 			{
-				sv.delay = f = loop_next(sv, e.mcode);
+				self.delay = f = loop_next(self, e.mcode);
 				e.pk_touch = (void()) 0;
 				if (!f)
 				{
 					if (WARNING) bprint("\b*** warning: loop code changed on live item loop - restoring item.\n");
-					item_call(item_by_mcode(e.scode));
+					item_call_save(e, item_by_mcode(e.scode));
 				}
 				else
-					item_call(item_by_mcode(f)); // set replacement item
+					item_call_save(e, item_by_mcode(f)); // set replacement item
 				if (self.map == "rune") self.map = ""; // rune server deal - this is a just in case - map runes should be pic or nopic
 			}
 		}
@@ -157,7 +155,7 @@ void() loopcyc_think =
 		if (dr) e = find( e, classname, "dyn_item");
 		else 
 		{
-			if (svm && sv.wait != -666)
+			if (svm && self.wait != -666)
 				e = find( e, classname, mmc);
 			else
 				e = e.theowner;
@@ -171,7 +169,6 @@ void() loopcyc_think =
 	}
 
 
-	self = sv;
 	if (rn)
 	{
 		remove(self);
@@ -273,11 +270,8 @@ void(entity e) init_loopcyc =
 				if (s2.flags & FL_ITEM)
 					v1 = stdv_rndloc(s2.origin + ' 0 0 8', 50, 100);
 				setorigin(sr, v1);
-				s2 = self;
-				self = sr;
-				self.wad = cl;
-				item_call(cl); // make first one
-				self = s2;
+				sr.wad = cl;
+				item_call_save(sr, cl); // make first one
 				s2 = sr; // for the chain up
 			}
 			f0 = f0 - 1;

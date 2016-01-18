@@ -362,6 +362,10 @@ void() PK_precache =
 
 	pk_livent = 0; // nothing lives yet
 
+// load pk bots w/enh. engine
+
+	if (DARKPLACES || chaos) cvar_set("sv_bot_pkset", "1");
+
 // extra sounds by...are apparently not supplied, except gib_?.wav
 
 	pk_xsound = (pk_flags & PK_XSOUND);
@@ -793,10 +797,8 @@ void() pk_liveupd =
 
 // dynamic items
 	DYN_OVR = cvar("pk_dyn_ovr");
-	DYN_ART = cvar("pk_dyn_art");
 	DYN_FORCE = FALSE;
 	if (!DYN_OVR) DYN_FORCE = cvar("pk_dyn_force");
-	DYN_ARTFR = cvar("pk_dyn_art_force");
 	DYN_FORCE_CNT = cvar("pk_dyn_force_cnt");
 	DYN_ARTFR_ONLY = FALSE; // yes, has to reset every time
 
@@ -805,7 +807,7 @@ void() pk_liveupd =
 		pk_bas_flags(PK_DYNAMIC, DYN_OVR);
 	}
 
-	if (!PK_ART && (DYN_ART || DYN_ARTFR))
+	if (!PK_ART && ((DYN_ART && (DYN_OVR || DYN_FORCE) ) || DYN_ARTFR))
 	{
 		if (WARNING)
 		{
@@ -816,6 +818,11 @@ void() pk_liveupd =
 		}
 		DYN_ART = FALSE;
 		DYN_ARTFR = FALSE;
+	}
+	else
+	{
+		DYN_ART = cvar("pk_dyn_art");
+		DYN_ARTFR = cvar("pk_dyn_art_force");
 	}
 
 	local entity e, sv;
@@ -971,7 +978,7 @@ void() pk_srvcmd_load =
 
 	e = spawn();
 	e.think = start_loopcyc;
-	e.nextthink = time + PIC_TO + 4 + 2 * crandom();
+	e.nextthink = time + PIC_TO + 2;
 
 	e = spawn();
 	e.think = pk_monitor;
@@ -1161,6 +1168,11 @@ void() pk_srvcmd_set =
 		registercvar("sv_c_botfreeze", "0"); // for testing
 		registercvar("sv_c_warning", "0");
 		registercvar("sv_c_adminlock", "0"); // if true, admin menu is locked out
+// pk*bot server control - spawns bots on level changes
+		registercvar("sv_bot_pk", "0"); // bot count . skills non team - replaces parm12
+		registercvar("sv_bot_pktm", "0"); // bot count . skills - team - replaces parm13
+		registercvar("sv_bot_pkset", "0"); // bot stats saved
+
 // rune server
 		registercvar("sv_c_rune", "0");
 		registercvar("sv_c_rune_cnt", "4");
@@ -1205,6 +1217,7 @@ void() pk_srvcmd_set =
 		registercvar("pk_dyn_art_force", "0"); // force artifacts on map if no dynamic spawner, if spawner exists this is the same as pk_dyn_art
 		registercvar("pk_dyn_force_cnt", "6"); // max force cnt - because forcing can exceed load max for dyn items
 		registercvar("pk_dyn_func_stop", "0"); // stop func_dynitem operation
+		registercvar("pk_art_rep", "1"); // replace artifacts w/pk items when off
 
 		registercvar("pk_explbox_resp", "1"); // respawn boom boxes / barrels
 
@@ -1533,6 +1546,10 @@ void(vector org) spawn_tfog2 =
 
 // special parms - for respawn
 
+void() q100_SetChangeParms;
+void() q100_SetNewParms;
+void() q100_DecodeLevelParms;
+
 void() SetNewParms_PK =
 {
 	parm1 = IT_SHOTGUN | IT_AXE;
@@ -1553,8 +1570,46 @@ void() SetNewParms_PK =
 
 // called from SetChangeParms - saves off pk parms for level change
 
-void() PK_ChangeParms =
+void() SetChangeParms =
 {
+	if (find(world,classname,"pk*bot")) bot_changeParms();
+
+	if (Q_100 || Q_99)
+	{
+		q100_SetChangeParms(); // always encoding now
+		return;
+	}
+// Cataboligne 9.11.3 purify - chase cam
+	cam_parms(0);
+
+	if (self.health <= 0 || self.classname == OBSERVER) // Cataboligne - 5.3.10 - fix level change issue when in dead observer or admin observer
+	{
+		SetNewParms_PK();
+		parm16 = parm16 | 256; // Cataboligne - 8.22.9 - pk orig oper
+		return ;
+	}
+// remove items
+	self.items = self.items - (self.items & (IT_KEY1 | IT_KEY2 | IT_INVISIBILITY | IT_INVULNERABILITY | IT_SUIT | IT_QUAD));
+
+// cap super health
+	if (self.health > 100)
+		self.health = 100;
+	if (self.health < 50)
+		self.health = 50;
+	parm1 = self.items;
+	parm2 = self.health;
+	parm3 = self.armorvalue;
+	if (self.ammo_shells < 25)
+		parm4 = 25;
+	else
+		parm4 = self.ammo_shells;
+	parm5 = self.ammo_nails;
+	parm6 = self.ammo_rockets;
+	parm7 = self.ammo_cells;
+	parm8 = self.weapon;
+	parm9 = self.armortype * 100;
+	parm10 = parm11 = parm15 = parm16 = 0;
+
 	parm10 = PK_IT_AXE | self.pk_items;
 // recode so *bot can have vars for skill level save - provide max inventory of 15 for mod expansion, current max is 3 on most except for explode ammo
 
@@ -1571,8 +1626,23 @@ void() PK_ChangeParms =
 
 // called from SetNewParms - clears pk parms
 
-void() PK_SetNewParms =
+void() SetNewParms =
 {
+	if (Q_100 || Q_99)
+	{
+		q100_SetNewParms(); // always encoding now
+		return;
+	}
+
+	parm1 = IT_SHOTGUN | IT_AXE;
+	parm2 = 100;
+	parm3 = 0;
+	parm4 = 25;
+	parm5 = 0;
+	parm6 = 0;
+	parm7 = 0;
+	parm8 = 1;
+	parm9 = 0;
 //	parm10 = PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP; // deprecated - not really used
 //	parm11 = parm12 = parm13 = parm14 = parm15 = 0; // chasecam change
 		parm10 = parm11 = 0;
@@ -1583,12 +1653,40 @@ void() PK_SetNewParms =
 	{
 		parm16 = parm16 | PK_IT_EXTRADISP;
 	}
+
+// Cataboligne 9.11.3 purify - chase cam
+	cam_parms(2);
 };
 
 // called from DecodeLevelParms - restores pk parms on new level
 
-void() PK_DecodeLevelParms = 
+
+void() DecodeLevelParms = 
 {
+	if (Q_100 || Q_99)
+	{
+		q100_DecodeLevelParms(); // always encoding now
+		return;
+	}
+
+	if (serverflags)
+	{
+		if (world.model == "maps/start.bsp" && !inHubMap) // Cataboligne - 5.19.10 - q1 SP hack for using forced dyn items
+			SetNewParms ();   // take away all stuff on starting new episode
+		if (world.model == "maps/qstart.bsp") SetNewParms();
+	}
+//	bot_skinDecode();
+
+	self.items = parm1;
+	self.health = parm2;
+	self.armorvalue = parm3;
+	self.ammo_shells = parm4;
+	self.ammo_nails = parm5;
+	self.ammo_rockets = parm6;
+	self.ammo_cells = parm7;
+	self.weapon = parm8;
+	self.armortype = parm9 * 0.01;
+
 	self.pk_items = parm10 | (parm16 & PK_IT_EXTRADISP); // fix PK mode false map to PK mode true map
 	self.pk_explode_ammo = parm11 & 15;
 	self.pk_turretammo = floor(parm11 / 16) & 3;
@@ -1607,6 +1705,29 @@ void() PK_DecodeLevelParms =
 // end pk_art
 
 	self.msgcount = (parm16 & 255);
+
+// Cataboligne 9.11.3 purify - chase cam
+	cam_parms(1);
+};
+
+void() PK_GotoNextMap =
+{
+	if (PK && !PK_ADMINMAP)
+	if (pk_flags & PK_TP_USERMAPON) // *pk - user supplied map loop deal
+	{
+		if (!execed)
+		{
+			execed = 1;
+			localcmd ("pknextmap\n");
+		}
+		return;
+	}
+
+	if(!PK_100 && !PK_ADMINMAP) 
+	{
+		if (check_custom_hub()) // *pk --- Cataboligne - 8.16.9 - do custom hub load from any exit here
+			return;
+	}
 };
 
 // called from PutClientInServer
@@ -1715,7 +1836,7 @@ entity() PK_SelectSpawnPoint =
 		pcount=0;
 		while (thing)
 		{
-			if (thing.classname == "player") // NOTE: could be reason for bot spawn frag bork - doesnt see pk*bot
+			if (thing.classname == "player" || thing.classname == "pk*bot") // NOTE: could be reason for bot spawn frag bork - didnt see pk*bot
 				pcount=pcount + 1;
 			thing=thing.chain;
 		}
@@ -1783,10 +1904,87 @@ void() pk_plcfg =
 };
 
 // called from PutClientInServer
+void() q100_PutClientInServer;
+void() player_stand1;
+void() player_pain;
+void() PlayerDie;
+float	modelindex_eyes, modelindex_player;
+void (vector org) spawn_tfog;
+void (vector org, entity death_owner) spawn_tdeath;
 
-void() PK_CIS =
+//void() PK_CIS =
+void() PutClientInServer =
 {
-// previously in CIS
+	local entity spot;
+
+	set_initBotLevel(); // *bot
+
+	if (Q_100 || Q_99)
+	{
+		q100_PutClientInServer(); // always encoding now
+		return;
+	}
+
+	spot = PK_SelectSpawnPoint (); // *pk - get a spawn point, pk style 
+	ClearSpawnPoint(spot); // *pk
+
+	self.classname = "player";
+	self.health = 100;
+	self.takedamage = DAMAGE_AIM;
+	self.solid = SOLID_SLIDEBOX;
+	self.movetype = MOVETYPE_WALK;
+	self.show_hostile = 0;
+	self.max_health = 100;
+	self.flags = FL_CLIENT;
+	self.air_finished = time + 12;
+	self.dmg = 2;   		// initial water damage
+	self.super_damage_finished = 0;
+	self.radsuit_finished = 0;
+	self.invisible_finished = 0;
+	self.invincible_finished = 0;
+	self.effects = 0;
+	self.invincible_time = 0;
+
+	DecodeLevelParms ();
+
+	W_SetCurrentAmmo ();
+
+	self.attack_finished = time;
+	self.th_pain = player_pain;
+	self.th_die = PlayerDie;
+
+	self.deadflag = DEAD_NO;
+// paustime is set by teleporters to keep the player from moving a while
+	self.pausetime = 0;
+
+//	spot = SelectSpawnPoint ();
+
+	self.origin = spot.origin + '0 0 1';
+	self.angles = spot.angles;
+	self.fixangle = TRUE;		// turn this way immediately
+
+// oh, this is a hack!
+	setmodel (self,"progs/eyes.mdl");
+	modelindex_eyes = self.modelindex;
+
+	setmodel (self,"progs/player.mdl");
+	modelindex_player = self.modelindex;
+
+	setsize (self,VEC_HULL_MIN,VEC_HULL_MAX);
+
+	self.view_ofs = ' 0 0 22';
+
+	player_stand1 ();
+
+	if (deathmatch || coop)
+	{
+		makevectors (self.angles);
+		spawn_tfog (self.origin + v_forward*20);
+	}
+
+	spawn_tdeath (self.origin,self);
+
+
 	pk_plcfg();
 	self.pk_items = self.pk_items | PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP
 																	| PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // Cataboligne 8.12.9 purify - pk artifacts
@@ -1834,7 +2032,7 @@ void() PK_CIS =
 
 //	self.alpha = 0.5; // testing
 
-	if (!PK) return;
+//	if (!PK) return;
 
 	if (inHubMap)
 	{ // give the respawn guy a fighting chance...
@@ -1854,6 +2052,11 @@ void() PK_CIS =
 
 	// PAINKEEP Fix the velocity on respawn bug
 	self.velocity = '0 0 0';
+
+	self.admin = 0;
+
+	Chase_cam_level_start(); // Cataboligne 8.9.9 purify - chase cam
+	self.rune_flag = 0;
 };
 
 /*
@@ -2039,7 +2242,8 @@ void () PlayerPostThink =
 	if (DARKPLACES || chaos)
 	if (cvar("botlevel")) // hack so alias can load new map & keep pk*bots
 	{
-		bot_changelevel();
+		bot_changelevel(); // map change MUST happen - this clears bots from map!
+//		bot_changeParms(); // save bots for change
 		cvar_set("botlevel", "0");
 	}
 
@@ -2196,7 +2400,7 @@ void () ClientConnect =
 {
 	local float v;
 
-	if (FRIKBOT) ClientInRankings ();
+	if (FRIKBOT) ClientInRankings (); // sets .ishuman for humans
 	bot_con(TRUE); // *bot - doesnt depend on active bots, must always happen
 	if (Q_100 || Q_99)
 	{

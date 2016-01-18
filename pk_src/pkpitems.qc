@@ -161,32 +161,69 @@ void(entity e) pkplus_item_control =
 {
 	if (e.classname == "func_make") return; // override
 
+// no sense in working removed items or constantly rndize items
+	if (cvar("pk_place_item") == 1) return;
+	if (cvar("pk_place_item") == 2)
+	{
+		if (cvar("pk_place_item_reload"))
+		if (cvar("pk_place_item_reload") < 60) return;
+		if (!PK_ART)
+		{
+			e.class_select = "";
+			e.classname = "";
+		}
+		return;
+	}
+// TDO: fix where rndize once made pkplus and they got turned off - re-rndize them
+
 	if (PK_ART) // turned back on - come here from loop
 	{
-		setmodel (e,e.mdl);
-		e.touch = painkeep_touch;
-		e.pk_touch = pkplus_touch;
+		if (e.mcode != e.scode)
+		{
+			e.mcode = e.scode;
+			e.wad = item_by_mcode(e.mcode);
+			item_call_save(e, e.wad);
+		}
+		else
+		{
+			setmodel (e,e.mdl);
+			e.touch = painkeep_touch;
+			e.pk_touch = pkplus_touch;
+		}
 		return;
 	}
 
-	if (time < PIC_TO)
-//	if (cvar("pk_place_item") != 0) // pic - just block appearance, rnd does rest - not needed
-	{
-		setmodel (e,"");
-		e.touch = SUB_Null;
-	}
-	else // IDEA: option to turn into rnd regular pk items
-	{
-		if (e.classname == "dyn_item")
+	if (e.classname == "dyn_item")
 		{
 			if (WARNING) bprint("*** Warning - dynamic items: pk_art is off and dynamic made a pkplus item - hiding\n");
 		}
-		else
-		if (WARNING) bprint("*** Warning - pk_art is off and code made a pkplus item - hiding\n");
-		setmodel (e,"");
-		e.touch = SUB_Null;
-	}
+//		else
+//		if (WARNING) bprint("*** Warning - pk_art is off and code made a pkplus item - hiding\n");
 
+	if (!cvar("pk_art_rep"))
+		{
+			setmodel (e,"");
+			e.touch = SUB_Null;
+		}
+	else
+		{
+			local float f;
+			f = MC_PK_RNDITM;
+//			if (e.mcode > 149 && e.mcode < MC_PK)
+			e.mcode = 141 + rint(random() * f);
+			e.wad = item_by_mcode(e.mcode);
+			if (e.wad != "")
+			{
+				e.pk_touch = (void()) 0; // so we can touch the new things
+				item_call_save(e, e.wad);
+			}
+			else
+			{
+				e.mcode = e.scode;
+				setmodel (e,"");
+				e.touch = SUB_Null;
+			}
+		}
 };
 
 // twiddled after map load

@@ -283,7 +283,7 @@ void () W_FireShotgun =
 {
 	local vector dir;
 
-	if (!(!Q_100 && self.pk_explode_ammo))
+	if (!(!Q_100 && !Q_99 && self.pk_explode_ammo))
 		sound (self,CHAN_WEAPON,"weapons/guncock.wav",1 ,ATTN_NORM);
 	else
 	{
@@ -317,7 +317,7 @@ void () W_FireSuperShotgun =
 		return ;
 	}
 
-	if (!(!Q_100 && self.pk_explode_ammo))
+	if (!(!Q_100 && !Q_99 && self.pk_explode_ammo))
 		sound (self,CHAN_WEAPON,"weapons/shotgn2.wav",1 ,ATTN_NORM);
 	else
 	{
@@ -534,7 +534,7 @@ void () W_FireLightning =
 	if (self.ammo_cells < 1)
 	{
 		self.weapon = W_BestWeapon ();
-		if (!Q_100) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
+		if (!Q_100 && !Q_99) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
 		W_SetCurrentAmmo ();
 		if (self.classname == "pk*bot")
 		{
@@ -779,7 +779,7 @@ void(float ox) W_FireSpikes =
 	if (self.ammo_nails < 1)
 	{
 		self.weapon = W_BestWeapon ();
-		if (!Q_100) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
+		if (!Q_100 && !Q_99) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
 		W_SetCurrentAmmo ();
 		if (self.classname == "pk*bot")
 		{
@@ -1468,7 +1468,7 @@ void () ImpulseCommands =
 // Cataboligne 9.11.3 purify - chase cam
 	if (self.impulse > 229 && self.impulse < 240) ccb_impulse_check();
 
-	if (!Q_100)
+	if (!Q_100 && !Q_99)
 	{
 		PK_ImpulseCommands();
 		return;

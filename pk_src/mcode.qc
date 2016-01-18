@@ -78,7 +78,7 @@ float MC_Q1						= 135;
 float MC_RNDITM				= 32;		// # of q1 items - have to change it items changes
 float MC_NR_RNDITM			= 28;		//   no runes
 
-float MC_SIGIL					= 133;
+float MC_SIGIL					= 135;
 
 float MC_BACKPACK				= 134;
 
@@ -295,6 +295,21 @@ float(string sc, entity e) pk_mcode =
 
 	if (tsc == "dyn_item")												return(0);
 // q1
+	if (e) // qualify ent
+	{
+	if ((tsc == "item_shells") && (e.spawnflags & 1))			return(MC_ASHELLS_LG);
+	if ((tsc == "item_spikes") && (e.spawnflags & 1))			return(MC_ANAILS_LG);
+	if ((tsc == "item_rockets") && (e.spawnflags & 1))			return(MC_AROCKETS_LG);
+	if ((tsc == "item_cells") && (e.spawnflags & 1))			return(MC_ACELLS_LG);
+	if ((tsc == "item_health") && (e.spawnflags & 1))			return(MC_HEALTHROT);
+	if ((tsc == "item_health") && (e.spawnflags & 2))			return(MC_HEALTHMEGA);
+
+	if ((tsc == "item_sigil") && (e.spawnflags & R_EARTH))	return(MC_SIGIL1);
+	if ((tsc == "item_sigil") && (e.spawnflags & R_BLACK))	return(MC_SIGIL2);
+	if ((tsc == "item_sigil") && (e.spawnflags & R_HELL))		return(MC_SIGIL4);
+	if ((tsc == "item_sigil") && (e.spawnflags & R_ELDER))	return(MC_SIGIL8);
+	}
+
 	if (tsc == "weapon_supershotgun")								return(MC_SUPER_SHOTGUN);
 	if (tsc == "weapon_nailgun")										return(MC_NAILGUN);
 	if (tsc == "weapon_supernailgun")								return(MC_SUPER_NAILGUN);
@@ -392,21 +407,6 @@ float(string sc, entity e) pk_mcode =
 
 // q3 - translates classname for now
 //	else if (tsc == "")								return(MC_);
-
-	if (e) // qualify ent
-	{
-	if ((tsc == "item_shells") && (e.spawnflags & 1))			return(MC_ASHELLS_LG);
-	if ((tsc == "item_spikes") && (e.spawnflags & 1))	return(MC_ANAILS_LG);
-	if ((tsc == "item_rockets") && (e.spawnflags & 1))	return(MC_AROCKETS_LG);
-	if ((tsc == "item_cells") && (e.spawnflags & 1))		return(MC_ACELLS_LG);
-	if ((tsc == "item_health") && (e.spawnflags & 1))	return(MC_HEALTHROT);
-	if ((tsc == "item_health") && (e.spawnflags & 2))	return(MC_HEALTHMEGA);
-
-	if ((tsc == "item_sigil") && (e.spawnflags & R_EARTH))		return(MC_SIGIL1);
-	if ((tsc == "item_sigil") && (e.spawnflags & R_BLACK))		return(MC_SIGIL2);
-	if ((tsc == "item_sigil") && (e.spawnflags & R_HELL))		return(MC_SIGIL4);
-	if ((tsc == "item_sigil") && (e.spawnflags & R_ELDER))		return(MC_SIGIL8);
-	}
 
 	if (tsc != "dyn_item") // && mc == 0)
 	{

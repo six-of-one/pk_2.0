@@ -269,6 +269,17 @@ void(string cls) item_call =
 //	bot_item_linx(self); // *bot - item tie in - needs checked for use here -- FIX
 };
 
+// save self, item call e
+
+void(entity e, string cl) item_call_save =
+{
+	local entity sv;
+
+	sv = self;
+	self = e;
+	item_call(cl);
+	self = sv;
+}
 // this section implements admin override of map items, remove (& replace), cycle & inf ammo
 
 void() item_down =
@@ -280,7 +291,7 @@ void() item_down =
 
 void(string cls, string rep, string am, string ram) item_repm =
 {
-	local entity e, sv;
+	local entity e;
 	local string pam;
 	local float f;
 
@@ -301,14 +312,12 @@ void(string cls, string rep, string am, string ram) item_repm =
 		f = WEP_STOP * ceil(2 * random()) * ceil(2 * random()) * ceil(2 * random());
 		if (pk_itemovr & CON_INF) pam = "pki"; // inf ammo - pk item subs
 	}
-	sv = self;
 	e = find(world,wad,rep);
 	while (e)
 	{
-		self = e;
 		if (cls == "rest")
 		{
-			item_call(rep);
+			item_call_save(e, rep);
 			if (ram != "")
 			{
 				if (pam == "rem" || pam == "pki") item_repm(pam, ram, "", "");
@@ -321,7 +330,7 @@ void(string cls, string rep, string am, string ram) item_repm =
 			{
 				f = f * 2;
 				if (f > WEP_CPNB) f = WEP_GWELL;
-				item_call(ammo_by_bit(f)); // TDO: finish item call
+				item_call_save(e, ammo_by_bit(f)); // TDO: finish item call
 			}
 			else
 				item_down();
@@ -330,13 +339,12 @@ void(string cls, string rep, string am, string ram) item_repm =
 		}
 		else
 		{
-			item_call(cls);
+			item_call_save(e, cls);
 			if (ram != "")
 			if (ram != pam) item_repm(pam, ram, "", "");
 		}
 		e = find(e,wad,rep);
 	}
-	self = sv;
 };
 
 // main loop handles admin item override
@@ -850,14 +858,14 @@ void() place_item_control;
 void() rndize_restore =
 {
 	self.nextthink = time + 10 + random() * 10;
-	if (cvar("pk_place_item") != 2)
+	if (cvar("pk_place_item") != 2 || self.owner.classname == "") // pkplus turned off & rndize once made some pkp items
 	{
 		self.nextthink = time + 0.1;
 		self.think = rndize_item;
 	}
 };
 
-// IDEA: rndize once should make a better effort of providing a good set of items (rndize inside type, weps health, etc)
+// IDEA: rndize once should make a better effort of providing a good set of items (rndize inside type, weps health, etc, or some kind of item counts?)
 
 void() rndize_item =
 {
@@ -882,51 +890,49 @@ void() rndize_item =
 		}
 		if (cvar("pk_place_item") == 2)
 		{
-			e.nextthink = time + 10 + random() * 10;
-			e.think = rndize_restore;
+			self.nextthink = time + 10 + random() * 10;
+			self.think = rndize_restore;
 			return;
 		}
 	}
 
 	self.owner.wad = item_by_mcode(self.owner.mcode);
-	e = self;
-	self = self.owner;
-	self.pk_touch = (void()) 0; // so we can touch the new things
+	self.owner.pk_touch = (void()) 0; // so we can touch the new things
 
 // TDO: chaos mod vector here
-	e.cnt = cvar("pk_place_item_reload"); // randomize every so often
+	self.cnt = cvar("pk_place_item_reload"); // randomize every so often
 
 //	bprint("*** rndize item: ");
 	if (cvar("pk_place_item") == 0)
 	{
 //		bprint("admin turned off & exiting randomize items & restoring\n");
-		self.wad = item_by_mcode(self.scode);
-		remove(e);
+		self.owner.wad = item_by_mcode(self.owner.scode);
+		remove(self);
 		pic_tsk = 0;
 	}
 	else
 	if (cvar("pk_place_item") == 1)
 	{
 		place_item_control();
-		remove(e);
+		remove(self);
 		return;
 	}
 	else
 	{
-		if (!e.cnt)
+		if (!self.cnt)
 		{
-			e.nextthink = time + 10 + random() * 10;
-			e.think = rndize_restore;
+			self.nextthink = time + 10 + random() * 10;
+			self.think = rndize_restore;
 		}
 		else
-			e.nextthink = time + fabs(e.cnt) + random() * e.cnt;
+			self.nextthink = time + fabs(self.cnt) + random() * self.cnt;
 	}
-//	bprint(self.classname);
+//	bprint(self.owner.classname);
 //	bprint(" is now: ");
-//	bprint(self.wad);
+//	bprint(self.owner.wad);
 //	bprint("\n");
 
-	item_call(self.wad);
+	item_call_save(self.owner, self.owner.wad);
 
 };
 
@@ -963,8 +969,13 @@ void() place_item_control =
 	if (cvar("pk_place_item") == 1)
 	{
 		pic_tsk = 1;
-		self.modelindex = 0;
+		setmodel(self, "");
 		self.touch = SUB_Null;
+		if (self.takedamage) // barrels & other exploders
+		{
+			self.solid = SOLID_NOT;
+			self.takedamage = DAMAGE_NO;
+		}
 		self.think = pic_restore_item;
 		self.nextthink = time + 10 + random() * 10;
 		return;
@@ -1022,268 +1033,4 @@ void() pic_test =
 	if (time < PIC_TO)
 	if (self.map != "nopic")
 		place_item_control();
-};
-
-void() set_translate =
-{
-	TR_WOLF = fabs(cvar("pk_tr_wolf" ));
-	TR_DOOM = fabs(cvar("pk_tr_doom" ));
-	TR_QUAKE = fabs(cvar("pk_tr_quake" ));
-	TR_Q2 = fabs(cvar("pk_tr_q2" ));
-	TR_Q3 = fabs(cvar("pk_tr_q3" ));
-	TR_ALL = fabs(cvar("pk_tr_all" ));
-};
-
-string(float tr) tran_str =
-{
-	if (tr == FL_TR_WOLF) return("Wolfenstien");
-	else if (tr == FL_TR_DOOM) return("DooM");
-	else if (tr == FL_TR_QUAKE) return("Quake");
-	else if (tr == FL_TR_Q2) return("Quake 2");
-	else if (tr == FL_TR_Q3) return("Quake 3");
-	else if (tr == FL_TR_RESTORE) return("Restoring");
-	else if (tr == FL_TR_RANDIN) return("Random genre");
-	else if (tr == FL_TR_RANDOM) return("any Random item");
-//	if (tr == FL_TR_REMOVE) 
-		return("null - removing");
-};
-
-// map translations
-
-void() check_translate =
-{
-	TR_NOT = cvar("pk_tr_not");
-
-	if (TR_ALL != cvar("pk_tr_all" ))
-	{
-		if (!TR_ALL) TR_ALL = FL_TR_RESTORE; // turned off & we need restore controls
-
-		if (WARNING)
-		{
-		bprint("*** Translate: ALL to ");
-		bprint(tran_str(TR_ALL));
-		bprint("\n\n");
-		}
-	}
-
-	if (TR_WOLF != cvar("pk_tr_wolf" ) || TR_ALL)
-	{
-		TR_WOLF = fabs(cvar("pk_tr_wolf" ));
-		if (!TR_WOLF) TR_WOLF = FL_TR_RESTORE; // turned off & we need restore controls
-
-		if (WARNING)
-		{
-		bprint("*** Translate: Wolf to ");
-		bprint(tran_str(TR_WOLF));
-		bprint("\n");
-		}
-
-		doom_item_control_loop("wolf_item", TR_WOLF);
-	}
-
-	if (TR_DOOM != cvar("pk_tr_doom" ) || TR_ALL)
-	{
-		TR_DOOM = fabs(cvar("pk_tr_doom" ));
-		if (!TR_DOOM) TR_DOOM = FL_TR_RESTORE; // turned off & we need restore controls
-
-		if (WARNING)
-		{
-		bprint("*** Translate: DooM to ");
-		bprint(tran_str(TR_DOOM));
-		bprint("\n");
-		}
-
-		doom_item_control_loop("doom_item", TR_DOOM);
-	}
-
-	if (TR_QUAKE != cvar("pk_tr_quake" ) || TR_ALL)
-	{
-		TR_QUAKE = fabs(cvar("pk_tr_quake" ));
-		if (!TR_QUAKE) TR_QUAKE = FL_TR_RESTORE; // turned off & we need restore controls
-
-		if (WARNING)
-		{
-		bprint("*** Translate: Quake to ");
-		bprint(tran_str(TR_QUAKE));
-		bprint("\n");
-		}
-
-		doom_item_control_loop("quake_item", TR_QUAKE);
-	}
-
-	if (TR_Q2 != cvar("pk_tr_q2" ) || TR_ALL)
-	{
-		TR_Q2 = fabs(cvar("pk_tr_q2" ));
-		if (!TR_Q2) TR_Q2 = FL_TR_RESTORE; // turned off & we need restore controls
-
-		if (WARNING)
-		{
-		bprint("*** Translate: Quake 2 to ");
-		bprint(tran_str(TR_Q2));
-		bprint("\n");
-		}
-
-		doom_item_control_loop("q2_item", TR_Q2);
-	}
-
-	if (TR_Q3 != cvar("pk_tr_q3" ) || TR_ALL)
-	{
-		TR_Q3 = fabs(cvar("pk_tr_q2" ));
-		if (!TR_Q3) TR_Q3 = FL_TR_RESTORE; // turned off & we need restore controls
-
-		if (WARNING)
-		{
-		bprint("*** Translate: Quake 3 to ");
-		bprint(tran_str(TR_Q3));
-		bprint("\n");
-		}
-
-		doom_item_control_loop("q3_item", TR_Q3);
-	}
-	set_translate();
-
-	if (cvar("pk_translate"))
-	{
-		bprint("\nMap translation bits\n{\n");
-		bprint(ftos(FL_TR_WOLF));
-		bprint("  - translate item to Wolf\n");
-		bprint(ftos(FL_TR_DOOM));
-		bprint("  - translate item to Doom\n");
-		bprint(ftos(FL_TR_QUAKE));
-		bprint("  - translate item to Quake\n");
-		bprint(ftos(FL_TR_Q2));
-		bprint("  - translate item to Quake 2\n");
-		bprint(ftos(FL_TR_Q3));
-		bprint("  - translate item to Quake 3\n");
-		bprint(ftos(FL_TR_RANDIN));
-		bprint("  - randomize these items in genre\n");
-		bprint(ftos(FL_TR_RANDOM));
-		bprint("  - randomize these items totally\n");
-		bprint(ftos(FL_TR_REMOVE));
-		bprint("  - remove these items\n");
-		bprint(ftos(-1));
-		bprint("  - internal restore - not selectable\n");
-		bprint("}\n\n");
-
-		bprint("Map translation vars\n{\n");
-		bprint("var: pk_tr_all = ");
-		bprint(ftos(TR_ALL));
-		bprint(" - overrides all other settings\n");
-		bprint("var: pk_tr_wolf = ");
-		bprint(ftos(TR_WOLF));
-		bprint("\n");
-		bprint("var: pk_tr_doom = ");
-		bprint(ftos(TR_DOOM));
-		bprint("\n");
-		bprint("var: pk_tr_quake = ");
-		bprint(ftos(TR_QUAKE));
-		bprint("\n");
-		bprint("var: pk_tr_q2 = ");
-		bprint(ftos(TR_Q2));
-		bprint("\n");
-		bprint("var: pk_tr_q3 = ");
-		bprint(ftos(TR_Q3));
-		bprint("\n");
-		bprint("var: pk_tr_not = ");
-		bprint(ftos(TR_NOT));
-		bprint(" - 0 = remove no translation, 1 = randomize in genre, 2 = randomize to any \n");
-		bprint("}\n\n");
-
-		if (TR_ALL || TR_Q3 || TR_Q2 || TR_QUAKE || TR_DOOM || TR_WOLF)
-		{
-			if (TR_ALL)
-			{
-				bprint("ALL: translating every item to: ");
-				if (TR_ALL == FL_TR_WOLF) bprint("Wolfenstien\n");
-				if (TR_ALL == FL_TR_DOOM) bprint("Doom\n");
-				if (TR_ALL == FL_TR_QUAKE) bprint("Quake\n");
-				if (TR_ALL == FL_TR_Q2) bprint("Quake 2\n");
-				if (TR_ALL == FL_TR_Q3) bprint("Quake 3\n");
-				if (TR_ALL == FL_TR_RANDIN) bprint("in genre random item!\n");
-				if (TR_ALL == FL_TR_RANDOM) bprint("any random item!\n");
-				if (TR_ALL == FL_TR_REMOVE) bprint("Nothing! - all items are removed, uh have fun!\n");
-				if (TR_Q3 || TR_Q2 || TR_QUAKE || TR_DOOM || TR_WOLF)
-					bprint("\n *** Warning: all other translations are overridden by ALL\n\n");
-			}
-			if (TR_WOLF)
-			{
-				if (TR_ALL) bprint("ALL overrides - ");
-				bprint("Translating wolf items to: ");
-				if (TR_WOLF == FL_TR_WOLF) bprint("Wolfenstien - DOH!\n");
-				if (TR_WOLF == FL_TR_DOOM) bprint("Doom\n");
-				if (TR_WOLF == FL_TR_QUAKE) bprint("Quake\n");
-				if (TR_WOLF == FL_TR_Q2) bprint("Quake 2\n");
-				if (TR_WOLF == FL_TR_Q3) bprint("Quake 3\n");
-				if (TR_WOLF == FL_TR_RANDIN) bprint("Random Wolfenstien\n");
-				if (TR_WOLF == FL_TR_RANDOM) bprint("any random item\n");
-				if (TR_WOLF == FL_TR_REMOVE) bprint("Nothing! - all wolf items are removed!\n");
-			}
-			if (TR_DOOM)
-			{
-				if (TR_ALL) bprint("ALL overrides - ");
-				bprint("Translating doom items to: ");
-				if (TR_DOOM == FL_TR_WOLF) bprint("Wolfenstien\n");
-				if (TR_DOOM == FL_TR_DOOM) bprint("Doom - DOH!\n");
-				if (TR_DOOM == FL_TR_QUAKE) bprint("Quake\n");
-				if (TR_DOOM == FL_TR_Q2) bprint("Quake 2\n");
-				if (TR_DOOM == FL_TR_Q3) bprint("Quake 3\n");
-				if (TR_DOOM == FL_TR_RANDIN) bprint("Random Doom\n");
-				if (TR_DOOM == FL_TR_RANDOM) bprint("any random item\n");
-				if (TR_DOOM == FL_TR_REMOVE) bprint("Nothing! - all doom items are removed!\n");
-			}
-			if (TR_QUAKE)
-			{
-				if (TR_ALL) bprint("ALL overrides - ");
-				bprint("Translating quake items to: ");
-				if (TR_QUAKE == FL_TR_WOLF) bprint("Wolfenstien\n");
-				if (TR_QUAKE == FL_TR_DOOM) bprint("Doom\n");
-				if (TR_QUAKE == FL_TR_QUAKE) bprint("Quake - DOH!\n");
-				if (TR_QUAKE == FL_TR_Q2) bprint("Quake 2\n");
-				if (TR_QUAKE == FL_TR_Q3) bprint("Quake 3\n");
-				if (TR_QUAKE == FL_TR_RANDIN) bprint("Random Quake\n");
-				if (TR_QUAKE == FL_TR_RANDOM) bprint("any random item\n");
-				if (TR_QUAKE == FL_TR_REMOVE) bprint("Nothing! - all quake items are removed!\n");
-			}
-			if (TR_Q2)
-			{
-				if (TR_ALL) bprint("ALL overrides - ");
-				bprint("Translating quake 2 items to: ");
-				if (TR_Q2 == FL_TR_WOLF) bprint("Wolfenstien\n");
-				if (TR_Q2 == FL_TR_DOOM) bprint("Doom\n");
-				if (TR_Q2 == FL_TR_QUAKE) bprint("Quake\n");
-				if (TR_Q2 == FL_TR_Q2) bprint("Quake 2 - DOH!\n");
-				if (TR_Q2 == FL_TR_Q3) bprint("Quake 3\n");
-				if (TR_Q2 == FL_TR_RANDIN) bprint("Random Quake 2\n");
-				if (TR_Q2 == FL_TR_RANDOM) bprint("any random item\n");
-				if (TR_Q2 == FL_TR_REMOVE) bprint("Nothing! - all quake 2 items are removed!\n");
-			}
-			if (TR_Q3)
-			{
-				if (TR_ALL) bprint("ALL overrides - ");
-				bprint("Translating quake 3 items to: ");
-				if (TR_Q3 == FL_TR_WOLF) bprint("Wolfenstien\n");
-				if (TR_Q3 == FL_TR_DOOM) bprint("Doom\n");
-				if (TR_Q3 == FL_TR_QUAKE) bprint("Quake\n");
-				if (TR_Q3 == FL_TR_Q2) bprint("Quake 2\n");
-				if (TR_Q3 == FL_TR_Q3) bprint("Quake 3 - DOH!\n");
-				if (TR_Q3 == FL_TR_RANDIN) bprint("Random Quake 3\n");
-				if (TR_Q3 == FL_TR_RANDOM) bprint("any random item\n");
-				if (TR_Q3 == FL_TR_REMOVE) bprint("Nothing! - all quake 3 items are removed!\n");
-			}
-			if (TR_WOLF == FL_TR_WOLF ||
-				TR_DOOM == FL_TR_DOOM ||
-				TR_QUAKE == FL_TR_QUAKE ||
-				TR_Q2 == FL_TR_Q2 ||
-				TR_Q3 == FL_TR_Q3
-				)	bprint(" *** Warning: Translatng one or more sets to themselves - this is feeble and pointless.\n");
-
-			if (RUNES) bprint(" *** Warning: Translate will not affect or create runes.\n");
-		}
-		else
-			bprint("No translations set\n");
-	bprint("\n");
-	}
-
-	cvar_set("pk_translate", "0");
-
 };

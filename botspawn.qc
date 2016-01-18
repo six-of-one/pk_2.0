@@ -21,7 +21,7 @@ void () initBotLevel =
 
 	NOISEQUEUE = noisetarget ();
 	num = ((serverflags & BOTS) / 16);
-	serverflags = ((serverflags - (serverflags & BOTS)) - INITLEVEL);
+	serverflags = serverflags - (serverflags & BOTS) - (serverflags & INITLEVEL);
 	NUMBOTS = 0;
 	NUMPATHS = 0;
 	NUMPATHERS = 0;
@@ -266,22 +266,51 @@ void () PutBotInServer =
 	local vector spot;
 	local string tmp;
 	local float aimvar;
-	self.classname = "pk*bot";
+
+	SetNewParms ();
+	PutClientInServer(); // Cataboligne - 6.20.10 - does all commented stuff below
+	// sets FL_CLIENT - might be ok
+
+	self.classname = "pk*bot"; // NOTE: decided to fix vw issue and not change this to player now as pk*bot work quite well
 	self.class_select = "pk*bot";
-	self.health = 100;
-	self.takedamage = DAMAGE_AIM;
-	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
-	self.show_hostile = 0;
-	self.max_health = 100;
 	self.air_finished = (time + 30);
 	self.dmg = 1;
-	self.super_damage_finished = 0;
-	self.radsuit_finished = 0;
-	self.invisible_finished = 0;
-	self.invincible_finished = 0;
-	self.effects = 0;
-	self.invincible_time = 0;
+
+//	self.health = 100;
+//	self.takedamage = DAMAGE_AIM;
+//	self.solid = SOLID_SLIDEBOX;
+//	self.show_hostile = 0;
+//	self.max_health = 100;
+//	self.super_damage_finished = 0;
+//	self.radsuit_finished = 0;
+//	self.invisible_finished = 0;
+//	self.invincible_finished = 0;
+//	self.effects = 0;
+//	self.invincible_time = 0;
+
+//	DecodeLevelParms ();
+//	W_SetCurrentAmmo ();
+//	self.attack_finished = time;
+//	if (PK) spwn = PK_SelectSpawnPoint (); // *pk - get a spawn point, pk style
+//	else
+//	spwn = SelectSpawnPoint ();
+//	spot = (spwn.origin + '0 0 1');
+//	self.origin = spot;
+//	setorigin (self,spot);
+//	self.angles = spwn.angles;
+//	self.fixangle = 1;
+//	setmodel (self,"progs/eyes.mdl");
+//	modelindex_eyes = self.modelindex;
+//	setmodel (self,"progs/player.mdl");
+//	modelindex_player = self.modelindex;
+//	setsize (self,VEC_HULL_MIN,VEC_HULL_MAX);
+//	self.deadflag = DEAD_NO;
+//	self.pausetime = 0;
+//	self.view_ofs = '0 0 22';
+//	makevectors (self.angles);
+//	spawn_tfog (self.origin + (v_forward * KINDA_WANT));
+//	spawn_tdeath (self.origin,self);
 	self.yaw_speed = (45 + (25 * self.skil));
 	self.lefty = STRAFE_DIR;
 	if (self.goalentity == world)
@@ -289,11 +318,7 @@ void () PutBotInServer =
 		self.goalentity = botmovetarget ();
 	}
 	self.goalentity.goalentity = world;
-	SetNewParms ();
-	DecodeLevelParms ();
-	W_SetCurrentAmmo ();
 	self.search_time = time;
-	self.attack_finished = time;
 	self.th_pain = bot_pain;
 	self.th_die = BotDie;
 	self.th_stand = bot_stand1;
@@ -306,21 +331,6 @@ void () PutBotInServer =
 	self.nextthink = (time + 0.1);
 	self.enemy = world;
 	self.pathtype = NEVERTARGET;
-	self.deadflag = DEAD_NO;
-	self.pausetime = 0;
-	if (PK) spwn = PK_SelectSpawnPoint (); // *pk - get a spawn point, pk style
-	else
-	spwn = SelectSpawnPoint ();
-	spot = (spwn.origin + '0 0 1');
-	self.origin = spot;
-	setorigin (self,spot);
-	self.angles = spwn.angles;
-	self.fixangle = 1;
-	setmodel (self,"progs/eyes.mdl");
-	modelindex_eyes = self.modelindex;
-	setmodel (self,"progs/player.mdl");
-	modelindex_player = self.modelindex;
-	setsize (self,VEC_HULL_MIN,VEC_HULL_MAX);
 	if (self.movetarget == world)
 	{
 		NewCarriedPath ();
@@ -341,10 +351,7 @@ void () PutBotInServer =
 		self.pather = 1;
 		NUMPATHERS = (NUMPATHERS + 1);
 	}
-	self.view_ofs = '0 0 22';
-	makevectors (self.angles);
-	spawn_tfog (self.origin + (v_forward * KINDA_WANT));
-	spawn_tdeath (self.origin,self);
+
 	if (BOTSPEED < 32)
 	{
 		dprint ("Feeling kind of slow today (SV_MAXSPEED = ");
@@ -357,7 +364,6 @@ void () PutBotInServer =
 	{
 		dprint ("Seems like sv_aim isn't 0.93\n");
 	}
-	if (!Q_100 && !Q_99) PK_CIS(); // *pk - set client pk elements
 };
 
 void () SpawnNewBot =
@@ -398,6 +404,7 @@ entity () AddBot =
 		self.skil = 3;
 	}
 //	initscore ();
+	if (DARKPLACES || chaos) bot_changeParms();
 	self = oldself;
 	return(newbot);
 };
@@ -747,6 +754,7 @@ void(entity e) removeBot =
 	remove (f.goalentity);
 	remove (f);
 	NUMBOTS = NUMBOTS - 1;
+	if (DARKPLACES || chaos) bot_changeParms();
 };
 
 void (entity ply, float n) removeTeamBots =

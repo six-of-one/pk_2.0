@@ -42,21 +42,17 @@ void () info_intermission =
 
 
 
-void () SetChangeParms =
+void () q100_SetChangeParms =
 {
-	if (find(world,classname,"pk*bot")) bot_changeParms();
-// Cataboligne 9.11.3 purify - chase cam
-	cam_parms(0);
-
-	if (self.health <= 0 || self.classname == OBSERVER) // Cataboligne - 5.3.10 - fix level change issue when in dead observer or admin observer
+	if (self.health <= 0)
 	{
-		SetNewParms_PK();
-		if (PK || custom_hub_loaded) parm16 = parm16 | 256; // Cataboligne - 8.22.9 - pk orig oper
+		q100_SetNewParms ();
 		return ;
 	}
 
 // remove items
-	self.items = self.items - (self.items & (IT_KEY1 | IT_KEY2 | IT_INVISIBILITY | IT_INVULNERABILITY | IT_SUIT | IT_QUAD));
+	self.items = self.items - (self.items & 
+	(IT_KEY1 | IT_KEY2 | IT_INVISIBILITY | IT_INVULNERABILITY | IT_SUIT | IT_QUAD) );
 
 // cap super health
 	if (self.health > 100)
@@ -75,15 +71,9 @@ void () SetChangeParms =
 	parm7 = self.ammo_cells;
 	parm8 = self.weapon;
 	parm9 = self.armortype * 100;
-	parm10 = parm11 = parm15 = parm16 = 0;
-//	if (PK) PK_ChangeParms();
-//	else if (!Q_100 && !Q_99 && ((self.pk_items & PK_IT_RANGE) | self.pk_explode_ammo | self.pk_turretammo | self.pk_canpabammo | self.pk_beartrapammo | self.pk_gravitywellammo))
-	if (!Q_100 && !Q_99) PK_ChangeParms(); // always encoding now
-//	bot_skinParms();
-
 };
 
-void () SetNewParms =
+void () q100_SetNewParms =
 {
 	parm1 = IT_SHOTGUN | IT_AXE;
 	parm2 = 100;
@@ -94,23 +84,15 @@ void () SetNewParms =
 	parm7 = 0;
 	parm8 = 1;
 	parm9 = 0;
-	if (PK || custom_hub_loaded) 
-		PK_SetNewParms();
-
-// Cataboligne 9.11.3 purify - chase cam
-	cam_parms(2);
 };
 
-void () DecodeLevelParms =
+void () q100_DecodeLevelParms =
 {
-	if (!PK)
 	if (serverflags)
 	{
-		if (world.model == "maps/start.bsp" || world.model == "maps/qstart.bsp") // Cataboligne - 5.19.10 - q1 SP hack for using forced dyn items
-			SetNewParms ();   // take away all stuff on starting new episode
-		if (world.model == "maps/qstart.bsp") PK_SetNewParms();
+		if (world.model == "maps/start.bsp")
+			q100_SetNewParms ();   // take away all stuff on starting new episode
 	}
-//	bot_skinDecode();
 
 	self.items = parm1;
 	self.health = parm2;
@@ -121,12 +103,6 @@ void () DecodeLevelParms =
 	self.ammo_cells = parm7;
 	self.weapon = parm8;
 	self.armortype = parm9 * 0.01;
-//	if (PK)  // fixed - possible to go from PK level to non PK level w/ custom hub - keep pk gooides
-	if (!Q_100 && !Q_99)
-		PK_DecodeLevelParms();
-
-// Cataboligne 9.11.3 purify - chase cam
-	cam_parms(1);
 };
 
 /*
@@ -173,22 +149,7 @@ entity () FindIntermission =
 string nextmap;
 void () GotoNextMap =
 {
-	if (PK && !PK_ADMINMAP)
-	if (pk_flags & PK_TP_USERMAPON) // *pk - user supplied map loop deal
-	{
-		if (!execed)
-		{
-			execed = 1;
-			localcmd ("pknextmap\n");
-		}
-		return;
-	}
-
-	if(!PK_100 && !PK_ADMINMAP) 
-	{
-		if (check_custom_hub()) // *pk --- Cataboligne - 8.16.9 - do custom hub load from any exit here
-			return;
-	}
+	PK_GotoNextMap();
 
 	if (cvar("samelevel"))	// if samelevel is set, stay on same level
 		changelevel (mapname);
@@ -366,7 +327,7 @@ void () changelevel_touch =
 
 	nextmap = self.map;
 
-	if (PK)
+	if (!Q_100 && !Q_99)
 	if (pk_flags & PK_SF_HUB) // *pk - using voting / hub system - nextmap is always hub
 		nextmap = hub_select(); //"start"; // *pk - if we're working with the hub system, then let's override this and go to the hub
 
@@ -544,14 +505,11 @@ void() DecodeLevelParms;
 void () PlayerDie;
 
 
-void () PutClientInServer =
+void () q100_PutClientInServer =
 {
 	local entity spot;
 
-	if (PK) spot = PK_SelectSpawnPoint (); // *pk - get a spawn point, pk style 
-	else
 	spot = SelectSpawnPoint ();
-	if (PK) ClearSpawnPoint(spot); // *pk
 
 	self.classname = "player";
 	self.health = 100;
@@ -570,7 +528,7 @@ void () PutClientInServer =
 	self.effects = 0;
 	self.invincible_time = 0;
 
-	DecodeLevelParms ();
+	q100_DecodeLevelParms ();
 
 	W_SetCurrentAmmo ();
 
@@ -608,12 +566,6 @@ void () PutClientInServer =
 	}
 
 	spawn_tdeath (self.origin,self);
-	if (!Q_100 && !Q_99) PK_CIS(); // *pk - set client pk elements
-	self.admin = 0;
-	set_initBotLevel(); // *bot
-
-	Chase_cam_level_start(); // Cataboligne 8.9.9 purify - chase cam
-	self.rune_flag = 0;
 };
 
 
