@@ -506,6 +506,7 @@ void(entity e, float camct, float mcd, string spf) xwep_fakeload;
 
 float(entity e, entity f, float dm) power_armor;
 void() power_armor_impulse;
+.float armorsave; // save armor value for power armor flipping value
 
 float X_PWR_ARMOR				= 1;
 float X_PWR_SCREEN			= 2;

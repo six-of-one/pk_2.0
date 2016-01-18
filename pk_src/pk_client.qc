@@ -634,6 +634,7 @@ CheckPowerups
 Check for turning off powerups
 ================
 */
+
 void () CheckPowerups =
 {
 	if (Q_100)
@@ -653,6 +654,31 @@ void () CheckPowerups =
 
 	if (self.health <= 0)
 		return;
+
+	if (self.ishuman)
+	if (self.x_items & X_PWR_ARMOR_ON || self.x_items & X_PWR_SCREEN_ON)
+	{
+		if ((time & 3) == 3 || (time & 3) == 2)
+		{
+			if (self.armorvalue <1) self.armorsave = -1;
+			if (!self.armorsave) self.armorsave = self.armorvalue;
+			self.armorvalue = self.ammo_cells;
+		}
+		else
+		if (self.armorsave)
+		{
+			if (self.armorsave < 1) self.armorvalue = 0;
+			else self.armorvalue = self.armorsave;
+			self.armorsave = 0;
+		}
+	}
+	else
+	if (self.armorsave)
+	{
+		if (self.armorsave < 1) self.armorvalue = 0;
+		else self.armorvalue = self.armorsave;
+		self.armorsave = 0;
+	}
 
 // invisibility
 	if (self.invisible_finished)

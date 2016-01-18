@@ -281,8 +281,13 @@ local float		rs;
 		return;
 	}
 
+// Cataboligne - 3.8.11 - custom death message ent causing specific pain sounds (by watertype specced in self.sounds of ent)
+	local float fs;
+	if (damage_attacker.class_select == "CDM")
+		fs = damage_attacker.sounds;
+
 // water pain sounds
-	if (self.watertype == CONTENT_WATER && self.waterlevel == 3)
+	if (self.watertype == CONTENT_WATER && self.waterlevel == 3 || fs == CONTENT_WATER)
 	{
 		DeathBubbles(1);
 		if (random() > 0.5)
@@ -294,7 +299,7 @@ local float		rs;
 	}
 
 // slime pain sounds
-	if (self.watertype == CONTENT_SLIME)
+	if (self.watertype == CONTENT_SLIME || fs == CONTENT_SLIME)
 	{
 // FIXME	put in some steam here
 		if (random() > 0.5)
@@ -305,7 +310,7 @@ local float		rs;
 		return;
 	}
 
-	if (self.watertype == CONTENT_LAVA)
+	if (self.watertype == CONTENT_LAVA || fs == CONTENT_LAVA)
 	{
 		if (random() > 0.5)
 			sound (self, CHAN_VOICE, "player/lburn1.wav", 1, ATTN_NORM);
