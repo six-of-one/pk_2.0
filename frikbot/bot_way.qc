@@ -253,6 +253,8 @@ entity(vector org) make_waypoint =
 {
 	local entity point;
 
+// added to pk 2.1 code 7/13/10 - fixes issues with waypoints made by observers and bots fallen out of level
+// note - 2 changes below if this returns world
 	if (self.classname == OBSERVER) // Cataboligne - 6.5.10 - none of these for jafo
 	{
 		return(world);
@@ -262,7 +264,7 @@ entity(vector org) make_waypoint =
 	{
 		self.cnt = self.cnt + 1;
 
-		if (WARNING)
+			if (WARNING)
 		if (self.cnt < 5)
 		{
 			bprint("*** Warning - ent tried to make way point in solid: ");
@@ -271,7 +273,7 @@ entity(vector org) make_waypoint =
 		}
 		return(world);
 	}
-
+// END added to pk 2.1 code 7/13/10
 	point = spawn();
 	point.classname = "waypoint";
 	point.search_time = time; // don't double back for me;
@@ -479,6 +481,7 @@ void() DynamicWaypoint =
 	if (!dynpoint)
 		return;
 	t = make_waypoint(self.dyn_dest);
+// added to pk 2.1 code 1/31/11 - new code protect from waypoint issues
 	if (!t)
 		return;
 
@@ -983,6 +986,7 @@ void(vector org, vector bit1, float bit4, float flargs) make_way =
 	local entity y;
 	waypoint_mode = WM_LOADED;
 	y = make_waypoint(org);
+// added to pk 2.1 code 1/31/11 - new code protect from waypoint issues
 	if (!y)
 		return;
 

@@ -205,6 +205,7 @@ void(string cls) item_call =
 
 //	else if (cls == "item_") item_();
 
+// painkeep
 	else if (cls == "item_painkeep_gwell") item_painkeep_gwell();
 	else if (cls == "item_painkeep_turret") item_painkeep_turret();
 	else if (cls == "item_painkeep_beartrap") item_painkeep_beartrap();
@@ -219,6 +220,11 @@ void(string cls) item_call =
 	else if (cls == "item_pkplus_tomb") item_pkplus_tomb();
 	else if (cls == "item_pkplus_actor") item_pkplus_actor();
 	else if (cls == "item_pkplus_phone") item_pkplus_phone();
+
+// hipnotic
+	else if (cls == "weapon_mjolnir") weapon_mjolnir();
+	else if (cls == "weapon_laser_gun")	weapon_laser_gun();
+	else if (cls == "weapon_proximity_gun") weapon_proximity_gun();
 
 // doom
 	else if (cls == "d_weapon_shotgun") d_weapon_shotgun();
@@ -608,9 +614,9 @@ void() item_loop =
 
 // fn(ammo_con) - handle admin infinite flag, runes, chaos, etc
 
-// cn - ammo count needing approval
+// cn - ammo count needing approval or weap id for "wpck" op mode
 // e - gun carrier tested (player / bot)
-// op - for load check
+// op - for load check, "wpck"
 
 float(float cn, entity e, string op) ammo_con =
 {
@@ -644,6 +650,9 @@ float(float cn, entity e, string op) ammo_con =
 
 		if (e.weapon == IT_SUPER_SHOTGUN)
 		if (pk_itemovr & WEP_SSHOT) return(0);
+
+		if (e.weapon == IT_MJOLNIR) // Cataboligne - 2.14.11 - hipnotic support special wep
+		if (pk_itemovr & WEP_THUNDER) return(0);
 		}
 	}
 	else if (op == "wpck") // wep check - allow auto sw to inf ammo wep
@@ -673,6 +682,8 @@ float(float cn, entity e, string op) ammo_con =
 		if (cn == IT_SUPER_SHOTGUN)
 		if (pk_itemovr & WEP_SSHOT) return(1);
 		}
+
+		if (cn == IT_MJOLNIR) return(1); // Cataboligne - 2.14.11 - hipnotic support special wep
 	}
 
 	return(f);

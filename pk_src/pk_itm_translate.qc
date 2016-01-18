@@ -312,7 +312,7 @@ string(entity e, float TR) map_trans =
 	else if (e.scode == MC_D_ACELLS_LG || e.scode == MC_ACELLS_LG || e.scode == MC_W_GAS || e.scode == MC_Q2_ACELLS || e.scode == MC_Q3_ACELLS)
 	{
 		if (TR == FL_TR_WOLF) return("w_ammo_gas");
-		if (TR == FL_TR_DOOM) return("d_ammo_cellpack");
+		if (TR == FL_TR_DOOM) return("d_ammo_cellbox");
 		if (TR == FL_TR_QUAKE) return("item_cells_lg");
 		if (TR == FL_TR_Q2) return("q2_ammo_cells");
 		if (TR == FL_TR_Q3) return("q3_ammo_cells");
@@ -323,7 +323,7 @@ string(entity e, float TR) map_trans =
 	else if (e.scode == MC_D_ACELLS || e.scode == MC_ACELLS)
 	{
 		if (TR == FL_TR_WOLF) return("w_ammo_gas");
-		if (TR == FL_TR_DOOM) return("d_ammo_cellbox");
+		if (TR == FL_TR_DOOM) return("d_ammo_cellpack");
 		if (TR == FL_TR_QUAKE) return("item_cells");
 		if (TR == FL_TR_Q2) return("q2_ammo_cells");
 		if (TR == FL_TR_Q3) return("q3_ammo_cells");
@@ -2514,9 +2514,9 @@ void(entity e, float mc) doom_alpha_tran =
 	{
 		if (DOOM_ALPHA == 0.4) // 0.4
 		{
-		setmodel(e, "progs/heal_medkit.mdl");
-		e.frame = 2;
-		e.skin = 2;
+		setmodel(e, "progs/barrel2.mdl");
+		e.frame = 3;
+		e.skin = 3;
 		}
 		else if (DOOM_ALPHA == 0.5) // 0.5
 		{
@@ -2536,9 +2536,9 @@ void(entity e, float mc) doom_alpha_tran =
 	{
 		if (DOOM_ALPHA == 0.4) // 0.4
 		{
-		setmodel(e, "progs/heal_medkit.mdl");
-		e.frame = 1;
-		e.skin = 1;
+		setmodel(e, "progs/d_stimpack04.mdl");
+		e.frame = 0;
+		e.skin = 0;
 		}
 		else if (DOOM_ALPHA == 0.5) // 0.5
 		{
@@ -2606,17 +2606,34 @@ void(entity e, float mc) doom_alpha_tran =
 /// ammo
 	if (e.mcode == MC_D_ACELLS || mc == MC_D_ACELLS)
 	{
-/*		if (DOOM_ALPHA == 0.6) // pre-beta
+/* for neg or special xlate - not a cell pack
+
+	if (DOOM_ALPHA == 0.4) // shield generator
 		{
-		setmodel (e, "progs/d_.mdl");
+		setmodel (e, "progs/d_cellpack.mdl");
 		e.frame = 1;
+		e.skin = 1;
 		}
-		else // release
+		*/
+
+	if (DOOM_ALPHA == 0.4 || DOOM_ALPHA == 0.5) // 0.4, 0.5
 		{
-*/
 		setmodel (e, "progs/d_cellbox.mdl");
 		e.frame = 0;
-//		}
+		e.skin = 2;
+		}
+	else if (DOOM_ALPHA == 0.6) // pre-beta
+		{
+		setmodel (e, "progs/d_cellbox.mdl");
+		e.frame = 0;
+		e.skin = 3;
+		}
+	else // release
+		{
+			setmodel (e, "progs/d_cellpack.mdl");
+			e.frame = 0;
+			e.skin = 0;
+		}
 		return;
 	}
 	if (e.mcode == MC_D_ABULLETS_LG || mc == MC_D_ABULLETS_LG)

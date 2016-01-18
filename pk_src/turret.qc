@@ -230,14 +230,25 @@ void() turret_searchForEnemy =
 
 	if (!self.currentammo && !self.turret_timeout && self.health < 1)
 	{
-		local float f;
+		local float f, c;
 		self.delay = TRUE; // KillStraker candidate
+		c = FALSE;
 		if (random() < 0.1)
 		{
-			f = pk_mcode("item_artifact_invulnerability", world); // TDO: doom, q3, q2 inv codes?
-			if (!find(world, classname, "item_artifact_invulnerability"))
-			if (!find(world, sscode, ftos(f)))
-				fn_make(f, v0);
+//d invuln
+			f = pk_mcode("d_art_invulnerable", world); 
+			if (find(world, classname, "d_art_invulnerable")) c = TRUE;
+			else if (find(world, sscode, ftos(f))) c = TRUE;
+//q2 invuln
+			f = pk_mcode("item_invulnerability", world); 
+			if (find(world, classname, "item_invulnerability")) c = TRUE;
+			else if (find(world, sscode, ftos(f))) c = TRUE;
+//q invuln
+			f = pk_mcode("item_artifact_invulnerability", world);
+			if (find(world, classname, "item_artifact_invulnerability")) c = TRUE;
+			else if (find(world, sscode, ftos(f))) c = TRUE;
+
+			if (!c) fn_make(f, v0); // if we didnt find an invulernable, now make one from quake - IDEA: use map type
 		}
 	}
 
@@ -852,7 +863,7 @@ void() turret_checkIfCanBeSolid =
 	local entity head;
 	local float f;
 
-	f = TRUE;
+	f = TRUE;  // Cataboligne - UNK.10 - fix broken solidify code
 
 	// see if there are any objects that block the turret from becoming solid
 	head = findradius(self.origin, 28);

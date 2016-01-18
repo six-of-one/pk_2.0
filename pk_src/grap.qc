@@ -450,6 +450,7 @@ void() grap_touch =
 		return;
 	}
 
+// advanced code - grap hit kills infinite (xtreme) turrets
 	grapOwner = findradius(self.origin, 50);
 	while (grapOwner)
 	{

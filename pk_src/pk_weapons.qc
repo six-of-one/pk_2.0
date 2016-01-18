@@ -1297,6 +1297,9 @@ float() PK_CheckNoAmmo =
 	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
 		return TRUE;
 
+	if (self.weapon == IT_MJOLNIR) // Cataboligne - 2.13.11 - hipnotic support special wep
+		return TRUE;
+
 	if (ammo_con(self.weapon, self, "wpck")) // see if its inf ammo wep
 		return TRUE;
 	
@@ -1661,7 +1664,7 @@ void() PK_ChangeWeapon =
 		local float am, fl, fl2;
 
 	am = 0;
-		fl2 = 0;
+	fl2 = 0;
 
 	if (self.impulse == 1)
 	{
@@ -1696,8 +1699,10 @@ void() PK_ChangeWeapon =
 				fl = IT_AXE;
 				fl2 = PK_IT_CLIGHT;
 	}
+	else if (self.impulse == 9) // Cataboligne - 2.13.11 - hipnotic support special wep
+		fl = IT_MJOLNIR;
 
-		am = !HasAmmo(fl, fl2);
+	am = !HasAmmo(fl, fl2);
 
 // PAINKEEP_START
 	// if already have the weapon or if you don't have the weapon, try the
@@ -1752,7 +1757,9 @@ void() PK_CycleWeaponCommand =
 	sf = 50;
 	while (1)
 	{
-		if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_CLIGHT)
+		if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_CLIGHT) // Cataboligne - 2.13.11 - hipnotic support special wep
+			self.weapon = IT_MJOLNIR;
+		else if (self.weapon == IT_MJOLNIR)
 		{
 			self.weapon = IT_AXE;
 			self.pk_currentitem = self.pk_currentInventory;
@@ -1841,7 +1848,9 @@ void() PK_CycleWeaponReverseCommand =
 			self.weapon = IT_AXE;
 			self.pk_currentitem = self.pk_currentInventory;
 		}
-		else if (self.weapon == IT_AXE && self.pk_currentitem == self.pk_currentInventory)
+		else if (self.weapon == IT_AXE && self.pk_currentitem == self.pk_currentInventory) // Cataboligne - 2.13.11 - hipnotic support special wep
+			self.weapon = IT_MJOLNIR;
+		else if (self.weapon == IT_MJOLNIR)
 		{
 			self.weapon = IT_AXE;
 			self.pk_currentitem = PK_IT_CLIGHT;
@@ -1923,7 +1932,8 @@ void() PK_ImpulseCommands =
 	if (self.impulse >= 1 && self.impulse <= 8)
 		W_ChangeWeapon ();
 	else if (self.impulse == 9)
-		PK_CheatCommand ();
+		W_ChangeWeapon (); // mjolnir
+//		PK_CheatCommand ();
 	else if (self.impulse == 10)
 		CycleWeaponCommand ();
 	else if (self.impulse == 11)

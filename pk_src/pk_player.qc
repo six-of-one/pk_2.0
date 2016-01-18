@@ -319,6 +319,40 @@ void() player_grapfire5 = [$lightfatt1, player_grapfire6 ] {self.weaponframe = 5
 void() player_grapfire6 = [$lightfatt1, player_grapfire7 ] {self.weaponframe = 6;};
 void() player_grapfire7 = [$lightfatt2, player_run ] {self.weaponframe = 7;};
 
+//============================================================================
+// hipnotic weapon support
+
+// mjolnir
+void()   player_hammer1 =  [$axatt1, player_hammer2   ] {self.weaponframe=1;}; // melee hit
+void()   player_hammer2 =  [$axatt2, player_hammer3   ] {self.weaponframe=2;};
+void()   player_hammer3 =  [$axatt3, player_hammer4   ] {self.weaponframe=3;};
+void()   player_hammer4 =  [$axatt4, player_hammer5   ] {self.weaponframe=4;HIP_FireMjolnir();};
+void()   player_hammer5 =  [$axatt5, player_hammer6   ] {self.weaponframe=4;};
+void()   player_hammer6 =  [$axatt6, player_run ] {self.weaponframe=4;};
+
+void()   player_mjolnir1b =  [$axattc1, player_mjolnir2   ] {self.weaponframe=1;}; // lightning fire
+void()   player_mjolnir2 =  [$axattc2, player_mjolnir3   ] {self.weaponframe=2;};
+void()   player_mjolnir3 =  [$axattc3, player_mjolnir4   ] {self.weaponframe=3;};
+void()   player_mjolnir4 =  [$axattc4, player_mjolnir5   ] {self.weaponframe=4;HIP_FireMjolnir();};
+void()   player_mjolnir5 =  [$axattc5, player_mjolnir6   ] {self.weaponframe=4;};
+void()   player_mjolnir6 =  [$axattc6, player_run ] {self.weaponframe=4;};
+
+// laser cannon
+void() player_laser1   =[$lightfatt1, player_laser3  ] {self.attack_finished = time + 0.1;self.weaponframe=1;self.nextthink = time + 0.1;HIP_FireLaser(0);};
+void() player_laser2   =[$lightfatt2, player_laser3  ] {self.attack_finished = time + 0.1;self.weaponframe=2;self.nextthink = time + 0.1;};
+void() player_laser3   =[$lightfatt2, player_laser1  ] {self.attack_finished = time + 0.1;self.weaponframe=4;self.nextthink = time + 0.1;HIP_FireLaser(1);};
+void() player_laser4   =[$lightfatt1, player_laser1  ] {self.attack_finished = time + 0.1;self.weaponframe=5;self.nextthink = time + 0.1;};
+
+//============================================================================
+// q2 animations
+
+void()	player_q2hgr1 =	[$axattd1, player_q2hgr2	] {};
+void()	player_q2hgr2 =	[$axattd2, player_q2hgr3	] {};
+void()	player_q2hgr3 =	[$axattd3, player_q2hgr4	] {};
+void()	player_q2hgr4 =	[$axattd4, player_run	] {};
+
+//============================================================================
+
 // player sound code - mostly unused - put this on a sv_ var - these are now setup to override the default sounds if active, just to simplify the coding
 // sec indicates section of player code sound is played from - NOTE: these are all commented out in player.qc
 

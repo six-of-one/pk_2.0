@@ -324,32 +324,32 @@ else bprint("\n");
 
 float(entity e, float s) getsurfacenumpoints =
 {
-	if (chaos || DARKPLACES)
+	if (DARKPLACES) // || chaos
 		return(getsurfacenumpoints_wrap(e, s));
 };
 vector(entity e, float s, float n) getsurfacepoint =
 {
-	if (chaos || DARKPLACES)
+	if (DARKPLACES)
 		return(getsurfacepoint_wrap(e, s, n));
 };
 vector(entity e, float s) getsurfacenormal =
 {
-	if (chaos || DARKPLACES)
+	if (DARKPLACES)
 		return(getsurfacenormal_wrap(e, s));
 };
 string(entity e, float s) getsurfacetexture =
 {
-	if (chaos || DARKPLACES)
+	if (DARKPLACES)
 		return(getsurfacetexture_wrap(e, s));
 };
 float(entity e, vector p) getsurfacenearpoint =
 {
-	if (chaos || DARKPLACES)
+	if (DARKPLACES)
 		return(getsurfacenearpoint_wrap(e, p));
 };
 vector(entity e, float s, vector p) getsurfaceclippedpoint =
 {
-	if (chaos || DARKPLACES)
+	if (DARKPLACES)
 		return(getsurfaceclippedpoint_wrap(e, s, p));
 };
 

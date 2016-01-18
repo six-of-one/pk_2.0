@@ -493,6 +493,7 @@ float PK_GASAMMO_MAX;
 
 .float x_items; // extra weapon item control - pwr armors / extended keys / etc
 void() x_item_touch;
+void(entity e, float camct, float mcd, string spf) xwep_fakeload;
 
 float(entity e, entity f, float dm) power_armor;
 void() power_armor_impulse;
@@ -574,6 +575,12 @@ void() flame_check;
 void() slime_flare;
 void() flamer_precache;
 
+// hip
+
+float IT_MJOLNIR				= 128;
+
+void() hip_precache;
+
 // wolf
 
 void() wchg2_weapon_touch;
@@ -609,6 +616,7 @@ void() q2_weapon_shotgun;
 void() q2_item_health;
 void() X_FireHandGrenade;
 void() X_FireBlaster;
+void()	player_q2hgr1;
 
 float q2_bfg_shot; // indicates damage from q2 bfg shot - may not get used, radius is already 1/2 dmg
 float Q2_BFG 					= 66604;
@@ -665,6 +673,8 @@ float AMMO_BULLETS			= 109;
 float AMMO_SLUGS				= 111;
 float AMMO_GRENADES			= 113; // q2 / q3 - handled as rockets in touch
 float AMMO_GAS					= 115;
+
+float EXPLOSIVE				= 114688; // for things that explode - chaos mod
 
 // **************************************
 // viswep
@@ -765,6 +775,17 @@ float VWX_FLAMER				= 22;
 float VWY_FLAMER				= 2;
 float VWZ_FLAMER				= 16;
 
+// hip
+
+// rockets
+float VWX_PROXMINE			= 18;
+float VWY_PROXMINE			= 11;
+float VWZ_PROXMINE			= 16;
+
+// cells
+float VWX_LASERCAN			= 22;
+float VWY_LASERCAN			= 9;
+float VWZ_LASERCAN			= 12;
 
 
 // **************************************

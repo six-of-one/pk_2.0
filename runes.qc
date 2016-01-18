@@ -220,7 +220,7 @@ void () rune_sigil_touch =
 	SUB_UseTargets();				// fire all targets / killtargets
 };
 
-// TDO: rule 1 sfx here, 3 runes - 10+ secs, 4 runes - 1+ min or till death
+// IDEA: rule 1 sfx here, 3 runes - 10+ secs, 4 runes - 1+ min or till death
 
 void () rune_touch =
 {

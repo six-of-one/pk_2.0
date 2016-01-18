@@ -77,8 +77,13 @@ xwep/flyers.qc
 
 // hipnotic
 
+hipnotic/hipdefs.qc
 hipnotic/hiprubbl.qc
 hipnotic/rotate.qc
+hipnotic/hammer.qc
+hipnotic/laser_cannon.qc
+hipnotic/proxmine.qc
+hipnotic/hipnoticents.qc
 
 // runes
 runes.qc

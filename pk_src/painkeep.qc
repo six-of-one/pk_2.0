@@ -24,11 +24,12 @@ void() PK_init =
 	q2_precache();
 	q3_precache();
 	chaos_precache();
+	hip_precache();
 	}
 
 	viswep_pre();
 
-	qweps = IT_AXE | IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN | IT_SUPER_NAILGUN | IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER | IT_LIGHTNING;
+	qweps = IT_AXE | IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN | IT_SUPER_NAILGUN | IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER | IT_LIGHTNING | IT_MJOLNIR;
 	pkweps = PK_IT_AXE | PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT	| PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB
 							 | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // pk plus weps
 
@@ -574,12 +575,12 @@ void() pk_liveupd =
 	DCAMTOACT = cvar("sv_cam_to_action");
 
 // viswep
-	VW = cvar("sv_vw");
+	VW = cvar("sv_vw"); // TDO: change out viswep models to qgun
 	VW_ARMOR = cvar("sv_vw_armor");
 
 	XENV = cvar("sv_c_xenv");
 
-	if (Q_99) // TDO: needs some stuff below - like maxs
+	if (Q_99) // TDO: needs some stuff below - like maxs (do they need changed?...)
 	{
 		item_control_menu();
 		return;
@@ -1435,14 +1436,16 @@ void(entity e, float chan, string samp, float vol, float atten) pk_sound =
 // TDO: q2 silencer for wep channel stuff
 	if (chan == CHAN_WEAPON)
 	if (e.silencer_finished)
-	if (e.silencer_finished > time)
 	{
-		svol = vol * Q2_SILENCE;
-	}
-	else
-	{
-		e.silencer_finished = 0;
-		sprint (e, "Silencer used up\n");
+		if (e.silencer_finished > time)
+		{
+			svol = vol * Q2_SILENCE;
+		}
+		else
+		{
+			e.silencer_finished = 0;
+			sprint (e, "Silencer used up\n");
+		}
 	}
 
 // pk_sound() - fn() here plays actual sound
