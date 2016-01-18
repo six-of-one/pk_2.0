@@ -57,6 +57,8 @@ float PKPLUS_ACTORQUAD		= 2;
 float PKPLUS_ACTORINVIS		= 3;
 float PRINT_HIGH				= 2;
 
+float PK_TOMB_SET;
+
 // vars - subs.qc
 
 /* hip code

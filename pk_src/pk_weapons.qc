@@ -540,7 +540,13 @@ void() PK_SetCurrentAmmo =
 
 	if (self.eweapon) // set model / ammo
 	{
-//		self.currentammo = self.eweapon.aflag;
+		if (self.eweapon.lip)
+		{
+			if (self.eweapon.lip == AMMO_SHELLS)
+				self.currentammo = self.ammo_shells;
+			else if (self.eweapon.lip == AMMO_BULLETS)
+				self.currentammo = self.ammo_bullet;
+		}
 		self.weaponframe = 0;
 		self.weaponmodel = self.eweapon.weaponmodel;
 	}
@@ -732,10 +738,24 @@ void() PK_SetCurrentAmmoOnly =
 		self.weaponframe = 0;
 		self.items = self.items | IT_CELLS;
 	}
-	else if (!self.eweapon)
+	else
 	{
 		self.currentammo = 0;
 		self.weaponmodel = "";
+		self.weaponframe = 0;
+	}
+
+	if (self.eweapon)
+	{
+		if (self.eweapon.lip)
+		{
+			if (self.eweapon.lip == AMMO_SHELLS)
+				self.currentammo = self.ammo_shells;
+			else if (self.eweapon.lip == AMMO_BULLETS)
+				self.currentammo = self.ammo_bullet;
+			else if (self.eweapon.lip == AMMO_ROCKETS)
+				self.currentammo = self.ammo_rockets;
+		}
 		self.weaponframe = 0;
 	}
 // Cataboligne 8.8.9 purify - chase cam

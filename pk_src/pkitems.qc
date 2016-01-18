@@ -301,7 +301,7 @@ void() pk_dyn_touch =
 void() pk_ammo_touch =
 {
 	local entity	sv;
-	local float best, bestpk; // *pk - best pk wep
+	local float best, bestpk, sk; // *pk - best pk wep
 
 	if (other.classname != "player")
 		return;
@@ -315,50 +315,106 @@ void() pk_ammo_touch =
 	bestpk = W_BestPKWeapon(); // *pk - best pk wep
 	self = sv;
 
-// shotgun
-	if (self.weapon == 1)
-	{
-		if (other.ammo_shells >= Q1_SHELLAMMO_MAX)
-			return;
-		other.ammo_shells = other.ammo_shells + self.aflag;
-	}
+	sk = TRUE; // skip old method if false
 
-// spikes
-	if (self.weapon == 2)
+	if (self.lip == AMMO_SLUGS) // slugs
 	{
-		if (other.ammo_nails >= Q1_NAILAMMO_MAX)
+		if (other.ammo_slug >= PK_SLUGAMMO_MAX)
 			return;
-		other.ammo_nails = other.ammo_nails + self.aflag;
-	}
+		other.ammo_slug = other.ammo_slug + self.currentammo;
+		sk = FALSE;
+	}	
 
-//	rockets
-	if (self.weapon == 3)
+	if (self.lip == AMMO_BULLETS) // any bullets
 	{
-		if (other.ammo_rockets >= Q1_ROCKETAMMO_MAX)
+		if (other.ammo_bullet >= PK_BULLETAMMO_MAX)
 			return;
-		other.ammo_rockets = other.ammo_rockets + self.aflag;
-	}
+		other.ammo_bullet = other.ammo_bullet + self.currentammo;
+		sk = FALSE;
+	}	
 
-//	cells
-	if (self.weapon == 4)
+	if (self.lip == AMMO_CELLS)
 	{
 		if (other.ammo_cells >= Q1_CELLAMMO_MAX)
 			return;
-		other.ammo_cells = other.ammo_cells + self.aflag;
+		other.ammo_cells = other.ammo_cells + self.currentammo;
+		sk = FALSE;
+	}	
+
+	if (self.lip == AMMO_ROCKETS)
+	{
+		if (other.ammo_rockets >= Q1_ROCKETAMMO_MAX)
+			return;
+		other.ammo_rockets = other.ammo_rockets + self.currentammo;
+		sk = FALSE;
+	}	
+
+	if (self.lip == AMMO_GRENADES) // FIX: decide if this will be separate for q2 & q3 - add max & cvar
+	{
+		if (other.ammo_rockets >= Q1_ROCKETAMMO_MAX)
+			return;
+		other.ammo_rockets = other.ammo_rockets + self.currentammo;
+		sk = FALSE;
+	}	
+
+	if (self.lip == AMMO_SHELLS)
+	{
+		if (other.ammo_shells >= Q1_SHELLAMMO_MAX)
+			return;
+		other.ammo_shells = other.ammo_shells + self.currentammo;
+		sk = FALSE;
+	}	
+
+	if (sk)
+	{
+// shotgun
+		if (self.weapon == 1)
+		{
+			if (other.ammo_shells >= Q1_SHELLAMMO_MAX)
+				return;
+			other.ammo_shells = other.ammo_shells + self.aflag;
+		}
+
+// spikes
+		if (self.weapon == 2)
+		{
+			if (other.ammo_nails >= Q1_NAILAMMO_MAX)
+				return;
+			other.ammo_nails = other.ammo_nails + self.aflag;
+		}
+
+//	rockets
+		if (self.weapon == 3)
+		{
+			if (other.ammo_rockets >= Q1_ROCKETAMMO_MAX)
+				return;
+			other.ammo_rockets = other.ammo_rockets + self.aflag;
+		}
+
+//	cells
+		if (self.weapon == 4)
+		{
+			if (other.ammo_cells >= Q1_CELLAMMO_MAX)
+				return;
+			other.ammo_cells = other.ammo_cells + self.aflag;
+		}
+
+		if (self.weapon == 5) // *pk exploding shells
+		{
+			if (other.pk_explode_ammo >= PK_EXPLODEAMMO_MAX)
+				return;
+			other.pk_explode_ammo = other.pk_explode_ammo + self.aflag;
+		}	
 	}
 
-	if (self.weapon == 5) // *pk exploding shells
-	{
-		if (other.pk_explode_ammo >= PK_EXPLODEAMMO_MAX)
-			return;
-		other.pk_explode_ammo = other.pk_explode_ammo + self.aflag;
-	}	
-	
 	pk_bound_ammo ();
 
 	sprint (other, "You got the ");
 	sprint (other, self.netname);
 	sprint (other, "\n");
+	if (self.noise != "")
+		sound (other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
+	else
 // ammo touch sound
 	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
@@ -701,8 +757,11 @@ void() pk_bound_ammo =
 		other.ammo_rockets = Q1_ROCKETAMMO_MAX;
 	if (other.ammo_cells > Q1_CELLAMMO_MAX)
 		other.ammo_cells = Q1_CELLAMMO_MAX;
-	if (other.ammo_cells > Q1_CELLAMMO_MAX)
-		other.ammo_cells = Q1_CELLAMMO_MAX;
+// new ammo
+	if (other.ammo_bullet > PK_BULLETAMMO_MAX)
+		other.ammo_bullet = PK_BULLETAMMO_MAX;
+	if (other.ammo_slug > PK_SLUGAMMO_MAX)
+		other.ammo_slug = PK_SLUGAMMO_MAX;
 
 	if (other.pk_gravitywellammo > PK_GRAVITYWELLAMMO_MAX)
 		other.pk_gravitywellammo = PK_GRAVITYWELLAMMO_MAX;
@@ -826,6 +885,9 @@ void() BackpackTouch =
 	other.ammo_nails = other.ammo_nails + self.ammo_nails;
 	other.ammo_rockets = other.ammo_rockets + self.ammo_rockets;
 	other.ammo_cells = other.ammo_cells + self.ammo_cells;
+// new ammo
+	other.ammo_bullet = other.ammo_bullet + self.ammo_bullet; // TDO: note below
+	other.ammo_slug = other.ammo_slug + self.ammo_slug;
 
 	other.pk_gravitywellammo = other.pk_gravitywellammo + self.pk_gravitywellammo;
 	other.pk_turretammo = other.pk_turretammo + self.pk_turretammo;

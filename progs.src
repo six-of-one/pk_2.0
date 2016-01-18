@@ -117,6 +117,8 @@ pk_src/actor.qc
 pk_src/phone.qc
 pk_src/pk_artifacts.qc
 
+// support for q2 converted maps
+pk_src/q2ents.qc
 // support for q3 maps in darkplaces
 pk_src/q3ents.qc
 

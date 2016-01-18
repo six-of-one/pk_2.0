@@ -256,6 +256,10 @@ void (entity e, float fl) pkvload =
 
 // can be used for vw special
 
+// qw - quake wep bit
+// pkw - pk wep bit
+// vh - first vwep of chain
+
 entity(float qw, float pkw, entity vh) vchk =
 {
 	local entity f;
@@ -583,11 +587,12 @@ void() viswep_post =
 		{
 			vhead.owner.eweapon = vhead.eweapon;
 
+			if (self.ishuman)
 			if ( !(self.cam_x & CHSCAM_ON))
 			{
 				if (vhead.owner.eweapon)
 				{
-					if (vhead.owner.eweapon.weaponmodel != vhead.owner.weaponmodel) PK_SetCurrentAmmo(); //vhead.owner.weaponmodel = vhead.owner.eweapon.weaponmodel;
+					if (vhead.owner.eweapon.weaponmodel != vhead.owner.weaponmodel) PK_SetCurrentAmmo();
 				}
 				else
 					if (ver_weaponmodel(vhead.owner.weaponmodel)) PK_SetCurrentAmmo();
@@ -704,6 +709,83 @@ void() player_bolt4	 =[$lightfatt4, player_bolt1  ]
 	SuperDamageSound();
 	bolt_fire();
 	self.attack_finished = time + 0.2;
+};
+
+// fire machine guns & chain guns
+
+void(float ns) mgchg_shot =
+{
+	EWEAP = self.eweapon;
+	if (EWEAP)
+	{
+		X_FireHitscan();
+		if (rune_haste(EWEAP.attack_finished / 2))
+			self.attack_finished = time + EWEAP.attack_finished;
+		if (ns)
+		if (EWEAP.noise3 != "")
+			sound (self, CHAN_WEAPON, EWEAP.noise3, 1, ATTN_NORM);
+		EWEAP = world;
+	}
+	else
+	{
+		if (WARNING) bprint("*** Warning -  EWEAP fn() call and eweapon is NULL!\n");
+			self.weapon = W_BestWeapon ();
+			if (!Q_100 && !Q_99) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
+		W_SetCurrentAmmo ();
+			if (self.classname == "pk*bot") self.think = self.th_run;
+	}
+};
+
+void() player_mgchg1   =[$lightfatt1, player_mgchg2  ] 
+{
+	self.effects = self.effects | EF_MUZZLEFLASH;
+
+	if (!self.button0)
+		{player_run ();return;}
+	self.weaponframe = self.weaponframe + 1;
+	if (self.weaponframe == 9)
+		self.weaponframe = 1;
+	SuperDamageSound();
+	mgchg_shot(0);
+};
+
+void() player_mgchg2   =[$lightfatt2, player_mgchg3  ]
+{
+	self.effects = self.effects | EF_MUZZLEFLASH;
+
+	if (!self.button0)
+		{player_run ();return;}
+	self.weaponframe = self.weaponframe + 1;
+	if (self.weaponframe == 9)
+		self.weaponframe = 1;
+	SuperDamageSound();
+	mgchg_shot(1);
+};
+
+void() player_mgchg3   =[$lightfatt3, player_mgchg4  ] 
+{
+	self.effects = self.effects | EF_MUZZLEFLASH;
+
+	if (!self.button0)
+		{player_run ();return;}
+	self.weaponframe = self.weaponframe + 1;
+	if (self.weaponframe == 9)
+		self.weaponframe = 1;
+	SuperDamageSound();
+	mgchg_shot(0);
+};
+
+void() player_mgchg4   =[$lightfatt4, player_mgchg1  ]
+{
+	self.effects = self.effects | EF_MUZZLEFLASH;
+
+	if (!self.button0)
+		{player_run ();return;}
+	self.weaponframe = self.weaponframe + 1;
+	if (self.weaponframe == 9)
+		self.weaponframe = 1;
+	SuperDamageSound();
+	mgchg_shot(1);
 };
 
 // fn(grap_vw_adj) - adjust start position for viswep location

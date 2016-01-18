@@ -374,9 +374,7 @@ void () T_MissileTouch =
 		return ;
 	}
 
-	if (!self.dmg) self.dmg = 100;
-
-	damg = self.dmg + random()*20;
+	damg = 100 + random()*20;
 
 	if (other.health)
 	{
@@ -387,7 +385,7 @@ void () T_MissileTouch =
 
 	// don't do radius damage to the other, because all the damage
 	// was done in the impact
-	T_RadiusDamage (self,self.owner,self.dmg + 20,other);
+	T_RadiusDamage (self, self.owner, 120, other);
 
 //	sound (self, CHAN_WEAPON, "weapons/r_exp3.wav", 1, ATTN_NORM);
 	self.origin = self.origin - 8*normalize(self.velocity);

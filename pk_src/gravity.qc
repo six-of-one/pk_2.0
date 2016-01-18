@@ -8,8 +8,6 @@ $frame cubelf01 cubelf02 cubelf03 cubelf04 cubelf05 cubelf06 cubelf07 cubelf08
 $frame cubelf09 cubelf10 cubelf11 cubelf12 cubelf13 cubelf14 cubelf15 cubelf16
 $frame cubelf17 cubelf18 cubelf19 cubelf20
 
-float PK_GRV_TIME;
-float PK_GRV_SET;
 
 void() gravity_touch =
 {

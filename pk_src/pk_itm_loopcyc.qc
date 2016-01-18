@@ -40,7 +40,9 @@ float(entity e, float p) loop_next =
 	
 	if (!p)
 	{
-	if (!cvar(e.noise1) && !cvar(e.noise2) && !cvar(e.noise3) && !cvar(e.noise4) && !cvar(e.target1) && !cvar(e.target2))
+	if (cvar(e.noise) == -666)
+		return(0);
+	else if (!cvar(e.noise1) && !cvar(e.noise2) && !cvar(e.noise3) && !cvar(e.noise4) && !cvar(e.target1) && !cvar(e.target2))
 		return(0);
 	else
 		return(102); // default here in case
@@ -224,29 +226,28 @@ void(entity e) init_loopcyc =
 
 	if (f0 > -1)
 	{
-	  if (!cvar("pk_cyc_master"))
-	 {
-		e.theowner = sr = find( world, classname, cl);
-		if (!sr)
+		if (!cvar("pk_cyc_master"))
 		{
-			remove(e);
-			return; // none on map right now
+			e.theowner = sr = find( world, classname, cl);
+			if (!sr)
+			{
+				remove(e);
+				return; // none on map right now
+			}
+
+		  while (sr) // chain em up
+			{
+			sr.theowner = find( sr, classname, cl);
+	//		if (cl != "dyn_item")
+	//			sr = sr.theowner;
+			if (sr.mcode == f0 || sr.mcode == f1)
+				sr = sr.theowner;
+			else
+				sr = find( sr, classname, cl);
+
+	//		if (cvar("pk_cyc_dyn") && !sr) cl = "dyn_item"; // include dynamics - must have 1 reg item to start loop.
+			}
 		}
-
-	  while (sr) // chain em up
-		{
-		sr.theowner = find( sr, classname, cl);
-//		if (cl != "dyn_item")
-//			sr = sr.theowner;
-		if (sr.mcode == f0 || sr.mcode == f1)
-			sr = sr.theowner;
-		else
-			sr = find( sr, classname, cl);
-
-//		if (cvar("pk_cyc_dyn") && !sr) cl = "dyn_item"; // include dynamics - must have 1 reg item to start loop.
-		}
-	 }
-
 	}
 	else // create a series of random cycle items
 	{

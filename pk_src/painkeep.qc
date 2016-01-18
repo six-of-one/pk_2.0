@@ -258,6 +258,7 @@ void() PK_precache =
 	precache_model ("progs/v2_harp.mdl");
 
 	doom_precache();
+	q2_precache();
 
 	viswep_pre();
 
@@ -800,6 +801,7 @@ void() pk_liveupd =
 	
 	if (Q_100)
 	{
+		Q1_CELLAMMO_MAX = 100;
 		XENV = FALSE;
 		return;
 	}
@@ -814,7 +816,7 @@ void() pk_liveupd =
 
 	XENV = cvar("sv_c_xenv");
 
-	if (Q_99)
+	if (Q_99) // TDO: needs some stuff below - like maxs
 	{
 		item_control_menu();
 		return;
@@ -847,13 +849,13 @@ void() pk_liveupd =
 	else 
 		Q1_CELLAMMO_MAX					= cvar("pk_cellammo_max");
 
-// item ammo levels
+// item ammo levels - NOTE: limit to what can be carried tween levels is fixed! (at 3)
 	PK_GRAVITYWELLAMMO_MAX	= cvar("pk_max_gravitywellammo");
 	PK_TURRETAMMO_MAX				= cvar("pk_max_turretammo");
 	PK_CANPABAMMO_MAX			= cvar("pk_max_canpabammo");
 	PK_BEARTRAPAMMO_MAX		= cvar("pk_max_beartrapammo");
 
-	PK_EXPLODEAMMO_MAX			= cvar("pk_max_explodeammo");
+	PK_EXPLODEAMMO_MAX			= cvar("pk_max_explodeammo"); // tween level limit ~15 ?
 // plus items
 	PKPLUS_EGOAMMO_MAX			= cvar("pk_max_egoammo");
 	PKPLUS_TOMBAMMO_MAX		= cvar("pk_max_tombammo");
@@ -869,6 +871,18 @@ void() pk_liveupd =
 		PK_TUR_TARGOWN != cvar("pk_tur_targetown") || 
 		PK_TUR_VARIETY != cvar("pk_tur_variety") || 
 		PK_TUR_QUADCON != cvar("pk_tur_quadcon")) PK_TUR_SET = FALSE; // reset
+
+// beartrap
+	if (PK_BT_TIME != cvar("pk_bt_time") ||
+			PK_BT_TIMETOFOLLOW != cvar("pk_bt_follow") ||
+			PK_BT_DMG != cvar("pk_bt_dmg")) PK_BT_SET = FALSE;
+
+// gravity
+
+	if (PK_GRV_TIME != cvar("pk_grv_time")) PK_GRV_SET = FALSE;
+
+// tomb
+	if (PKPLUS_TOMB_TIME != cvar("pk_tomb_time")) PK_TOMB_SET = FALSE;
 
 // map translations
 	check_translate();
@@ -1121,6 +1135,9 @@ void() pk_srvcmd_set =
 	Q1_ROCKETAMMO_MAX				= 100;
 	Q1_CELLAMMO_MAX					= 200; // pk amount
 
+	PK_BULLETAMMO_MAX				= 200; // TDO: cvar
+	PK_SLUGAMMO_MAX					= 50; // TDO: cvar
+	
 // item ammo levels
 	PK_GRAVITYWELLAMMO_MAX	= 1;
 	PK_TURRETAMMO_MAX				= 3;
@@ -1311,6 +1328,7 @@ void() pk_srvcmd_set =
 /// loop master - no individual loops will run - possible to swamp loop sets this way
 // remove / replace
 /// 0 loop id set - ids 1 - 6 all 0, remove these items - 1+ set, change 0 to 1 and loop from there - 0 id never loaded again
+/// 0 loop id set to -666 - remove all items id'ed
 // plain loop
 /// 0 not set, 1 set - 2 - 6 not set, exit / remove - 2+ set, loop starting with id 1
 

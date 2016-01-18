@@ -171,8 +171,11 @@ float MC_W_MACHGUN			= 201;
 float MC_W_CHAINGUN			= 202;
 float MC_W_MORTAR				= 203;
 float MC_W_FLAMER				= 204;
+float MC_W_CLIP				= 205;
+float MC_W_KEY_G				= 206;
+float MC_W_KEY_B				= 207;
 
-float MC_W_RNDITM				= 5;		// # of total items
+float MC_W_RNDITM				= 8;		// # of total items
 
 // fn(bit_mcode) - item bit assoc with given mcode
 
@@ -282,6 +285,10 @@ float(float mcv, entity e) bit_mcode =
 	if (mc == MC_W_CHAINGUN)											return(IT_SUPER_NAILGUN);
 	if (mc == MC_W_MORTAR)												return(IT_ROCKET_LAUNCHER);
 	if (mc == MC_W_FLAMER)												return(IT_GRENADE_LAUNCHER);
+//	if (mc == MC_W_CLIP)													return(IT_BULLETS);
+
+	if (mc == MC_W_KEY_G)												return(IT_KEY1);
+	if (mc == MC_W_KEY_B)												return(IT_KEY2);
 
 	return(0);
 };
@@ -320,6 +327,11 @@ float(string sc, entity e) pk_mcode =
 		{
 			if (e.items == IT_KEY1)											return(MC_KEY1);
 			if (e.items == IT_KEY2)											return(MC_KEY2);
+		}
+		if (tsc == "w_key")
+		{
+			if (e.spawnflags & 1)											return(MC_W_KEY_G);
+			if (e.spawnflags & 2)											return(MC_W_KEY_B);
 		}
 	}
 
@@ -420,6 +432,10 @@ float(string sc, entity e) pk_mcode =
 	if (tsc == "w_weapon_chaingun")									return(MC_W_CHAINGUN);
 	if (tsc == "w_weapon_mortar")										return(MC_W_MORTAR);
 	if (tsc == "w_weapon_flamer")										return(MC_W_FLAMER);
+	if (tsc == "w_ammo_clip")											return(MC_W_CLIP);
+	if (tsc == "w_key_g")												return(MC_W_KEY_G);
+	if (tsc == "w_key_b")												return(MC_W_KEY_B);
+
 
 // q3 - translates classname for now
 //	else if (tsc == "")								return(MC_);
@@ -556,6 +572,10 @@ string (float mc) item_by_mcode =
 	if (mc == MC_W_CHAINGUN)											return("w_weapon_chaingun");
 	if (mc == MC_W_MORTAR)												return("w_weapon_mortar");
 	if (mc == MC_W_FLAMER)												return("w_weapon_flamer");
+
+	if (mc == MC_W_CLIP)													return("w_ammo_clip");
+	if (mc == MC_W_KEY_G)												return("w_key_g");
+	if (mc == MC_W_KEY_B)												return("w_key_b");
 
 //	if (mc == MC_) return("item_");
 
@@ -932,16 +952,7 @@ void() barrel_explode =
 
 	self.takedamage = DAMAGE_NO;
 	self.classname = "explo_box";
-	// did say self.owner
-/*
-//	T_RadiusDamage (self, self, bdmg, e);
-	sound (self, CHAN_VOICE, bsnd, 1, ATTN_NORM);
-	particle (self.origin, '0 0 0', 75, 255);
 
-	self.origin_z = self.origin_z + 32;
-
-//	BecomeExplosion ();
-*/
 	sound (self, CHAN_VOICE, bsnd, 1, ATTN_NORM);
 	particle (self.origin, '0 0 0', 75, 255);
 	self.origin_z = self.origin_z + 32;

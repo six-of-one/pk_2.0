@@ -37,12 +37,14 @@ float D_DEF_BLAST				= 2;
 
 float D_BARREL_BLAST			= 128;
 
-float D_POWER_WAIT			= 60; // seconds major doom powers need to respawn
+// should be RSP_TIME
+float D_POWER_WAIT			= 30; // seconds major doom powers need to respawn
 
-float d_reps_base				= 57005000; // heh heh - DEAD+
-void() d_rep_set;
-float() mega_touch;
-void() d_weapon_touch;
+float DOOM_SHOT_DMG			= -1666666; // tell code to calculate doom bullet damage - d3 * 5 per shot
+float DOOM_ROCK_DMG			= -1666667; // tell code to calculate doom rocket damage - 
+
+float W_DEF_BULLETS_CLIP	= 8;
+
 
 void() doom_precache =
 {
@@ -70,6 +72,7 @@ void() doom_precache =
 	precache_model ("progs/d_cellbox.mdl");
 	precache_model ("progs/d_cellpack.mdl");
 // doom weps
+	precache_model ("progs/d_chainsaw.mdl");
 	precache_model ("progs/d_pistol.mdl");
 	precache_model ("progs/d_bfg.mdl");
 	precache_model ("progs/d_rock.mdl");
@@ -101,11 +104,14 @@ void() doom_precache =
 	precache_model ("progs/w_chaing.mdl");
 	precache_model ("progs/w_mortar.mdl");
 	precache_model ("progs/w_flamer.mdl");
+	precache_model ("progs/w_clip.mdl");
+	precache_model ("progs/w_key.mdl");
 
 	precache_model ("progs/vw_w_knife.mdl");
 	precache_model ("progs/vw_w_pistol.mdl");
 	precache_model ("progs/vw_w_mgun.mdl");
 	precache_model ("progs/vw_w_chaing.mdl");
+	precache_model ("progs/vw_w_2chaing.mdl");
 	precache_model ("progs/vw_w_mortar.mdl");
 	precache_model ("progs/vw_w_flamer.mdl");
 
@@ -113,6 +119,7 @@ void() doom_precache =
 	precache_model ("progs/v_w_pistol.mdl");
 	precache_model ("progs/v_w_mgun.mdl");
 	precache_model ("progs/v_w_chg.mdl");
+	precache_model ("progs/v_w_2chg.mdl");
 	precache_model ("progs/v_w_mortar.mdl");
 	precache_model ("progs/v_w_flamer.mdl");
 
@@ -204,7 +211,7 @@ void() d_item_healthstimpak =
 	self.healamount = D_DEF_HSTIMPAK;
 //	self.healtype = HEAL_NORM;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
-	if (self.class_select == "") self.class_select = "doom_item";if (self.class_select == "") self.class_select = "doom_item";
+	if (self.class_select == "") self.class_select = "doom_item";
 };
 
 void() d_item_spiritarmor =
@@ -252,12 +259,15 @@ void() d_item_armorblue =
 void() d_ammo_ammobox =
 {
 	item_spikes();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_BULLETS;
+	self.currentammo = D_DEF_BULLETS_BOX;
 
 	setmodel (self, "progs/d_ammobox.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Box of bullets";
-	self.currentammo = D_DEF_BULLETS_BOX;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 	if (self.class_select == "") self.class_select = "doom_item";
 };
@@ -265,11 +275,15 @@ void() d_ammo_ammobox =
 void() d_ammo_clip =
 {
 	item_spikes();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_BULLETS;
+	self.currentammo = D_DEF_BULLETS_CLIP;
+
 	setmodel (self, "progs/d_clip.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "A clip";
-	self.currentammo = D_DEF_BULLETS_CLIP;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 	if (self.class_select == "") self.class_select = "doom_item";
 };
@@ -277,11 +291,15 @@ void() d_ammo_clip =
 void() d_ammo_1rocket =
 {
 	item_rockets();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_ROCKETS;
+	self.currentammo = D_DEF_ROCKETS_SM;
+
 	setmodel (self, "progs/d_1rocket.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Rocket";
-	self.currentammo = D_DEF_ROCKETS_SM;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 	if (self.class_select == "") self.class_select = "doom_item";
 };
@@ -289,11 +307,15 @@ void() d_ammo_1rocket =
 void() d_ammo_rockbox =
 {
 	item_rockets();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_ROCKETS;
+	self.currentammo = D_DEF_ROCKETS_LG;
+
 	setmodel (self, "progs/d_rockbox.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Box of Rockets";
-	self.currentammo = D_DEF_ROCKETS_LG;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 	if (self.class_select == "") self.class_select = "doom_item";
 };
@@ -301,23 +323,31 @@ void() d_ammo_rockbox =
 void() d_ammo_4shell =
 {
 	item_shells();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_SHELLS;
+	self.currentammo = D_DEF_SHELLS;
+
 	setmodel (self, "progs/d_4shell.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "4 shells";
-	self.currentammo = D_DEF_SHELLS;
-//	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
 void() d_ammo_shellbox =
 {
 	item_shells();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_SHELLS;
+	self.currentammo = D_DEF_SHELLBOX;
+
 	setmodel (self, "progs/d_shellbox.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Box of Shells";
-	self.currentammo = D_DEF_SHELLBOX;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 	if (self.class_select == "") self.class_select = "doom_item";
 };
@@ -325,11 +355,15 @@ void() d_ammo_shellbox =
 void() d_ammo_cellbox =
 {
 	item_cells();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_CELLS;
+	self.currentammo = D_DEF_CELLBOX;
+
 	setmodel (self, "progs/d_cellbox.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Box of cells";
-	self.currentammo = D_DEF_CELLBOX;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 	if (self.class_select == "") self.class_select = "doom_item";
 };
@@ -337,22 +371,26 @@ void() d_ammo_cellbox =
 void() d_ammo_cellpack =
 {
 	item_cells();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_CELLS;
+	self.currentammo = D_DEF_CELLPAK;
+
 	setmodel (self, "progs/d_cellpack.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Cells";
-	self.currentammo = D_DEF_CELLPAK;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
 void() d_barrel =
 {
-	self.noise = "doom/dsbarexp.wav";
-	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Barrel";
 	misc_explodbox_set(self, "progs/barrel.mdl", D_BARREL_BLAST + random() * 8, 20, MOVETYPE_NONE);
-	self.health = 20 + random() * 15; // heh heh
+	self.health = 20 + random() * 16; // heh heh
+	self.noise = "doom/dsbarexp.wav";
+	self.noise4 = "doom/dsitembk.wav";
 //	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 	if (self.class_select == "") self.class_select = "doom_item";
 };
@@ -382,9 +420,10 @@ void() d_weapon_rocketlauncher =
 // stats
 	self.currentammo = D_DEF_BLAST;
 	self.items = IT_ROCKET_LAUNCHER;
-	self.weaponframe = AMMO_ROCKETS;
+	self.lip = AMMO_ROCKETS;
 	self.attack_finished = 0.6;
-	self.dmg = 120;
+	self.dmg = DOOM_ROCK_DMG;
+	self.dodmg = 128; // splash
 	self.dmg_save = 1;
 
 // appearances
@@ -403,11 +442,19 @@ void() d_weapon_chaingun =
 	weapon_supernailgun();
 	self.netname = "Chain Gun";
 
-//TEST
-//	setmodel (self, "progs/q2_chg.mdl");
-//	self.weaponmodel = "progs/v_q2_chg.mdl";
-	self.vwepmdl = "progs/vw_q2_chg.mdl";
-//	self.noise3 = "q2/q2_chg_fire.wav";
+	self.touch = d_weapon_touch;
+	self._attack = SUB_Null;
+	self._fr_attack = player_mgchg1;
+
+// stats
+	self.items = IT_SUPER_NAILGUN;
+	self.currentammo = D_DEF_CHAING;
+	self.lip = AMMO_BULLETS;
+	self.attack_finished = 0.11;
+	self.dmg = DOOM_SHOT_DMG;
+	self.dmg_save = 1;
+	self.dmg_take = 1;
+	self.punchangle = ' 0.065 0.065 0';
 
 	setmodel (self, "progs/d_chaingun.mdl");
 	self.weaponmodel = "progs/v_d_chg.mdl";
@@ -416,12 +463,7 @@ void() d_weapon_chaingun =
 	self.noise3 = "doom/dspistol.wav";
 	self.noise = "doom/dswpnup.wav";
 	self.noise4 = "doom/dsitembk.wav";
-	self.currentammo = D_DEF_CHAING;
 	self.effects = self.effects | EF_FULLBRIGHT;
-//	self._attack = player_dchg1;
-	self.attack_finished = 0.11;
-	self.punchangle = ' 0.065 0.065 0'; // bullet spread out
-//	self.mask_x = CB_HUMAN | CB_GREMLIN | CB_SPEC;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -431,13 +473,19 @@ void() d_weapon_pistol =
 	weapon_nailgun();
 	self.netname = "Pistol";
 
+	self.touch = d_weapon_touch;
+	self._attack = X_FireHitscan;
+	self._fr_attack = player_shot1; // FIX - special framing
+
 // stats
 	self.currentammo = 25;
 	self.items = IT_NAILGUN; // IT_AXE; // testing
-	self.weaponframe = AMMO_BULLETS;
+	self.lip = AMMO_BULLETS;
 	self.attack_finished = 0.4;
-	self.dmg = 120;
+	self.dmg = DOOM_SHOT_DMG;
 	self.dmg_save = 1;
+	self.dmg_take = 1;
+	self.punchangle = ' 0.01 0.01 0';
 
 	setmodel (self, "progs/d_pistol.mdl");
 	self.weaponmodel = "progs/v_d_pistol.mdl";
@@ -446,9 +494,6 @@ void() d_weapon_pistol =
 	self.noise = "doom/dswpnup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
-//	self._attack = player_dchg1;
-	self.attack_finished = 0.4;
-	self.punchangle = ' 0.01 0.01 0'; // bullet spread out
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -477,14 +522,15 @@ void() d_weapon_shotgun =
 	weapon_shotgun();
 
 	self.touch = d_weapon_touch;
-	self._attack = W_FireShotgun;
+	self._attack = X_FireHitscan;
 	self._fr_attack = player_shot1;
 
 	self.currentammo = D_DEF_SHOTG;
 	self.items = IT_SHOTGUN;
-	self.weaponframe = AMMO_SHELLS;
+	self.lip = AMMO_SHELLS;
 	self.attack_finished = 1;
-	self.dmg = 10;
+	self.dmg = DOOM_SHOT_DMG;
+	self.dmg_take = 7; // shot cnt
 	self.dmg_save = 1;
 	self.punchangle = ' 0.04 0.04 0'; // bullet spread out -- TDO: get doom value, this is q1
 
@@ -504,15 +550,16 @@ void() d_weapon_supershotgun =
 	self.netname = "Super shotgun";
 
 	self.touch = d_weapon_touch;
-	self._attack = W_FireSuperShotgun;
+	self._attack = X_FireHitscan;
 	self._fr_attack = player_shot1;
 
 	self.currentammo = D_DEF_SHOTG;
 	self.items = IT_SUPER_SHOTGUN;
-	self.weaponframe = AMMO_SHELLS;
+	self.lip = AMMO_SHELLS;
 	self.attack_finished = 1.6667;
-	self.dmg = 10;
+	self.dmg = DOOM_SHOT_DMG;
 	self.dmg_save = 2;
+	self.dmg_take = 21; // shot cnt
 	self.punchangle = ' 0.14 0.08 0'; // bullet spread out -- TDO: get doom value, this is q1
 
 	setmodel (self, "progs/d_dblshot.mdl");
@@ -538,7 +585,6 @@ void() d_weapon_plasma =
 	self.noise3 = "doom/dsplasma.wav";
 	self.noise4 = "doom/dsitembk.wav";
 
-	self.aflag = 5;
 	self.attack_finished = 0.083;
 //	self._attack = player_dplasma1;
 //	self._hk_major = SUB_Null;
@@ -717,6 +763,20 @@ void() w_weapon_machinegun =
 {
 	weapon_nailgun();
 
+	self.touch = d_weapon_touch;
+	self._attack = SUB_Null;
+	self._fr_attack = player_mgchg1;
+
+// stats
+	self.currentammo = 6;
+	self.items = IT_NAILGUN;
+	self.lip = AMMO_BULLETS;
+	self.attack_finished = 0.16667; // 6 per
+	self.dmg = 10;
+	self.dmg_save = 1;
+	self.dmg_take = 1;
+	self.punchangle = ' 0.02 0.02 0';
+
 	self.netname = "Machine Gun";
 
 	setmodel (self, "progs/w_mgun.mdl");
@@ -725,16 +785,27 @@ void() w_weapon_machinegun =
 	self.noise3 = "wolf/w_mg.wav";
 	self.noise = "wolf/pickup_gn.wav";
 	self.noise4 = "doom/dsitembk.wav";
-	self.currentammo = D_DEF_CHAING; // FIX FIX
 	self.effects = self.effects | EF_FULLBRIGHT;
-	self.attack_finished = 0.16667;
-	self.punchangle = ' 0.02 0.02 0'; // bullet spread out
-//	self._attack = player_dchg1;
-//	self._hk_major = SUB_Null;
-//	self.mode_x = IV_NAILGUN;
-//	self.mask_x = CB_HUMAN | CB_GREMLIN | CB_SPEC;
-
 	if (self.class_select == "") self.class_select = "wolf_item";
+};
+
+void() w_chg_base =
+{
+// stats
+	self.items = IT_SUPER_NAILGUN;
+	self.currentammo = 6;
+	self.lip = AMMO_BULLETS;
+	self.attack_finished = 0.087; // 11.5 per
+	self.dmg = 10;
+	self.dmg_save = 1;
+	self.dmg_take = 2;
+	self.punchangle = ' 0.05 0.05 0';
+
+	self.netname = "Chain Gun";
+
+	setmodel (self, "progs/w_chaing.mdl");
+	self.weaponmodel = "progs/v_w_chg.mdl";
+	self.vwepmdl = "progs/vw_w_chaing.mdl";
 };
 
 void() w_weapon_chaingun =
@@ -742,18 +813,15 @@ void() w_weapon_chaingun =
 	d_rep_set();
 	weapon_nailgun();
 
-	self.netname = "Chain Gun";
+	w_chg_base();
+	self.touch = wchg2_weapon_touch;
+	self._attack = SUB_Null;
+	self._fr_attack = player_mgchg1;
 
-	setmodel (self, "progs/w_chaing.mdl");
-	self.weaponmodel = "progs/v_w_chg.mdl";
-	self.vwepmdl = "progs/vw_w_chaing.mdl";
 	self.noise3 = "wolf/w_chg.wav";
 	self.noise = "wolf/pickup_gn.wav";
 	self.noise4 = "doom/dsitembk.wav";
-	self.currentammo = D_DEF_CHAING;
 	self.effects = self.effects | EF_FULLBRIGHT;
-	self.attack_finished = 0.087;
-	self.punchangle = ' 0.065 0.065 0'; // bullet spread out
 	if (self.class_select == "") self.class_select = "wolf_item";
 };
 
@@ -776,9 +844,10 @@ void() w_weapon_mortar =
 // stats
 	self.currentammo = 5; // W_DEF_BLAST;
 	self.items = IT_ROCKET_LAUNCHER;
-	self.weaponframe = AMMO_ROCKETS;
+	self.lip = AMMO_ROCKETS;
 	self.attack_finished = 0.8;
 	self.dmg = 120;
+	self.dodmg = 120;
 	self.dmg_save = 1;
 // appearances
 	self.netname = "Mortar";
@@ -814,8 +883,19 @@ void() w_weapon_pistol =
 {
 	weapon_nailgun();
 
-	self.currentammo = 25;
+	self.touch = d_weapon_touch;
+	self._attack = X_FireHitscan;
+	self._fr_attack = player_shot1; // FIX - special framing
+
+// stats
+	self.currentammo = 6;
+	self.items = IT_SHOTGUN; // IT_AXE; // testing
+	self.lip = AMMO_BULLETS;
 	self.attack_finished = 0.465; // 2.15 per
+	self.dmg = 10;
+	self.dmg_save = 1;
+	self.dmg_take = 1;
+	self.punchangle = ' 0.01 0.01 0';
 
 	self.netname = "Luger Pistol";
 	setmodel (self, "progs/w_pistol.mdl");
@@ -845,6 +925,52 @@ void() w_weapon_knife =
 
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "wolf_item";
+};
+
+void() w_ammo_clip =
+{
+	item_spikes();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_BULLETS;
+	self.currentammo = W_DEF_BULLETS_CLIP;
+
+	setmodel (self, "progs/w_clip.mdl");
+	self.noise = "wolf/pickup_am.wav";
+	self.noise4 = "doom/dsitembk.wav";
+	self.netname = "A clip";
+	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	if (self.class_select == "") self.class_select = "wolf_item";
+};
+
+void() w_key =
+{
+	if (self.spawnflags & 1)
+		item_key2();
+	else //if (self.spawnflags & 2)
+		item_key1();
+
+	self.noise = "wolf/pickup_gdy.wav";
+	setmodel (self, "progs/w_key.mdl");
+
+	self.netname = "Blue key";
+	if (self.spawnflags & 1) self.netname = "Gold key";
+	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	if (self.class_select == "") self.class_select = "wolf_item";
+};
+
+void() w_key_g =
+{
+	self.spawnflags = 1;
+	self.skin = 1;
+	w_key();
+};
+
+void() w_key_b =
+{
+	self.spawnflags = 2;
+	self.skin = 2;
+	w_key();
 };
 
 // code to run doom ents
@@ -936,15 +1062,23 @@ void() d_weapon_touch =
 	if (leave && (other.items & self.items))	return ;
 	new = self.items;
 
-	if (self.classname == "d_weapon_rocketlauncher" || self.classname == "w_weapon_mortar")
+	if (self.classname == "q2_weapon_rocketlauncher" || self.classname == "d_weapon_rocketlauncher" || self.classname == "w_weapon_mortar")
 	{
 	other.ammo_rockets = other.ammo_rockets + self.currentammo; // TDO: ammo type fn
 	camc = other.ammo_rockets;
 	}
 	else if (self.classname == "d_weapon_shotgun" || self.classname == "d_weapon_supershotgun")
 	{
-	other.ammo_shells = other.ammo_shells + self.currentammo; // TDO: ammo type fn
+	other.ammo_shells = other.ammo_shells + self.currentammo;
 	camc = other.ammo_shells;
+	}
+	else if (self.classname == "d_weapon_pistol" || self.classname == "d_weapon_chaingun"
+					|| self.classname == "w_weapon_machinegun"
+					|| self.classname == "w_weapon_chaingun"
+					|| self.classname == "w_weapon_pistol")
+	{
+	other.ammo_bullet = other.ammo_bullet + self.currentammo;
+	camc = other.ammo_bullet;
 	}
 	else
 	{
@@ -962,7 +1096,7 @@ void() d_weapon_touch =
 		}
 	}
 
-	if (!vchk(new, 0, other.vwepent))
+	if (!vchk(new, 0, other.vwepent) || new == IT_SHOTGUN)
 	{
 		e = vload(other, new);
 		e.eweapon = e;
@@ -972,10 +1106,13 @@ void() d_weapon_touch =
 
 		e.weapon = e.items = self.items;
 		e.currentammo = self.currentammo;
-		e.weaponframe = self.weaponframe;
+		e.lip = self.lip;
 		e.attack_finished = self.attack_finished;
 		e.dmg = self.dmg;
+		e.dodmg = self.dodmg;
 		e.dmg_save = self.dmg_save;
+		e.dmg_take = self.dmg_take;
+		e.punchangle = self.punchangle;
 		e.aflag = camc;
 
 		e.netname = self.netname;
@@ -1032,11 +1169,192 @@ void() d_weapon_touch =
 	SUB_UseTargets();				// fire all targets / killtargets
 };
 
+void() wchg2_weapon_touch =
+{
+	if (!vchk(self.items, 0, other.vwepent))
+	{
+		d_weapon_touch();
+		return;
+	}
+	if (!vchk(IT_LIGHTNING, 0, other.vwepent))
+	{
+		self.items = IT_LIGHTNING;
+		self.dmg_save = 2;
+		self.dmg_take = 4;
+		self.punchangle = ' 0.07 0.07 0';
+
+		self.netname = "Dual Chain Gun";
+
+		self.weaponmodel = "progs/v_w_2chg.mdl";
+		self.vwepmdl = "progs/vw_w_2chaing.mdl";
+
+		d_weapon_touch();
+		w_chg_base();
+	}
+};
+
+
+void () X_MissileTouch =
+{
+	if (other == self.owner)
+		return;		// don't explode on owner
+
+	if (pointcontents(self.origin) == CONTENT_SKY)
+	{
+		remove (self);
+		return ;
+	}
+if (self.eweapon) {
+bprint(" *** eweap ");
+bprint(self.eweapon.netname);
+}
+else
+bprint(" *** missile (?) ");
+
+	if (!self.dmg) self.dmg = 100 + random() * 20;
+	else if (self.dmg == DOOM_ROCK_DMG) self.dmg = 20 * ceil(random() * 8);
+	if (!self.dodmg) self.dodmg = 120;
+
+bprint(", hit dmg = ");
+bprint(ftos(self.dmg));
+bprint(", splash dmg = ");
+bprint(ftos(self.dodmg));
+
+	if (other.health)
+	{
+		if (other.classname == "monster_shambler")
+			self.dmg = self.dmg * 0.5;	// mostly immune
+		T_Damage (other,self,self.owner,self.dmg);
+	}
+
+	// don't do radius damage to the other, because all the damage
+	// was done in the impact
+	T_RadiusDamage (self,self.owner,self.dodmg,other);
+
+bprint(", tot dmg = ");
+bprint(ftos(self.dmg+self.dodmg));
+bprint(".\n");
+
+//	sound (self, CHAN_WEAPON, "weapons/r_exp3.wav", 1, ATTN_NORM);
+	self.origin = self.origin - 8*normalize(self.velocity);
+
+	WriteByte (MSG_BROADCAST,SVC_TEMPENTITY);
+	WriteByte (MSG_BROADCAST,TE_EXPLOSION);
+	WriteCoord (MSG_BROADCAST,self.origin_x);
+	WriteCoord (MSG_BROADCAST,self.origin_y);
+	WriteCoord (MSG_BROADCAST,self.origin_z);
+
+	BecomeExplosion ();
+};
+
+// handle eweapon hitscan bullet shooters
+float tdmg;
+
+void (float shotcount, float pdmg, vector dir, vector spread) X_FireBullets =
+{
+	local vector direction;
+	local vector src;
+	local float ddmg
+
+	makevectors (self.v_angle);
+
+	ddmg = pdmg;
+
+	src = self.origin + v_forward*10;
+	src_z = self.absmin_z + self.size_z * 0.7;
+
+	ClearMultiDamage ();
+	while (shotcount > 0)
+	{
+		if (pdmg == DOOM_SHOT_DMG) {ddmg = 5 * ceil(random() * 3);
+
+bprint(", bdmg = ");
+bprint(ftos(ddmg));
+
+}
+tdmg = tdmg + ddmg;
+
+		direction = dir + crandom()*spread_x*v_right + crandom()*spread_y*v_up;
+
+		traceline (src, src + direction*2048, FALSE, self);
+		if (trace_fraction != 1.0)
+			TraceAttack (ddmg, direction);
+
+		shotcount = shotcount - 1;
+	}
+	ApplyMultiDamage ();
+};
+
+/*
+================
+X_FireHitscan - fire eweapon hit scan weps
+================
+*/
+void () X_FireHitscan =
+{
+	local vector dir;
+	local float f, d, t;
+
+
+bprint(" *** eweap ");
+bprint(EWEAP.netname);
+tdmg = 0;
+
+	self.punchangle_x = -2 * EWEAP.dmg_save;
+	cam_punch(); // Cataboligne - 6.26.10 - because of fire from frames call
+
+	if (EWEAP.lip == AMMO_SHELLS)
+		f = self.ammo_shells;
+	else if (EWEAP.lip == AMMO_BULLETS)
+		f = self.ammo_bullet;
+	d = EWEAP.dmg_save; // ammo to fire
+	t = EWEAP.dmg_take; // shots to fire
+
+	f = f - ammo_con(d, self, ""); // use ammo
+	if (f < 0)
+	{
+		d = d + f; // only can fire this many
+		f = 0;
+		t = EWEAP.dmg_take * (d / EWEAP.dmg_save); // pellets or bullets we get to shoot due to reduced ammo
+	}
+
+	if (!ammo_con(EWEAP.weapon, self, "wpck"))
+	if (d < 1) // NOTE: can this ever happen?
+	{
+		self.weapon = W_BestWeapon ();
+		if (!Q_100 && !Q_99) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
+		W_SetCurrentAmmo ();
+		if (self.classname == "pk*bot")
+			self.think = self.th_run;
+		return ;
+	}
+
+	if (EWEAP.lip == AMMO_SHELLS)
+		self.currentammo = self.ammo_shells = f;
+	else if (EWEAP.lip == AMMO_BULLETS)
+		self.currentammo = self.ammo_bullet = f;
+
+	if (self.classname == "pk*bot")
+		dir = botaim ();
+	else
+		dir = aim (self,100000);
+
+	X_FireBullets (t, EWEAP.dmg, dir, EWEAP.punchangle);
+
+bprint(", tot dmg = ");
+bprint(ftos(tdmg));
+bprint(".\n");
+
+};
+
+
+// fire any eweapon
+
 void() e_weap_Attack =
 {
 	local entity e;
 
-	e = self.eweapon;
+	EWEAP = e = self.eweapon;
 
 	if (rune_haste(e.attack_finished / 2))
 		self.attack_finished = time + e.attack_finished;
@@ -1045,8 +1363,19 @@ void() e_weap_Attack =
 	if (e._fr_attack != SUB_Null) e._fr_attack();
 	if (e.noise3 != "")
 		sound (self, CHAN_WEAPON, e.noise3, 1, ATTN_NORM);
-	e.aflag = self.currentammo;
+//	e.aflag = self.currentammo;
+
+// rocket wep specials
+	if (e._attack == W_FireRocket)
+	if (newmis.classname == "missile")
+	{
+		newmis.touch = X_MissileTouch;
+		newmis.dmg = e.dmg;
+		newmis.dodmg = e.dodmg;
+		newmis.eweapon = e;
+	}
+
+	EWEAP = world;
 
 	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
 };
-

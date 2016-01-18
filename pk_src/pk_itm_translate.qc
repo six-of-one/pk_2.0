@@ -881,11 +881,6 @@ void() check_translate =
 
 // common item temp code - does nothing for now
 
-void() q2_weapon_rocketlauncher =
-{
-	SUB_Nop();
-};
-
 void() q3_weapon_rocketlauncher =
 {
 	SUB_Nop();

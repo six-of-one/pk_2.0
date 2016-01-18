@@ -1,10 +1,5 @@
 /* beartrap */
 
-float PK_BT_TIMETOFOLLOW;
-float PK_BT_DMG;
-float PK_BT_TIME;
-float PK_BT_SET;
-
 
 .entity beartrap_target;
 .float beartrapdmg_time;

@@ -268,20 +268,36 @@ float FL_TR_REMOVE		= 128; // remove these items
 
 float NO_PI;					// dont let item_call call place_item
 
+.float ammo_bullet;
+.float ammo_slug;
+
+float PK_BULLETAMMO_MAX;
+float PK_SLUGAMMO_MAX;
+
+// wolf
+
+void() wchg2_weapon_touch;
+
 // doom
 
 void() doom_precache;
 void(entity e, float trv) master_item_control;
 void(string tri, float trv) master_item_control_loop;
 
+float d_reps_base				= 57005000; // heh heh - DEAD+
+void() d_rep_set;
+float() mega_touch;
+void() d_weapon_touch;
+void () X_FireHitscan;
+
+// q2
+
+void() q2_precache;
+
 // q3
 
 void() q3_suspend;
 
-// **************************************
-// painkeep protos
-
-// **************************************
 
 // so we can make new sv_ console vars
 //DP_REGISTERCVAR - adds a new console cvar to the server console (in singleplayer this is the player's console), the cvar exists until the mod is unloaded or the game quits.
@@ -293,6 +309,184 @@ float(string name, string value) registercvar = #93;
 //darkplaces implementation: LordHavoc
 //movetype definitions:
 float MOVETYPE_FOLLOW		= 12;
+
+
+float AMMO_NONE				= 100;
+float AMMO_SHELLS				= 101; // gun uses this ammo type
+float AMMO_NAILS				= 103;
+float AMMO_ROCKETS			= 105;
+float AMMO_CELLS				= 107;
+float AMMO_BULLETS			= 109;
+float AMMO_SLUGS			= 111;
+float AMMO_GRENADES		= 113;
+
+// **************************************
+// viswep
+
+// **************************************
+float qweps, pkweps; // inventory bit masks for weps
+.entity vwepent; // vis wep entity pointers
+.entity eweapon; // vis wep pointer
+.string vwepmdl; // visible weapon model load
+.void() _attack; // fires weapon - null if fire from frames
+.void() _fr_attack; // starts frame set
+void() e_weap_Attack;
+entity EWEAP; // current firing pointer - dont use with thinks!
+
+void() viswep_pkbot;
+void() viswep_post;
+void() viswep_pre;
+void(entity vh, float cd) viswep_ld;
+float(string wpm) ver_weaponmodel;
+void() player_nail3;
+float VW; // viswep support - set to 0 to return to generic gun / axe
+float VW_ARMOR; // viswep armor support - eventually admin controlled & cvar
+
+// Cataboligne - projectile / cartridge fire(d) positioning - 9.30.9
+
+// really needed by viswep & chasecam which shows how bad original positioning looks
+
+float FL_NDISMDL				= 8388608; // flag to prevent display of viswep models
+
+// q weps
+// shotguns - cart eject - just an extra
+float VWX_SHOTGUN				= 11;
+float VWY_SHOTGUN				= 9;
+float VWZ_SHOTGUN				= 9;
+
+float VWX_VEL_SHOTGUN		= 8;	// cart eject velocity
+float VWY_VEL_SHOTGUN		= 48;
+float VWZ_VEL_SHOTGUN		= 16;
+
+// nails
+float VWX_NAILG				= 16;	// 12		v_forward *
+float VWY_NAILG				= 9;	//			v_right *
+float VWZ_NAILG				= 15;	// 16		v_up *
+
+float VWX_SNAILG				= 22;	// 14
+float VWY_SNAILG				= 9;
+float VWZ_SNAILG				= 15;	// 16
+
+float VWX_PNAILG				= 31;	// 15
+float VWY_PNAILG				= 9.5;// 8
+float VWZ_PNAILG				= 14;	// 15
+
+// rockets
+float VWX_ROCKETL				= 20;
+float VWY_ROCKETL				= 11;
+float VWZ_ROCKETL				= 16;
+
+float VWX_GRENADEL			= 18;	// 10
+float VWY_GRENADEL			= 11;
+float VWZ_GRENADEL			= 16;
+
+// cell guns
+float VWX_THUNDER				= 12;
+float VWY_THUNDER				= 8;
+float VWZ_THUNDER				= 16;
+
+// pk weps
+// cell guns
+float VWX_CHTHUNDER			= 20;	// 18
+float VWY_CHTHUNDER			= 8;
+float VWZ_CHTHUNDER			= 16;
+
+float VWX_HARP_IDLE			= 4;	// harpoon is fired, player standing idle
+float VWY_HARP_IDLE			= -10;
+float VWZ_HARP_IDLE			= -6;
+
+float VWX_HARP_RETR			= 8;	// harpoon being retracted
+float VWY_HARP_RETR			= 8;
+float VWZ_HARP_RETR			= 0;
+
+
+
+// **************************************
+// Cataboligne 9.11.3 purify - chase cam
+
+// **************************************
+void() chase_cam_precache;
+void(float sel) cam_parms;
+void() Chase_cam_level_start;
+void() cam_waterjump;
+
+// message protocol defines
+float SVC_SETVIEWPORT	= 5;
+float SVC_SETVIEWANGLES	= 10;
+
+// free player entity variable
+// '.float speed'  bit-flag defines:
+//float CHSCAM_MONSTER  = ;
+float CHSCAM_ON			= 1;
+float LASERTARG_ON		= 4;
+float LASERTARG_LIT		= 32;
+
+.vector cam; // all chase cam data
+void() cam_punch;						// return punchangle if passed parm - otherwise set self. var
+void() dead_cam_set;					// Cataboligne 9.11.3 purify proto - chase cam
+float DCAMTO;							// timeout for death cam 2 mins
+float DCAMTOACT;						// action after timeout 0 = respawn, 1 = disconnect
+float FFW_LIMIT;						// time limit on how long players get frags from fire & forget weaps after dead
+float NOCIDE;
+float NOENVCIDE;
+
+// cam vision field settings
+float DCAM_FOV					= 130; // dead cam crow vision
+string DCAM_SET_FOV			= "fov 130\n"; // set it if not set or changed
+string STD_FOV					= "fov 90\n";
+string CAM_FOV					= "fov 80\n"; // field for cam view
+
+
+// **************************************
+// Rotation - Hip
+
+// **************************************
+.vector neworigin;
+.vector rotate;
+.float endtime;
+.float rotate_type;
+.string path;
+.string group;
+.string event;
+.float duration;
+
+
+// **************************************
+// painkeep protos
+
+// **************************************
+
+
+// admin code
+.float admin;
+float(string mp) PK_mapmode;
+void() PK_SetAdmin;
+void() PK_AdminImpulse;
+void() admin_sv_cfg;
+void() Admin_mainmenu;
+float() admin_postthink;
+void() admin_resettimeout;
+void() observer; // *bot
+void() observer_off;
+string OBSERVER = "jafo"; // nod to Blue Thunder : "just another fucking observer"
+float pk_flags_ck;
+float pk_itemovr_ck;
+float (float rl) AdminBitFlag;
+void() dyn_item;
+void() pk_cphub;
+void(entity e) pk_admincfg;
+void () tfragadmin_touch;
+
+float PK_TP_STATUSON			= 256;
+.float hubstartupmessage;
+.float messagetimeout;
+
+.float revotemsg;
+
+// For the level sequences, if the exec file has been run yet.
+float execed;
+float PK_TP_USERMAPON		= 512;
+
 
 // relocated from defs.qc
 
@@ -321,51 +515,12 @@ void(entity client, string s, string s1, string s2, string s3, string s4) center
 //void(entity client, string s, string s1, string s2, string s3, string s4, string s5) centerprint6 = #73;	// sprint, but in middle
 void(entity client, string s, string s1, string s2, string s3, string s4, string s5, string s6) centerprint7 = #73;	// sprint, but in middle
 
-// auto turrets
-.float turret_timeout;
-.float turret_soundtimeout;
-.float turret_ownertimeout;
-.entity turret_base;
-void(entity e, float tm) turret_KillStraker;
-
-float PK_TUR_AMMO; // base cells to fire, 0 = infinite
-float PK_TUR_TIME; // time to live, after which explode, 0 = no timeout
-float PK_TUR_HEAL; // health we get - base = 2/3 this, < 0 = no limit
-float PK_TUR_TARGOWN; // time after which turret shoots owner, 0 = dont target owner
-float PK_TUR_VARIETY; // a variety of turrets - 
-float PK_TUR_QUADCON;
-float PK_TUR_SET; // set non 0 when vars loaded
-
 // items
 .float pk_items;	// Items used for impulse 1
 .float pk_currentitem;
 float pk_attack;		// bit 1 = can make a pk attack on any map, bit 2 = pk_artifacts attack
 void() use_pkitem; // bots using pk items
 
-float AMMO_NONE				= 100;
-float AMMO_SHELLS				= 101; // gun uses this ammo type
-float AMMO_NAILS				= 103;
-float AMMO_ROCKETS			= 105;
-float AMMO_CELLS				= 107;
-float AMMO_BULLETS			= 109;
-
-// viswep
-float qweps, pkweps; // inventory bit masks for weps
-.entity vwepent; // vis wep entity pointers
-.entity eweapon; // vis wep pointer
-.string vwepmdl; // visible weapon model load
-.void() _attack; // fires weapon - null if fire from frames
-.void() _fr_attack; // starts frame set
-void() e_weap_Attack;
-
-void() viswep_pkbot;
-void() viswep_post;
-void() viswep_pre;
-void(entity vh, float cd) viswep_ld;
-float(string wpm) ver_weaponmodel;
-void() player_nail3;
-float VW; // viswep support - set to 0 to return to generic gun / axe
-float VW_ARMOR; // viswep armor support - eventually admin controlled & cvar
 
 // Items used in impulse 1
 float PK_IT_AXE				= 1;
@@ -395,7 +550,7 @@ Impulse 36 - AutoSentry
 Impulse 37 - Can of Pork and Beans
 Impulse 38 - Axe (just to do complete)
 */
-// turret ammo
+// pk ammo
 .float pk_gravitywellammo, pk_turretammo, pk_canpabammo, pk_beartrapammo;
 
 // Ammo Max'S
@@ -418,6 +573,7 @@ float pk_livent; // current count
 
 // new gibs
 entity damage_inflictor;	// set by T_Damage
+
 
 // Variables used for the air gun.
 
@@ -496,9 +652,46 @@ float GRAP_ROPE				= 9;
 
 float VW_HARP_FRADJ        = 20; // frame adjust from run / stand for a fired harp
 
+
 // can o p&b
 .float copb_timeout;
 .float copb_nextFartTimeout;
+
+
+// auto turrets
+.float turret_timeout;
+.float turret_soundtimeout;
+.float turret_ownertimeout;
+.entity turret_base;
+void(entity e, float tm) turret_KillStraker;
+
+float PK_TUR_AMMO; // base cells to fire, 0 = infinite
+float PK_TUR_TIME; // time to live, after which explode, 0 = no timeout
+float PK_TUR_HEAL; // health we get - base = 2/3 this, < 0 = no limit
+float PK_TUR_TARGOWN; // time after which turret shoots owner, 0 = dont target owner
+float PK_TUR_VARIETY; // a variety of turrets - 
+float PK_TUR_QUADCON;
+float PK_TUR_SET; // set non 0 when vars loaded
+
+// b traps
+float PK_BT_SET;
+float PK_BT_TIMETOFOLLOW;
+float PK_BT_DMG;
+float PK_BT_TIME;
+
+.float beartrap_time;
+.float bt_immune_time;
+float BT_BUFFER				= 2;	  	// The nuber of secs people are immune to beartraps after spawning
+
+// grav
+
+float PK_GRV_TIME;
+float PK_GRV_SET;
+
+
+// exploding ammo for shotgun
+.float pk_explode_ammo;
+float PK_EXPLODEAMMO_MAX;
 
 // item repositions
 .vector ip_orgOrigin;
@@ -507,12 +700,9 @@ float VW_HARP_FRADJ        = 20; // frame adjust from run / stand for a fired ha
 float ip_timeout				= 2;
 
 
-// exploding ammo for shotgun
-.float pk_explode_ammo;
-float PK_EXPLODEAMMO_MAX;
-
 // For Drowning Ignoring armor
 float ignorearmor;
+
 
 // hub ops
 //float PK_SF_HUB = 16;
@@ -536,11 +726,6 @@ float DONTALLOWBOTS			= 1;		// If we want to show anti bots messages at startup
 void() updateStatusDisplay;
 
 .float laststattime;					// time of last status update
-
-
-.float beartrap_time;
-.float bt_immune_time;
-float BT_BUFFER				= 2;	  	// The nuber of secs people are immune to beartraps after spawning
 
 // Quake Packet Message
 float	SVC_CENTERPRINT		= 26;
@@ -567,35 +752,6 @@ void(float to, float f) WriteBFloat;
 .float pk_dutychecking;
 float PK_TP_DUTYON			= 128;
 
-// admin code
-.float admin;
-float(string mp) PK_mapmode;
-void() PK_SetAdmin;
-void() PK_AdminImpulse;
-void() admin_sv_cfg;
-void() Admin_mainmenu;
-float() admin_postthink;
-void() admin_resettimeout;
-void() observer; // *bot
-void() observer_off;
-string OBSERVER = "jafo"; // nod to Blue Thunder : "just another fucking observer"
-float pk_flags_ck;
-float pk_itemovr_ck;
-float (float rl) AdminBitFlag;
-void() dyn_item;
-void() pk_cphub;
-void(entity e) pk_admincfg;
-void () tfragadmin_touch;
-
-float PK_TP_STATUSON			= 256;
-.float hubstartupmessage;
-.float messagetimeout;
-
-.float revotemsg;
-
-// For the level sequences, if the exec file has been run yet.
-float execed;
-float PK_TP_USERMAPON		= 512;
 
 // **************************************
 // Cataboligne relocated from many places
@@ -638,6 +794,7 @@ float() W_BestPKWeapon;
 void(entity targ) pk_setDamageSkin;
 // added
 void() painkeep_touch;
+void() pk_ammo_touch;
 void() pk_bound_ammo;
 void() pk_item_position;
 void() pk_item_position_init;
@@ -693,105 +850,6 @@ void(entity e) pk_missile_splash;
 .void() pk_touch; 						// group all touch code mods here
 void() pk_placeitem;
 
-// Rotation
-.vector neworigin;
-.vector rotate;
-.float endtime;
-.float rotate_type;
-.string path;
-.string group;
-.string event;
-.float duration;
-
-
-// Cataboligne 9.11.3 purify - chase cam
-void() chase_cam_precache;
-void(float sel) cam_parms;
-void() Chase_cam_level_start;
-void() cam_waterjump;
-
-// message protocol defines
-float SVC_SETVIEWPORT	= 5;
-float SVC_SETVIEWANGLES	= 10;
-
-// free player entity variable
-// '.float speed'  bit-flag defines:
-//float CHSCAM_MONSTER  = ;
-float CHSCAM_ON			= 1;
-float LASERTARG_ON		= 4;
-float LASERTARG_LIT		= 32;
-
-.vector cam; // all chase cam data
-void() cam_punch;						// return punchangle if passed parm - otherwise set self. var
-void() dead_cam_set;					// Cataboligne 9.11.3 purify proto - chase cam
-float DCAMTO;							// timeout for death cam 2 mins
-float DCAMTOACT;						// action after timeout 0 = respawn, 1 = disconnect
-float FFW_LIMIT;						// time limit on how long players get frags from fire & forget weaps after dead
-float NOCIDE;
-float NOENVCIDE;
-
-// cam vision field settings
-float DCAM_FOV					= 130; // dead cam crow vision
-string DCAM_SET_FOV			= "fov 130\n"; // set it if not set or changed
-string STD_FOV					= "fov 90\n";
-string CAM_FOV					= "fov 80\n"; // field for cam view
-
-// Cataboligne - projectile / cartridge fire(d) positioning - 9.30.9
-
-// really needed by viswep & chasecam which shows how bad original positioning looks
-
-float FL_NDISMDL				= 8388608; // flag to prevent display of viswep models
-
-// q weps
-// shotguns - cart eject - just an extra
-float VWX_SHOTGUN				= 11;
-float VWY_SHOTGUN				= 9;
-float VWZ_SHOTGUN				= 9;
-
-float VWX_VEL_SHOTGUN		= 8;	// cart eject velocity
-float VWY_VEL_SHOTGUN		= 48;
-float VWZ_VEL_SHOTGUN		= 16;
-
-// nails
-float VWX_NAILG				= 16;	// 12		v_forward *
-float VWY_NAILG				= 9;	//			v_right *
-float VWZ_NAILG				= 15;	// 16		v_up *
-
-float VWX_SNAILG				= 22;	// 14
-float VWY_SNAILG				= 9;
-float VWZ_SNAILG				= 15;	// 16
-
-float VWX_PNAILG				= 31;	// 15
-float VWY_PNAILG				= 9.5;// 8
-float VWZ_PNAILG				= 14;	// 15
-
-// rockets
-float VWX_ROCKETL				= 20;
-float VWY_ROCKETL				= 11;
-float VWZ_ROCKETL				= 16;
-
-float VWX_GRENADEL			= 18;	// 10
-float VWY_GRENADEL			= 11;
-float VWZ_GRENADEL			= 16;
-
-// cell guns
-float VWX_THUNDER				= 12;
-float VWY_THUNDER				= 8;
-float VWZ_THUNDER				= 16;
-
-// pk weps
-// cell guns
-float VWX_CHTHUNDER			= 20;	// 18
-float VWY_CHTHUNDER			= 8;
-float VWZ_CHTHUNDER			= 16;
-
-float VWX_HARP_IDLE			= 4;	// harpoon is fired, player standing idle
-float VWY_HARP_IDLE			= -10;
-float VWZ_HARP_IDLE			= -6;
-
-float VWX_HARP_RETR			= 8;	// harpoon being retracted
-float VWY_HARP_RETR			= 8;
-float VWZ_HARP_RETR			= 0;
 
 
 // testing

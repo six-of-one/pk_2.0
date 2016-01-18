@@ -10,8 +10,6 @@
  *
  */
 
-float PK_TOMB_SET;
-
 void () corpsefollow;
 void () corpse_drag1 =  [ 56, corpse_drag2  ] { 	corpsefollow (); };
 void () corpse_drag2 =  [ 57, corpse_drag3  ] { };

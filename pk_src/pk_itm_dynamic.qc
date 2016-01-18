@@ -263,6 +263,10 @@ void(string cls) item_call =
 	else if (cls == "w_weapon_mortar") w_weapon_mortar();
 	else if (cls == "w_weapon_flamer") w_weapon_flamer();
 
+	else if (cls == "w_ammo_clip") w_ammo_clip();
+	else if (cls == "w_key_g") w_key_g();
+	else if (cls == "w_key_b") w_key_b();
+
 	else return;
 	self.mdl = self.model;
 	self.flags = FL_ITEM;
