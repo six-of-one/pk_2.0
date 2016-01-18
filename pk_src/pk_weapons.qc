@@ -399,7 +399,7 @@ void() PK_SetCurrentAmmo =
 		self.currentammo = self.ammo_nails;
 // PULSE_GUN_START
 		if (PK)
-		{			
+		{
 			if (PK_100 || Q_100)
 				self.weaponmodel = "progs/v_fnail.mdl";
 			else
@@ -1437,13 +1437,12 @@ void() PK_ImpulseCommands =
 		if (pk_flags & PK_TP_SPARKSFLASH)
 		{
 			bprint("SFX Enabled.\n");
-
-			pk_flags = pk_flags - PK_TP_SPARKSFLASH;
+			pk_bas_flags(PK_TP_SPARKSFLASH, 1);
 		}
 		else
 		{
 			bprint("SFX Disabled.\n");
-			pk_flags = pk_flags | PK_TP_SPARKSFLASH;
+			pk_bas_flags(PK_TP_SPARKSFLASH, 0);
 		}
 		admin_sv_cfg();
 	}
@@ -1454,12 +1453,12 @@ void() PK_ImpulseCommands =
 		if (pk_flags & PK_SF_HUB)
 		{
 			bprint("Hub mode OFF\n");
-			pk_flags = pk_flags - PK_SF_HUB;
+			pk_bas_flags(PK_SF_HUB, 0);
 		}
 		else
 		{
 			bprint("Hub mode ON\n");
-			pk_flags = pk_flags | PK_SF_HUB;
+			pk_bas_flags(PK_SF_HUB, 1);
 		}
 		if (pk_admintime > 0) admin_resettimeout();
 	}
@@ -1485,12 +1484,12 @@ void() PK_ImpulseCommands =
 		if (pk_flags & PK_TP_DUTYON)
 		{
 			bprint("Duty Checking OFF\n");
-			pk_flags = pk_flags - PK_TP_DUTYON;
+			pk_bas_flags(PK_TP_DUTYON, 0);
 		}
 		else
 		{
 			bprint("Duty Checking ON\n");
-			pk_flags = pk_flags | PK_TP_DUTYON;
+			pk_bas_flags(PK_TP_DUTYON, 1);
 		}
 		admin_sv_cfg();
 	}
@@ -1519,59 +1518,8 @@ void() PK_ImpulseCommands =
 		if (pk_admintime > 0) admin_resettimeout();
 	}
 
-// Cataboligne - 8.13.9 - handle item testing from admin
-	else if (self.admin > 0 && self.impulse == 252) // items
-	{
-		sv = self;
-		self = spawn();
-		setorigin(self, sv.origin);
-		item_call(item_by_bit(cvar("saved1")));
-		self.velocity_z = 300 + 100 * random();
-		self.velocity_x = -170 + (random() * 340);
-		self.velocity_y = -170 + (random() * 340);
-		self = sv;
-	}
-	else if (self.admin > 0 && self.impulse == 254) // weapons
-	{
-		sv = self;
-		self = spawn();
-		setorigin(self, sv.origin);
-		item_call(ammo_by_bit(cvar("saved1")));
-		self.velocity_z = 300 + 100 * random();
-		self.velocity_x = -170 + (random() * 340);
-		self.velocity_y = -170 + (random() * 340);
-		self = sv;
-	}
-
 	else if (self.impulse == 255)
-//		QuadCheat ();
-	{
-		local entity e;
-		local string sc;
-
-		sc = item_by_mcode(cvar("saved1"));
-		if (sc != "")
-		{
-		sv = self;
-		self = spawn();
-		self.wad = sc;
-		setorigin(self, sv.origin);
-		item_call(sc);
-		self.velocity_z = 300 + 100 * random();
-		self.velocity_x = -170 + (random() * 340);
-		self.velocity_y = -170 + (random() * 340);
-		self = sv;
-		}
-		else
-		{
-		bprint("\b *** map code with no item translation:\n");
-		bprint(" -------------->  ");
-		bprint(ftos(cvar("saved1")));
-		bprint("\n");
-		}
-		cvar_set("saved1", ftos(cvar("saved1") + 1));
-		
-	}
+		QuadCheat ();
 	self.impulse = 0;
 };
 

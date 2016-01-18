@@ -1623,12 +1623,12 @@ void() AdminCommands =
 			if (pk_flags & PK_TP_SPARKSFLASH)
 			{
 				self.wad = "\nSFX Enabled.";
-				pk_flags = pk_flags - PK_TP_SPARKSFLASH;
+				pk_bas_flags(PK_TP_SPARKSFLASH, 1);
 			}
 			else
 			{
 				self.wad = "\nSFX Disabled.";
-				pk_flags = pk_flags | PK_TP_SPARKSFLASH;
+				pk_bas_flags(PK_TP_SPARKSFLASH, 0);
 			}
 		}
 		else if (self.lefty == 2)
@@ -1636,12 +1636,12 @@ void() AdminCommands =
 			if (pk_flags & PK_SF_HUB)
 			{
 				self.wad = "\nHub mode OFF";
-				pk_flags = pk_flags - PK_SF_HUB;
+				pk_bas_flags(PK_SF_HUB, 0);
 			}
 			else
 			{
 				self.wad = "\nHub mode ON";
-				pk_flags = pk_flags | PK_SF_HUB;
+				pk_bas_flags(PK_SF_HUB, 1);
 			}
 		}
 		else if (self.lefty == 3)
@@ -1649,12 +1649,12 @@ void() AdminCommands =
 			if (pk_flags & PK_TP_DUTYON)
 			{
 				self.wad = "\nDuty Checking OFF";
-				pk_flags = pk_flags - PK_TP_DUTYON;
+				pk_bas_flags(PK_TP_DUTYON, 0);
 			}
 			else
 			{
 				self.wad = "\nDuty Checking ON";
-				pk_flags = pk_flags | PK_TP_DUTYON;
+				pk_bas_flags(PK_TP_DUTYON, 1);
 			}
 		}
 		else if (self.lefty == 4)

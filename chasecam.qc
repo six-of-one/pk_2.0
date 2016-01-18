@@ -836,7 +836,7 @@ void(float sel) cam_parms =
 	if (IROBOT(self)) return; // no cam for bots
 
 	CAM_DEF = 1; // compiled default for non dp engines
-	if (DARKPLACES || chaos)
+	if (DARKPLACES || chaos) // IDEA - move to live upd
 	{
 		CAM_DEF = cvar("sv_cam_def"); // dp var disables default cam
 		if (chaos)

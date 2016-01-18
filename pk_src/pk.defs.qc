@@ -38,7 +38,6 @@ string st_hub3					= "hub3";
 float pk_flags;							// replaces old usage of temp1, savedgamecfg stores this
 float pk_xsound;							// set to state of PK_XSOUND bit for sound code toggle
 
-.float mcode;								// map item code - handle sub lists
 float pk_itemovr;							// control items - admin override
 float pk_map;								// true if a painkeep map is loaded
 float pk_ditems;							// count painkeep items for dyn_items code
@@ -57,6 +56,7 @@ float pk_admintime;						// if > 0 - inactivity timer for admin mode
 float pk_adminframe;						// only do once per frame
 float LIVE_ADMIN				= 100;	// for being in game with admin privs - previous painkeep admin mode
 float ADMIN_LOGIN				= -2;		// .admin value for login
+float ADMINLOCK;						// polled from sv_c_adminlock
 float USER_MENU				= -1;		// .admin value that handles user menu - admin code set runs user menus
 float USER_TIMEOUT			= 5;		// timeout user menu in 5 secs
 float USER_IMPULSE			= 39;		// user menu impulse
@@ -82,6 +82,8 @@ float DYN_ARTFR;
 float DYN_ARTFR_ONLY; // if set true dynamic only adds artifacts to map
 float DYN_FORCE_CNT; // max forced items to load
 float DYN_START_TIME			= 5;	// seconds till dynamic spawner starts its thing - precache must cutoff before this, leave a couple secs for map load
+string (float mc) item_by_mcode;
+void(string cls) item_call;
 
 // respawn times
 //float RSP_AMMO; // these are dm 3 rules

@@ -72,13 +72,13 @@ pk_src/viswep.qc
 
 // painkeep code
 pk_src/mcode.qc
+pk_src/2dtrain.qc
 pk_src/pkitems.qc
 pk_src/pk_weapons.qc
 pk_src/pk_player.qc
 pk_src/meantime.qc
 pk_src/drip.qc
 pk_src/sparks.qc
-pk_src/2dtrain.qc
 pk_src/sound.qc
 pk_src/fallaway.qc
 pk_src/turret.qc

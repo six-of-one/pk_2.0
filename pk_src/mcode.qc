@@ -9,14 +9,22 @@
  * qc - map codes for wep cycling - chaos mod code
  *
  */
+ 
+.float mcode;								// map item code - handle sub lists
+.float scode;								// save item code - for restore
 
-float MIN_ITEM					= 100;
+//float MIN_ITEM					= 100;
 //float MAX_INVITEM			= 255;
 //float MAX_OLDQ				= 300;
-float MAX_ITEM					= 9999;
+float MAX_ITEM					= 1023;
+
+float ITEM_SET1				= 1023;
+float ITEM_SET2				= 1047552; // allows multiplexing of 2 x 1023 bit values in 1 float if needed
+
 
 // master code list
 
+/// quake 1
 // q1 wep ids
 float MC_AXE					= 100;
 float MC_SHOTGUN				= 101;
@@ -26,72 +34,68 @@ float MC_SUPER_NAILGUN		= 104;
 float MC_GRENADEL	 			= 105;
 float MC_ROCKETL				= 106;
 float MC_THUNDER				= 107;
-// pk wep ids
-float MC_EXPSHOTGUN			= 108;
-float MC_PULSE_NAILGUN		= 109;
-float MC_CHTHUNDR				= 110;
-float MC_GRAP					= 111;
-float MC_AIRGUN				= 112;
-
-// device ids - carryable stuff? (doesnt use ammo like a range wep)
-float MC_CARRYABLE			= 200;
-// pk weps;
-float MC_BEARTRAP				= 200;
-float MC_GRAVITY				= 201;
-float MC_SENTRY				= 202;
-float MC_CANOBEANS			= 203;
-// pk plus
-float MC_TOMB					= 204;
-float MC_EGO					= 205;
-float MC_PHONE					= 206;
-float MC_MASK					= 207;
-
-
 
 // ammo ids
-float MIN_AMMO					= 400;
-float MAX_AMMO					= 500;
-
-float MC_ASHELLS				= 400;
-float MC_ASHELLS_LG			= 401;
-float MC_ANAILS				= 402;
-float MC_ANAILS_LG			= 403;
-float MC_AROCKETS				= 404;
-float MC_AROCKETS_LG			= 405;
-float MC_ACELLS				= 406;
-float MC_ACELLS_LG			= 407;
-
-float MC_AEXPLSH				= 410;
+float MC_ASHELLS				= 108;
+float MC_ASHELLS_LG			= 109;
+float MC_ANAILS				= 110;
+float MC_ANAILS_LG			= 111;
+float MC_AROCKETS				= 112;
+float MC_AROCKETS_LG			= 113;
+float MC_ACELLS				= 114;
+float MC_ACELLS_LG			= 115;
 
 // armor ids
-float MC_ARMOR1				= 300;
-float MC_ARMOR2				= 301;
-float MC_ARMOR3				= 302;
-
-// NOTE: all items below are NOT inventory saveable
+float MC_ARMOR1				= 116;
+float MC_ARMOR2				= 117;
+float MC_ARMOR3				= 118;
 
 // key ids
-float MC_KEY1					= 303;
-float MC_KEY2					= 304;
+float MC_KEY1					= 119;
+float MC_KEY2					= 120;
 
 // special ids
-float MC_QUAD					= 306;
-float MC_PENT					= 307;
-float MC_RING					= 308;
-float MC_SUIT					= 309;
+float MC_QUAD					= 121;
+float MC_PENT					= 122;
+float MC_RING					= 123;
+float MC_SUIT					= 124;
 
-float MC_BACKPACK				= 310;
-
-float MC_HEALTHROT			= 311;
-float MC_HEALTH				= 312;
-float MC_HEALTHMEGA			= 313;
+float MC_HEALTHROT			= 125;
+float MC_HEALTH				= 126;
+float MC_HEALTHMEGA			= 127;
 
 // sigil id
-float MC_SIGIL					= 314;
-float MC_SIGIL1				= 315;
-float MC_SIGIL2				= 316;
-float MC_SIGIL4				= 317;
-float MC_SIGIL8				= 318;
+float MC_SIGIL					= 128;
+float MC_SIGIL1				= 129;
+float MC_SIGIL2				= 130;
+float MC_SIGIL4				= 131;
+float MC_SIGIL8				= 132;
+
+float MC_BACKPACK				= 133;
+
+/// painkeep
+// pk wep ids
+float MC_EXPSHOTGUN			= 140;
+float MC_PULSE_NAILGUN		= 141;
+float MC_CHTHUNDR				= 142;
+float MC_GRAP					= 143;
+float MC_AIRGUN				= 144;
+
+// device ids - carryable stuff? (doesnt use ammo like a range wep)
+//float MC_CARRYABLE			= 200;
+// pk weps;
+float MC_BEARTRAP				= 145;
+float MC_GRAVITY				= 146;
+float MC_SENTRY				= 147;
+float MC_CANOBEANS			= 148;
+// pk plus
+float MC_TOMB					= 149;
+float MC_EGO					= 150;
+float MC_PHONE					= 151;
+float MC_MASK					= 152;
+
+float MC_AEXPLSH				= 153;
+
 
 
 // fn(pk_mcode) - map code for items
@@ -120,6 +124,7 @@ float(string sc, entity e) pk_mcode =
 	else if (tsc == "weapon_airfist")								mc = MC_AIRGUN;
 	else if (tsc == "weapon_chainlg")								mc = MC_CHTHUNDR;
 	else if (tsc == "weapon_grapgun")								mc = MC_GRAP;
+	else if (tsc == "weapon_pulsenail")								mc = MC_PULSE_NAILGUN;
 	else if (tsc == "item_painkeep_gwell")							mc = MC_GRAVITY;
 	else if (tsc == "item_painkeep_turret")						mc = MC_SENTRY;
 	else if (tsc == "item_painkeep_beartrap")						mc = MC_BEARTRAP;
@@ -177,6 +182,25 @@ float(string sc, entity e) pk_mcode =
 
 };
 
+// implement for upgrades
+
+void () painkeep_weapon_touch;
+
+/*QUAKED weapon_pulsenail (0 .5 .8) (-16 -16 0) (16 16 32)
+*/
+
+void () weapon_pulsenail =
+{
+	precache_model ("progs/g_fnail.mdl");
+	setmodel (self, "progs/g_fnail.mdl");
+	self.weapon = IT_NAILGUN;
+	self.netname = "Pulse Rifle";
+	self.touch = painkeep_weapon_touch;
+	setsize (self,'-16 -16 0','16 16 56');
+	StartItem ();
+};
+
+
 // fn(item_by_mcode) - given map code mc, return call string
 
 string (float mc) item_by_mcode =
@@ -208,9 +232,6 @@ string (float mc) item_by_mcode =
 	if (mc == MC_SIGIL4)													return("item_sigil4");
 	if (mc == MC_SIGIL8)													return("item_sigil8");
 
-//	if (mc == MC_) return("item_");
-
-// wep ammo by bit
 	if (mc == MC_ASHELLS)												return("item_shells");
 	if (mc == MC_ANAILS)													return("item_spikes");
 	if (mc == MC_AROCKETS)												return("item_rockets");
@@ -230,6 +251,7 @@ string (float mc) item_by_mcode =
 	if (mc == MC_BEARTRAP)												return("item_painkeep_beartrap");
 	if (mc == MC_AEXPLSH)												return("item_painkeep_expshells");
 	if (mc == MC_CHTHUNDR)												return("weapon_chainlg");
+	if (mc == MC_PULSE_NAILGUN)										return("weapon_pulsenail");
 	if (mc == MC_GRAP)													return("weapon_grapgun");
 	if (mc == MC_AIRGUN)													return("weapon_airfist");
 	if (mc == MC_CANOBEANS)												return("item_painkeep_can");
@@ -238,6 +260,8 @@ string (float mc) item_by_mcode =
 	if (mc == MC_TOMB)													return("item_pkplus_tomb");
 	if (mc == MC_MASK)													return("item_pkplus_actor");
 	if (mc == MC_PHONE)													return("item_pkplus_phone");
+
+//	if (mc == MC_) return("item_");
 
 	return("");
 };

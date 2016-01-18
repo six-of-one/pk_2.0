@@ -669,19 +669,63 @@ void(float b) b_launch =
 	}
 };
 
-void() pk_srvcmd_load =
+void() start_loopcyc;
+
+// fn(pk_liveupd) - these cvar update live during game
+
+float st_pk_sfx;			// state vars - so we know when it changes
+float st_pk_hub;
+float st_pk_duty;
+
+// fn(pk_bas_flags) - set basic pk flags, handles cvar update, admin cfg
+
+// bt - bit
+// st - state, 1 or 0
+
+void(float bt, float st) pk_bas_flags =
 {
-	if (!DARKPLACES && !chaos) return;
+	if (bt == PK_SF_HUB)
+	{
+		if (st)	pk_flags = pk_flags | PK_SF_HUB;
+		else		pk_flags = pk_flags - (pk_flags & PK_SF_HUB);
+		if (DARKPLACES || chaos) cvar_set("sv_pk_hub", ftos(st));
+		st_pk_hub = st;
+	}
 
-	VW = cvar("sv_vw");
-	VW_ARMOR = cvar("sv_vw_armor");
-	PK_99 = cvar("sv_pk99");
-	PK_100 = cvar("sv_pk100");
-	PK_ART_DEF  = cvar("sv_pk_art");
+	if (bt == PK_TP_SPARKSFLASH)
+	{
+		if (st)	pk_flags = pk_flags | PK_TP_SPARKSFLASH;
+		else		pk_flags = pk_flags - (pk_flags & PK_TP_SPARKSFLASH);
+		if (DARKPLACES || chaos) cvar_set("sv_pk_sfx", ftos(st));
+		st_pk_sfx = st;
+	}
+
+	if (bt == PK_TP_DUTYON)
+	{
+		if (st)	pk_flags = pk_flags | PK_TP_DUTYON;
+		else		pk_flags = pk_flags - (pk_flags & PK_TP_DUTYON);
+		if (DARKPLACES || chaos) cvar_set("sv_pk_duty", ftos(st));
+		st_pk_duty = st;
+	}
+	admin_sv_cfg();
+};
+
+void() pk_liveupd =
+{
+// server controls
+
+	Q_100_OBJERR = cvar("sv_q100_objerr");
 	PK_100_OBJERR = cvar("sv_pk100_objerr");
+	ADMINLOCK = cvar("sv_c_adminlock");
 
-// respawn times
-	RSP_TIME = cvar("pk_rsp_time");
+	NOCIDE = 	cvar("sv_pl_nocide");
+	NOENVCIDE = cvar("sv_pl_nolavacide");
+
+// pk basics - if a cvar is changed, update status bit
+	
+	if (st_pk_sfx != cvar("sv_pk_sfx")) pk_bas_flags(PK_TP_SPARKSFLASH, cvar("sv_pk_sfx"));
+	if (st_pk_hub != cvar("sv_pk_hub")) pk_bas_flags(PK_SF_HUB, cvar("sv_pk_hub"));
+	if (st_pk_duty != cvar("sv_pk_duty")) pk_bas_flags(PK_TP_DUTYON, cvar("sv_pk_duty"));
 
 // q1 ammo
 	Q1_SHELLAMMO_MAX				= cvar("q1_shellammo_max");
@@ -703,28 +747,123 @@ void() pk_srvcmd_load =
 	PKPLUS_PHONEAMMO_MAX	= cvar("pk_max_phoneammo");
 
 	PK_MAX_LIVENT = cvar("pk_max_livent");
+// respawn times
+	RSP_TIME = cvar("pk_rsp_time");
+
+	PK_MAX_LIVENT = cvar("pk_max_livent");
+
+// cam stuff
+	DCAMTO = cvar("sv_cam_timeout");
+	DCAMTOACT = cvar("sv_cam_to_action");
+	FFW_LIMIT = cvar("sv_pl_ffwlimit");
+
+// viswep
+	VW = cvar("sv_vw");
+	VW_ARMOR = cvar("sv_vw_armor");
+
+// check for botmatch changes
+	if (deathmatch || coop)
+	if (cvar("sv_botmatch") != 0) b_launch(0);
+
+	if (cvar("pk_mapcode")) // print list of map codes available to console
+	{
+		cvar_set("pk_mapcode", "0");
+		local float f;
+		local string cl;
+		f = 1;
+		while (f < 1024)
+		{
+			cl =  item_by_mcode(f);
+			if (cl != "")
+			{
+				if (f < 10) bprint(" ");
+				if (f < 100) bprint(" ");
+				if (f < 1000) bprint(" ");
+				bprint(ftos(f));
+				bprint("  -  ");
+				bprint(cl);
+				bprint("\n");
+			}
+			f = f + 1;
+		}
+	}
+
+	if (cvar("pk_make")) // create item at player location if map code valid
+	{
+		local entity e, sv;
+		local string sc;
+
+		sc = item_by_mcode(cvar("pk_make"));
+		if (sc != "")
+		{
+		sv = self;
+		self = spawn();
+		self.wad = sc;
+		setorigin(self, sv.origin);
+		item_call(sc);
+		self.velocity_z = 300 + 100 * random();
+		self.velocity_x = -170 + (random() * 340);
+		self.velocity_y = -170 + (random() * 340);
+		self = sv;
+		}
+		else
+		{
+		bprint("\b *** map code with no item translation:\n");
+		bprint(" -------------->  ");
+		bprint(ftos(cvar("pk_make")));
+		bprint("\n");
+		}
+//		cvar_set("saved1", ftos(cvar("saved1") + 1));
+		cvar_set("pk_make", "0");
+	}
+}
+// fn(pk_monitor) - some sv_ commands are continuosly monitored
+
+void() pk_monitor =
+{
+	pk_liveupd();
+
+	self.nextthink = time + 15;
+};
+
+void() pk_srvcmd_load =
+{
+	if (!DARKPLACES && !chaos) return;
+
+	local entity e;
+
+	e = spawn();
+	e.think = start_loopcyc;
+	e.nextthink = time + 5;
+
+	e = spawn();
+	e.think = pk_monitor;
+	e.nextthink = time + 15;
+
+// set server flag bit stored states
+
+	st_pk_sfx = st_pk_hub = st_pk_duty = 0;
+	if (pk_flags & PK_TP_SPARKSFLASH) st_pk_sfx = 1;
+	if (pk_flags & PK_SF_HUB) st_pk_hub = 1;
+	if (pk_flags & PK_TP_DUTYON) st_pk_duty = 1;
+	
+	pk_liveupd(); // load live now
+
+// these all req. map reload for full effectiveness
+	PK_99 = cvar("sv_pk99");
+	PK_100 = cvar("sv_pk100");
+	PK_ART_DEF  = cvar("sv_pk_art");
 
 // q1
 	Q_99 = cvar("sv_q99");
 	Q_100 = cvar("sv_q100");
-	Q_100_OBJERR = cvar("sv_q100_objerr");
 // dynamic items
 	DYN_OVR = cvar("pk_dyn_ovr");
 	DYN_ART = cvar("pk_dyn_art");
 	if (!DYN_OVR && !(pk_flags & PK_DYNAMIC)) DYN_FORCE = cvar("pk_dyn_force");
 	DYN_ARTFR = cvar("pk_dyn_art_force");
 	DYN_FORCE_CNT = cvar("pk_dyn_force_cnt");
-// cam stuff
-	DCAMTO = cvar("sv_cam_timeout");
-	DCAMTOACT = cvar("sv_cam_to_action");
-	FFW_LIMIT = cvar("sv_pl_ffwlimit");
 
-	NOCIDE = 	cvar("sv_pl_nocide");
-	NOENVCIDE = cvar("sv_pl_nolavacide");
-
-// check for botmatch changes
-	if (deathmatch || coop)
-	if (cvar("sv_botmatch") != 0) b_launch(0);
 };
 
 void() pk_srvcmd_set =
@@ -738,6 +877,7 @@ void() pk_srvcmd_set =
 	PK_99 = FALSE;
 	PK_100 = FALSE; // if true run 100% true to pk v1.11
 	PK_100_OBJERR = FALSE;
+	ADMINLOCK = 0;
 
 // q1 control
 	Q_99 = FALSE;
@@ -803,6 +943,7 @@ void() pk_srvcmd_set =
 		registercvar("sv_c_mapcmd", "1");
 		registercvar("sv_c_mapcfg", "1");
 		registercvar("sv_c_srvcfg", "1");
+		registercvar("sv_c_adminlock", "0"); // if true, admin menu is locked out
 
 		registercvar("sv_vw", "1");
 		registercvar("sv_vw_armor", "0");
@@ -811,6 +952,11 @@ void() pk_srvcmd_set =
 		registercvar("sv_pk100", "0");
 		registercvar("sv_pk100_objerr", "0");
 		registercvar("sv_pk_art", "1");
+
+		registercvar("sv_pk_sfx", "1");
+		registercvar("sv_pk_hub", "1");
+		registercvar("sv_pk_duty", "0");
+
 // cam controls
 		registercvar("sv_cam_off", "0"); // set to 1 to turn cam off entirely
 		registercvar("sv_cam_def", "1"); // set to 0 to default to no cam view
@@ -867,24 +1013,116 @@ void() pk_srvcmd_set =
 		registercvar("pk_max_livent", "256");
 
 // map item upgrade loops
+/// loop master - no individual loops will run - possible to swamp loop sets this way
+// remove / replace
+/// 0 loop id set - ids 1 - 6 all 0, remove these items - 1+ set, change 0 to 1 and loop from there - 0 id never loaded again
+// plain loop
+/// 0 not set, 1 set - 2 - 6 not set, exit / remove - 2+ set, loop starting with id 1
+
+		registercvar("pk_cyc_master", "0"); // if true no individual loops
+		registercvar("pk_cyc_halt", "0"); // if true halt all loops, restore original items (0 or 1)
+		registercvar("pk_cyc_dyn", "0"); // if true include dynamic items in loop change
+		registercvar("pk_mapcode", "0"); // if true print mapcode item classname calls to console
+		registercvar("pk_make", "0"); // if set to valid map code, create item at player location
+// lg loop
+		registercvar("pk_cyc_lg_t", "-60"); // time for loop - if (-) neg, 20% val + random() * 80% val
+		registercvar("pk_cyc_lg_0", "0");
+		registercvar("pk_cyc_lg_1", "0");
+		registercvar("pk_cyc_lg_2", "0");
+		registercvar("pk_cyc_lg_3", "0");
+		registercvar("pk_cyc_lg_4", "0");
+		registercvar("pk_cyc_lg_5", "0");
+		registercvar("pk_cyc_lg_6", "0");
 // rl loop
-		registercvar("pk_rl_t", "-60"); // time for loop
-		registercvar("pk_rl_0", "0");
-		registercvar("pk_rl_1", "0");
-		registercvar("pk_rl_2", "0");
-		registercvar("pk_rl_3", "0");
-		registercvar("pk_rl_4", "0");
-		registercvar("pk_rl_5", "0");
-		registercvar("pk_rl_6", "0");
-// tl loop
-		registercvar("pk_gl_t", "-60"); // time for loop
-		registercvar("pk_gl_0", "0");
-		registercvar("pk_gl_1", "0");
-		registercvar("pk_gl_2", "0");
-		registercvar("pk_gl_3", "0");
-		registercvar("pk_gl_4", "0");
-		registercvar("pk_gl_5", "0");
-		registercvar("pk_gl_6", "0");
+		registercvar("pk_cyc_rl_t", "-60"); // default = 13 - 60 mins
+		registercvar("pk_cyc_rl_0", "0");
+		registercvar("pk_cyc_rl_1", "0");
+		registercvar("pk_cyc_rl_2", "0");
+		registercvar("pk_cyc_rl_3", "0");
+		registercvar("pk_cyc_rl_4", "0");
+		registercvar("pk_cyc_rl_5", "0");
+		registercvar("pk_cyc_rl_6", "0");
+// gl loop
+		registercvar("pk_cyc_gl_t", "-60");
+		registercvar("pk_cyc_gl_0", "0");
+		registercvar("pk_cyc_gl_1", "0");
+		registercvar("pk_cyc_gl_2", "0");
+		registercvar("pk_cyc_gl_3", "0");
+		registercvar("pk_cyc_gl_4", "0");
+		registercvar("pk_cyc_gl_5", "0");
+		registercvar("pk_cyc_gl_6", "0");
+// sng loop
+		registercvar("pk_cyc_sng_t", "-60");
+		registercvar("pk_cyc_sng_0", "0");
+		registercvar("pk_cyc_sng_1", "0");
+		registercvar("pk_cyc_sng_2", "0");
+		registercvar("pk_cyc_sng_3", "0");
+		registercvar("pk_cyc_sng_4", "0");
+		registercvar("pk_cyc_sng_5", "0");
+		registercvar("pk_cyc_sng_6", "0");
+// ng loop
+		registercvar("pk_cyc_ng_t", "-60");
+		registercvar("pk_cyc_ng_0", "0");
+		registercvar("pk_cyc_ng_1", "0");
+		registercvar("pk_cyc_ng_2", "0");
+		registercvar("pk_cyc_ng_3", "0");
+		registercvar("pk_cyc_ng_4", "0");
+		registercvar("pk_cyc_ng_5", "0");
+		registercvar("pk_cyc_ng_6", "0");
+// ssg loop
+		registercvar("pk_cyc_ssg_t", "-60");
+		registercvar("pk_cyc_ssg_0", "0");
+		registercvar("pk_cyc_ssg_1", "0");
+		registercvar("pk_cyc_ssg_2", "0");
+		registercvar("pk_cyc_ssg_3", "0");
+		registercvar("pk_cyc_ssg_4", "0");
+		registercvar("pk_cyc_ssg_5", "0");
+		registercvar("pk_cyc_ssg_6", "0");
+// pkw loop - painkeep range weps
+		registercvar("pk_cyc_pkw_t", "-60");
+		registercvar("pk_cyc_pkw_0", "0");
+		registercvar("pk_cyc_pkw_1", "0");
+		registercvar("pk_cyc_pkw_2", "0");
+		registercvar("pk_cyc_pkw_3", "0");
+		registercvar("pk_cyc_pkw_4", "0");
+		registercvar("pk_cyc_pkw_5", "0");
+		registercvar("pk_cyc_pkw_6", "0");
+// pkc loop - painkeep fire & forget
+		registercvar("pk_cyc_pkc_t", "-60");
+		registercvar("pk_cyc_pkc_0", "0");
+		registercvar("pk_cyc_pkc_1", "0");
+		registercvar("pk_cyc_pkc_2", "0");
+		registercvar("pk_cyc_pkc_3", "0");
+		registercvar("pk_cyc_pkc_4", "0");
+		registercvar("pk_cyc_pkc_5", "0");
+		registercvar("pk_cyc_pkc_6", "0");
+// art loop
+		registercvar("pk_cyc_art_t", "-60");
+		registercvar("pk_cyc_art_0", "0");
+		registercvar("pk_cyc_art_1", "0");
+		registercvar("pk_cyc_art_2", "0");
+		registercvar("pk_cyc_art_3", "0");
+		registercvar("pk_cyc_art_4", "0");
+		registercvar("pk_cyc_art_5", "0");
+		registercvar("pk_cyc_art_6", "0");
+// ammo loop
+		registercvar("pk_cyc_ammo_t", "-60");
+		registercvar("pk_cyc_ammo_0", "0");
+		registercvar("pk_cyc_ammo_1", "0");
+		registercvar("pk_cyc_ammo_2", "0");
+		registercvar("pk_cyc_ammo_3", "0");
+		registercvar("pk_cyc_ammo_4", "0");
+		registercvar("pk_cyc_ammo_5", "0");
+		registercvar("pk_cyc_ammo_6", "0");
+// itm loop
+		registercvar("pk_cyc_itm_t", "-60");
+		registercvar("pk_cyc_itm_0", "0");
+		registercvar("pk_cyc_itm_1", "0");
+		registercvar("pk_cyc_itm_2", "0");
+		registercvar("pk_cyc_itm_3", "0");
+		registercvar("pk_cyc_itm_4", "0");
+		registercvar("pk_cyc_itm_5", "0");
+		registercvar("pk_cyc_itm_6", "0");
 
 // q1
 		registercvar("sv_q99", "0");
@@ -912,6 +1150,7 @@ void() pk_srvcmd_set =
 		pk_mapcmd = cvar("sv_c_mapcmd");
 		pk_mapcfg = cvar("sv_c_mapcfg");
 		pk_srvcfg = cvar("sv_c_srvcfg");
+		ADMINLOCK = cvar("sv_c_adminlock");
 
 // NOTE: chaos eng doesnt need to store defaults this way - they will save in config.cfg
 
