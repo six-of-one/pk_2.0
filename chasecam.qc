@@ -12,7 +12,7 @@ chasecam file
 .float clientcolors; //controls coloring on scoreboard (this determines player colors exactly like the "color" command, except for using a single number that contains pants and shirt colors (pants + shirt * 16, 0-255 potentially), so be sure to set it for a bot)
 
 // already in pk for hub view
-// string CL_BOBAMT = "cl_bob 0.02\n"; // val for turning view bob back on when not in chasecam
+// string CL_BOBSET = "cl_bob 0.02\n"; // val for turning view bob back on when not in chasecam
 
 string CAM_MODEL = "progs/null.mdl";
 float CAM_DIST		= 100.0;
@@ -51,6 +51,25 @@ void( float opt ) Remove_chase_cam;
 // called by chase cam or player entities
 // hack - handles cl_bob deal - Cataboligne 1.8.8
 // IDEA - save bob value
+
+// fn(cam_setbob) - handle bob settings
+
+void(string bcm) cam_setbob =
+{
+	if (bcm == "")
+	{
+		if (cvar("cl_bob")) stuffcmd( self, "cl_bob 0\n" ); // dont bob view
+	}
+	else if (bcm == CL_BOBSET)
+	{
+		if (cvar("cl_bob") != CL_BOBVAL) stuffcmd( self, bcm ); // bob view setting
+	}
+	else
+	{
+		stuffcmd( self, bcm );
+	}
+};
+
 void( entity player_ent ) Chase_cam_setweapon =
 {
 	local entity e;
@@ -60,12 +79,14 @@ void( entity player_ent ) Chase_cam_setweapon =
 	if ( (self.dest2_x & CHSCAM_ON) )
 	{
 		self.weaponmodel = "";
-		stuffcmd( self, "cl_bob 0\n" ); // chase cam - dont bob view
+//		stuffcmd( self, "cl_bob 0\n" ); // chase cam - dont bob view
+		cam_setbob("");
 	}
 	else
 	{
 		W_SetCurrentAmmo();
-		stuffcmd( self, CL_BOBAMT ); // fpv - bob back on
+//		stuffcmd( self, CL_BOBSET ); // fpv - bob back on
+		cam_setbob(CL_BOBSET);
 	}
 	self = e;
 };
@@ -84,7 +105,7 @@ void( entity cam_owner, vector vpos ) Start_chase_cam =
 		return;
 	}
 
-	stuffcmd( cam_owner, "fov 80\n" );
+	stuffcmd( cam_owner, CAM_FOV );
 
 	chase_cam = spawn();
 
@@ -168,7 +189,7 @@ void() Reable_chase_cam =
 // FALSE = remove view but keep alive with Reable_chase_cam();-
 void( float opt ) Remove_chase_cam =
 {
-	stuffcmd( self.owner, "fov 90\n" );
+	stuffcmd( self.owner, STD_FOV );
 
 	// turn off bit-flag-
 	self.owner.dest2_x = self.owner.dest2_x - (self.owner.dest2_x & CHSCAM_ON);
@@ -196,6 +217,7 @@ void( float opt ) Remove_chase_cam =
 
 
 // fn(bot_renew) - do button push for bots on think or call
+// because bots, like sandmen __ALWAYS__ go to carosel to renew.
 
 // NOTE: does this need to be in a bot file?
 
@@ -204,12 +226,24 @@ void() bot_renew =
 		self.owner.health = -1;
 		self.owner.deadflag = DEAD_RESPAWNABLE;
 		self.think = SUB_Remove;
-		setorigin(self.owner, self.oldorigin);
+		self.nextthink = time + 0.2; // Cat - fixed 4.4.10 - these were not removing for frikbot
+
+	setorigin(self.owner, self.oldorigin);
 		self.owner.velocity = ' 0 0 0';
 		if (!intermission_running) 
 		{
 			self.owner.think = respawn;
 			self.owner.nextthink = time + 0.5;
+
+
+// TEST
+if (0)  {
+bprint("##		bot renewed: ");
+bprint(self.owner.netname);
+bprint("\n");
+}
+
+
 		}
 }
 
@@ -239,6 +273,16 @@ void () cam_deathmove =
 		{
 			self.owner.think = respawn;
 			self.owner.nextthink = time + 0.5;
+
+
+// TEST
+if (0)  {
+bprint("##		player renewed: ");
+bprint(self.owner.netname);
+bprint("\n");
+}
+
+
 		}
 		return;
 	}
@@ -255,6 +299,23 @@ void () cam_deathmove =
 			bot_renew();
 		return;
 	}
+	else if (DCAMTO && self.delay < time)
+	{
+		if (DCAMTOACT)
+		{
+//			self.owner.think = ClientDisconnect;
+//			self.owner.nextthink = time + 0.5;
+			stuffcmd( self.owner, "disconnect\n" );
+			remove(self);
+		}
+		else
+		{
+			self.owner.think = respawn;
+			self.owner.nextthink = time + 0.5;
+		}
+		return;
+	}
+
 // observers are very poor - no possesions
 	if (self.owner.frame || self.owner.effects || self.owner.weapon || self.owner.currentammo || self.owner.model != "progs/null.mdl")
 	{
@@ -278,7 +339,8 @@ void () cam_deathmove =
 		set_viewport(self.owner, self.owner);
 		sprint(self.owner,"your spirit is free!\n");
 	}
-	stuffcmd( self.owner, "fov 130\n" ); // I see short dead dudes - enforce crow vision
+	if (cvar("fov") != DCAM_FOV) stuffcmd( self.owner, DCAM_SET_FOV ); // I see short dead dudes - enforce crow vision
+
 	self.owner.weaponmodel = "";
 	self.owner.weapon = 0;
 	self.owner.flags = self.owner.flags | FL_ONGROUND;
@@ -293,7 +355,9 @@ void () cam_deathview =
 
 	if (!self.wait && self.owner.model != "progs/null.mdl")
 	{
+		self.delay = 0;
 		self.wait = time + 4;
+		if (DCAMTO) self.delay = DCAMTO + time;
 	}
 
 	if (self.wait < time) // when timed out go to deathmove code
@@ -395,7 +459,7 @@ void() Keep_cam_chasing_owner =
 
 	if (self.owner.solid == SOLID_NOT)
 	{
-//		stuffcmd( self.owner, "fov 90\n" );
+//		stuffcmd( self.owner, STD_FOV );
 
 		if (intermission_running)
 		{
@@ -702,7 +766,7 @@ void() Chase_cam_level_start =
 	e.owner = self;
 	e.nextthink = time + 0.2;
 	e.think = Chase_cam_lvlstart_think;
-	stuffcmd(self, "fov 90\n" ); // incase of crow vision
+	stuffcmd(self, STD_FOV ); // incase of crow vision
 };
 
 
@@ -816,6 +880,8 @@ void(float sel) cam_parms =
 	// QC has already initiated all death processes
 void () dead_cam_set =
 {
+	viswep_ld(self.vwepent, -2);
+
 	if (Q_100 || PK_100) return; // Cataboligne - 8.16.9 - quake compatability mode
 
 	if (self.flags & FL_CLIENT)

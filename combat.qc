@@ -68,6 +68,23 @@ void(entity targ, entity attacker) Killed =
 {
 	local entity oself;
 
+
+// TEST
+if (0)  {
+		bprint(">>>		kill ck: ");
+		bprint(attacker.netname);
+		if (attacker.owner)
+		{
+		bprint(" ( ");
+		bprint(attacker.owner.netname);
+		bprint(" )");
+		}
+		bprint(" - killed: ");
+		bprint(targ.netname);
+		bprint("\n");
+}
+
+
 	oself = self;
 	self = targ;
 
@@ -102,6 +119,17 @@ void(entity targ, entity attacker) Killed =
 
 	monster_death_use ();
 	self.th_die ();
+
+
+// TEST
+if (0)  {
+		bprint(">>>		cam ck: ");
+		bprint(targ.netname);
+		bprint(" died - removing visweps for: ");
+		bprint(self.netname);
+		bprint("\n");
+}
+
 
 	dead_cam_set(); // Cataboligne 9.11.3 purify - chase cam
 

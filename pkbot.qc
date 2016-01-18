@@ -699,6 +699,9 @@ void () BotDead =
 	}
 	self.think = respawnBot;
 	self.deadflag = DEAD_DEAD;
+
+	// attempt to fix viswep hang bug on pk*bot
+//	if (self.vwepent) viswep_ld(self.vwepent, -2); --- not fixed
 };
 
 void () BotDie =

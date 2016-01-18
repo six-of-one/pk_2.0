@@ -995,7 +995,7 @@ void() BotAI =
 // try some pk items randomly - Cataboligne - 9.29.9
 	else if (random() < 0.1)
 		use_pkitem();
-// end pk item,s
+// end pk items
 
 
 	bot_dodge_stuff();

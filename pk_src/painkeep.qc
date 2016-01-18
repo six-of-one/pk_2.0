@@ -174,6 +174,8 @@ void() PK_precache =
 
 	viswep_pre();
 
+	DARKPLACES = cvar("pr_checkextension"); // check for dp engine
+	
 	qweps = IT_AXE | IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN | IT_SUPER_NAILGUN | IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER | IT_LIGHTNING;
 	pkweps = PK_IT_AXE | PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT	| PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB
 							 | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // pk plus weps
@@ -189,6 +191,8 @@ void() PK_precache =
 // PK_100 - fix - needs to be admin toggle
 
 	PK_100 = FALSE; // if true run 100% true to pk v1.11
+
+	pk_srvcmd_set(); // get this here
 
 	PK_ART = PK_ART_DEF & !PK_100; // Cataboligne - 8.12.9 - pk artifacts support init - FIX - needs to read admin var
 	if (PK_ART) pk_art_precache(); // Cataboligne 8.12.9 purify - pk artifacts
@@ -234,7 +238,7 @@ void() PK_precache =
 	}
  }
 
-// set PK mode based on engine var | saved2
+// set PK mode based on engine var | saved*
 
 	pk_flags = pk_flags_ck = cvar("savedgamecfg");
 	pk_map = PK_mapmode(world.model);
@@ -423,6 +427,44 @@ float(string mp) PK_mapmode =
 	return(md);
 };
 
+// fn(pk_srvcmd_set) - setup new server control vars & load from cfg or alias
+
+// NOTE - only works under darkplaces for now
+
+void() pk_srvcmd_set =
+{
+	PK_ART_DEF  = TRUE;
+
+	if (!DARKPLACES) return;
+
+// new server controls
+	registercvar("sv_vw_armor", "0");
+	registercvar("sv_pk100", "0");
+	registercvar("sv_pk_art", "1");
+
+/*
+		if (pk_srvcmd)
+		{
+			localcmd("d");
+			localcmd(ADMINSRVCMD);
+			localcmd(mapname);
+			localcmd(ADMINSRVCMD);
+		}
+*/
+		if (pk_srvcfg)
+		{
+			localcmd("exec ");
+			localcmd("d_server.cfg\n");
+			localcmd("exec ");
+			localcmd(mapname);
+			localcmd("_server.cfg\n");
+		}
+	
+	VW_ARMOR = cvar("sv_vw_armor");
+	PK_100 = cvar("sv_pk100");
+	PK_ART_DEF  = cvar("sv_pk_art");
+};
+
 // called from many places - handles pk_mode 0 where map sets whether or not we use PK stuff
 
 // really sound(), mod for frikbot code
@@ -527,34 +569,6 @@ void(vector org) spawn_tfog2 =
 
 // special parms - for respawn
 
-void(entity e, float pt) test_parms =
-{
-// TESTING
-	stuffcmd (e, "alias");
-	stuffcmd (e, " parm1");
-//	stuffcmd (e, ftos(e.id));
-	stuffcmd (e," \"");
-	stuffcmd (e, "saved2 ");
-	stuffcmd (e, ftos(pt));
-	stuffcmd (e, "\"\n");
-
-	stuffcmd (e, "alias");
-	stuffcmd (e, " parm2");
-//	stuffcmd (e, ftos(e.id));
-	stuffcmd (e," \"");
-	stuffcmd (e, "saved2 ");
-	stuffcmd (e, ftos(e.items));
-	stuffcmd (e, "\"\n");
-
-	stuffcmd (e, "alias");
-	stuffcmd (e, " parm3");
-//	stuffcmd (e, ftos(e.id));
-	stuffcmd (e," \"");
-	stuffcmd (e, "saved2 ");
-	stuffcmd (e, ftos(e.pk_items));
-	stuffcmd (e, "\"\n");
-}
-
 void() SetNewParms_PK =
 {
 	parm1 = IT_SHOTGUN | IT_AXE;
@@ -650,6 +664,13 @@ void(entity spot) ClearSpawnPoint =
 
 // called from PutClientInServer
 
+// notes: does not include info_player_start - regular q1 dm spawn select does
+//			 if in single player & PK mode set for pk items, spawn is random.
+
+// fixing these if not in PK_100
+
+// IDEA: if no spawns, use whatever is available - ammo, teleports, etc. - dont give away goodies
+
 entity() PK_SelectSpawnPoint =
 {
 	local	entity spot, newspot, thing;
@@ -668,6 +689,35 @@ entity() PK_SelectSpawnPoint =
 
 // choose a info_player_deathmatch point
 
+// not PK_100 - support single player & coop - hey this is a request
+
+ if (!PK_100)
+ {
+	if (coop)
+	{
+		lastspawn = find (lastspawn,classname,"info_player_coop");
+		if (lastspawn == world)
+			lastspawn = find (lastspawn,classname,"info_player_start");
+		if (lastspawn != world)
+			return lastspawn;
+	}
+	else if (!deathmatch)
+	{
+		if (serverflags & 15)
+		{	// return with a rune to start
+			spot = find (world,classname,"info_player_start2");
+			if (spot)
+				return spot;
+		}
+
+		spot = find (world,classname,"info_player_start");
+		if (!spot)
+			error ("PutClientInServer: no info_player_start on level");
+		else
+			return(spot);
+	}
+ }
+ 
 // ok, find all spots that don't have players nearby
 
 	spots = world;
@@ -724,6 +774,8 @@ entity() PK_SelectSpawnPoint =
 };
 
 // config players for admin on spawn & map for players if cfg avail
+
+// code sets admin kby config & tries to run map commands - {mapname}.cfg file and any alias {mapname}_mapcmd
 
 void() pk_plcfg =
 {
@@ -790,9 +842,11 @@ void() PK_CIS =
 	self.pklastweapon = self.pk_currentitem;
 	self.pkprevweapon = self.pk_currentitem;
 
-	stuffcmd(self, CL_BOBAMT); // restore bobing - may have come from a hub vote
+	stuffcmd(self, CL_BOBSET); // restore bobing - may have come from a hub vote
 
 	self.pkplus_actortype = 0; // Cataboligne 8.12.9 purify - pk artifacts
+
+//	self.alpha = 0.5; // testing
 
 	if (!PK) return;
 
@@ -1146,7 +1200,7 @@ void() pk_clientdisconnect =
 	admin_sv_cfg();
 };
 
-// called from killed - updated client obit
+// called from killed - updated client obit for pk items
 
 void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 {

@@ -35,7 +35,7 @@ float pk_map;								// true if a painkeep map is loaded
 float pk_ditems;							// count painkeep items for dyn_items code
 float PK_DYNTO					= 120;	// timeout in 120 secs
 float PK_DYNRAD				= 8000;	// dynamic radius search 8000 units
-float DARKPLACES_ENGINE		= 3275;	// for detecting darkplaces - modded engine sets cvar("chaos") to this value
+float DARKPLACES;							// for detecting darkplaces - modded engine sets cvar("chaos") to this value
 float chaos;
 
 float PK_ADMIN;							// allow admin - set this to 0 to completely disable all admin
@@ -57,6 +57,11 @@ string ADMINTIME				= "float3\n"; // load the time out
 string ADMINMAPCMD			= "_mapcmd\n"; // append to mapname for alias cmd
 float pk_mapcmd				= 1; // TOD: admin option later
 float pk_mapcfg				= 1; // TOD: admin option later
+//string ADMINSRVCMD			= "_srvcmd\n"; // server vars alias cmd
+//float pk_srvcmd				= 1; // TOD: admin option later
+float pk_srvcfg				= 1; // TOD: admin option later
+
+void() pk_srvcmd_set;
 
 // item override admin
 
@@ -126,6 +131,12 @@ void() infinite_ammo;
 //DP_REGISTERCVAR - adds a new console cvar to the server console (in singleplayer this is the player's console), the cvar exists until the mod is unloaded or the game quits.
 //idea: LordHavoc - darkplaces implementation: LordHavoc
 float(string name, string value) registercvar = #93;
+
+//DP_MOVETYPEFOLLOW
+//idea: id Software, LordHavoc (redesigned)
+//darkplaces implementation: LordHavoc
+//movetype definitions:
+float MOVETYPE_FOLLOW = 12;
 
 // relocated from defs.qc
 
@@ -310,7 +321,8 @@ float ignorearmor;
 
 // hub ops
 //float PK_SF_HUB = 16;
-string CL_BOBAMT                          = "cl_bob 0.02\n"; // val for turning view bob back on when not exited hub
+string CL_BOBSET           = "cl_bob 0.02\n"; // val for turning view bob back on when not exited hub
+float CL_BOBVAL				= 0.02; // standard bob amount
 float PK_SF_HUB				= 1024;	// moved to pk_flags
 float PK_TP_TIMEMASK			= 63;
 float inHubMap;
@@ -483,15 +495,23 @@ void() pk_placeitem;
 // Rotation
 .vector neworigin;
 .vector rotate;
-.float  endtime;
-.float  rotate_type;
+.float endtime;
+.float rotate_type;
 .string path;
 .string group;
 .string event;
-.float      duration;
+.float duration;
 
 
 void() dead_cam_set; // Cataboligne 9.11.3 purify proto - chase cam
+float DCAMTO					= 0; // testing 120; // timeout for death cam 2 mins
+float DCAMTOACT				= 0; // action after timeout 0 = respawn, 1 = disconnect
+
+// cam vision field settings
+float DCAM_FOV					= 130; // dead cam crow vision
+string DCAM_SET_FOV			= "fov 130\n"; // set it if not set or changed
+string STD_FOV					= "fov 90\n";
+string CAM_FOV					= "fov 80\n"; // field for cam view
 
 // Cataboligne - projectile / cartridge fire(d) positioning - 9.30.9
 
@@ -542,11 +562,18 @@ float VWZ_CHTHUNDER			= 16;
 
 float VWX_HARP_IDLE			= 4;	// harpoon is fired, player standing idle
 float VWY_HARP_IDLE			= -10;
-float VWZ_HARP_IDLE			= -4;
+float VWZ_HARP_IDLE			= -6;
 
 float VWX_HARP_RETR			= 8;	// harpoon being retracted
 float VWY_HARP_RETR			= 8;
 float VWZ_HARP_RETR			= 0;
+
+
+// testing
+.float alpha; // darkplaces model transparency!
+
+entity lastspawn;
+
 /*
 
 NOTES:

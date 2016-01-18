@@ -167,7 +167,7 @@ void () main =
 };
 
 
-entity lastspawn;
+//entity lastspawn;		// Cataboligne @ 1.20.10 - moved for pk 2.0
 
 //=======================
 /*QUAKED worldspawn (0 0 0) ?
@@ -397,15 +397,6 @@ void () InitBodyQue =
 		f = f - 1;
 	}
 	bodyque_head.owner = e; // close loop
-/*
-	bodyque_head.owner = spawn ();
-	bodyque_head.owner.classname = "bodyque";
-	bodyque_head.owner.owner = spawn ();
-	bodyque_head.owner.owner.classname = "bodyque";
-	bodyque_head.owner.owner.owner = spawn ();
-	bodyque_head.owner.owner.owner.classname = "bodyque";
-	bodyque_head.owner.owner.owner.owner = bodyque_head;
-*/
 };
 
 

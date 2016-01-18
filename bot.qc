@@ -14,6 +14,9 @@
 
 /*
 
+NOTES: frikbot code duplicates some of this, so that code was used and this commented out
+if removing frikbot for any reason this will need to be restored
+
 deprecated for same fn in frikbot
 
 float(float clientno) ClientBitFlag =
@@ -484,15 +487,8 @@ void() bot_touch =
 
 	if (self.state == CACHE_ROUTE_TOUCH || self.state == BOT_TOUCHED_CACHE_ROUTE_TOUCH)
 	{
-		if (other.movetarget.movetarget){
+		if (other.movetarget.movetarget)
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
-if (0) {
-bprint("hi, code base here, ran bot cacheRoute for item ( ");
-bprint(self.classname);
-bprint(" , ");
-bprint(self.netname);
-bprint(" )\n");}
-}
 	}
 
 // NOTE: original code has bot call this after collecting item - this is slightly different as it calls it no matter what
@@ -501,12 +497,6 @@ bprint(" )\n");}
 	{
 		if (self.state == BOT_TOUCHED || self.state == BOT_TOUCHED_CACHE_ROUTE_TOUCH)
 		{
-if (0) {
-bprint("hi, code base here, ran bot_toucheditem for item ( ");
-bprint(self.classname);
-bprint(" , ");
-bprint(self.netname);
-bprint(" )\n");}
 			bot_toucheditem ();
 		}
 		e = other;
@@ -519,15 +509,7 @@ bprint(" )\n");}
 		if (e.think == player_run) e.think = e.th_run;
 		if (e.think == player_stand1) e.think = e.th_stand;
 		e.classname = "pk*bot";
-if (0) {
-bprint("hi, code base here, in PK - bot ( ");
-bprint(e.netname);
-bprint(" )	touched item ( ");
-bprint(self.classname);
-bprint(" , ");
-bprint(self.netname);
-if (self.solid == SOLID_NOT) bprint(") and collected it.\n");
-else bprint(" )\n");}
+
 	}
 };
 */
@@ -550,14 +532,6 @@ void(entity e) bot_BackpackSetup =
 
 void(entity e) bot_item_linx =
 {
-if (e.state)
-{
-bprint("hi, code base here with a dev note, this is odd: bot item ( ");
-bprint(e.classname);
-bprint(" , ");
-bprint(e.netname);
-bprint(" ) - already has .state set?\n");
-}
 
 // clear state for cacheRoute calls
 	e.state = 0;
@@ -581,7 +555,6 @@ bprint(" ) - already has .state set?\n");
 // health items
 	if (e.classname == "item_health") // || e.model == "maps/b_bh10.bsp" / "maps/b_bh25.bsp / maps/b_bh100.bsp
 	{
-//bprint("in bot item health\n");
 		e.state = BOT_TOUCHED;
 		e.th_weight = healthweight;
 		if (e.healtype == 2) // || e.model == "maps/b_bh100.bsp"
@@ -596,7 +569,6 @@ bprint(" ) - already has .state set?\n");
 // armor
 	if (e.model == "progs/armor.mdl") // IDEA: how to catch armor if model can change?
 	{
-//bprint("in bot item armor\n");
 		e.th_weight = armorweight;
 		e.th_cache = cachearmor;
 		e.th_update = updatearmor;
@@ -669,7 +641,6 @@ bprint(" ) - already has .state set?\n");
 // artifacts
 	if (e.touch == powerup_touch || e.pk_touch == powerup_touch)
 	{
-//bprint("in bot item powerup\n");
 		e.th_weight = artifactweight;
 		if (e.classname != "item_artifact_envirosuit")
 		{
@@ -684,20 +655,9 @@ bprint(" ) - already has .state set?\n");
 // any painkeep item - seems coder didnt program bot for these
 	if (e.pk_items || e.pk_currentitem || e.netname == "Exploding Shells") // yuk :(~
 	{
-//bprint("in bot item PK\n");
 	e.th_weight = dont_weight;
 	return;
 	}
-
-bprint("hi, code base here, this is odd: bot item ( ");
-bprint(e.classname);
-bprint(" , ");
-bprint(e.netname);
-bprint(" ) - fell through tests! - on: ");
-bprint(mapname);
-bprint(" @ ");
-bprint(vtos(e.origin));
-bprint("\n");
 
 /* deprecated for easy code above
 	if (e.classname == "item_artifact_super_damage")

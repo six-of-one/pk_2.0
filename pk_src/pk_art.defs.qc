@@ -10,7 +10,7 @@
  *
  */
  
- float PK_ART_DEF				= 1;	// admin uses to enable / disable artifacts support - compile with 0 to disable artifacts permanently
+ float PK_ART_DEF;			// admin uses to enable / disable artifacts support - compile with 0 to disable artifacts permanently
  float PK_ART;							// admin artifacts toggle - artifacts code works when non 0
  
 void(float sel) pk_art_parms;

@@ -134,20 +134,23 @@ void() pk_harpoon_frames =
 			{
 				self.weaponframe = self.weaponframe + 1;
 			}
-			if (!PK_100) stuffcmd( self, "cl_bob 0\n" ); // dont bob while pulling in
+			if (!PK_100) //stuffcmd( self, "cl_bob 0\n" ); // dont bob while pulling in
+				cam_setbob("");
 		}
 		else
 		{
 			self.weaponframe = 8;
 			if (!PK_100)
-			if ( !(self.dest2_x & CHSCAM_ON) ) stuffcmd( self, CL_BOBAMT );
+			if ( !(self.dest2_x & CHSCAM_ON) ) //stuffcmd( self, CL_BOBSET );
+				cam_setbob(CL_BOBSET);
 		}
 	}
 	else
 	{
 		self.weaponframe=0;
 		if (!PK_100)
-		if ( !(self.dest2_x & CHSCAM_ON) ) stuffcmd( self, CL_BOBAMT );
+		if ( !(self.dest2_x & CHSCAM_ON) ) //stuffcmd( self, CL_BOBSET );
+				cam_setbob(CL_BOBSET);
 	}
 
 };
@@ -207,38 +210,6 @@ void() player_pnail4	 =[$lightfatt4, player_pnail1]
 	pulse_idle();
 	self.nextthink = time + 0.2;
 };
-
-/*
-void() player_supernail1	 =[$lightfatt1, player_supernail2  ]
-{
-	self.effects = self.effects | EF_MUZZLEFLASH;
-
-	if (!self.button0)
-		{player_run ();return;}
-
-	self.weaponframe = self.weaponframe + 1;
-	if (self.weaponframe == 9)
-		self.weaponframe = 1;
-	SuperDamageSound();
-	W_FireSpikes (4);
-	self.attack_finished = time + 0.2;
-};
-
-void() player_supernail2	 =[$lightfatt2, player_supernail1  ]
-{
-	self.effects = self.effects | EF_MUZZLEFLASH;
-
-	if (!self.button0)
-		{player_run ();return;}
-
-	self.weaponframe = self.weaponframe + 1;
-	if (self.weaponframe == 9)
-		self.weaponframe = 1;
-	SuperDamageSound();
-	W_FireSpikes (-4);
-	self.attack_finished = time + 0.2;
-};
-*/
 
 // chain thunderbolt code & frames
 

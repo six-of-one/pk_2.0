@@ -15,23 +15,50 @@
 
 q3 support via translation
 
-q3 wep				pk wep
+q3 wep					pk wep
 ------------------------------------------
-bfg					chain_lg
-plasma				chain_lg
-machinegun			supernailgun / nailgun
-shotgun				supershotgun
-grapplinghook		harpoon
-railgun				gravity well / turret
-lighting				lighting
+bfg						chain_lg
+plasma					chain_lg
+machinegun				supernailgun / nailgun
+shotgun					supershotgun
+grapplinghook			harpoon
+railgun					gravity well / turret
+lighting					lighting
 ------------------------------------------
-slugs					explodeshells
-grenades				rockets
-lightning			cells
-bfg					cells
+slugs						explodeshells
+grenades					rockets
+lightning				cells
+bfg						cells
 ------------------------------------------
-armor shard			beartrap
-item health sm		candle
+armor shard				beartrap
+item_armor_combat		item_armor2
+item_armor_body		item_armorInv
+------------------------------------------
+item health sm			candle
+item_health_large		item_health
+item_health_mega		item_health
+------------------------------------------
+item_quad				item_artifact_super_damage
+item_regen				item_artifact_invulnerability
+item_invis				item_artifact_invisibility
+item_enviro				item_artifact_envirosuit
+
+
+
+FIX FIX FIX
+
+- precache needed !
+
+SV_ModelIndex("progs/v_reggun.mdl"): not precached (fix your code), precaching anyway
+SV_ModelIndex("progs/v_q3_mgun.mdl"): not precached (fix your code), precaching anyway
+
+SV_SoundIndex("sound/misc/w_pkup.wav"): not precached (fix your code), precaching anyway
+SV_SoundIndex("sound/misc/am_pkup.wav"): not precached (fix your code), precaching anyway
+SV_SoundIndex("sound/items/respawn1.wav"): not precached (fix your code), precaching anyway
+SV_SoundIndex("reggun/fire4.wav"): not precached (fix your code), precaching anyway
+SV_SoundIndex("sound/weapons/machinegun/machgf1b.wav"): not precached (fix your code), precaching anyway
+SV_SoundIndex("sound/weapons/rocket/rocklf1a.wav"): not precached (fix your code), precaching anyway
+
 
 */
 
@@ -198,6 +225,8 @@ void() ammo_bfg =
 	item_cells();
 }
 
+// spawnfunc_ - because quake already has variables ammo_* and the function names cannot be used
+//  -- darkplaces has a special call mode for map items that appends spawnfunc_ to cover stuff like this
 
 //ammo_shells
 //ammo_rockets

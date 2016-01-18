@@ -6,6 +6,31 @@ Cataboligne 9.26.9
 
 */
 
+// TEST - check for errors in viswep chains
+string vw_error;
+
+void(entity e) vw_errck =
+{
+	local entity pr, tr, ltr;
+	tr = pr = e;
+	ltr = world;
+	while (tr)
+	{
+		if (tr.classname != "viswep")
+		{
+			vw_error = tr.classname;
+			if (tr.vwepent)
+			if (tr.vwepent.classname  == "viswep")
+				if (tr != e) ltr = tr.vwepent;
+			tr.vwepent = world;
+			pr.vwepent = ltr; // always unlink - yes this is a repair in a test situ
+		}
+		pr = tr;
+		tr = tr.vwepent;
+	}
+};
+
+
 .float viswframe; // special framing - drop / pull [not used yet]
 .entity exteriormodeltoclient; // dp var -- viswep deal - good fix for dp
 
@@ -26,6 +51,7 @@ void() viswep_pre =
 	precache_model ("progs/vw_rock.mdl");
 	precache_model ("progs/vw_light.mdl");
 // pk weps
+	precache_model ("progs/vw_pnailg.mdl");
 	precache_model ("progs/vw_cube.mdl");
 	precache_model ("progs/vw_sentry.mdl");
 	precache_model ("progs/vw_canpab.mdl");
@@ -33,10 +59,10 @@ void() viswep_pre =
 	precache_model ("progs/vw_airgun2.mdl");
 	precache_model ("progs/vw_clight.mdl");
 	precache_model ("progs/vw_beartrap.mdl");
-//	precache_model ("progs/vw_.mdl");
-//	precache_model ("progs/vw_.mdl");
-//	precache_model ("progs/vw_.mdl");
-//	precache_model ("progs/vw_.mdl");
+	precache_model ("progs/vw_pkp_actor.mdl");
+	precache_model ("progs/vw_pkp_ego.mdl");
+	precache_model ("progs/vw_pkp_phone.mdl");
+	precache_model ("progs/vw_pkp_tomb.mdl");
 // armor
 	precache_model ("progs/vw_armor.mdl");
 
@@ -54,7 +80,7 @@ float(float qw, float pkw) FL_MELEE =
 	local float c;
 
 	Q_MELEE = IT_AXE;
-	PK_MELEE = PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB;
+	PK_MELEE = PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE;
 
 	if (PK_100) PK_MELEE = PK_IT_AXE;
 
@@ -78,10 +104,9 @@ float(float qw, float pkw) FL_RANGE =
 	local float c;
 
 	Q_RANGE = IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN | IT_SUPER_NAILGUN | IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER | IT_LIGHTNING;
-	PK_RANGE = PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT
-									 | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // FIX - here only until vw_* models are avail to put them in melee - for now qgun
+	PK_RANGE = PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT;
 
-	if (PK_100) PK_RANGE = PK_RANGE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB;
+	if (PK_100) PK_RANGE = PK_RANGE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE;
 
 	c = FALSE;
 
@@ -100,7 +125,7 @@ float(float qw, float pkw) FL_RANGE =
 
 // need this because pk_items have carryable bits always set
 
-float pkbits; // global so _ld can use it
+//float pkbits; // global so _ld can use it
 
 float(entity e) mk_pkbits =
 {
@@ -122,10 +147,56 @@ float(entity e) mk_pkbits =
 	return(nbits);
 };
 
-// fn([pk]vload) - load up vwepent for and ent
+// fn([pk]vload) - load up vwepent for an ent
 
 // e - ent loading to
 // fl - flag of wep to load
+
+// TEST - finding viswep hanging bug
+void() vwep_tst =
+{
+	local entity tr;
+
+	tr = self.owner.vwepent;
+	if (tr == self)
+	if (0) 
+	if (self.delay)
+	{
+		self.delay = 1;
+		bprint("*** Test - tracking weps, I am a: ");
+		bprint(self.model);
+		if (self.vwepent) bprint(" +chain ");
+		bprint(" - carried by: ");
+		bprint(self.owner.netname);
+		bprint(" - ");
+		bprint(self.owner.classname);
+		if (self.owner.ishuman) bprint(" - a human.");
+		else bprint(" - a bot.");
+		bprint("\n");
+	}
+
+	while (tr)
+	{
+		
+		if (tr == self)
+		{
+			self.nextthink = time + 0.1;
+			return;
+		}
+		tr = tr.vwepent;
+	}
+	if (!self.wait) self.wait = time;
+		bprint("***			***\n");
+		bprint("***			*** Test - error - we (");
+		bprint(self.model);
+			bprint(") have been orphaned by: ");
+		bprint(self.owner.netname);
+		bprint(" -  at: ");
+		bprint(ftos(self.wait));
+		bprint("\n");
+	self.nextthink = time + 0.1;
+	self.think = SUB_Remove;
+};
 
 entity(entity e, float fl) vload =
 {
@@ -134,6 +205,11 @@ entity(entity e, float fl) vload =
 
 	md = "";
 	tr = e;
+// TEST - think for vwep check
+local float tst;
+//if (!tr.vwepent) 
+	tst = 1;
+
 	while (tr.vwepent)
 		tr = tr.vwepent;
 
@@ -161,20 +237,40 @@ entity(entity e, float fl) vload =
 	tr.vwepent.mdl = md;
 	setmodel(tr.vwepent, md);
 
-// devmsg
-if (cvar("saved1") == 991)
-{
-dprint("\nvw add: ");
-dprint(ftos(tr.vwepent.weapon) );
-dprint(" mdl: ");
-dprint(tr.vwepent.mdl );
-dprint("\n");
-}
+/*
+	if (DARKPLACES) // TEST - trying movement deal
+	{
+		tr.vwepent.movetype = MOVETYPE_FOLLOW; // make the tr.vwepent follow
+		tr.vwepent.solid = SOLID_NOT; // MOVETYPE_FOLLOW is always non-solid
+		tr.vwepent.aiment = e; // make the tr.vwepent follow e
+		tr.vwepent.punchangle = e.angles; // the original angles of e
+		tr.vwepent.view_ofs = '0 0 0'; //tr.vwepent.origin - e.origin; // relative origin
+		tr.vwepent.v_angle = '0 0 0'; //tr.vwepent.angles - e.angles; // relative angles
+	}
+*/
 
+// TEST
+//if (fl != IT_AXE) {
+if (0) {
+bprint(" -----		  call load: ");
+bprint(md);
+bprint(" for: ");
+bprint(e.netname);
+bprint("\n");
+}
+if (tst)
+{
+	tr.vwepent.think = vwep_tst;
+	tr.vwepent.nextthink = time + 0.5;
+}
 	return(tr.vwepent);
 };
 
-void(entity e, float fl) pkvload =
+//TEST
+entity
+
+//void
+(entity e, float fl) pkvload =
 {
 	local entity tr;
 	local string md;
@@ -195,27 +291,32 @@ void(entity e, float fl) pkvload =
 	else if (fl == PK_IT_AIRGUN) md = "progs/vw_airgun2.mdl";
 	else if (fl == PK_IT_CLIGHT) md = "progs/vw_clight.mdl";
 	else if (fl == PK_IT_BEARTRAP) md = "progs/vw_beartrap.mdl";
-//	else if (fl == PKPLUS_IT_EGO) md = "progs/vw_.mdl";
-//	else if (fl == PKPLUS_IT_TOMB) md = "progs/vw_.mdl";
-//	else if (fl == PKPLUS_IT_ACTOR) md = "progs/vw_.mdl";
-//	else if (fl == PKPLUS_IT_PHONE) md = "progs/vw_.mdl";
+	else if (fl == PKPLUS_IT_EGO) md = "progs/vw_pkp_ego.mdl";
+	else if (fl == PKPLUS_IT_TOMB) md = "progs/vw_pkp_tomb.mdl";
+	else if (fl == PKPLUS_IT_ACTOR) md = "progs/vw_pkp_actor.mdl";
+	else if (fl == PKPLUS_IT_PHONE) md = "progs/vw_pkp_phone.mdl";
 
 	if (md == "") md = VW_DEFGUN;
 	tr.mdl = md;
 	setmodel(tr, md);
 
-// devmsg
-
-if (cvar("saved1") == 991)
-{
-dprint("\npkvw add: ");
-dprint(ftos(fl) );
-dprint(" under: ");
-dprint(ftos(tr.weapon) );
-dprint(" mdl: ");
-dprint(tr.vwepent.mdl );
-dprint("\n");
+// TEST
+if (0) {
+bprint(" -----		call pkload: ");
+bprint(md);
+bprint(" for: ");
+bprint(e.netname);
+bprint("\n");
 }
+
+if (1)
+{
+	tr.think = vwep_tst;
+	tr.nextthink = time + 0.5;
+}
+return(tr);
+// TEST
+
 
 };
 
@@ -245,22 +346,85 @@ entity(float qw, float pkw, entity vh) vchk =
 void(entity vh, float cd) viswep_ld =
 {
 	local entity tr, pr;
-	local float bts, pkts, f, at;
+	local float pkbits, bts, pkts, f, at;
 
 	tr = vh;
 	pr = self;
 	at = pkts = bts = 0;
 
+	pkbits = mk_pkbits(self);
+
+// TEST
+	local float nvw, fld;
+if (!tr) nvw = 1;// came in with null viswep set
+
+
+
 // NOTE: fix - need unload (-1) here
 	if (cd < 0)
 	{
+
+
+// TEST
+if (0) //!tr) // came in with null viswep set
+if (!tr)
+{
+	bprint("*** null viswep set for: ");
+	bprint(self.netname);
+	bprint(" - ");
+	bprint(self.classname);
+	bprint("\n");
+}
+
+
 		while (tr)
 		{
+
+
+// TEST
+if (0) {
+if (tr == vh) bprint(">>>    Unlinking for ");
+if (tr == vh) bprint(tr.owner.netname);
+if (tr == vh) bprint("	---	");
+bprint(tr.model);
+bprint(" --- ");
+}
+
+// TEST *** VW ERROR
+if (tr == vh) {vw_errck(vh);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: viswep_ld: ");
+		bprint(ftos(cd));
+		bprint("\n");
+	}}
+
+
 			pr = tr;
 			tr = tr.vwepent;
+			pr.mdl = "";
 			remove(pr);
+
+// TEST
+if (0) 
+if (!tr)
+{
+bprint(" -- ");
+bprint(ftos(tr.owner.items));
+bprint(" -- pk = ");
+bprint(ftos(mk_pkbits(tr.owner)));
+}
+
 		}
-		self.vwepent = world;
+		if (self) // because we may come here with self = first viswep ent
+		if (self.classname != "viswep")
+			self.vwepent = world;
+
+// TEST
+//bprint("\n");
+
 
 //		if (cd == -3)
 //		{
@@ -269,6 +433,10 @@ void(entity vh, float cd) viswep_ld =
 //		}
 		return;
 	}
+
+// TEST
+float unlk;
+
 // have items & check for inventory
 	while (tr)
 	{
@@ -277,14 +445,15 @@ void(entity vh, float cd) viswep_ld =
 			at = self.armortype;
 			if (!at)
 			{
+				tr.mdl = "";
 				tr.think = SUB_Remove;
 				tr.nextthink = time + 0.01;
 				tr.model = "";
 				pr.vwepent = tr.vwepent;
 			}
-			if (at == 0.3) tr.skin = 0;
-			else if (at == 0.6) tr.skin = 1;
-			else if (at == 0.8) tr.skin = 2;
+			if (at > 0.6) tr.skin = 2;
+			else if (at <= 0.6) tr.skin = 1;
+			else if (at <= 0.3) tr.skin = 0;
 			tr.armortype = at;
 		}
 		else
@@ -292,11 +461,34 @@ void(entity vh, float cd) viswep_ld =
 		{
 			if (! tr.weapon & self.items)
 			{
+
+
+// TEST
+if (0) {
+		bprint("*** Unlinking -  a: ");
+		if (tr.model != "") bprint(tr.model);
+		else  eprint(tr);
+//		else { bprint(tr.classname); bprint(" - "); bprint(tr.netname); }
+		if (tr.vwepent) bprint(" +chain ");
+		bprint(" - carried by: ");
+		bprint(tr.owner.netname);
+		bprint(" - ");
+		bprint(tr.owner.classname);
+		if (tr.owner.ishuman) bprint(" - a human -- ");
+		else bprint(" - a bot -- ");
+bprint(ftos(tr.owner.items));
+bprint(" -- pk = ");
+bprint(ftos(mk_pkbits(tr.owner)));
+		bprint("\n");
+		unlk = 1;
+}
+
+				tr.mdl = "";
 				tr.think = SUB_Remove;
 				tr.nextthink = time + 0.01;
 				tr.model = "";
 				pr.vwepent = tr.vwepent;
-			}
+				}
 			else
 				bts = bts | tr.weapon;
 		}
@@ -304,6 +496,28 @@ void(entity vh, float cd) viswep_ld =
 		{
 			if (! tr.pk_currentitem & pkbits)
 			{
+
+
+// TEST
+if (0) {
+		bprint("*** Unlinking -  a: ");
+		if (tr.model != "") bprint(tr.model);
+		else  eprint(tr);//{ bprint(tr.classname); bprint(" - "); bprint(tr.netname); }
+		if (tr.vwepent) bprint(" +chain ");
+		bprint(" - carried by: ");
+		bprint(tr.owner.netname);
+		bprint(" - ");
+		bprint(tr.owner.classname);
+		if (tr.owner.ishuman) bprint(" - a human -- ");
+		else bprint(" - a bot -- ");
+bprint(ftos(tr.owner.items));
+bprint(" -- pk = ");
+bprint(ftos(mk_pkbits(tr.owner)));
+		bprint("\n");
+		unlk = 1;
+}
+
+				tr.mdl = "";
 				tr.think = SUB_Remove;
 				tr.nextthink = time + 0.01;
 				tr.model = "";
@@ -314,16 +528,50 @@ void(entity vh, float cd) viswep_ld =
 		}
 		pr = tr;
 		tr = tr.vwepent;
+
+
+// TEST
+if (0) //unlk)
+{
+		bprint("    --- Unlinked ");
+		if (tr) bprint("trace is: ");
+		if (tr) bprint(tr.model);
+		if (pr) if (pr.model != "") bprint(" -  prev is: ");
+		if (pr) if (pr.model != "") bprint(pr.model);
+		if (pr) if (pr.model == "") bprint(" -  prev is deleted ");
+		if (tr.vwepent) bprint(" -  next trace is: ");
+		if (tr.vwepent) bprint(tr.vwepent.model);
+		if (!tr && !pr) bprint(" -  nothing left.");
+		bprint("\n");
+}
+unlk = 0;
+
+
 	}
 
 	if (VW_ARMOR)
 	if (self.armortype && !at)
 	{
 		tr = vload(self, IT_ARMOR1);
-		if (self.armortype == 0.3) tr.skin = 0;
-		else if (self.armortype == 0.6) tr.skin = 1;
-		else if (self.armortype == 0.8) tr.skin = 2;
+
+// TEST
+if (0) 
+if (!nvw) {
+if (!fld) {
+	bprint(">>>    loading arm for ");
+	bprint(self.netname);
+	bprint("	---	");
+	fld = 1;
+}
+		bprint(tr.model);
+		bprint(" --- ");
+}
+
+
 		tr.armortype = at = self.armortype;
+		if (tr.armortype > 0.6) tr.skin = 2;
+		else if (tr.armortype <= 0.6) tr.skin = 1;
+		else if (tr.armortype <= 0.3) tr.skin = 0;
 	}
 //	if (!pkbits)
 //	if ((self.items & IT_AXE) && !(bts & IT_AXE))
@@ -332,50 +580,99 @@ void(entity vh, float cd) viswep_ld =
 	f = 1;
 	while ( f & qweps && f < 8388609 ) // NOTE: this will not load an axe
 	{
-if (cvar("saved1") == 992)
-{
-dprint("q load test: ");
-dprint(ftos(f) );
-dprint(" bts: ");
-dprint(ftos(bts & f) );
-dprint("\n");
-}
-		if ((self.items & f) && !(bts & f))
+		if ((self.items & f) && !(bts & f)){
+// TEST
+			tr = 
 			vload(self, f);
+
+// TEST
+if (0) 
+if (!nvw) {
+if (!fld) {
+	bprint(">>>    loading qw for ");
+	bprint(self.netname);
+	bprint("	---	");
+	fld = 1;
+}
+		bprint(tr.model);
+		bprint(" --- ");
+
+}
+}
+
+
 		f = f * 2;
 	}
 
 	f = 1;
 	while ( f & pkweps && f < 8388609 )
 	{
-if (cvar("saved1") == 992)
-{
-dprint("pk load test: ");
-dprint(ftos(f) );
-dprint(" pkts: ");
-dprint(ftos(pkts & f) );
-dprint(" pkbits: ");
-dprint(ftos(pkbits) );
-dprint("\n");
-}
-		if ((pkbits & f) && !(pkts & f))
+		if ((pkbits & f) && !(pkts & f)){
+// TEST
+			tr = 
 			pkvload(self, f);
+
+// TEST
+if (0) 
+if (!nvw) {
+if (!fld) {
+	bprint(">>>    loading pkw for ");
+	bprint(self.netname);
+	bprint("	---	");
+	fld = 1;
+}
+		bprint(tr.model);
+		bprint(" --- ");
+}
+
+}
+
+
 		f = f * 2;
 	}
 
-tr =self.vwepent;
-if (cvar("saved1") == 993)
-while (tr)
-{
-dprint("vw: ");
-dprint(ftos(tr.weapon) );
-dprint(" pki: ");
-dprint(ftos(tr.pk_currentitem) );
-dprint(" mdl: ");
-dprint(tr.mdl );
-dprint("\n");
+if (0) 
+if (fld)  {
+bprint(" -- ");
+bprint(ftos(self.items));
+bprint(" -- pk = ");
+bprint(ftos(mk_pkbits(self)));
+bprint("\n");
+}
 
-tr = tr.vwepent;
+
+// TEST *** VW ERROR
+vw_errck(vh);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: viswep_ld: ");
+		bprint(ftos(cd));
+		bprint("\n");
+	}
+
+// TEST 
+if (0) 
+if (nvw)
+{
+	tr = self.vwepent;
+bprint(">>>    Just linked for ");
+bprint(tr.owner.netname);
+bprint(" - self = ");
+bprint(self.netname);
+bprint("	---	");
+	while (tr)
+	{
+		bprint(tr.model);
+		bprint(" --- ");
+		tr = tr.vwepent;
+	}
+bprint(" -- ");
+bprint(ftos(self.items));
+bprint(" -- pk = ");
+bprint(ftos(mk_pkbits(self)));
+bprint("\n");
 }
 
 };
@@ -395,6 +692,20 @@ void() viswep_pkbot =
 	while (self)
 	{
 		viswep_post();
+
+
+// TEST *** VW ERROR
+vw_errck(self.vwepent);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: pkbot post: ");
+		bprint(self.netname);
+		bprint("\n");
+	}
+
+
 // bot post think checks - NOTE: need to go elsewhere
 		if (self.copb_timeout)
 		{
@@ -420,21 +731,87 @@ void() viswep_pkbot =
 
 float vw_frame; // once per frame
 
-float tmpt; // dev msg - viswep frame tracking
-
 void() viswep_post =
 {
 	local entity vhead;
-	local float qld; 
+	local float qld, pkbits; 
 
 //	if (!self.flags & FL_CLIENT) return;
+
+
+// TEST *** VW ERROR
+vw_error = "";
+
+	vhead = find(world,classname,"pk*bot");
+	while (vhead)
+	{
+		if (vhead.vwepent)
+			vw_errck(vhead.vwepent);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: master entry: ");
+		bprint(vhead.netname);
+		bprint("\n");
+	}
+vw_error = "";
+
+		vhead = find(vhead,classname,"pk*bot");
+	}
+	vhead = find(world,classname,"player");
+	while (vhead)
+	{
+		if (vhead.vwepent)
+			vw_errck(vhead.vwepent);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: master entry: ");
+		bprint(vhead.netname);
+		bprint("\n");
+	}
+vw_error = "";
+
+		vhead = find(vhead,classname,"player");
+	}
+// TEST *** VW ERROR
+//vw_errck(self.vwepent);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: post entry: ");
+		bprint(self.netname);
+		bprint("\n");
+	}
 
 	if (vw_bot_frame != framecount)
 	if (self.classname != "pk*bot" && self.ishuman) viswep_pkbot();
 
 	if (self.deadflag || self.classname == OBSERVER || self.view_ofs == '0 0 0' || (self.admin && self.admin != USER_MENU)) //intermission_running)
 	{
+
+
+vw_errck(self.vwepent);
+
+
 		if (self.vwepent) viswep_ld(self.vwepent, -2); // unload all weps - for now just removes ent, later deadthrow what's not put in pack if died
+
+
+// TEST *** VW ERROR
+//vw_errck(self.vwepent);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: viswep logical (dead etc) unload on: ");
+		bprint(self.netname);
+		bprint("\n");
+	}
+
+
 		return;
 	}
 
@@ -460,23 +837,71 @@ void() viswep_post =
 			{
 				if (self.vwepent.vwepent)
 				{
+					self.vwepent.vwepent.mdl = "";
 					remove(self.vwepent.vwepent);
 					self.vwepent.vwepent = world;
 				}
 			}
 		}
+
+
+// TEST *** VW ERROR
+vw_errck(self.vwepent);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: viswep PK100 or Q100 on: ");
+		bprint(self.netname);
+		bprint("\n");
+	}
+
+
 	}
 	else
 	{
 
-	if (!vhead)
+	if (!vhead){
 		viswep_ld(vhead, 1);
+
+
+// TEST *** VW ERROR
+vw_errck(self.vwepent);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: viswep init - no chain on: ");
+		bprint(self.netname);
+		bprint("\n");
+	}
+}
+
 	else
-	if (self.items & qweps != vhead.items || vhead.armorvalue != self.armortype * VW_ARMOR) qld = TRUE;
+	{
+		if (self.items & qweps != vhead.items || vhead.armorvalue != self.armortype * VW_ARMOR) qld = TRUE;
 
-	pkbits = mk_pkbits(self);
-	if (vhead.pk_items != pkbits || qld) viswep_ld(vhead, 1);
+		pkbits = mk_pkbits(self);
+		if (vhead.pk_items != pkbits || qld) viswep_ld(vhead, 1);
+	}
 
+
+// TEST *** VW ERROR
+vw_errck(self.vwepent);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: viswep updating existing on: ");
+		bprint(self.netname);
+		bprint("\n");
+		
+		viswep_ld(vhead, -1);
+		viswep_ld(vhead, 1);
+	}
+
+
+	
 	}
 
 	if (!self.vwepent) return;
@@ -511,6 +936,7 @@ void() viswep_post =
 	//	vofs_z = vhead.finaldest_z;
 		if (vhead.owner.items & IT_INVISIBILITY) vhead.model = ""; // heh heh, player invisible
 		else
+		if (vhead.mdl != "" && vhead.classname == "viswep") // TEST - fix can not modify free ent, by ignoring anything not a viswep
 		if (vhead.model == "" || (vhead.origin + vofs) != vhead.owner.origin || vhead.angles != vhead.owner.angles || vhead.weaponframe != vhead.owner.frame) // update track
 			{
 			if (vhead.model == "") setmodel(vhead, vhead.mdl);
@@ -548,29 +974,86 @@ void() viswep_post =
 					if ( (vhead.owner.frame - gremlin_frame_adjust) < range_frames) vadd = viswaddf;
 				 }
 
-if (cvar("saved1") == 999)
-if (tmpt != vhead.owner.frame)  // test
-{
-tmpt = vhead.owner.frame;
-dprint("vwf = ");
-dprint(ftos(vframe));
-dprint(", vadd = ");
-dprint(ftos(vadd));
-dprint(", dwep = ");
-dprint(ftos(dwep));
-dprint(", pk: ");
-dprint(ftos(pkdwep) );
-dprint(", frame = ");
-dprint(ftos(vhead.owner.frame));
-dprint("\n");
-}
 				} // IDEA - viswframe weps on gremlins back for special frames
 			vhead.frame = vframe + vadd - gremlin_frame_adjust - grap_frame_adjust;
-			setorigin(vhead, vhead.owner.origin + vofs); // ... sync visible weapon model
-			vhead.angles = vhead.owner.angles;
+//			if (!DARKPLACES) // TEST
+//				{
+				setorigin(vhead, vhead.owner.origin + vofs); // ... sync visible weapon model
+				vhead.angles = vhead.owner.angles;
+//				}
 			}
 		vhead = vhead.vwepent;
 		}
+
+// TEST *** VW ERROR
+vw_errck(self.vwepent);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: post exit: ");
+		bprint(self.netname);
+		bprint("\n");
+	}
+/*
+	vhead = find(world,classname,"viswep");
+	while (vhead)
+	{
+		if (vhead.vwepent)
+		if (vhead.vwepent.classname != "viswep")
+		{
+		bprint("vw error - ");
+		bprint(vhead.vwepent.classname);
+		if (vhead.vwepent.classname == "")
+			bprint(vhead.vwepent.netname);
+			
+		bprint(" found in master test exit by: ");
+		bprint(vhead.model);
+		bprint(" - ");
+		bprint(vhead.owner.netname);
+		bprint("\n");
+		
+		vhead.vwepent = world; // NOTE: fixing in test!
+		}
+		vhead = find(vhead,classname,"viswep");
+	}
+*/
+vw_error = "";
+
+	vhead = find(world,classname,"pk*bot");
+	while (vhead)
+	{
+		if (vhead.vwepent)
+			vw_errck(vhead.vwepent);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: master exit: ");
+		bprint(vhead.netname);
+		bprint("\n");
+	}
+vw_error = "";
+
+		vhead = find(vhead,classname,"pk*bot");
+	}
+	vhead = find(world,classname,"player");
+	while (vhead)
+	{
+		if (vhead.vwepent)
+			vw_errck(vhead.vwepent);
+if (vw_error != "")
+	{
+		bprint("vw error - ");
+		bprint(vw_error);
+		bprint(" found in vw chain for: master exit: ");
+		bprint(vhead.netname);
+		bprint("\n");
+	}
+vw_error = "";
+
+		vhead = find(vhead,classname,"player");
+	}
 
 };
 

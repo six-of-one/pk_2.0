@@ -333,12 +333,6 @@ void() painkeep_touch =
 		if (self.state == BOT_TOUCHED || self.state == BOT_TOUCHED_CACHE_ROUTE_TOUCH) // *bot code - patch in bot_toucheditem for bots - routes here because this is PK master touch fn()
 		{
 			bot_toucheditem ();
-if (cvar("saved1") == 898) {
-bprint("hi, code base here, ran PK bot_toucheditem for item ( ");
-bprint(self.classname);
-bprint(" , ");
-bprint(self.netname);
-bprint(" )\n");}
 		}
 //		if (self.pk_touch != painkeep_touch) // bots dont get pktouch stuff yet...
 //		{
@@ -351,15 +345,8 @@ bprint(" )\n");}
 //	if (self.pk_touch != painkeep_touch)
 	if (self.state == CACHE_ROUTE_TOUCH || self.state == BOT_TOUCHED_CACHE_ROUTE_TOUCH) // *bot code - patch in cacheRoute for bot code - routes here because this is PK master touch fn()
 	{
-		if (other.movetarget.movetarget){
+		if (other.movetarget.movetarget)
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
-if (cvar("saved1") == 898) {
-bprint("hi, code base here, ran PK cacheRoute for item ( ");
-bprint(self.classname);
-bprint(" , ");
-bprint(self.netname);
-bprint(" )\n");}
-}
 	}
 
 	if (other.classname != "player") // pk - this is where the grap can grab stuff
@@ -387,15 +374,6 @@ bprint(" )\n");}
 			e.classname = "pk*bot";
 			if (e.think == player_run) e.think = e.th_run;
 			if (e.think == player_stand1) e.think = e.th_stand;
-if (cvar("saved1") == 899) {
-bprint("hi, code base here, in PK - bot ( ");
-bprint(e.netname);
-bprint(" )	touched item ( ");
-bprint(self.classname);
-bprint(" , ");
-bprint(self.netname);
-if (self.solid == SOLID_NOT) bprint(") and collected it.\n");
-else bprint(" )\n");}
 		}
 		if (pk_flags & PK_DYNAMIC) pk_dyn_touch();
 		return;
@@ -476,19 +454,6 @@ else bprint(" )\n");}
 
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
-
-if (e)
-//if (cvar("saved1") == 899)
-{
-bprint("hi, code base here, in PK  (item) - bot ( ");
-bprint(e.netname);
-bprint(" )	touched item ( ");
-bprint(self.classname);
-bprint(" , ");
-bprint(self.netname);
-if (self.solid == SOLID_NOT) bprint(") and collected it.\n");
-else bprint(" )\n");}
-
 	
 	if (pk_flags & PK_DYNAMIC) pk_dyn_touch();
 };
@@ -681,8 +646,9 @@ void() pk_item_position =
 	self.think = ip_checkForMovement;
 	self.nextthink = time + 60;
 
-if (self.classname == "dyn_item")
-bprint("********* err: dyn in item position *********");
+// dynamic items should not end up here
+//if (self.classname == "dyn_item")
+//bprint("********* error: dynamic in item position *********");
 
 };
 
@@ -695,8 +661,9 @@ void() pk_item_position_init =
 	self.think = ip_checkForMovement;
 	self.nextthink = time + 60;
 
-if (self.classname == "dyn_item")
-bprint("******** err: dyn in ip *********");
+// dynamic items should not end up here
+//if (self.classname == "dyn_item")
+//bprint("******** error: dynamic in ip *********");
 
 };
 
@@ -1180,18 +1147,6 @@ void(string cls, string rep, string am, string ram) item_repm =
 	}
 	sv = self;
 	e = find(world,wad,rep);
-/*
-bprint("repm set: ");
-bprint(cls);
-bprint(" for: ");
-bprint(rep);
-if (ram != "" && ram != am){
-bprint(" ammo set: ");
-bprint(am);
-bprint(" for: ");
-bprint(ram);}
-bprint("\n");
-//*/
 	while (e)
 	{
 		self = e;
@@ -1258,16 +1213,11 @@ void() item_loop =
 					sf = sf - 1;
 				}
 			}
-			if (sf < 1) {f = lvl; bprint("cyc failed!\n ");}
+			if (sf < 1) f = lvl;
 			else
 			{
 				pko = f | CON_ONLY | CON_CYC;// | pko - (pko & (CON_NONE | CON_SUBS));
 				pks = pks | f;
-//bprint("cyc item: ");
-//bprint(item_by_bit(f));
-//bprint(", #: ");
-//bprint(ftos(f));
-//bprint("\n");
 			}
 		}
 		else if (pko & CON_SUBS) // find a valid substitute code
@@ -1281,12 +1231,6 @@ void() item_loop =
 				sf = sf - 1;
 			}
 			if (e < lvls || sf < 1) pko = pko - (pko & CON_SUBS); // cant sub if no sub item - can this happen?
-if (pko & CON_SUBS) {
-bprint("replacement item set: ");
-bprint(item_by_bit(e));}
-else
-bprint("NONE AVAILABLE!");
-bprint("\n");
 		}
 
 	if (f != lvl)
@@ -1300,29 +1244,19 @@ bprint("\n");
 		{
 			if (pko & CON_ONLY)
 			{
-//bprint("only item: ");
-//bprint(item_by_bit(f));
 				for (e = lvls;e < lvl; e = e * 2)
 				{
 					cl = item_by_bit(f);
 //					if (e != f)//{
 					item_repm(cl, item_by_bit(e), ammo_by_bit(f), ammo_by_bit(e));
-//bprint(", tko: ");
-//bprint(item_by_bit(e));}
 
 				}
-//bprint("\n");
 			}
 			else if (pko & CON_NONE)
 			{
-bprint("remove item: ");
-bprint(item_by_bit(f));
 				cl = item_by_bit(e);
 				if (pko & CON_SUBS) item_repm(cl, item_by_bit(f), ammo_by_bit(e), ammo_by_bit(f));
 				else item_repm("", item_by_bit(f), "", ammo_by_bit(f));
-if (pko & CON_SUBS) {bprint(", sub item: "); bprint(item_by_bit(e));}
-else bprint(", gone!");
-bprint("\n");
 			}
 			else if (pko & CON_INF)
 				item_repm("rest", item_by_bit(f), "", ammo_by_bit(f));
@@ -1359,7 +1293,6 @@ bprint("\n");
 	{
 		self.nextthink = time + CYC_TIME + crandom() * CYC_TIME;
 		self.count = pks; // next cycle starts at these items
-//bprint("set cyc time\n");
 	}
 	else
 		remove(self);
@@ -1454,20 +1387,11 @@ void() dyn_spawn =
 	rseu = sv;
 	self.origin = sv.origin + ' 0 0 16';
 // give players notice
-bprint("dyn found ");
-bprint(ftos(ri));
-bprint(" -items, spawning: ");
-bprint(self.wad);
-bprint(" at: ");
-bprint(vtos(self.origin));
-bprint(" - ");
-bprint(sv.classname);
 	item_call(self.wad);
 	sv = spawn();
 	sv.enemy = self;
 	sv.think = dyn_rem;
 	sv.nextthink = time + PK_DYNTO + crandom() * 55;
-	bprint("\n");
 };
 
 // think to handle dynamic item spawns if enabled
@@ -1485,9 +1409,6 @@ void() dyn_item =
 
 	if (self.classname != "dyn_spawner")
 	{
-bprint("* dynamic items entry: ");
-bprint(ftos(pk_ditems));
-bprint(" items total\n");
 		self.classname = "dyn_spawner";
 		self.nextthink = time + 5;// TEST 40 + 20 * crandom();
 		self.count = 4 + 4 * random();
@@ -1503,11 +1424,6 @@ bprint(" items total\n");
 	if (pk_ditems < self.count)
 	 {
 		cd = 1 + 2 * random();
-bprint("*** dynamic spawning: ");
-bprint(ftos(pk_ditems));
-bprint(" items total - add attempt: ");
-bprint(ftos(floor(cd)));
-bprint("\n");
 		while (cd > 0.2)
 		{
 			e = spawn();

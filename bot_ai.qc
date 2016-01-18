@@ -162,7 +162,10 @@ float () RunAway =
 			bprint (self.netname);
 			bprint (": Run for it, ");
 			bprint (self.enemy.netname);
-			bprint (" is the freaking Anti-Christ!\n");
+			if (random() < 0.7)
+				bprint (" is the freaking Anti-Christ!\n");
+			else
+				bprint (" has nasty pointy teeth!\n"); // Cat - 4.5.10 - Python mods
 		}
 		return (1);
 	}
@@ -234,7 +237,7 @@ float () RunAway =
 			if (runawayspeakchance <= 0.1)
 			{
 				bprint (self.netname);
-				bprint (": I'm being assraped by convicts!");
+				bprint (": help, tossed salads!");
 			}
 			use_pkitem();
 			return (1);
@@ -304,33 +307,50 @@ float () BotFoundTarget =
 		bprint (self.enemy.netname);
 		bprint ("!\n");
 	}
-	if ((huntspeakchance <= 0.020) && (huntspeakchance > 0.010))
+	else if ((huntspeakchance <= 0.020) && (huntspeakchance > 0.010))
 	{
 		bprint (self.netname);
 		bprint (": Don't Fuck with Daddy ");
 		bprint (self.enemy.netname);
 		bprint ("!\n");
 	}
-	if ((huntspeakchance <= 0.030) && (huntspeakchance > 0.020))
+	else if ((huntspeakchance <= 0.030) && (huntspeakchance > 0.020))
 	{
 		bprint (self.netname);
 		bprint (": Come meet my lil' friend ");
 		bprint (self.enemy.netname);
 		bprint ("!\n");
 	}
-	if ((huntspeakchance <= 0.040) && (huntspeakchance > 0.030))
+	else if ((huntspeakchance <= 0.040) && (huntspeakchance > 0.030))
 	{
 		bprint (self.netname);
 		bprint (": Looks like ");
 		bprint (self.enemy.netname);
-		bprint (" just shit his pants!\n");
+		if (random() < 0.4)
+			bprint (" just shit his pants!\n");
+		else
+			bprint (" is an empty headed animal food trough wiper!\n"); // Cat - 4.5.10 - Python mods
 	}
-	if ((huntspeakchance <= 0.050) && (huntspeakchance > 0.040))
+	else if ((huntspeakchance <= 0.050) && (huntspeakchance > 0.040))
 	{
 		bprint (self.netname);
 		bprint (": ");
 		bprint (self.enemy.netname);
 		bprint (" has 5 seconds to beg for mercy, Times up!\n");
+	}
+	else if ((huntspeakchance <= 0.060) && (huntspeakchance > 0.050)) // Cat - unk date - Python mods
+	{
+		bprint (self.netname);
+		bprint (": ");
+		bprint (self.enemy.netname);
+		bprint (" - Your mother was a hamster and your father smelt of elderberries!\n");
+	}
+	else if ((huntspeakchance <= 0.070) && (huntspeakchance > 0.060))
+	{
+		bprint (self.netname);
+		bprint (": ");
+		bprint (self.enemy.netname);
+		bprint (" has got two empy halves of coconuts and is banging them together!\n");
 	}
 	if (self.enemy == world)
 	{

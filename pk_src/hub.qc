@@ -193,10 +193,15 @@ void() hub_custom =
 
 // set appearance - model has different frames & skins for variety
 // IDEA - set facing in cphub? - not for now, all portals should be "directionless"
-	setmodel (self, "progs/hub_port.mdl");
-	setsize(self, self.mins, self.maxs);
-	self.frame = self.delay;
-	self.skin = self.wait;
+	if (self.delay < 0)
+		setmodel (self, "progs/null.mdl");
+	else
+	{
+		setmodel (self, "progs/hub_port.mdl");
+		setsize(self, self.mins, self.maxs);
+		self.frame = self.delay;
+		self.skin = self.wait;
+	}
 	if (self.style) self.effects = EF_DIMLIGHT; // lite er up
 //	if (self.frame) setorigin(self, self.origin + ' 0 0 -20'); // adjust on bprint
 
@@ -233,7 +238,8 @@ void() pk_cphub =
 	{
 		bprint("{\n\"classname\" \"hub_control\"\n\"target\" \"votes\"\n\"wait\" \"180\"\n\"map\" \"start\"\n\"origin\" \"0 0 -10000\"\n}\n");
 		bprint("// hub model\n");
-		bprint("// delay = 0, ball with lightning\n");
+		bprint("// delay = -1, no model, using map feature\n");
+		bprint("//       = 0, ball with lightning\n");
 		bprint("//       = 1, capped column\n");
 		bprint("//       = 2, obelisk with base\n");
 		bprint("//       = 3, pyramid with base\n");
@@ -267,8 +273,12 @@ void() pk_cphub =
 		bprint("\"message\" \"Painkeep Hub\"\n\"delay\" \"0\"\n");
 		bprint("\"wait\" \"0\"\n\"style\" \"1\"\n\"origin\" \"");
 	}
-	bprint(vtos(self.origin + ' 0 0 -20'));
-	if (cvar("saved1") != 482) bprint("\"  // you must remove ' and ' from origin vector");
+	bprint(ftos(self.origin_x));
+	bprint(" ");
+	bprint(ftos(self.origin_y));
+	bprint(" ");
+	bprint(ftos(self.origin_z - 20));
+	if (cvar("saved1") != 482) bprint("\"  // you may want to round up to tenths on decimals - ex: 128.5 1024.0 5.6.");
 	else bprint("\"");
 	bprint("\n}\n");
 };
@@ -374,7 +384,6 @@ entity() getHighestWithoutRandom =
 		{
 			c = c + 1;
 			r = random() * 100;
-			//bprint(ftos(r));
 			// randomly choose new highest
 			if (r < (100 / c))
 				highest = e;

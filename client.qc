@@ -336,7 +336,6 @@ void () execute_changelevel =
 		other.modelindex = 0;
 		other.voteIntermission = 0; // *pk - hub ops
 		setorigin (other,pos.origin);
-		if (other.ishuman) test_parms(other, 16); // *pk TESTING
 		other = find (other,classname,"player");
 	}
 
@@ -607,7 +606,6 @@ void () PutClientInServer =
 
 	spawn_tdeath (self.origin,self);
 	if (!Q_100 && !Q_99) PK_CIS(); // *pk - set client pk elements
-	viswep_ld(self.vwepent, -3);
 	self.admin = 0;
 	set_initBotLevel(); // *bot
 
@@ -1339,7 +1337,7 @@ void () ClientDisconnect =
 	bprint (ftos (self.frags));
 	bprint (" frags\n");
 	sound (self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_NONE);
-	set_suicide_frame ();
+	set_suicide_frame();
 };
 
 /*

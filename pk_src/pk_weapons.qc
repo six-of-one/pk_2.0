@@ -1471,8 +1471,8 @@ void() PK_ImpulseCommands =
 		if (pk_admintime > 0) admin_resettimeout();
 	}
 
-// Cataboligne - 8.13.9 - handle item testing from admin - FIX - admin restriction
-	else if (self.impulse == 252) // items
+// Cataboligne - 8.13.9 - handle item testing from admin
+	else if (self.admin > 0 && self.impulse == 252) // items
 	{
 		sv = self;
 		self = spawn();
@@ -1483,7 +1483,7 @@ void() PK_ImpulseCommands =
 		self.velocity_y = -170 + (random() * 340);
 		self = sv;
 	}
-	else if (self.impulse == 254) // weapons
+	else if (self.admin > 0 && self.impulse == 254) // weapons
 	{
 		sv = self;
 		self = spawn();

@@ -357,9 +357,9 @@ void() Admin_dmmapmenu2 =
 						"  15: pkts00   35: pkn15  \n"
 						"    :          36: pkn16  \n"
 						"    :          37: pkn17  \n"
-						"  18: hub2 *   38: pkn18  \n"
-						"  19: hub3 *   39: pkn19  \n"
-						"    :          40: pkn20  \n"
+						"  18: hub2     38: pkn18  \n"
+						"  19: hub3     39: pkn19  \n"
+						"  20: chv_hub  40: pkn20  \n"
 						"  41: painkeep2           \n"
 						"  42: custom hub          \n"
 						"  60: original maps       \n"
@@ -367,7 +367,7 @@ void() Admin_dmmapmenu2 =
 						" 666: main menu           \n"
 						"  admin impulse exits     \n"
 					 "\b+------------------------+\n"
-					 "              * you must rename or link hub2 & hub3\n"
+//					 "              * you must rename or link hub2 & hub3\n"
 					 "\b Enter code: ";
 };
 
@@ -564,6 +564,10 @@ string() MapDM2 =
 	{
 		mname = "hub3";
 	}
+	else if (self.lefty == 20)
+	{
+		mname = "chv_hub";
+	}
 	return(mname);
 };
 
@@ -631,10 +635,6 @@ float() MapDM =
 					if (f.message != "")
 					{
 						f.origin = (f.mins + f.maxs) * 0.5;
-//bprint(f.message);
-//bprint(", dist: ");
-//bprint(ftos(vlen(e.origin - f.origin)));
-//bprint("\n");
 						if (vlen(e.origin - f.origin) < dx)
 						{
 							c = b;
@@ -1746,16 +1746,6 @@ void() PK_SetAdmin =
 	{
 		pk_admintime = cvar("saved2");
 		remove(e);
-if (0) // devmsg
-{
-bprint("admin impulse: ");
-bprint(ftos(pk_adminimp));
-bprint(", code: ");
-bprint(ftos(pk_admincode));
-bprint(", timeout: ");
-bprint(ftos(pk_admintime));
-bprint("\n");
-}
 	}
 /* more input
 	else if (self.classname == "admin") 
@@ -2055,9 +2045,6 @@ void() PK_AdminImpulse =
 // code allows us to act like regular keypad entry, heh heh
 	else if (self.impulse && (self.admin < -1 || (self.admin & 3) == 2)) // enter codes for menu or login
 	{
-//bprint("in numeric: "); // track input
-//bprint(ftos(self.admin));
-//bprint (" - out = ");
 		f = self.impulse; // cant change impulse to 0 - need to * password below
 		if (f == 10) f = 0; // translate 0
 		if (f < 10) self.lefty = (self.lefty * 10) + f; // build code
@@ -2071,21 +2058,13 @@ void() PK_AdminImpulse =
 			else if (self.admin < 9) self.wad = "";
 			if (self.admin < 9) centerprint3(self, self.message, as, "<");
 			else centerprint3(self, self.message, as, self.wad);
-//bprint(ftos(self.impulse));
-//bprint("\n");
 			self.impulse = 0;
 			return;
 		}
-//bprint(ftos(self.impulse));
-//bprint("\n");
 	}
 
 	if (self.admin > 0)
 	{
-//bprint("admin: ");
-//bprint(ftos(self.admin));
-////bprint(ftos(self.impulse));
-//bprint("\n");
 		AdminCommands();
 		self.impulse = 0;
 	}
@@ -2122,16 +2101,6 @@ void() PK_AdminImpulse =
 		{
 			as = ftos(floor(admin_time - time));
 			centerprint3(self, "Enter admin password - seconds left: ", as, "\n");
-if (0) // devmsg
-{
-	bprint("imp: ");
-	bprint(ftos(pk_adminimp));
-	bprint("  pwd: ");
-	bprint(ftos(pk_admincode));
-	bprint("  tim: ");
-	bprint(ftos(pk_admintime));
-	bprint("\n");
-}
 		}
 	}
 };

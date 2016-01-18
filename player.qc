@@ -652,6 +652,7 @@ void() set_suicide_frame =
 	self.movetype = MOVETYPE_TOSS;
 	self.deadflag = DEAD_DEAD;
 	self.nextthink = -1;
+	viswep_ld(self.vwepent, -2);
 };
 
 

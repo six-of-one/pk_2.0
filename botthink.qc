@@ -301,7 +301,7 @@ void () BotPostThink =
 	fraglimit = cvar ("fraglimit");
 	if (fraglimit && (self.frags >= fraglimit))
 	{
-		NextLevel ();
+		NextLevel (); // Cat - 4.5.10 - NOTE: is it just me or does it seem like the bot doesnt even have to reach the exit...
 		self.button0 = 1;
 		self.think = IntermissionThink;
 		self.nextthink = (time + 5);
