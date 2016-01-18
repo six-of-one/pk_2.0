@@ -221,7 +221,18 @@ void() turret_searchForEnemy =
 	  return;
 	}
 
-	if (!self.currentammo && !self.turret_timeout && self.health < 1) self.delay = TRUE; // KillStraker candidate
+	if (!self.currentammo && !self.turret_timeout && self.health < 1)
+	{
+		local float f;
+		self.delay = TRUE; // KillStraker candidate
+		if (random() < 0.1)
+		{
+			f = pk_mcode("item_artifact_invulnerability", world); // TDO: doom, q3, q2 inv codes?
+			if (!find(world, classname, "item_artifact_invulnerability"))
+			if (!find(world, sscode, ftos(f)))
+				fn_make(f, v0);
+		}
+	}
 
 	// set the gun, so always lines up with the stand
 	setorigin(self, self.turret_base.origin);

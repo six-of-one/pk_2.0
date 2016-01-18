@@ -9,9 +9,6 @@
  * qc - map codes for wep cycling - chaos mod code
  *
  */
- 
-.float mcode;								// map item code - handle sub lists
-.float scode;								// save item code - for restore
 
 //float MIN_ITEM					= 100;
 //float MAX_INVITEM			= 255;
@@ -28,50 +25,56 @@ float ITEM_SET2				= 1047552; // allows multiplexing of 2 x 1023 bit values in 1
 // q1 wep ids
 float MC_AXE					= 100;
 float MC_SHOTGUN				= 101;
-float MC_SUPER_SHOTGUN		= 102;
+float MC_SUPER_SHOTGUN		= 102; // - 101 to get item override menu #
 float MC_NAILGUN				= 103;
 float MC_SUPER_NAILGUN		= 104;
 float MC_GRENADEL	 			= 105;
 float MC_ROCKETL				= 106;
 float MC_THUNDER				= 107;
 
-// ammo ids
-float MC_ASHELLS				= 108;
-float MC_ASHELLS_LG			= 109;
-float MC_ANAILS				= 110;
-float MC_ANAILS_LG			= 111;
-float MC_AROCKETS				= 112;
-float MC_AROCKETS_LG			= 113;
-float MC_ACELLS				= 114;
-float MC_ACELLS_LG			= 115;
+// 108 is special - xlates to pkitems on admin item override menu
+
+// special ids
+float MC_QUAD					= 109;
+float MC_PENT					= 110;
+float MC_RING					= 111;
+float MC_SUIT					= 112;
 
 // armor ids
-float MC_ARMOR1				= 116;
-float MC_ARMOR2				= 117;
-float MC_ARMOR3				= 118;
+float MC_ARMOR1				= 113;
+float MC_ARMOR2				= 114;
+float MC_ARMOR3				= 115;
+
+// health ids - translate
+float MC_HEALTHROT			= 116;
+float MC_HEALTH				= 117;
+float MC_HEALTHMEGA			= 118;
 
 // key ids
 float MC_KEY1					= 119;
 float MC_KEY2					= 120;
 
-// special ids
-float MC_QUAD					= 121;
-float MC_PENT					= 122;
-float MC_RING					= 123;
-float MC_SUIT					= 124;
+// sigil id - flags
+float MC_SIGIL1				= 121;
+float MC_SIGIL2				= 122;
+float MC_SIGIL4				= 123;
+float MC_SIGIL8				= 124;
 
-float MC_HEALTHROT			= 125;
-float MC_HEALTH				= 126;
-float MC_HEALTHMEGA			= 127;
+// ammo ids
+float MC_ASHELLS				= 125;
+float MC_ASHELLS_LG			= 126;
+float MC_ANAILS				= 127;
+float MC_ANAILS_LG			= 128;
+float MC_AROCKETS				= 129;
+float MC_AROCKETS_LG			= 130;
+float MC_ACELLS				= 131;
+float MC_ACELLS_LG			= 132;
 
-// sigil id
-float MC_SIGIL					= 128;
-float MC_SIGIL1				= 129;
-float MC_SIGIL2				= 130;
-float MC_SIGIL4				= 131;
-float MC_SIGIL8				= 132;
+float MC_Q1						= 133;
 
-float MC_BACKPACK				= 133;
+float MC_SIGIL					= 133;
+
+float MC_BACKPACK				= 134;
 
 /// painkeep
 // pk wep ids
@@ -96,6 +99,7 @@ float MC_MASK					= 152;
 
 float MC_AEXPLSH				= 153;
 
+float MC_PK						= 154;
 
 
 // fn(pk_mcode) - map code for items
@@ -164,10 +168,10 @@ float(string sc, entity e) pk_mcode =
 	else if ((tsc == "item_health") && (e.spawnflags & 1))	mc = MC_HEALTHROT;
 	else if ((tsc == "item_health") && (e.spawnflags & 2))	mc = MC_HEALTHMEGA;
 
-	else if ((tsc == "item_sigil") && (e.spawnflags & 1))		mc = MC_SIGIL1;
-	else if ((tsc == "item_sigil") && (e.spawnflags & 2))		mc = MC_SIGIL2;
-	else if ((tsc == "item_sigil") && (e.spawnflags & 4))		mc = MC_SIGIL4;
-	else if ((tsc == "item_sigil") && (e.spawnflags & 8))		mc = MC_SIGIL8;
+	else if ((tsc == "item_sigil") && (e.spawnflags & R_EARTH))		mc = MC_SIGIL1;
+	else if ((tsc == "item_sigil") && (e.spawnflags & R_BLACK))		mc = MC_SIGIL2;
+	else if ((tsc == "item_sigil") && (e.spawnflags & R_HELL))		mc = MC_SIGIL4;
+	else if ((tsc == "item_sigil") && (e.spawnflags & R_ELDER))		mc = MC_SIGIL8;
 	}
 
 	if (tsc != "dyn_item" && mc == 0)
@@ -242,8 +246,8 @@ string (float mc) item_by_mcode =
 	if (mc == MC_AROCKETS_LG)											return("item_rockets_lg");
 	if (mc == MC_ACELLS_LG)												return("item_cells_lg");
 
-//	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
-//		return("");
+	if (Q_100 || Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+		return("");
 	
 // pk item subs by special bits
 	if (mc == MC_GRAVITY)												return("item_painkeep_gwell");
@@ -264,4 +268,65 @@ string (float mc) item_by_mcode =
 //	if (mc == MC_) return("item_");
 
 	return("");
+};
+
+// TDO: expand fn - handle chaos items, non respawnables, provide location area
+
+// fn_make - make an item from map code value
+
+void(float mc, vector vo) fn_make =
+{
+	local string sc;
+	local entity e, sv;
+	local vector v1;
+
+	sc = item_by_mcode(mc);
+  if (sc != "")
+ {
+	v1 = vo;
+  if (vo == v0) // no origin sent, get random one around some other object
+  {	  
+	e = dyn_rndloc();
+	if (!e) 	e = findradius(world.origin, 256000);
+	if (!e) 
+	{
+		bprint("*** warning: fn_make could not find a random (or any) location - giving up\n");
+		return; // crap - no location
+	}
+	v1 = e.origin + ' 0 0 16';
+	if (e.flags & FL_ITEM) // randomize away from other map items
+		v1 = stdv_rndloc(e.origin + ' 0 0 16', 50, 100);
+  }
+
+	sv = self;
+	self = spawn();
+	self.wad = sc;
+
+	self.origin = v1;
+	item_call(sc);
+	self.velocity_z = 300 + 100 * random();
+	self.velocity_x = -170 + (random() * 340);
+	self.velocity_y = -170 + (random() * 340);
+
+	bprint("\b*** fn_make item spawned: ");
+	bprint(self.wad);
+	if (e)
+	{
+	bprint(" near: ");
+	bprint(e.classname);
+	}
+	else
+	bprint(" on the map");
+	bprint("\n");
+
+	self = sv;
+
+ }
+	else
+	{
+	bprint("\b *** map code with no item translation:\n");
+	bprint(" -------------->  ");
+	bprint(ftos(mc));
+	bprint("\n");
+	}
 };

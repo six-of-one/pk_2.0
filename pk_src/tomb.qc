@@ -175,7 +175,7 @@ void () touchtomb_think =
 
 void () tomb_think =
 {
-	if ( (self.tomb_death_time < time) )
+	if ( self.tomb_death_time && (self.tomb_death_time < time) )
 	{
 		self.think = tombdie;
 		self.nextthink = (time + 0.1);
@@ -259,7 +259,8 @@ void () tomb_launch =
 	tomb.angles_z = 0;
 	tomb.v_angle = self.v_angle;
 	tomb.v_angle_z = 0;
-	tomb.tomb_death_time = (time + PKPLUS_TOMB_TIME);
+	if (PKPLUS_TOMB_TIME)
+		tomb.tomb_death_time = (time + PKPLUS_TOMB_TIME);
 	tomb.think = tomb_checkonground;
 	tomb.nextthink = (time + 0.5);
 	AddToSplash (tomb);

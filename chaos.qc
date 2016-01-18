@@ -25,6 +25,7 @@ float(entity hent, string match, string srch) cnt_ent =
 //	else if (match == "class_select") sr = find (world, class_select, srch);
 //	else if (match == "quakeset") sr = find (world, quakeset, srch);
 	else if (match == "netname") sr = find (world, netname, srch);
+	else if (match == "map") sr = find (world, map, srch);
 //	else if (match == "scode") sr = find (world, scode, srch);
 	ch = hent;
 
@@ -41,6 +42,7 @@ float(entity hent, string match, string srch) cnt_ent =
 //			else if (match == "class_select") sr = find (sr, class_select, srch);
 //			else if (match == "quakeset") sr = find (sr, quakeset, srch);
 			else if (match == "netname") sr = find (sr, netname, srch);
+			else if (match == "map") sr = find (sr, map, srch);
 //			else if (match == "scode") sr = find (sr, scode, srch);
 		}
 	if (hent) ch.chain = world; // remove other potential chains left around - not even sure if this can happen

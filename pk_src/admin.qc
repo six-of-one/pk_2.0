@@ -94,6 +94,83 @@ void() admin_sv_cfg =
 	if (pk_admintime > 0) admin_resettimeout();
 };
 
+// given a mask (max value of all 1s - does not mask bits to print), print a bit set as string of 1s & 0s
+
+void(float msk, float bt) bit_print =
+{
+	local float b, f, sf ;
+	local string b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11 , b12, b13, b14, b15, b16, b17, b18, b19, b20, b21, b22, b23, b24;  
+
+	if (msk < 1 || bt < 1) return;
+
+	b = fabs(bt);
+	f = fabs(msk);
+	sf = 24;
+
+	while (sf > 0 && f >= 1)
+	{
+/*
+bprint("mask: ");
+bprint(ftos(f));
+bprint(" bit: ");
+bprint(ftos(b&1));
+bprint(" sf: ");
+bprint(ftos(sf));
+bprint("\n");*/
+		if (sf == 24) b1 = ftos(b & 1);
+		else if (sf == 23) b2 = ftos(b & 1);
+		else if (sf == 22) b3 = ftos(b & 1);
+		else if (sf == 21) b4 = ftos(b & 1);
+		else if (sf == 20) b5 = ftos(b & 1);
+		else if (sf == 19) b6 = ftos(b & 1);
+		else if (sf == 18) b7 = ftos(b & 1);
+		else if (sf == 17) b8 = ftos(b & 1);
+		else if (sf == 16) b9 = ftos(b & 1);
+		else if (sf == 15) b10 = ftos(b & 1);
+		else if (sf == 14) b11 = ftos(b & 1);
+		else if (sf == 13) b12 = ftos(b & 1);
+		else if (sf == 12) b13 = ftos(b & 1);
+		else if (sf == 11) b14 = ftos(b & 1);
+		else if (sf == 10) b15 = ftos(b & 1);
+		else if (sf == 9) b16 = ftos(b & 1);
+		else if (sf == 8) b17 = ftos(b & 1);
+		else if (sf == 7) b18 = ftos(b & 1);
+		else if (sf == 6) b19 = ftos(b & 1);
+		else if (sf == 5) b20 = ftos(b & 1);
+		else if (sf == 4) b21 = ftos(b & 1);
+		else if (sf == 3) b22 = ftos(b & 1);
+		else if (sf == 2) b23 = ftos(b & 1);
+		else if (sf == 1) b24 = ftos(b & 1);
+		b = floor(b / 2);
+		f = floor(f / 2);
+		sf = sf - 1;
+	}
+	if (sf < 1)		bprint(b24);
+	if (sf < 2)		bprint(b23);
+	if (sf < 3)		bprint(b22);
+	if (sf < 4)		bprint(b21);
+	if (sf < 5)		bprint(b20);
+	if (sf < 6)		bprint(b19);
+	if (sf < 7)		bprint(b18);
+	if (sf < 8)		bprint(b17);
+	if (sf < 9)		bprint(b16);
+	if (sf < 10)	bprint(b15);
+	if (sf < 11)	bprint(b14);
+	if (sf < 12)	bprint(b13);
+	if (sf < 13)	bprint(b12);
+	if (sf < 14)	bprint(b11);
+	if (sf < 15)	bprint(b10);
+	if (sf < 16)	bprint(b9);
+	if (sf < 17)	bprint(b8);
+	if (sf < 18)	bprint(b7);
+	if (sf < 19)	bprint(b6);
+	if (sf < 20)	bprint(b5);
+	if (sf < 21)	bprint(b4);
+	if (sf < 22)	bprint(b3);
+	if (sf < 23)	bprint(b2);
+	if (sf <24)		bprint(b1);
+};
+
 // return 2^rl, bounded by 2^0 (lowest bit, 1) to 2^23 (highest bit, 8388608)
 
 /*  code table:
@@ -138,6 +215,38 @@ float (float rl) AdminBitFlag =
 	return(e);
 };
 
+// return a random bit from a mask
+
+float(float msk) rnd_bit_mask =
+{
+	float f, sf, mm, b;
+
+	if (msk < 1) return(0); // no other possibilities
+	if (msk == 1) return(1);
+
+	b = mm = 0;
+	f = 1;
+	if (f & msk) b = f;
+	while (msk > f && mm < 23) // max out rnd selector
+	{
+		mm = mm + 1;
+		f = AdminBitFlag(mm);
+		if (!b)
+		if (f & msk) b = f;
+	}
+
+	f = 0;
+	sf = 100;
+	while (f == 0 && sf > 0)
+	{
+		f = AdminBitFlag(random() * mm);
+		if (! (f & msk)) f = 0;
+		sf = sf - 1;
+	}
+	if (!f) // damn - didnt get one? - take first bit then
+		f = b;
+	return(f);
+};
 
 // clear screen from admin - exit or failed login after wait
 
@@ -949,6 +1058,49 @@ void() Admin_itembits =
 	bprint("\b--------------------------------\n");
 };
 
+string() build_itemmenu =
+{
+	local string f;
+
+	f =		       "\b     Admin Items Menu:     \n"
+				       "\b+--------------------------+\n"
+							"  +------- \bweapons\b ------+  \n"
+							"  01: Double shotgun        \n" // 1
+							"  02: Nailgun               \n" // 2
+							"  03: Preforator            \n" // 4
+							"  04: Grenade launcher      \n" // 8
+							"  05: Rocket launcher       \n" // 16
+							"  06: Lightning gun         \n" // 32
+							"  07: Painkeep items        \n" // 64
+							"  +------ \bartifacts\b -----+  \n" 
+							"  08: Quad damage           \n" // 128
+							"  09: Invulnerability       \n" // 256
+							"  10: Radiation suit        \n" // 512
+							"  11: Ring of shadows       \n" // 1024
+							"  +-------- \barmor\b -------+  \n" 
+							"  12: Green Armor           \n" // 2048
+							"  13: Yellow Armor          \n" // 4096
+							"  14: Red Armor             \n" // 8192
+							"  +------- \bhealth\b -------+  \n" 
+							"  15: 15 Health             \n" // 16384
+							"  16: 25 Health             \n" // 32768
+							"  17: Mega Health           \n" // 65536
+							"  +------ \bcontrols\b ------+  \n" 
+							"  18: Only these items      \n" // 131072
+							"  19: None of these items   \n" // 262144
+							"  20: Substitute removed    \n" // 542288
+							"  21: Infinite ammo         \n" // 1048576
+							"  22: Cycle selected items  \n" // 2097152
+							"  29: All bits off          \n" 
+							"  30: Show item bits        \n" 
+							"  31: Update map now        \n"
+							" 666:  main menu            \n"
+							" admin impulse: exit admin  \n"
+				       "\b+--------------------------+\n"
+						 "\b  Enter code: ";
+	return(f);
+};
+
 void() Admin_itemmenu =
 {
 	if (Q_99)
@@ -993,43 +1145,7 @@ void() Admin_itemmenu =
 	}
 	else
 	{
-	self.message =
-				       "\b     Admin Items Menu:     \n"
-				       "\b+--------------------------+\n"
-							"  +------- \bweapons\b ------+  \n"
-							"  01: Double shotgun        \n" // 1
-							"  02: Nailgun               \n" // 2
-							"  03: Preforator            \n" // 4
-							"  04: Grenade launcher      \n" // 8
-							"  05: Rocket launcher       \n" // 16
-							"  06: Lightning gun         \n" // 32
-							"  07: Painkeep items        \n" // 64
-							"  +------ \bartifacts\b -----+  \n" 
-							"  08: Quad damage           \n" // 128
-							"  09: Invulnerability       \n" // 256
-							"  10: Radiation suit        \n" // 512
-							"  11: Ring of shadows       \n" // 1024
-							"  +-------- \barmor\b -------+  \n" 
-							"  12: Green Armor           \n" // 2048
-							"  13: Yellow Armor          \n" // 4096
-							"  14: Red Armor             \n" // 8192
-							"  +------- \bhealth\b -------+  \n" 
-							"  15: 15 Health             \n" // 16384
-							"  16: 25 Health             \n" // 32768
-							"  17: Mega Health           \n" // 65536
-							"  +------ \bcontrols\b ------+  \n" 
-							"  18: Only these items      \n" // 131072
-							"  19: None of these items   \n" // 262144
-							"  20: Substitute removed    \n" // 542288
-							"  21: Infinite ammo         \n" // 1048576
-							"  22: Cycle selected items  \n" // 2097152
-							"  29: All bits off          \n" 
-							"  30: Show item bits        \n" 
-							"  31: Update map now        \n"
-							" 666:  main menu            \n"
-							" admin impulse: exit admin  \n"
-				       "\b+--------------------------+\n"
-						 "\b  Enter code: ";
+	self.message = build_itemmenu();
 	}
 	self.wad = "";
 	self.admin = 26;
@@ -1694,12 +1810,14 @@ void() AdminCommands =
 			{
 				self.wad = "\nDynamic Painkeep items OFF";
 				pk_flags = pk_flags - PK_DYNAMIC;
+				DYN_OVR = FALSE;
 				if (DARKPLACES || chaos) cvar_set("pk_dyn_ovr","0"); // set this var if it exists
 			}
 			else
 			{
 				self.wad = "\nDynamic Painkeep items ON";
 				pk_flags = pk_flags | PK_DYNAMIC;
+				DYN_OVR = TRUE;
 				z = find(world,classname,"dyn_spawner");
 				if (!z)
 				{

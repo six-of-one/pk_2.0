@@ -89,7 +89,7 @@ deprecated - handled by pk v1.2.1 code
 	self.solid = SOLID_NOT;
 	if (deathmatch == 1)
 	{
-		self.nextthink = (time + 30);
+		self.nextthink = (time + RSP_TIME);
 		self.think = SUB_regen;
 	}
 	activator = other;
@@ -141,11 +141,11 @@ void () pkplus_touch =
 	{
 		if ((self.pk_items == PKPLUS_IT_EGO) || (self.pk_items == PKPLUS_IT_PHONE))
 		{
-			self.nextthink = (time + (60 * 2));
+			self.nextthink = (time + (RSP_TIME * 10));
 		}
 		else
 		{
-			self.nextthink = (time + 60);
+			self.nextthink = (time + RSP_TIME * 2);
 		}
 	}
 	self.think = SUB_regen;

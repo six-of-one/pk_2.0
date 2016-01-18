@@ -128,6 +128,15 @@ void() CheckWaterLevels =
 	          e.think = turret_deathAnim;
 	          e.nextthink = time + 0.1;
 	        }
+			  else if (e.map  == "rune")
+			  {
+				  local entity f;
+	          e.think = SUB_Remove;
+	          e.nextthink = time + 0.1;
+				 rune_count = cnt_ent(world, "map", "rune") - 1;
+				 f = find(world,classname,"rune_maker");
+				 if (f) f.nextthink = time + 10 + random() * 60;
+			  }
 			  if (PK_ART) pk_art_ck_lava(e); // Cataboligne 8.12.9 purify - pk artifacts
 	      }
 	    }

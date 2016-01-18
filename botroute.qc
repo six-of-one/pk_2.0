@@ -290,6 +290,11 @@ float () CheckDropPath =
 	{
 		return (0);
 	}
+	if (self.classname == OBSERVER)
+	{
+		return (0);
+	}
+
 	carriedPath = self.movetarget;
 	upstreamPath = carriedPath.movetarget;
 	lnd = pointcontents (carriedPath.origin);
@@ -369,6 +374,10 @@ void () DropBotPath =
 	local string tmp;
 	local entity oldpath;
 	local float drop;
+	if (self.classname == OBSERVER)
+	{
+		return;
+	}
 	oldpath = self.movetarget;
 	if (oldpath.movetarget)
 	{

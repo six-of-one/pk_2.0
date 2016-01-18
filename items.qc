@@ -52,6 +52,14 @@ void () PlaceItem =
 {
 	local float oldz;
 
+	if (chaos || DARKPLACES)
+	if (time < 5)
+		place_item_control();
+ 
+	self.mcode = pk_mcode("", self); // put map code on ent
+	self.sscode = ftos(self.mcode);
+	if (!self.scode) self.scode = self.mcode;
+
 	self.mdl = self.model;		// so it can be restored on respawn
 	self.flags = FL_ITEM;		// make extra wide
 	self.solid = SOLID_TRIGGER;
@@ -515,7 +523,7 @@ void () weapon_touch =
 	self.model = string_null;
 	self.solid = SOLID_NOT;
   if (deathmatch == 1)
-		self.nextthink = time + 30;
+		self.nextthink = time + RSP_TIME;
 		self.think = SUB_regen;
 
 	activator = other;
@@ -696,7 +704,7 @@ void () ammo_touch =
 	self.model = string_null;
 	self.solid = SOLID_NOT;
   if (deathmatch == 1)
-		self.nextthink = time + 30;
+		self.nextthink = time + RSP_TIME;
 	self.think = SUB_regen;
 
 	activator = other;
@@ -1061,27 +1069,32 @@ void () item_sigil =
 	precache_sound ("misc/runekey.wav");
 	self.noise = "misc/runekey.wav";
 
-	if (self.spawnflags & 1)
+	if (self.spawnflags & R_EARTH)
 	{
 		precache_model ("progs/end1.mdl");
 		setmodel (self,"progs/end1.mdl");
+		self.netname = "Earth magic"; // Cataboligne - 5.32.10 - for rune server
 	}
-	if (self.spawnflags & 2)
+	if (self.spawnflags & R_BLACK)
 	{
 		precache_model2 ("progs/end2.mdl");
 		setmodel (self,"progs/end2.mdl");
+		self.netname = "Black magic"; // Cataboligne - 5.32.10 - for rune server
 	}
-	if (self.spawnflags & 4)
+	if (self.spawnflags & R_HELL)
 	{
 		precache_model2 ("progs/end3.mdl");
 		setmodel (self,"progs/end3.mdl");
+		self.netname = "Hell magic"; // Cataboligne - 5.32.10 - for rune server
 	}
-	if (self.spawnflags & 8)
+	if (self.spawnflags & R_ELDER)
 	{
 		precache_model2 ("progs/end4.mdl");
 		setmodel (self,"progs/end4.mdl");
+		self.netname = "Elder magic"; // Cataboligne - 5.32.10 - for rune server
 	}
 
+	self.map = "rune"; // Cataboligne - 5.32.10 - for rune server
 	self.touch = sigil_touch;
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
@@ -1122,9 +1135,9 @@ void () powerup_touch =
 
 		if ((self.classname == "item_artifact_invulnerability") ||
 			(self.classname == "item_artifact_invisibility"))
-			self.nextthink = time + 60*5;
+			self.nextthink = time + RSP_TIME * 10; // * 2 * 5
 		else
-			self.nextthink = time + 60;
+			self.nextthink = time + RSP_TIME * 2;
 
 		self.think = SUB_regen;
 	}
@@ -1139,25 +1152,25 @@ void () powerup_touch =
 	if (self.classname == "item_artifact_envirosuit")
 	{
 		other.rad_time = 1;
-		other.radsuit_finished = time + 30;
+		other.radsuit_finished = time + POW_TIME;
 	}
 
 	if (self.classname == "item_artifact_invulnerability")
 	{
 		other.invincible_time = 1;
-		other.invincible_finished = time + 30;
+		other.invincible_finished = time + POW_TIME;
 	}
 
 	if (self.classname == "item_artifact_invisibility")
 	{
 		other.invisible_time = 1;
-		other.invisible_finished = time + 30;
+		other.invisible_finished = time + POW_TIME;
 	}
 
 	if (self.classname == "item_artifact_super_damage")
 	{
 		other.super_time = 1;
-		other.super_damage_finished = time + 30;
+		other.super_damage_finished = time + POW_TIME;
 	}
 
 	activator = other;

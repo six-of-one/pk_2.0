@@ -73,12 +73,14 @@ void() PK_precache =
 	precache_model ("progs/turgib3.mdl");
 	precache_model ("progs/turstand.mdl");
 	precache_model ("progs/turtop.mdl");
+	precache_model ("progs/turtop2.mdl");
 	precache_sound ("weapons/sentry/turrt_3.wav");
 	precache_sound ("weapons/sentry/turcl_2b.wav");
 		// new modes
 	precache_model ("progs/laser.mdl");
 	precache_sound ("enforcer/enfire.wav");
- 
+	precache_sound ("enforcer/enfstop.wav");
+
 	// GRAVITY Moved to here so the cheat command would work correctly
 	precache_model ("progs/cubsmall.mdl");
 	precache_model ("progs/cube.mdl");
@@ -339,6 +341,7 @@ void() PK_precache =
 
 // setup dynamic items
 
+	if (!DARKPLACES && !chaos) // admin menu only control
 	if (PK || Q_99 || DYN_FORCE || DYN_ARTFR)
 	if (!PK_100 && !Q_100)
 	if (pk_flags & PK_DYNAMIC || DYN_OVR || DYN_FORCE || DYN_ARTFR)
@@ -563,8 +566,6 @@ void() q_startmap =
 // fn(pk_srvcmd_load) - load new server control vars
 // fn(botmatch) - load bots for bot match
 
-// NOTE - only works under darkplaces for now
-
 void() botmatch =
 {
 	local float f, t, b;
@@ -669,7 +670,6 @@ void(float b) b_launch =
 	}
 };
 
-void() start_loopcyc;
 
 // fn(pk_liveupd) - these cvar update live during game
 
@@ -710,6 +710,7 @@ void(float bt, float st) pk_bas_flags =
 	admin_sv_cfg();
 };
 
+
 void() pk_liveupd =
 {
 // server controls
@@ -748,7 +749,8 @@ void() pk_liveupd =
 
 	PK_MAX_LIVENT = cvar("pk_max_livent");
 // respawn times
-	RSP_TIME = cvar("pk_rsp_time");
+	RSP_TIME = cvar("sv_c_rsp_time");
+	POW_TIME = cvar("sv_c_pow_time");
 
 	PK_MAX_LIVENT = cvar("pk_max_livent");
 
@@ -761,6 +763,66 @@ void() pk_liveupd =
 	VW = cvar("sv_vw");
 	VW_ARMOR = cvar("sv_vw_armor");
 
+// dynamic items
+	DYN_OVR = cvar("pk_dyn_ovr");
+	DYN_ART = cvar("pk_dyn_art");
+	if (!DYN_OVR) DYN_FORCE = cvar("pk_dyn_force");
+	DYN_ARTFR = cvar("pk_dyn_art_force");
+	DYN_FORCE_CNT = cvar("pk_dyn_force_cnt");
+	DYN_ARTFR_ONLY = FALSE; // yes, has to reset every time
+
+	if (!DYN_OVR && (pk_flags & PK_DYNAMIC)) // got toggled - set pk_flags bit
+	{
+		pk_flags = pk_flags - (pk_flags & PK_DYNAMIC);
+		admin_sv_cfg();
+	}
+	else if (DYN_OVR && !(pk_flags & PK_DYNAMIC))
+	{
+		pk_flags = pk_flags | PK_DYNAMIC;
+		admin_sv_cfg();
+	}
+
+	local entity e, sv;
+	local string m;
+	local float f, k, sf;
+
+// test it
+	if (PK || Q_99 || DYN_FORCE || DYN_ARTFR)
+	if (!PK_100 && !Q_100)
+ {
+	if (pk_flags & PK_DYNAMIC || DYN_OVR || DYN_FORCE || DYN_ARTFR)
+	{
+		if (!DYN_OVR && !DYN_FORCE) DYN_ARTFR_ONLY = DYN_ARTFR;
+//		if (DYN_FORCE || DYN_ARTFR) PK = TRUE;
+		if (!find(world,classname,"dyn_spawner"))
+		{
+			pk_ditems = 0;
+			e = spawn();
+			if (e)
+			{
+				e.think = dyn_item;
+				e.nextthink = time + DYN_START_TIME; // do this well after items spawn
+			}
+		}
+	}
+	else
+	{
+		e = find(world,classname,"dyn_spawner");
+		while (e)
+		{
+			bprint("*** Warning - dynamic items deactivated\n");
+			e.nextthink = -1;
+			remove(e);
+			e = find(e,classname,"dyn_spawner");
+		}
+	}
+
+ }
+
+
+// runes
+run_runes();
+ 
 // check for botmatch changes
 	if (deathmatch || coop)
 	if (cvar("sv_botmatch") != 0) b_launch(0);
@@ -768,7 +830,6 @@ void() pk_liveupd =
 	if (cvar("pk_mapcode")) // print list of map codes available to console
 	{
 		cvar_set("pk_mapcode", "0");
-		local float f;
 		local string cl;
 		f = 1;
 		while (f < 1024)
@@ -788,42 +849,71 @@ void() pk_liveupd =
 		}
 	}
 
-	if (cvar("pk_make")) // create item at player location if map code valid
+	if (!PK_100)
+	if (cvar("pk_make")) // create item at random location if map code valid
 	{
-		local entity e, sv;
-		local string sc;
-
-		sc = item_by_mcode(cvar("pk_make"));
-		if (sc != "")
-		{
-		sv = self;
-		self = spawn();
-		self.wad = sc;
-		setorigin(self, sv.origin);
-		item_call(sc);
-		self.velocity_z = 300 + 100 * random();
-		self.velocity_x = -170 + (random() * 340);
-		self.velocity_y = -170 + (random() * 340);
-		self = sv;
-		}
-		else
-		{
-		bprint("\b *** map code with no item translation:\n");
-		bprint(" -------------->  ");
-		bprint(ftos(cvar("pk_make")));
-		bprint("\n");
-		}
+		fn_make(cvar("pk_make"), v0);
 //		cvar_set("saved1", ftos(cvar("saved1") + 1));
 		cvar_set("pk_make", "0");
 	}
+
+	k = cvar("pk_tog_mcode") - 101;
+	if (k < 1 || k > 17) k = cvar("pk_tog_itemmenu");
+
+	if (k > 31)
+	{
+		m = build_itemmenu();
+		bprint(m);
+	}
+	else if (k ==  31)
+	{
+		e = spawn();
+		if (e)
+		{
+			e.think = item_loop;
+			e.nextthink = time + 0.1;
+		}
+	}
+	else if (k == 30)
+		Admin_itembits();
+	else if (k == 29)
+	{
+		pk_itemovr = 0;
+		admin_sv_cfg();
+	}
+	else if (k < 23)
+	{
+			f = AdminBitFlag(k - 1);
+			if (Q_99  && k == 6) f = 0;
+			if (pk_itemovr & f)
+				pk_itemovr = pk_itemovr - (pk_itemovr & f);
+			else
+				pk_itemovr = pk_itemovr | f;
+			if (pk_itemovr != pk_itemovr_ck)
+			{
+				if (pk_itemovr & f)
+					m = "\nBit toggled on for selected item: ";
+				else
+					m = "\nBit toggled off for selected item: ";
+				bprint (m);
+				bprint(ftos(f));
+				bprint("\n");
+			}
+			admin_sv_cfg();
+	}
+
+	cvar_set("pk_tog_mcode", "0");
+	cvar_set("pk_tog_itemmenu", "0");
+
 }
 // fn(pk_monitor) - some sv_ commands are continuosly monitored
+// TDO: chaos mod - chaos effect can turn this off, so chaos can muss vars.
 
 void() pk_monitor =
 {
 	pk_liveupd();
 
-	self.nextthink = time + 15;
+	self.nextthink = time + 3 + random();
 };
 
 void() pk_srvcmd_load =
@@ -834,11 +924,11 @@ void() pk_srvcmd_load =
 
 	e = spawn();
 	e.think = start_loopcyc;
-	e.nextthink = time + 5;
+	e.nextthink = time + 5.1;
 
 	e = spawn();
 	e.think = pk_monitor;
-	e.nextthink = time + 15;
+	e.nextthink = time + 4.5;
 
 // set server flag bit stored states
 
@@ -846,8 +936,6 @@ void() pk_srvcmd_load =
 	if (pk_flags & PK_TP_SPARKSFLASH) st_pk_sfx = 1;
 	if (pk_flags & PK_SF_HUB) st_pk_hub = 1;
 	if (pk_flags & PK_TP_DUTYON) st_pk_duty = 1;
-	
-	pk_liveupd(); // load live now
 
 // these all req. map reload for full effectiveness
 	PK_99 = cvar("sv_pk99");
@@ -857,13 +945,8 @@ void() pk_srvcmd_load =
 // q1
 	Q_99 = cvar("sv_q99");
 	Q_100 = cvar("sv_q100");
-// dynamic items
-	DYN_OVR = cvar("pk_dyn_ovr");
-	DYN_ART = cvar("pk_dyn_art");
-	if (!DYN_OVR && !(pk_flags & PK_DYNAMIC)) DYN_FORCE = cvar("pk_dyn_force");
-	DYN_ARTFR = cvar("pk_dyn_art_force");
-	DYN_FORCE_CNT = cvar("pk_dyn_force_cnt");
-
+	
+	pk_liveupd(); // load live now
 };
 
 void() pk_srvcmd_set =
@@ -883,6 +966,18 @@ void() pk_srvcmd_set =
 	Q_99 = FALSE;
 	Q_100 = FALSE;
 	Q_100_OBJERR = FALSE;
+
+// runes
+	RUNES = 0;
+	RUNE_CNT = 4;
+	RUNE_MASK = 15;
+	RUNE_3_ACM = 0.2;
+
+	RUNE_RANDOM = 0;
+	R_EARTH = RUNE_FLG_RS; // allow power mix
+	R_BLACK = RUNE_FLG_DM;
+	R_HELL = RUNE_FLG_HS;
+	R_ELDER = RUNE_FLG_RG;
 
 // cam controls
 	DCAMTO = 0; // FIX - final release should have 2 mins & respawn
@@ -905,7 +1000,8 @@ void() pk_srvcmd_set =
 	PK_DYNTO = 120;
 
 // respawn times
-	RSP_TIME = 60;
+	RSP_TIME = 30;
+	POW_TIME = 30;
 
 // q1 ammo
 	Q1_SHELLAMMO_MAX				= 100;
@@ -944,6 +1040,16 @@ void() pk_srvcmd_set =
 		registercvar("sv_c_mapcfg", "1");
 		registercvar("sv_c_srvcfg", "1");
 		registercvar("sv_c_adminlock", "0"); // if true, admin menu is locked out
+// rune server
+		registercvar("sv_c_rune", "0");
+		registercvar("sv_c_rune_cnt", "4");
+		registercvar("sv_c_rune_mask", "15");
+		registercvar("sv_c_rune_3acm", "0.2");
+		registercvar("sv_c_rune_random", "0"); // runes will have random powers
+		registercvar("sv_c_rune_set", "0");
+		
+		registercvar("sv_c_rsp_time", "30");
+		registercvar("sv_c_pow_time", "30"); // artifact power time
 
 		registercvar("sv_vw", "1");
 		registercvar("sv_vw_armor", "0");
@@ -963,6 +1069,7 @@ void() pk_srvcmd_set =
 		registercvar("sv_cam_timeout", "0"); // set to # to timeout dead cam in # secs - limit on deadcam state
 		registercvar("sv_cam_to_action", "0"); // set to 1 - disconnect, 0 - respawn
 
+		registercvar("botlevel", "0"); // when true, post code will call bot_changelevel so manual change will load pk*bs
 		registercvar("sv_botmatch", "0"); // load bots without admin
 		registercvar("sv_pl_ffwlimit", "0"); // limits how long a dead player can collect frags for fire & forget weapons
 		registercvar("sv_pl_nocide", "0"); // dont count suicides as -1 frag
@@ -975,8 +1082,8 @@ void() pk_srvcmd_set =
 		registercvar("pk_dyn_art_force", "0"); // force artifacts on map if no dynamic spawner, if spawner exists this is the same as pk_dyn_art
 		registercvar("pk_dyn_force_cnt", "6"); // max force cnt - because forcing can exceed load max for dyn items
 		registercvar("pk_dyn_func_stop", "0"); // stop func_dynitem operation
+
 // pk items
-		registercvar("pk_rsp_time", "60");
 		registercvar("pk_bt_time", "90"); // time for beartraps to live
 		registercvar("pk_bt_follow", "15"); // time for beartraps to hold on & bite
 		registercvar("pk_bt_dmg", "2"); // beartrap damage per bite
@@ -1022,8 +1129,14 @@ void() pk_srvcmd_set =
 		registercvar("pk_cyc_master", "0"); // if true no individual loops
 		registercvar("pk_cyc_halt", "0"); // if true halt all loops, restore original items (0 or 1)
 		registercvar("pk_cyc_dyn", "0"); // if true include dynamic items in loop change
+		registercvar("pk_place_item", "0"); // place_item will if this is:  1 - not load regular map items, 2 - randomize all items (at time < 5 secs)
+		registercvar("pk_place_item_reload", "0"); // reload place_item 2 deal every this cnt + this cnt * random
 		registercvar("pk_mapcode", "0"); // if true print mapcode item classname calls to console
 		registercvar("pk_make", "0"); // if set to valid map code, create item at player location
+		registercvar("pk_runemap", "0"); // if true print rune data to console
+		registercvar("pk_tog_mcode", "0"); // if set toggle mcode item bit in item override
+		registercvar("pk_tog_itemmenu", "0"); // if set run menu cmd item - includes show menu, 32
+
 // lg loop
 		registercvar("pk_cyc_lg_t", "-60"); // time for loop - if (-) neg, 20% val + random() * 80% val
 		registercvar("pk_cyc_lg_0", "0");

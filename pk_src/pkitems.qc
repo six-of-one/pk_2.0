@@ -140,7 +140,7 @@ void () painkeep_weapon_touch =
 	self.solid = SOLID_NOT;
 	if (deathmatch == 1)
 	{
-		self.nextthink = time + 30;
+		self.nextthink = time + RSP_TIME;
 		self.think = SUB_regen;
 	}
 
@@ -327,7 +327,7 @@ void() pk_ammo_touch =
 	self.model = string_null;
 	self.solid = SOLID_NOT;
 	if (deathmatch == 1)
-	  self.nextthink = time + 30;
+	  self.nextthink = time + RSP_TIME;
 	self.think = SUB_regen;
 
 	activator = other;
@@ -376,6 +376,17 @@ void() painkeep_touch =
 		return;
 	}
 
+	if (self.pk_touch == (void()) 0)
+	{
+		bprint("\b *** warning: in painkeep_touch for: ");
+		bprint(self.classname);
+		bprint(" and pk_touch is (void) 0 !!\n");
+		if (self.classname != "dyn_item") item_call(self.classname);
+		else if (self.wad != "") item_call(self.wad);
+		else if (self.scode) item_call(item_by_mcode(self.scode));
+		return;
+	}
+	else
 	if (self.pk_touch != painkeep_touch) // all items route through here - handle special cases, other touch fns & return
 	{
 		if (self.pk_touch == ammo_touch) self.pk_touch = pk_ammo_touch; // new fn for ammo collections
@@ -629,17 +640,46 @@ void() ip_regen =
 };
 
 // think to check for item movement, set respawn think if moved
+// chaos mod vector
 
 void() ip_checkForMovement =
 {
+	local entity e;
+
 	if (self.solid != SOLID_NOT)
+ {
+	if (self.map == "rune" && RUNES)
+	{
+		self.cnt = self.cnt + 1;
+		if (self.cnt > self.count) // not touched in 2 - 6 mins
+		{
+			e = dyn_rndloc();
+			if (!e) 	e = findradius(world.origin, 256000);
+			if (e)
+			{
+				setorigin(self, e.origin + ' 0 0 4');
+				if (e.flags & FL_ITEM) // randomize away from other map items
+					self.origin = stdv_rndloc(e.origin + ' 0 0 4', 50, 100);
+				self.ip_orgOrigin = self.origin;
+				self.count = 2 + random() * 3.8; // reset for new location
+				self.cnt = 0;
+
+				bprint("\b*** RUNE relocating: ");
+				bprint(self.netname);
+				bprint(" near: ");
+				bprint(e.classname);
+				bprint("\n");
+			}
+		}
+	}
+	else
 	if (self.ip_orgOrigin != self.origin)
 	{ // position has changed... repawn after x minutes..
 		self.think = ip_regen;
-		self.nextthink = time + (ip_timeout * 60);
+		self.nextthink = time + (ip_timeout * (RSP_TIME * 2));
 		return;
 	}
-
+ }
 	self.nextthink = time + 60;
 };
 
@@ -665,9 +705,12 @@ void() pk_item_position =
 };
 
 // called from PlaceItem, starts position think checks
+// chaos mod vector
 
 void() pk_item_position_init =
 {
+	if (!PK) bprint("*** pk_item_position_init called when not in PK mode.\n");
+
 	self.ip_orgOrigin = self.origin;
 
 	self.think = ip_checkForMovement;
@@ -986,16 +1029,85 @@ void() PK_DropBackpack =
 	AddToSplash(newmis); // *pk - splash tossed items
 };
 
+// randomize any item
+
+void() rndize_item =
+{
+	local entity e;
+	local float sf;
+
+	if (self.owner.mcode < MC_Q1)
+		self.owner.mcode = 102 + rint(random() * 30);
+	else if (self.owner.mcode < MC_PK)
+		self.owner.mcode = 141 + rint(random() * 12);
+
+	sf = 100;
+	if (RUNES)
+	while (self.owner.mcode >= MC_SIGIL1 && self.owner.mcode <= MC_SIGIL8 && sf > 0) // runes dont allow runes to be made here
+	{
+		self.owner.mcode = 102 + rint(random() * 30);
+		sf = sf - 1;
+		if (sf < 1) self.owner.mcode = self.owner.scode; // fail
+	}
+
+	self.owner.wad = item_by_mcode(self.owner.mcode);
+	e = self;
+	self = self.owner;
+	self.pk_touch = (void()) 0; // so we can touch the new things
+
+// TDO: chaos mod vector here
+	e.cnt = cvar("pk_place_item_reload"); // randomize every so often
+
+//	bprint("*** rndize item: ");
+	if (cvar("pk_place_item") == 0)
+	{
+//		bprint("admin turned off & exiting randomize items & restoring\n");
+		self.wad = item_by_mcode(self.scode);
+		e.cnt = 0;
+	}
+//	bprint(self.classname);
+//	bprint(" is now: ");
+//	bprint(self.wad);
+//	bprint("\n");
+
+	item_call(self.wad);
+
+	if (!e.cnt)
+		remove(e);
+	else
+	{
+		e.nextthink = time + fabs(e.cnt) + random() * e.cnt;
+	}
+};
+
+// Called by place item under specific conditions for map load
+
+void() place_item_control =
+{
+	if (cvar("pk_place_item") == 1)
+	{
+		remove(self);
+		return;
+	}
+	else if (cvar("pk_place_item") == 2)
+	{
+		local entity e;
+		e = spawn();
+		if (e)
+		{
+			e.owner = self;
+			e.think = rndize_item;
+			e.nextthink = time + 5 + random() * 2;
+			e.classname = "rndize_item";
+		}
+	}
+};
 
 // called from PlaceItem - sorts many things now - happens 0.2 secs after map load
 
 void() pk_placeitem =
 {
-	if (0 && time < 5)
-	{
-		remove(self);
-		return;
-	}
+
 	if (self.classname != "dyn_item")
 	{
 		pk_item_position_init();
@@ -1024,7 +1136,9 @@ void() pk_placeitem =
 		self.netname = "Pulse Rifle";
 	}
 
-	self.mcode = pk_mcode("", self); // put map code on ent
+	self.mcode = pk_mcode("", self); // put map code on ent - do we need this? placeitem sets these too
+	self.sscode = ftos(self.mcode);
+	if (!self.scode) self.scode = self.mcode;
 };
 
 
@@ -1133,10 +1247,10 @@ void(string cls) item_call =
 	else if (cls == "item_key1") item_key1();
 	else if (cls == "item_key2") item_key2();
 
-	else if (cls == "item_sigil1") { self.spawnflags = 1; item_sigil(); scls = "item_sigil"; }
-	else if (cls == "item_sigil2") { self.spawnflags = 2; item_sigil(); scls = "item_sigil"; }
-	else if (cls == "item_sigil4") { self.spawnflags = 4; item_sigil(); scls = "item_sigil"; }
-	else if (cls == "item_sigil8") { self.spawnflags = 8; item_sigil(); scls = "item_sigil"; }
+	else if (cls == "item_sigil1") { self.spawnflags = rune_bit(MC_SIGIL1); item_sigil(); scls = "item_sigil"; }
+	else if (cls == "item_sigil2") { self.spawnflags = rune_bit(MC_SIGIL2); item_sigil(); scls = "item_sigil"; }
+	else if (cls == "item_sigil4") { self.spawnflags = rune_bit(MC_SIGIL4); item_sigil(); scls = "item_sigil"; }
+	else if (cls == "item_sigil8") { self.spawnflags = rune_bit(MC_SIGIL8); item_sigil(); scls = "item_sigil"; }
 
 //	else if (cls == "item_") item_();
 
@@ -1155,7 +1269,8 @@ void(string cls) item_call =
 	if (self.classname != "dyn_item") // dont do these for dyn items
 	{
 		self.classname = scls;
-		if (PK) pk_placeitem();
+//		if (PK)  // try this out
+		pk_placeitem();
 		self.think = SUB_regen; // dont go thru place_item - use regen method
 		self.nextthink = time + 1 + 3 * random(); // spread em out
 		self.model = string_null;
@@ -1203,6 +1318,7 @@ void(string cls, string rep, string am, string ram) item_repm =
 			item_call(rep);
 			if (ram != "")
 			{
+bprint("repm: item_repm internal - rest -- rem | pki replace or restore\n");
 				if (pam == "rem" || pam == "pki") item_repm(pam, ram, "", "");
 				else item_repm("rest", ram, "", "");
 			}
@@ -1217,12 +1333,14 @@ void(string cls, string rep, string am, string ram) item_repm =
 			}
 			else
 				item_down();
+bprint("repm: restore on -:-, pki or rem --- ram != pam\n");
 			if (ram != "")
 			if (ram != pam) item_repm(pam, ram, "", "");
 		}
 		else
 		{
 			item_call(cls);
+bprint("repm: restore on end else --- ram != pam\n");
 			if (ram != "")
 			if (ram != pam) item_repm(pam, ram, "", "");
 		}
@@ -1285,6 +1403,7 @@ void() item_loop =
 	{
 		if (! (pko & CON_RUN))
 		{
+bprint("repm: restore on no con_run\n");
 			item_repm("rest", item_by_bit(f), "", ammo_by_bit(f)); // restore
 //			return;
 		}
@@ -1296,6 +1415,7 @@ void() item_loop =
 				{
 					cl = item_by_bit(f);
 //					if (e != f)//{
+bprint("repm: restore on con_only\n");
 					item_repm(cl, item_by_bit(e), ammo_by_bit(f), ammo_by_bit(e));
 
 				}
@@ -1303,11 +1423,13 @@ void() item_loop =
 			else if (pko & CON_NONE)
 			{
 				cl = item_by_bit(e);
-				if (pko & CON_SUBS) item_repm(cl, item_by_bit(f), ammo_by_bit(e), ammo_by_bit(f));
+	bprint("repm: restore on con_none - con_subs or else\n");
+			if (pko & CON_SUBS) item_repm(cl, item_by_bit(f), ammo_by_bit(e), ammo_by_bit(f));
 				else item_repm("", item_by_bit(f), "", ammo_by_bit(f));
 			}
-			else if (pko & CON_INF)
-				item_repm("rest", item_by_bit(f), "", ammo_by_bit(f));
+			else if (pko & CON_INF) { bprint("repm: restore on rest - con_inf\n");
+
+				item_repm("rest", item_by_bit(f), "", ammo_by_bit(f)); }
 		}
 		if (pko & CON_CYC) f = lvl;
 		else f = f * 2;
@@ -1360,17 +1482,17 @@ void() infinite_ammo =
 	{
 		if (e.health > 0)
 		{
-			if (e.items & IT_SUPER_SHOTGUN)
+			if (e.weapon == IT_SUPER_SHOTGUN)
 			if (pk_itemovr & WEP_SSHOT) e.ammo_shells = 99;
-			if (e.items & IT_NAILGUN)
+			if (e.weapon == IT_NAILGUN)
 			if (pk_itemovr & WEP_NAILGUN) e.ammo_nails = 99;
-			if (e.items & IT_SUPER_NAILGUN)
+			if (e.weapon == IT_SUPER_NAILGUN)
 			if (pk_itemovr & WEP_PERF) e.ammo_nails = 99;
-			if (e.items & IT_GRENADE_LAUNCHER)
+			if (e.weapon == IT_GRENADE_LAUNCHER)
 			if (pk_itemovr & WEP_GREN) e.ammo_rockets = 99;
-			if (e.items & IT_ROCKET_LAUNCHER)
+			if (e.weapon == IT_ROCKET_LAUNCHER)
 			if (pk_itemovr & WEP_ROCKET) e.ammo_rockets = 99;
-			if (e.items & IT_LIGHTNING || e.pk_items & PK_IT_CLIGHT)
+			if (e.weapon == IT_LIGHTNING || e.pk_items & PK_IT_CLIGHT)
 			if (pk_itemovr & WEP_THUNDER) e.ammo_cells = 99;
 		}
 		e = find(e, classname,src);
@@ -1385,6 +1507,7 @@ void() infinite_ammo =
 
 // fn(dyn_spawn) - create an item
 // fn(dyn_rem) - remove a dynamic item after a timeout
+// fn(dyn_rndloc) - get a random location to spawn an item dynamically
 
 void() dyn_rem =
 {
@@ -1395,15 +1518,13 @@ void() dyn_rem =
 
 entity rseu; // random spawn ent origin used
 
-void() dyn_spawn =
-{
-	local entity e, sv;
-	local string src;
-	float ri, sf;
+// returns a "near" entity to use its origin - this is really the only safe way to pick a random location within a map
 
-// get a random origin
-  if (self.origin == v0)
-  {
+entity() dyn_rndloc =
+{
+	float ri, sf;
+	local entity e, sv;
+
 	ri = sf = 0;
 	sv = e = find(world,classname,"player");
 	while (e)
@@ -1412,9 +1533,9 @@ void() dyn_spawn =
 		e = find(e,classname,"player");
 	}
 	e = findradius(sv.origin, PK_DYNRAD);
-	if (!e) return; // nothing found!
+	if (!e) return(world); // nothing found!
 	sv = e;
-	while (e.chain)
+	while (e.chain) // count stuff for a random location selection from all these items found in range
 	{
 		if (!e.chain) e = world;
 		else if (e.chain.flags & FL_ITEM) { ri = ri + 1; e = e.chain; }
@@ -1435,11 +1556,51 @@ void() dyn_spawn =
 		sf = sf - 1;
 	}
 	rseu = sv;
-	self.origin = sv.origin + ' 0 0 16';
+	return(sv);
+};
+
+// some deviation around a random loc, rule out solid areas
+
+vector(vector v1, float d1, float r1) stdv_rndloc =
+{
+	vector v2;
+	local float sf, pco, f, k;
+
+	v2 = v1;
+	sf = 500;
+	pco = CONTENT_SOLID;
+
+	while (sf > 0 && pco == CONTENT_SOLID)
+	{
+		f = crandom() * r1;
+		k = d1;
+		if (f < 0) k = 0 - d1;
+		v2_x = v1_x + k + f;
+		f = crandom() * r1;
+		k = d1;
+		if (f < 0) k = 0 - d1;
+		v2_y = v1_y + k + f;
+		pco = pointcontents(v2);
+		sf = sf - 1;
+		if (sf < 1) v2 = v1;
+	}
+	return(v2);
+};
+
+void() dyn_spawn =
+{
+	local entity sv;
+
+// get a random origin
+  if (self.origin == v0)
+  {
+		sv = dyn_rndloc();
+		if (!sv) return; // nothing found!
+		self.origin = sv.origin + ' 0 0 16';
   }
   else
   {
-	sv = findradius(self.origin, PK_DYNRAD);
+		sv = findradius(self.origin, PK_DYNRAD);
   }
 // give players notice
 	bprint("*** Dynamic item spawned: ");
@@ -1467,10 +1628,11 @@ void() dyn_item =
 	float cd, f, b;
 	entity e;
 
-	if (PK_100 || Q_100) // Cataboligne - 8.15.9 - pk compat mode, just in case
+	if (PK_100 || Q_100 || !(pk_flags & PK_DYNAMIC || DYN_OVR || DYN_FORCE || DYN_ARTFR)) // Cataboligne - 8.15.9 - pk compat mode, just in case
 	{
-	remove(self);
-	return;
+//		bprint("*** Warning - dynamic items deactivated\n");
+		remove(self);
+		return;
 	}
 
 	if (self.classname != "dyn_spawner")
@@ -1491,11 +1653,12 @@ void() dyn_item =
 			bprint("***   Dynamic items will spawn on this map - keep an eye out\n");
 		}
 	}
-	else if (!DYN_FORCE && !DYN_ARTFR_ONLY)
-	{		
-		if (!PK || (!(pk_flags & PK_DYNAMIC) && !DYN_OVR)) // got turned off go away
-			remove(self);
-	}
+// deprecated for remover above
+//	else if (!DYN_FORCE && !DYN_ARTFR_ONLY)
+//	{		
+//		if (!PK || (!(pk_flags & PK_DYNAMIC) && !DYN_OVR)) // got turned off go away
+//			remove(self);
+//	}
 	else
 	{
 	if (pk_ditems < 0) pk_ditems = 0;
@@ -1770,28 +1933,39 @@ float(entity e, float p) loop_next =
 
 void() loopcyc_think =
 {
-	local float f, rp, rn;
+	local float f, rp, rn, dr, svm;
 	local entity e, sv;
+	local string mmc;
 
+	svm = cvar("pk_cyc_master");
 	sv = self;
 	f = cvar(sv.noise);
 	rp = cvar(sv.noise1);
-	rn = FALSE;
+	sv.cnt = dr = rn = FALSE;
 
 	if (!f && !rp) // 1 & 0 are zeroed - restore items & remove
 	{
 		rn = TRUE;
 	}
-	
-	e = sv.theowner;
+
+	if (svm && sv.wait != -666)
+	{
+		mmc = item_by_mcode(self.delay);
+		e = find( world, classname, mmc);
+	}
+	else
+		e = sv.theowner;
 	while (e)
 	{
 		self = e;
 		if (!e.scode) e.scode = e.mcode;
+		if (!sv.cnt) sv.cnt = e.mcode;
 		if (cvar("pk_cyc_halt") || rn)
 		{
 			item_call(item_by_mcode(e.scode));
 		}
+		else if (e.classname == "dyn_item" && e.mcode != sv.cnt)
+			dr = TRUE;
 		else
 		{
 			f = loop_next(sv, 0); // check all 0's
@@ -1801,9 +1975,9 @@ void() loopcyc_think =
 				e.nextthink = -1;
 				e.pk_touch = e.touch = SUB_Null;
 			}
-			else
+			else // cycle according to rules
 			{
-				f = loop_next(sv, e.mcode);
+				sv.delay = f = loop_next(sv, e.mcode);
 				e.pk_touch = (void()) 0;
 				if (!f)
 				{
@@ -1815,8 +1989,22 @@ void() loopcyc_think =
 			}
 		}
 
-		e = e.theowner;
+		if (dr) e = find( e, classname, "dyn_item");
+		else 
+		{
+			if (svm && sv.wait != -666)
+				e = find( e, classname, mmc);
+			else
+				e = e.theowner;
+		}
+
+		if (!dr && !e && cvar("pk_cyc_dyn"))
+		{
+			e = find( world, classname, "dyn_item");	
+			dr = TRUE;
+		}
 	}
+
 
 	self = sv;
 	if (rn)
@@ -1840,10 +2028,11 @@ void() loopcyc_think =
 
 void(entity e) init_loopcyc =
 {
-	local entity sr;
+	local entity sr, s2;
 	local string cl;
 	local float f0, f1;
 
+	e.theowner = world;
 	cl = "";
 	f0 = cvar(e.noise);
 	f1 = cvar(e.noise1);
@@ -1852,27 +2041,79 @@ void(entity e) init_loopcyc =
 		remove(e);
 		return; // failed - no 0 or 1
 	}
-	if (f0) cl = item_by_mcode(f0);
-	if (cl == "") cl = item_by_mcode(f1);
+	if (f0)
+	{
+		e.delay = f0;
+		cl = item_by_mcode(f0);
+	}
+	if (cl == "")
+	{
+		e.delay = f1;
+		cl = item_by_mcode(f1);
+	}
 	if (cl == "")
 	{
 		remove(e);
 		return; // failed - 0 or 1 (or both) not valid map codes
 	}
 
-	e.theowner = sr = find( world, classname, cl);
-	if (!sr)
-	{
-		remove(e);
-		return; // none on map right now
-	}
-
 	if (!cvar(e.target)) cvar_set(e.target, "-60"); // default timer
 
-	while (sr) // chain em up
+	if (f0 > -1)
 	{
+	  if (!cvar("pk_cyc_master"))
+	 {
+		e.theowner = sr = find( world, classname, cl);
+		if (!sr)
+		{
+			remove(e);
+			return; // none on map right now
+		}
+
+	  while (sr) // chain em up
+		{
 		sr.theowner = find( sr, classname, cl);
-		sr = sr.theowner;
+//		if (cl != "dyn_item")
+//			sr = sr.theowner;
+		if (sr.mcode == f0 || sr.mcode == f1)
+			sr = sr.theowner;
+		else
+			sr = find( sr, classname, cl);
+
+//		if (cvar("pk_cyc_dyn") && !sr) cl = "dyn_item"; // include dynamics - must have 1 reg item to start loop.
+		}
+	 }
+
+	}
+	else // create a series of random cycle items
+	{
+		e.wait = -666; // so we dont master server these!
+		f0 = fabs(f0);
+		while (f0 > 0)
+		{
+			sr = spawn();
+			if (!e.theowner) e.theowner = sr;
+			else s2.theowner = sr;
+			if (sr)
+			{
+				s2 = dyn_rndloc();
+				if (!s2)
+				{
+					remove(e);
+					return; // no location - fail!
+				}
+				sr.origin = s2.origin + ' 0 0 8';
+				if (s2.flags & FL_ITEM)
+					sr.origin = stdv_rndloc(s2.origin + ' 0 0 8', 50, 100);
+				s2 = self;
+				self = sr;
+				self.wad = cl;
+				item_call(cl); // make first one
+				self = s2;
+				s2 = sr; // for the chain up
+			}
+			f0 = f0 - 1;
+		}
 	}
 
 	f0 = cvar(e.target);
@@ -1972,3 +2213,146 @@ void() start_loopcyc =
 	self.nextthink = time + 15; // recheck every 10 secs?
 };
 
+// rune 1 rules - runes expire in pow time
+
+void () rune_1_expire =
+{
+	self.owner.rune_flag = 0;
+	sprint(self.owner, "The power of the ");
+	sprint(self.owner, self.netname);
+	sprint(self.owner, " rune has expired.\n");
+	remove(self);
+};
+
+void () rune_touch =
+{
+	local entity e;
+
+	if (other.classname != "player")
+	if (other.classname != "pk*bot")
+			return;
+	if (other.health <= 0)
+		return ;
+	if (RUNES == 1)
+	if (other.rune_flag)
+		return ;
+
+	centerprint3 (other,"You got the ",self.netname," Rune!");
+	sprint(other,"You have the power of ");
+	rune_print(other, self.spawnflags, FALSE);
+
+	sound (other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
+	stuffcmd (other,"bf\n");
+
+	other.rune_flag = other.rune_flag | self.spawnflags;
+
+	if (RUNES == 1)
+	{
+		e = spawn();
+		if (e)
+		{
+			e.classname = "rune_1_expiry";
+			e.netname = self.netname;
+			e.think = rune_1_expire;
+			e.nextthink = time + POW_TIME;
+			e.owner = other;
+		}
+	}
+	if (RUNES == 3)
+	{
+		if (self.spawnflags & RUNE_FLG_RS) other.rune_3_resist = other.rune_3_resist + RUNE_3_ACM;
+		if (self.spawnflags & RUNE_FLG_DM) other.rune_3_dmg = other.rune_3_dmg + RUNE_3_ACM;
+		if (self.spawnflags & RUNE_FLG_HS) other.rune_3_haste = other.rune_3_haste + RUNE_3_ACM;
+		if (self.spawnflags & RUNE_FLG_RG) other.rune_3_rgn = other.rune_3_rgn + RUNE_3_ACM;
+	}
+
+// remove it in single player, or setup for respawning in deathmatch
+	self.model = string_null;
+	self.solid = SOLID_NOT;
+	self.cnt = 0;
+	self.count = self.count + 0.13; // increment for each grab - more activity = less chance of rune moving
+
+	if (RUNES == 1 || RUNES == 3)
+	{
+	if (deathmatch !=  2) // this is likely a meaningless deal for runes
+		self.nextthink = time + RSP_TIME;
+	self.think = SUB_regen;
+	}
+
+//	serverflags = serverflags | (self.spawnflags & 15);
+
+	activator = other;
+	SUB_UseTargets();				// fire all targets / killtargets
+};
+
+// make runes for runeserver
+float rune_map; // runes on level
+
+void() rune_maker =
+{
+	local entity e;
+	local float sf, f;
+
+	if (rune_count < RUNE_CNT)
+	{
+		if (rune_count < 2) // make at least 2 sort of quicker
+			self.nextthink = time + random() * 30;
+		else
+			self.nextthink = time + 10 + random() * 60;
+
+// make a rune
+		e = spawn();
+		if (e)
+		{
+			rune_count = rune_count + 1;
+			self = e;
+
+			self.mcode = MC_SIGIL1 + rint(random() * 3.3);
+			sf = 111;
+// if ((rune_map & 15) != (RUNE_MASK & 15))  // basic 4 runes spawn first, fulfilling mask goal, could be 0
+			if (rune_count < 4) // spawn 4 uinque runes on a map when starting
+			while (sf > 0)
+			{
+				f = rune_bit(self.mcode);
+				if (!(f & rune_map))
+					sf = 0;
+				else
+					self.mcode = MC_SIGIL1 + rint(random() * 3.3);
+				sf = sf - 1;
+			}
+			self.wad = item_by_mcode(self.mcode);
+
+			e = dyn_rndloc();
+			if (!e) 	e = findradius(world.origin, 256000);
+			if (!e) 
+			{
+				bprint("*** warning: rune_make could not find a random (or any) location - giving up\n");
+				remove(self);
+				return; // crap - no location
+			}
+			self.origin = e.origin + ' 0 0 8';
+			if (e.flags & FL_ITEM) // randomize away from other map items
+				self.origin = stdv_rndloc(e.origin + ' 0 0 8', 50, 100);
+
+			item_call(self.wad);
+			self.pk_touch = rune_touch;
+			AddToSplash(self); // splash code kills lava immersed runes
+
+			rune_map = rune_map | self.spawnflags;
+			self.count = 2 + random() * 3.8; // controls no-touch reposition code in check movement deal
+			self.cnt = 0;
+
+			bprint("\b*** RUNE spawned: ");
+			bprint(self.netname);
+			if (e)
+			{
+				bprint(" near: ");
+				bprint(e.classname);
+			}
+			else
+			bprint(" on the map");
+			bprint("\n");
+
+		}
+	}
+};

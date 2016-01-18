@@ -66,6 +66,11 @@ string ADMINCODE				= "float1\n"; // local command that loads admin security pas
 string ADMINIMPULSE			= "float2\n"; // load the impulse
 string ADMINTIME				= "float3\n"; // load the time out
 string ADMINMAPCMD			= "_mapcmd\n"; // append to mapname for alias cmd
+string() build_itemmenu;
+void() Admin_itembits;
+float(float msk) rnd_bit_mask;
+void(float msk, float bt) bit_print;
+
 float pk_mapcmd; 							// TOD: admin option later
 float pk_mapcfg; 							// TOD: admin option later
 //string ADMINSRVCMD			= "_srvcmd\n"; // server vars alias cmd
@@ -73,6 +78,35 @@ float pk_mapcfg; 							// TOD: admin option later
 float pk_srvcfg; 							// TOD: admin option later
 
 void() pk_srvcmd_set;
+
+// runes
+.float rune_flag;
+float RUNE_3_ACM; // amount to accumulate under rule 3
+.float rune_3_dmg; // rule 3 - these are cumulative effects
+.float rune_3_resist;
+.float rune_3_haste;
+.float rune_3_rgn;
+float rune_set;
+void() run_runes;
+void(entity e, entity p) rune_id;
+
+float RUNES;
+float RUNE_CNT;
+float RUNE_MASK;
+float RUNE_RANDOM;
+float rune_count; // total # on map
+void() rune_maker;
+
+float R_EARTH; // allow power mix
+float R_HELL;
+float R_BLACK;
+float R_ELDER;
+
+float RUNE_FLG_RS			= 1;
+float RUNE_FLG_DM			= 2;
+float RUNE_FLG_HS			= 4;
+float RUNE_FLG_RG			= 8;
+float RUNE_MASK_ALL		= 15; // because manual config must mask of bad bits
 
 // item override admin
 float DYN_OVR;
@@ -84,6 +118,16 @@ float DYN_FORCE_CNT; // max forced items to load
 float DYN_START_TIME			= 5;	// seconds till dynamic spawner starts its thing - precache must cutoff before this, leave a couple secs for map load
 string (float mc) item_by_mcode;
 void(string cls) item_call;
+entity() dyn_rndloc;
+vector(vector v1, float d1, float r1) stdv_rndloc
+void() start_loopcyc;
+void(float mc, vector vo) fn_make;
+float(string sc, entity e) pk_mcode;
+void() place_item_control;
+
+.float mcode;								// map item code - handle sub lists
+.float scode;								// save item code - for restore
+.string sscode;							// map item code string - for find
 
 // respawn times
 //float RSP_AMMO; // these are dm 3 rules
@@ -92,6 +136,7 @@ void(string cls) item_call;
 //float RSP_WEP;
 //float RSP_ART;
 float RSP_TIME; // respawn time
+float POW_TIME; // power time
 
 float WEP_SSHOT				= 1; 	 // admin of super shotgun
 float WEP_NAILGUN				= 2; 	 // admin of nailgun
@@ -143,8 +188,10 @@ float CON_NONE					= 262144;  // none of the selected items will be loaded
 float CON_SUBS					= 524288;  // substitute something for removed items
 float CON_INF					= 1048576; // infinite ammo to all weps with bit set above - except carryables
 float CON_CYC					= 2097152; // cycle selected bits in thier group
+
 float CON_CHAOS				= 2490368; // item chaos it all 3 control bits set
-float CON_RUN					= 4063232; // any control bit CON_* entries above - used by autorun
+// excluding inf_ammo from run bits
+float CON_RUN					= 3014656; //4063232; // any control bit CON_* entries above - used by autorun
 float CYC_TIME					= 60; // TEST - 240; // seconds for cycle base - 4 mins +|- 2 mins
 
 void() item_loop;
@@ -198,6 +245,7 @@ void(entity client, string s, string s1, string s2, string s3, string s4, string
 .float turret_soundtimeout;
 .float turret_ownertimeout;
 .entity turret_base;
+void(entity e, float tm) turret_KillStraker;
 
 // items
 .float pk_items;	// Items used for impulse 1

@@ -325,9 +325,9 @@ void () pk_art_powerup_touch =
 
 		if ((self.classname == "item_artifact_invulnerability") ||
 			(self.classname == "item_artifact_invisibility"))
-			self.nextthink = time + 60*5;
+			self.nextthink = time + RSP_TIME * 10;
 		else
-			self.nextthink = time + 60;
+			self.nextthink = time + RSP_TIME * 2;
 
 		self.think = SUB_regen;
 	}
@@ -342,13 +342,13 @@ void () pk_art_powerup_touch =
 	if (self.classname == "item_artifact_envirosuit")
 	{
 		other.rad_time = 1;
-		other.radsuit_finished = time + 30;
+		other.radsuit_finished = time + POW_TIME;
 	}
 
 	if (self.classname == "item_artifact_invulnerability")
 	{
 		other.invincible_time = 1;
-		other.invincible_finished = time + 30;
+		other.invincible_finished = time + POW_TIME;
 		if (other.pkplus_actortype == PKPLUS_ACTORPENT) // pk art code here
 			other.pkplus_actortype = 0;
 	}
@@ -356,13 +356,13 @@ void () pk_art_powerup_touch =
 	if (self.classname == "item_artifact_invisibility")
 	{
 		other.invisible_time = 1;
-		other.invisible_finished = time + 30;
+		other.invisible_finished = time + POW_TIME;
 	}
 
 	if (self.classname == "item_artifact_super_damage")
 	{
 		other.super_time = 1;
-		other.super_damage_finished = time + 30;
+		other.super_damage_finished = time + POW_TIME;
 		if (other.pkplus_actortype == PKPLUS_ACTORQUAD) // pk art code here
 			other.pkplus_actortype = 0;
 		}

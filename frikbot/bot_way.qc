@@ -252,6 +252,25 @@ entity way_foot; // Ugh. Do I need a foot for this or not?
 entity(vector org) make_waypoint = 
 {
 	local entity point;
+
+	if (pointcontents(org) == CONTENT_SOLID) // Cataboligne - 5.31.10 - in case a bot falls out of level
+	{
+		self.cnt = self.cnt + 1;
+		
+		if (self.cnt < 5)
+		{
+			bprint("*** Warning - ent tried to make way point in solid: ");
+			bprint(self.classname);
+			bprint("\n");
+			return(world);
+		}
+		else 
+		if (self.cnt > 2000)
+		if (IROBOT(self))
+			T_Damage(self, self, self, 10000);
+		return(world);
+	}
+
 	point = spawn();
 	point.classname = "waypoint";
 	point.search_time = time; // don't double back for me;
@@ -459,6 +478,8 @@ void() DynamicWaypoint =
 	if (!dynpoint)
 		return;
 	t = make_waypoint(self.dyn_dest);
+	if (!t)
+		return;
 
 	if (!self.dyn_flags)
 	{
@@ -961,6 +982,9 @@ void(vector org, vector bit1, float bit4, float flargs) make_way =
 	local entity y;
 	waypoint_mode = WM_LOADED;
 	y = make_waypoint(org);
+	if (!y)
+		return;
+
 	y.b_aiflags = flargs;
 	y.b_pants = bit1_x;
 	y.b_skill = bit1_y;

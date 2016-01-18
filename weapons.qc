@@ -1432,6 +1432,8 @@ ImpulseCommands
 */
 void () ImpulseCommands =
 {
+	if (self.impulse == 51)
+		rune_id(self, self);
 	if (self.impulse > 98) botImpulseCommand (); // *bot
 // Cataboligne 9.11.3 purify - chase cam
 	if (self.impulse > 229 && self.impulse < 240) ccb_impulse_check();

@@ -127,7 +127,7 @@ void() grap_fire =
 
 	if (trace_fraction != 1.0 && !trace_ent.takedamage)
 	{
-		// To near a wall, can't throw turret
+		// To near a wall, can't shoot
 	  sprint(self, "Too close to a wall!!\n");
 	  return;
 	}
@@ -453,8 +453,7 @@ void() grap_touch =
 	if (other.classname == "turret")
 	if (other.delay == TRUE)
 	{
-		other.think = turret_deathAnim;
-		other.nextthink = 1 + random() * 5; // spread out
+		turret_KillStraker(other, 1 + random() * 5);
 	}
 
 	self.touch = SUB_Null;

@@ -1234,12 +1234,21 @@ void () PlayerPostThink =
 	if (BotPostFrame ())
 		return ;
 
-	if (!(self.view_ofs == '0 0 0') && !self.deadflag)
 	if (find(world,classname,"pk*bot"))
+  {
+	if (!(self.view_ofs == '0 0 0') && !self.deadflag)
 	if (CheckDropPath ()) // *bot
 	{
 		DropBotPath ();
 	}
+
+	if (cvar("botlevel")) // hack so alias can load new map & keep pk*bots
+	{
+		bot_changelevel();
+		cvar_set("botlevel", "0");
+	}
+
+  }
 
 //	if (self.weapon || self.vwepent) 
 	viswep_post(); // Cataboligne - 9.26.9 - viswep code link - always have to run this for 1 player + pk*bots deal

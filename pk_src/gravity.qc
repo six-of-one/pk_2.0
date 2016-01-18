@@ -24,8 +24,7 @@ void() gravity_touch =
 	if (other.classname == "turret")
 	if (other.delay == TRUE)
 	{
-		other.think = turret_deathAnim;
-		other.nextthink = 1 + random() * 5; // spread out
+		turret_KillStraker(other, 1 + random() * 5);
 	}
 };
 
@@ -67,6 +66,7 @@ void() gravity_pull =
 		if (e.classname != "gravity") // don't yank on any other gravity wells
 		if (e.classname != "beartrap")
 		if (pk_art_movshot_ck(e, "grav")) // Cataboligne 8.12.9 purify - pk artifacts
+		if (e.classname != "chase_cam")
 		//if (e != self.owner)
 		if ((e.classname == OBSERVER && random() < 0.01666) || e.classname != OBSERVER)
 		if (e.movetype != MOVETYPE_NONE) // anything that can move
