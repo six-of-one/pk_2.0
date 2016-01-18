@@ -1,0 +1,14 @@
+note to self:
+
+pk 2.0 code base (prior to 2.2.1 final release) got polluted with archon code due to
+qbkp version save using the same base dir.
+
+not worth the time to fix this repo.
+
+    |       _-=* Cataboligne
+  \ | /    http://www.cataboligne.org/
+   \|/       
+----O----   chaos [ at ] cataboligne.org
+   /|\
+  / | \       [-clan Arioch-]
+    |      http://www.rothrin.net/museum/oldsites/arioch/
