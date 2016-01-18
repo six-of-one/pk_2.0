@@ -231,11 +231,17 @@ float ammo_frame;
 float(float cn, entity e, string op) ammo_con;
 void () PlaceItem;
 
+// common item controls
+
+void() q2_weapon_rocketlauncher;
+void() q3_weapon_rocketlauncher;
+
 // map translations
 
 void() check_translate;
 
-float TR_Q1DEF;
+float TR_Q1DEF;					// default non q1 stuff to q1 in some sits
+float TR_Q1QRY;					// query status - only need to do this once
 float TR_WOLF;
 float TR_DOOM;
 float TR_QUAKE;
@@ -332,6 +338,7 @@ float qweps, pkweps; // inventory bit masks for weps
 .void() _fr_attack; // starts frame set
 void() e_weap_Attack;
 
+void() viswep_pkbot;
 void() viswep_post;
 void() viswep_pre;
 void(entity vh, float cd) viswep_ld;

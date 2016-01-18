@@ -34,7 +34,7 @@ void(entity e, float f, float r) rune_print =
 	else if (f == RUNE_FLG_DM && RUNES < 2) 	sprint(e, "Damage = 2 x damage for 30 secs.  8 x damage if combined with quad.\n");
 	else if (f == RUNE_FLG_DM) 	sprint(e, "Damage = 2 x damage.\n");
 	else if (f == RUNE_FLG_HS) sprint(e, "Haste - double fire rate for most weps.\n");
-	else if (f == RUNE_FLG_RG) sprint(e, "Regenerate 5 health | armor every 1/2 second\n");
+	else if (f == RUNE_FLG_RG) sprint(e, "Regeneration - add 5 health | armor every 1/2 second\n");
 	else sprint(e, "Rune not identified - unknown power!\n");
 
 	return;
@@ -54,7 +54,7 @@ float(float mc, float bc) rune_bit_code =
 	local float f;
 
 	f = 0;
-	if (mc == MC_SIGIL1) f = R_EARTH; //RUNE_FLG_RS;
+	if (mc == MC_SIGIL1) f = R_EARTH; //RUNE_FLG_RS; // these can be randomly assigned now
 	else if (mc == MC_SIGIL2) f = R_BLACK; //RUNE_FLG_DM;
 	else if (mc == MC_SIGIL4) f = R_HELL; //RUNE_FLG_HS;
 	else if (mc == MC_SIGIL8) f = R_ELDER; //RUNE_FLG_RG;
@@ -75,7 +75,7 @@ string(float b) rune_name =
 	return("Unknown magic");
 }
 
-float map_rune_found;
+float nonserver_rune_found;
 
 void(float b) rune_map_print =
 {
@@ -91,7 +91,7 @@ void(float b) rune_map_print =
 	e = find(world, netname, rune_name(b));
 	while (e && e.map != "rune")
 	{
-		map_rune_found = TRUE; // found a map spawned / dynamic / func_make rune
+		nonserver_rune_found = TRUE; // found a map spawned / func_dynamic / func_make rune
 		e = find(e, netname, rune_name(b));
 	}
 	if (e)
@@ -526,6 +526,8 @@ void() run_runes =
 		rune_map_print(R_HELL);
 		rune_map_print(R_ELDER);
 		bprint("\n");
+		if (nonserver_rune_found)
+			bprint("* non server Runes are loaded on this map.\n\n");
 		cvar_set("pk_runemap", "0");
 	}
 
@@ -549,6 +551,9 @@ void() rune_regen =
 {
 	if (self.deadflag)
 		return;
+
+	if (self.view_ofs == '0 0 0')
+		return;		// intermission or finale
 
 	if (self.rg_time > time)
 		return;

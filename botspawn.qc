@@ -10,12 +10,36 @@
  *
  */
 
+// because if we call it straight up it missed the bots
+
+void(float tm) th_bot_changeParms =
+{
+	local entity e;
+
+	e = world;
+	if (self.classname != "th_bot_changeParms")
+	{
+		if (!find(world, classname, "th_bot_changeParms"))
+			e = spawn();
+		if (e)
+		{
+			e.classname = "th_bot_changeParms";
+			e.think = th_bot_changeParms;
+			e.nextthink = time + tm;
+		}
+	}
+	else
+	{
+		bot_changeParms();
+		remove(self);
+	}
+};
 
 void () initBotLevel =
 {
 	local float num;
 	local float offset;
-	local float i;
+	local float i, f;
 	local entity e;
 	local string tmp;
 
@@ -26,17 +50,24 @@ void () initBotLevel =
 	NUMPATHS = 0;
 	NUMPATHERS = 0;
 	offset = 1;
-	while (num > 0)
+	if (self.cnt > 0 && !num)
 	{
-		num = (num - 1);
+		i = BOT_SAVE_SKILL;
+	}
+	while (num > 0 || i > 0)
+	{
+		if (num > 0) num = (num - 1);
+		if (i > 0) i = (i - 1);
 		c_skill = skill;
+		f = 0;
 		if ((NUMBOTS < (BOT_SAVE_SKILL - 1)) && !(serverflags & DEDICATED))
 		{
 //			c_skill = ((0.1 * (parm12 & (offset * 31))) / offset);
-			c_skill = ((self.cnt & (offset * 3)) / offset);
+			f = c_skill = ((self.cnt & (offset * 3)) / offset);
 		}
 		offset = (offset * 4);
-		AddAnotherBot(c_skill);
+		if (num || (i && f > 0))
+			AddAnotherBot(c_skill);
 	}
 	if (serverflags & TEAMFLAG)
 	{
@@ -58,6 +89,8 @@ void () initBotLevel =
 	}
 	if (!teamplay)
 	{
+		if (self.classname == "initBotLevel")
+			remove(self);
 		return ;
 	}
 	num = ((serverflags & TEAMBOTS) / 256);
@@ -404,7 +437,6 @@ entity () AddBot =
 		self.skil = 3;
 	}
 //	initscore ();
-	if (DARKPLACES || chaos) bot_changeParms();
 	self = oldself;
 	return(newbot);
 };
@@ -683,6 +715,7 @@ void (float skl) AddAnotherBot =
 	WriteByte (MSG_ALL,newbot.id);
 	WriteShort (MSG_ALL,newbot.frags);
 */
+	if (DARKPLACES || chaos) th_bot_changeParms(12.5);
 	if (BOTFREEZE) bot_froze(newbot); // Cataboligne - 6.9.10 - bots get really cold now - dev code
 };
 
@@ -717,6 +750,7 @@ void (entity ply, float n) addTeamBots =
 			newbot.netname = "[Bot3]";
 		}
 		i = (i - 1);
+		if (DARKPLACES || chaos) th_bot_changeParms(12.5);
 	}
 };
 
@@ -754,7 +788,7 @@ void(entity e) removeBot =
 	remove (f.goalentity);
 	remove (f);
 	NUMBOTS = NUMBOTS - 1;
-	if (DARKPLACES || chaos) bot_changeParms();
+	if (DARKPLACES || chaos) th_bot_changeParms(1);
 };
 
 void (entity ply, float n) removeTeamBots =

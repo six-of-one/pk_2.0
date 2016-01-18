@@ -311,6 +311,19 @@ void () BotPostThink =
 // fix get item issue with rndize
 	if (self.classname != "pk*bot")	self.classname = "pk*bot";
 
+// bot post think checks
+		if (self.copb_timeout)
+		{
+			if (self.copb_timeout >= time)
+			{
+				copb_checkFart();
+			}
+			else
+			{
+				self.copb_timeout = 0;
+			}
+		}
+
 // runes
 	if (self.rune_flag & RUNE_FLG_RG) rune_regen();
 };

@@ -451,9 +451,7 @@ float (string wpm) ver_weaponmodel =
 	return(FALSE);
 };
 
-// fn(viswep_pkbot) - load / unload pkbots
-
-float vw_bot_frame; // handle pk*bots
+// fn(viswep_pkbot) - viswep set for pk*bots
 
 void() viswep_pkbot =
 {
@@ -466,18 +464,6 @@ void() viswep_pkbot =
 	while (self)
 	{
 		viswep_post();
-// bot post think checks - NOTE: need to go elsewhere
-		if (self.copb_timeout)
-		{
-			if (self.copb_timeout >= time)
-			{
-				copb_checkFart();
-			}
-			else
-			{
-				self.copb_timeout = 0;
-			}
-		}
 
 		self = find(self,classname,"pk*bot");
 	}
@@ -499,9 +485,6 @@ void() viswep_post =
 //	if (!self.flags & FL_CLIENT) return;
 
 	vw_chain(self);
-
-	if (vw_bot_frame != framecount)
-	if (self.classname != "pk*bot" && self.ishuman) viswep_pkbot();
 
 														// NOTE - check this vs. invisibility for norm & morphs
 	if (self.deadflag || self.classname == OBSERVER || self.view_ofs == '0 0 0' || self.model == "") //(self.admin && self.admin != USER_MENU)) //intermission_running)
@@ -620,7 +603,7 @@ void() viswep_post =
 			{
 				if ((vhead.weapon == dwep) && (dwep != IT_AXE)) qld = TRUE; // main weapon - not holstered
 				else if ((vhead.weapon == dwep) && (vhead.pk_currentitem == pkdwep)) qld = TRUE;
-// TDO: set eweapon by vw
+
 				if (vhead.weapon == dwep)
 				{
 					vhead.owner.eweapon = vhead.eweapon;

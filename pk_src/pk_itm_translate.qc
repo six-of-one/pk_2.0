@@ -23,8 +23,7 @@ void(entity e) hide_item =
 	e.th_stand = e.touch;
 	e.touch = SUB_Null;
 	e.path = e.map;
-	e.map = ""; // hide from pic
-
+	if (e.map == "pic_item") e.map = "repic"; // hide from pic, allow restore
 };
 
 string(entity e, float TR) map_trans =
@@ -127,6 +126,7 @@ void(entity e, float trvs) item_translate =
 	else if (mcc != "")
 	{
 		NO_PI = 3.1415;
+		if(e.map == "repic") e.map = "pic_item";
 		item_call_save(e, mcc);
 	}
 	if (WARNING) bprint("\n");
@@ -136,22 +136,16 @@ void(entity e, float trv) master_item_control =
 {
 	if (e.classname == "func_make") return; // override
 
-//	if (e.class_select == "") e.class_select = "doom";
-
 	if (!PK_100 && !Q_100) // turned back on - come here from loop
 	{
-		if (trv)
+		if (e.wad == "q1")
 		{
-			item_translate(e, trv);
+			hide_item (e);
 			return;
 		}
-		else if (e.wad == "q1")
+		else if (trv)
 		{
-			setmodel (e,"");
-			e.th_stand = e.touch;
-			e.touch = SUB_Null;
-			e.path = e.map;
-			e.map = ""; // hide from pic
+			item_translate(e, trv);
 			return;
 		}
 		setmodel (e,e.mdl);
@@ -159,22 +153,18 @@ void(entity e, float trv) master_item_control =
 		if (e.th_stand != SUB_Null) e.pk_touch = e.th_stand;
 		e.th_stand = SUB_Null;
 		e.map = e.path;
+		if(e.map == "repic") e.map = "pic_item";
 		return;
 	}
 
 	if (trv)
+	{
+		if(e.map == "repic") e.map = "pic_item";
 		item_translate(e, trv);
-	else
-	if (time < PIC_TO || !trv)
-//	if (cvar("pk_place_item") != 0) // pic - just block appearance, rnd does rest - not needed
-	{
-// TDO: doom item translate if map has no wad = "q1" items
-			hide_item (e);
 	}
-	else // IDEA: option to turn into rnd regular pk items
-// NOTE: pk_100 or q_100 - this code should never run
+	else
 	{
-		if (e.classname == "dyn_item")
+		if (e.classname == "dyn_item") // NOTE: should never happen, pk100 has no dyn (unless func_dyn)
 		{
 			if (WARNING)
 			{
@@ -183,16 +173,8 @@ void(entity e, float trv) master_item_control =
 				bprint(" - hiding\n");
 			}
 		}
-		else
-		if (WARNING)
-		{
-			bprint("*** Warning - pk_100 and code made a ");
-			bprint(e.class_select);
-			bprint(" - hiding\n");
-		}
 		hide_item (e);
 	}
-
 };
 
 // allow live translate of doom items - later
@@ -481,4 +463,16 @@ void() check_translate =
 
 	cvar_set("pk_translate", "0");
 
+};
+
+// common item temp code - does nothing for now
+
+void() q2_weapon_rocketlauncher =
+{
+	SUB_Nop();
+};
+
+void() q3_weapon_rocketlauncher =
+{
+	SUB_Nop();
 };

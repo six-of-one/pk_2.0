@@ -208,12 +208,15 @@ void() bot_skinParms =
 void() bot_changeParms =
 {
 	local float offset, toffset, team1;
-	local float nb, nt;
+	local float nb, nt, pk12, pk13;
 	local entity e;
 
 	e = find(world,classname,"pk*bot");
 	offset = toffset = 1;
-	parm12 = parm13 = 0; // tuned for painkeep merge
+	if (DARKPLACES || chaos)
+		pk12 = pk13 = 0;
+	else
+		parm12 = parm13 = 0; // tuned for painkeep merge
 	team1 = 100;
 	nb = nt = 0;
 	while (e)
@@ -224,7 +227,10 @@ void() bot_changeParms =
 			if (nb < BOT_SAVE_SKILL)
 			{
 //				parm12 = (parm12 + (((offset * e.skil) * 10) & (offset * 31)));
-				parm12 = (parm12 + ((offset * e.skil) & (offset * 3)));
+				if (DARKPLACES || chaos)
+					pk12 = (pk12 + ((offset * e.skil) & (offset * 3)));
+				else
+					parm12 = (parm12 + ((offset * e.skil) & (offset * 3)));
 				offset = (offset * 4);
 			}
 		}
@@ -240,12 +246,20 @@ void() bot_changeParms =
 				if (nt < BOT_SAVE_SKILL)
 				{
 //				parm13 = (parm13 + (((toffset * e.skil) * 10) & (toffset * 31)));
-				parm13 = (parm13 + ((toffset * e.skil) & (toffset * 3)));
+				if (DARKPLACES || chaos)
+					pk13 = (pk13 + ((toffset * e.skil) & (toffset * 3)));
+				else
+					parm13 = (parm13 + ((toffset * e.skil) & (toffset * 3)));
 				toffset = (toffset * 4);
 				}
 			}
 		}
 		e = find (e,classname,"pk*bot");
+	}
+	if (DARKPLACES || chaos)
+	{
+		cvar_set("sv_bot_pk", ftos(pk12));
+		cvar_set("sv_bot_pktm", ftos(pk13));
 	}
 };
 
@@ -265,8 +279,16 @@ void() bot_skinDecode =
 
 void() set_initBotLevel =
 {
-	local float dedflags;
+	local float dedflags, pk12, pk13;
 	local entity e;
+
+	pk12 = pk13 = 0;
+	if (DARKPLACES || chaos)
+	{
+		if (!cvar("sv_bot_pkset")) return;
+		pk12 = cvar("sv_bot_pk");
+		pk13 = cvar("sv_bot_pktm");
+	}
 
   	dedflags = cvar ("temp1");
 	if (dedflags & DEDICATED)
@@ -274,15 +296,24 @@ void() set_initBotLevel =
 		serverflags = (dedflags | INITLEVEL);
 		cvar_set ("temp1","0");
 	}
-	if (serverflags & INITLEVEL)
+	if (serverflags & INITLEVEL || pk12 || pk13)
 	if (!find(world,classname,"initBotLevel"))
 	{
 		e = spawn();
 		e.think = initBotLevel;
 		e.nextthink = time + 2; // give players time to start
 		e.classname = "initBotLevel";
-		e.cnt = parm12; // should be bot skill for up to 6 bots
-		e.count = parm13;
+		if (DARKPLACES || chaos)
+		{
+			e.cnt = pk12;
+			e.count = pk13;
+			cvar_set("sv_bot_pkset", "0");
+		}
+		else
+		{
+			e.cnt = parm12; // should be bot skill for up to 6 bots
+			e.count = parm13;
+		}
 	}
 
 // from prev fn() - set_CarriedPath
@@ -376,7 +407,7 @@ void(entity targ, entity attacker) bot_kill =
 		f.classname = "player";
 	}
 
-	if (PK) PK_ClientObituary(targ, damage_inflictor, attacker); // *pk - pk death handler
+	if (!Q_100) PK_ClientObituary(targ, damage_inflictor, attacker); // *pk - pk death handler
 	else ClientObituary(targ, attacker);
 
 	if (e) e.classname = "pk*bot";
@@ -730,12 +761,12 @@ void () printIntro =
 			addTeamBots (self,num);
 		}
 //		centerprint (self,"Server running team pk*bots v1.1\nand PainKeep v1.1");
-		centerprint (self,"Server running team pk*bots v1.1, frikbot 0.10.1");
+		centerprint (self,"Server running team pk*bots v2.0.1, frikbot 0.10.1");
 	}
 	else
 	{
 //		centerprint (self,"Server running pk*bots v1.1\nand PainKeep v1.1");
-		centerprint (self,"Server running pk*bots v1.1, frikbot 0.10.1");
+		centerprint (self,"Server running pk*bots v2.0.1, frikbot 0.10.1");
 	}
 };
 
@@ -760,7 +791,7 @@ void (entity e) bot_freeze =
 	{
 		e.movetype = e.style;
 		e.attack_finished = 0;
-		e.think = e.think1;
+		e.think = e.think1; // if this is spuriously called this is not good
 		e.nextthink = time + 0.1;
 		b_ufr = b_ufr + 1;
 	}

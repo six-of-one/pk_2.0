@@ -508,7 +508,7 @@ void () weapon_touch =
 	self = other;
 
 // PK-NOTE: "old" variable above does nothing...what was iD's plan for it?
-	if (!Q_100)
+	if (PK)
 		PK_Deathmatch_Weapon (new, 0); // *pk - new wep switch rule for higher risk weps
 	else
 	if (!deathmatch)
@@ -596,6 +596,17 @@ void () weapon_grenadelauncher =
 
 void () weapon_rocketlauncher =
 {
+// CIC example - wont do anything for a bit
+	if (world.wad == "q2.wad")
+	{
+		q2_weapon_rocketlauncher();
+		return;
+	}
+	else if (world.wad == "")
+	{
+		q3_weapon_rocketlauncher();
+		return;
+	}
 	precache_model ("progs/g_rock2.mdl");
 	setmodel (self,"progs/g_rock2.mdl");
 	self.weapon = 3;

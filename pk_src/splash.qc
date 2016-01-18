@@ -158,36 +158,33 @@ void() CheckWaterLevels =
 
 		if (pcc == CONTENT_SOLID || ceil(e.velocity_z) == -2011)
 		{
-			local float d;
-			d = FALSE;
-
 			if (ceil(e.velocity_z) == -2011)
 			{
-				d = TRUE;
-				if (WARNING)
-				if (e.wait > -888)
+				if (e.flags & FL_ITEM)
 				{
-					e.wait = -888;
-//					bprint("*** warning: falling item hit -2011 vel*_z (terminal) - ");
-//					bprint(item_ident(e));
-//					bprint("\n");
-				}
-				if ((e.flags & FL_ITEM) && e.ip_orgOrigin != v0) // put items back now
-				{
-					e.wait = e.wait - 1;
-					if (e.wait < -895) e.movetype = MOVETYPE_NONE;
-					e.ip_orgOrigin_z = e.ip_orgOrigin_z + 4;
-					setorigin (e, e.ip_orgOrigin);
-					e.velocity = v0;
-					e.think = ip_checkForMovement;
-					e.nextthink = time + CFM_TIME;
-					d = FALSE;
-					if (WARNING)
+					if (e.wait > -888)
 					{
-						bprint("*** warning: falling item reset - ");
-						bprint(item_ident(e));
-						if (e.movetype == MOVETYPE_NONE) bprint(" - FROZEN");
-						bprint("\n");
+						e.wait = -888;
+	//					bprint("*** warning: falling item hit -2011 vel*_z (terminal) - ");
+	//					bprint(item_ident(e));
+	//					bprint("\n");
+					}
+					if (e.ip_orgOrigin != v0) // put items back now
+					{
+						e.wait = e.wait - 1;
+						if (e.wait < -895) e.movetype = MOVETYPE_NONE; // drastic but neccesary if a bounding box seems to cut into a wall / solid because item keeps falling after every reset
+						e.ip_orgOrigin_z = e.ip_orgOrigin_z + 3;
+						setorigin (e, e.ip_orgOrigin);
+						e.velocity = v0;
+						e.think = ip_checkForMovement;
+						e.nextthink = time + CFM_TIME;
+						if (WARNING)
+						{
+							bprint("*** warning: falling item reset - ");
+							bprint(item_ident(e));
+							if (e.movetype == MOVETYPE_NONE) bprint(" - FROZEN");
+							bprint("\n");
+						}
 					}
 				}
 				else if (e.flags & FL_MONSTER && e.solid != SOLID_NOT) e.th_die(); // note: swim monsters dont set splash
@@ -204,35 +201,6 @@ void() CheckWaterLevels =
 					remove(e); // remove all else
 				}
 			}
-/*
-			if (!e.endtime) e.endtime = time;
-			else
-			if (e.endtime + SOLID_TIME < time)
-			if (e.velocity_z < -1000)
-			if (e.classname != "player" || IROBOT(e))
-				d = TRUE;
-
-		if (d)
-			{
-				if (e.flags & FL_MONSTER && e.solid != SOLID_NOT) e.th_die(); // note: swim monsters dont set splash
-				else if (e.flags & FL_MONSTER) remove(e); // kill then remove
-//				else if (e.touch == pulse_touch) remove(e); // pulse nails
-				else if (e.classname == "beartrap") remove(e);
-				else if (e.classname == "turret")
-				{
-					remove(e.turret_base);
-					remove(e);
-				}
-				else if (e.classname == "spike") remove(e);
-				else if (IROBOT(e)) T_Damage(e, e, e, 10000); // TDO: obit for this - nocide
-				else if (WARNING)
-				{
-					bprint("*** warning: falling item exited level? - ");
-					bprint(item_ident(e));
-					bprint("\n");
-				}
-			}
-			*/
 		}
 		else
 			e.endtime = 0;

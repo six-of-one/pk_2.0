@@ -1221,6 +1221,7 @@ void() pk_item_position_init =
 
 void() pk_placeitem =
 {
+	local float f;
 
 	if (self.classname != "dyn_item")
 	{
@@ -1241,12 +1242,24 @@ void() pk_placeitem =
 	if (!PK_100 && !Q_100)
 	{
 		if (self.wad == "q1") master_item_control(self, 0);
-		else if ((TR_ALL || TR_DOOM) && self.class_select == "doom_item")  master_item_control(self, TR_DOOM);
 		else if ((TR_ALL || TR_WOLF) && self.class_select == "wolf_item")  master_item_control(self, TR_WOLF);
+		else if ((TR_ALL || TR_DOOM) && self.class_select == "doom_item")  master_item_control(self, TR_DOOM);
+		else if ((TR_ALL || TR_Q2) && self.class_select == "q2_item")  master_item_control(self, TR_Q2);
+		else if ((TR_ALL || TR_Q3) && self.class_select == "q3_item")  master_item_control(self, TR_Q3);
 	}
 	else
 	{
-		if (self.class_select == "doom_item") master_item_control(self, 0);
+		f = 0;
+		if (TR_Q1QRY > 0)
+		{
+			TR_Q1QRY = 0;
+			if (find(world,wad,"q1")) TR_Q1QRY = -1; // map was designed for dual items - remove only
+		}
+		if (TR_Q1DEF && (TR_Q1QRY == 0)) f = FL_TR_QUAKE;
+		if (self.class_select == "wolf_item") master_item_control(self, f);
+		else if (self.class_select == "doom_item") master_item_control(self, f);
+		else if (self.class_select == "q2_item") master_item_control(self, f);
+		else if (self.class_select == "q3_item") master_item_control(self, f);
 	}
 
 

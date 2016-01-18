@@ -763,6 +763,9 @@ void(float bt, float st) pk_bas_flags =
 
 void() pk_liveupd =
 {
+	local entity e;
+	local float f;
+
 // server controls
 
 	Q_100_OBJERR = cvar("sv_q100_objerr");
@@ -779,9 +782,18 @@ void() pk_liveupd =
 	if (deathmatch || coop)
 	if (cvar("sv_botmatch") != 0) b_launch(0);
 
-	if (TR_Q1DEF != cvar("pk_tr_q1def")
+// toggle for q1 def item translation
+	if (PK_100 || Q_100)
+	if (TR_Q1QRY == 0)
+	if (TR_Q1DEF != cvar("pk_tr_q1def"))
 	{
-		
+		TR_Q1DEF = cvar("pk_tr_q1def");
+		f = 0;
+		if (TR_Q1DEF) f = FL_TR_QUAKE;				/// NOTE: TR_ALL overrides this setting
+		master_item_control_loop("wolf_item", f);
+		master_item_control_loop("doom_item", f);
+		master_item_control_loop("q2_item", f);
+		master_item_control_loop("q3_item", f);
 	}
 	
 	if (Q_100) return;
@@ -896,9 +908,6 @@ void() pk_liveupd =
 		DYN_ART = cvar("pk_dyn_art");
 		DYN_ARTFR = cvar("pk_dyn_art_force");
 	}
-
-	local entity e;
-	local float f;
 
 // test it
 	if (pk_flags & PK_DYNAMIC || DYN_OVR || DYN_FORCE || DYN_ARTFR)
@@ -1073,6 +1082,7 @@ void() pk_srvcmd_set =
 // map translations
 
 	TR_Q1DEF = 1;
+	TR_Q1QRY = 1;
 	TR_WOLF = 0;
 	TR_DOOM = 0;
 	TR_QUAKE = 0;

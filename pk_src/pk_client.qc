@@ -904,32 +904,34 @@ void () PlayerPreThink =
 };
 
 
+float vw_bot_frame; // handle pk*bots
+
 //void() pk_post_think =
 void () PlayerPostThink =
 {
+	if (vw_bot_frame != framecount) viswep_pkbot();
+
 	if (FRIKBOT)
 	if (BotPostFrame ())
 		return ;
 
 	if (find(world,classname,"pk*bot"))
   {
-	if (!(self.view_ofs == '0 0 0') && !self.deadflag)
-	if (CheckDropPath ()) // *bot
-	{
-		DropBotPath ();
-	}
+		if ((self.view_ofs != '0 0 0') && !self.deadflag)
+		if (CheckDropPath ()) // *bot
+		{
+			DropBotPath ();
+		}
 
-	if (DARKPLACES || chaos)
-	if (cvar("botlevel")) // hack so alias can load new map & keep pk*bots
-	{
-		bot_changelevel(); // map change MUST happen - this clears bots from map!
-//		bot_changeParms(); // save bots for change
-		cvar_set("botlevel", "0");
-	}
-
+		if (DARKPLACES || chaos)
+		if (cvar("botlevel")) // hack so alias can load new map & keep pk*bots
+		{
+			bot_changelevel(); // map change MUST happen - this clears bots from map!
+	//		bot_changeParms(); // save bots for change
+			cvar_set("botlevel", "0");
+		}
   }
 
-//	if (self.weapon || self.vwepent) 
 	viswep_post(); // Cataboligne - 9.26.9 - viswep code link - always have to run this for 1 player + pk*bots deal
 
 	if ((PK_ADMIN && !ADMINLOCK) || (self.admin == USER_MENU && self.view_ofs != '0 0 0')) // *pk - run admin for both modes - any deactivation will 0 this || make sure user menu always works
@@ -949,6 +951,9 @@ void () PlayerPostThink =
 			self.flags = self.flags - (self.flags & FL_NDISMDL);
 			}
 
+// runes - these qaulify the below 2 tests in the call!
+	if (self.rune_flag & RUNE_FLG_RG) rune_regen();
+
 	if (Q_100 || Q_99) // TDO: check q99-ness hereish
 	{
 		q100_PlayerPostThink();
@@ -959,9 +964,6 @@ void () PlayerPostThink =
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
 
-
-// runes
-	if (self.rune_flag & RUNE_FLG_RG) rune_regen();
 
 	if (self.deadflag)
 	// BOLT_START
