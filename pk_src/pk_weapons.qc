@@ -1150,6 +1150,8 @@ void() PK_ChangeWeapon =
 
 void() PK_CycleWeaponCommand =
 {
+	local float sf;
+	sf = 50;
 	while (1)
 	{
 		if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_CLIGHT)
@@ -1187,6 +1189,16 @@ void() PK_CycleWeaponCommand =
 			self.pk_currentitem = PK_IT_CLIGHT;
 		}
 
+// fix loop bug - we hope
+		if (sf < 1)
+		{
+			self.weapon = IT_AXE;
+			self.pk_currentitem = PK_IT_AXE;
+			W_SetCurrentAmmo();
+			return;
+		}
+		sf=sf - 1;
+
 		if (CanSelect(self.weapon, self.pk_currentitem))
 		{
 			W_SetCurrentAmmo();
@@ -1200,6 +1212,8 @@ void() PK_CycleWeaponCommand =
 
 void() PK_CycleWeaponReverseCommand =
 {
+	local float sf;
+	sf = 50;
 	while (1)
 	{
 		if (self.weapon == IT_LIGHTNING)
@@ -1236,6 +1250,16 @@ void() PK_CycleWeaponReverseCommand =
 		}
 		else if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_CLIGHT)
 			self.weapon = IT_LIGHTNING;
+
+// fix loop bug - we hope
+		if (sf < 1)
+		{
+			self.weapon = IT_AXE;
+			self.pk_currentitem = PK_IT_AXE;
+			W_SetCurrentAmmo();
+			return;
+		}
+		sf=sf - 1;
 
 		if (CanSelect(self.weapon, self.pk_currentitem))
 		{

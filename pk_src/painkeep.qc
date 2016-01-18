@@ -171,7 +171,7 @@ void() PK_precache =
 	{
 // access code first
 		e = spawn();
-		e.nextthink = time + 0.3; // cat: 8.8.9 - had to increment 0.1, wasnt getting code
+		e.nextthink = time + 0.5; // cat: 8.8.9 - had to increment, wasnt getting code
 		e.think = PK_SetAdmin;
 		e.classname = "admincode";
 
@@ -179,7 +179,7 @@ void() PK_precache =
 		pk_admincode = pk_adminimp = -1;
 		pk_adminpwdmask = TRUE;
 
-		localcmd("noadmingamma\n"); // set gamma leWvel
+		localcmd("noadmingamma\n"); // set gamma level
 		localcmd("noadmin_centertime\n");
 
 // set defaults not usually bound by quake
@@ -219,6 +219,8 @@ void() PK_precache =
 	{
 		PK = PK_mapmode(world.model);
 	}
+
+	PK_ART = PK_ART_DEF; // Cataboligne - 8.12.9 - pk artifacts support init - FIX - needs to read admin var
 
 	custom_hub_loaded = pk_flags & PK_HUB2; // see if we came from a custom hub
 // run this and a non PK map loaded with map command exits custom hub loop as with normal hub under v1.2
@@ -384,7 +386,7 @@ float(string mp) PK_mapmode =
 		else if (mp == "maps/pkn18.bsp") md = TRUE;
 		else if (mp == "maps/pkn19.bsp") md = TRUE;
 		else if (mp == "maps/pkn20.bsp") md = TRUE;
-		}
+	}
 	return(md);
 };
 
@@ -429,7 +431,7 @@ void(vector pos, string samp, float vol, float atten) ambientsound =
 		else if (samp == "ambience/swamp1.wav") psamp = "alt_ambience/swamp1.wav";
 		else if (samp == "ambience/swamp2.wav") psamp = "alt_ambience/swamp2.wav";
 		else if (samp == "ambience/hum1.wav") psamp = "alt_ambience/hum1.wav";
-		else if (psamp != samp) precache_sound(psamp);
+		if (psamp != samp) precache_sound(psamp);
 	}
 	pk_ambientsound(pos, psamp, vol, atten);
 };
@@ -1395,7 +1397,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 				return;
 			}
 
-			// hell if I know; he's just dead!!!
+			// its worse than that - he's dead Jim
 			bprint (" died\n");
 		}
 	}

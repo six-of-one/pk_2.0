@@ -76,6 +76,7 @@ void () SetChangeParms =
 	if (PK) PK_ChangeParms();
 	if (find(world,classname,"pk*bot")) bot_changeParms();
 //	bot_skinParms();
+	if (self.classname == "pk*bot") dprint("pk*bot in setchangeparms\n");
 
 // Cataboligne 9.11.3 purify - chase cam
 	cam_parms(0);

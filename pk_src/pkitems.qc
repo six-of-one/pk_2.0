@@ -13,7 +13,7 @@
 
 
 /*
- * New weapons and items. These are not functional.
+ * New weapons and items. These are not functional. -- Cataboligne - huh? what does this mean??
  *
  * weapon_airfist
  * weapon_grapgun

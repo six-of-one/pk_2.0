@@ -1,6 +1,9 @@
 ./progs.dat
 
 defs.qc
+// painkeep artifacts
+pk_src/pk_art.defs.qc
+
 // painkeep code
 pk_src/pk.defs.qc
 bot.defs.qc
@@ -88,6 +91,9 @@ pk_src/motd.qc
 pk_src/admin.qc
 
 // pk_src/frames.qc - not in original progs.src
+
+// painkeep artifacts
+pk_src/pk_artifacts.qc
 
 // support for q3 maps in darkplaces
 pk_src/q3items.qc

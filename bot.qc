@@ -222,8 +222,8 @@ void() bot_changeParms =
 				if (nt < BOT_SAVE_SKILL)
 				{
 //				parm13 = (parm13 + (((toffset * e.skil) * 10) & (toffset * 31)));
-				parm13 = (parm13 + ((offset * e.skil) & (offset * 3)));
-				toffset = (offset * 4);
+				parm13 = (parm13 + ((toffset * e.skil) & (toffset * 3)));
+				toffset = (toffset * 4);
 				}
 			}
 		}

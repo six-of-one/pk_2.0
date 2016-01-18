@@ -716,4 +716,4 @@ float LASERTARG_LIT		= 32;
 
 // moved here due to v106 tones
 
-.float	 healtype
+.float	 healtype;

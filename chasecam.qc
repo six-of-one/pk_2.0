@@ -1008,25 +1008,6 @@ void(float opt) Chase_cam_read_temp1 =
 		Chase_cam_change_zmult(2);
 };
 
-/* painkeep hacks - was out of parms, need to store bit tho
-
-void() cam_defaults=
-{
-	// only reset if zeroed  (so DM/COOP respawns don't reset)
-	if (! parm14) parm14 = 100; // dist - cam distance
-	if (! parm15) parm15 = 0.22; //zmult - cam height offset
-	if (! parm16)
-		parm16 = cvar("temp1") & (CHSCAM_ON | LASERTARG_ON | LASERTARG_LIT);
-};
-
-void() cam_decode=
-{
-	if (! self.dest2_x) self.dest2_x = parm16;
-	if (! self.dest2_y) self.dest2_y = parm14;
-	if (! self.dest2_z) self.dest2_z = parm15;
-};
-*/
-
 // fn(cam_parms) - manage parms between levels
 
 void(float sel) cam_parms =
