@@ -679,7 +679,11 @@ bprint("hi, code base here, this is odd: bot item ( ");
 bprint(e.classname);
 bprint(" , ");
 bprint(e.netname);
-bprint(" ) - fell through tests!\n");
+bprint(" ) - fell through tests! - on: ");
+bprint(mapname);
+bprint(" @ ");
+bprint(vtos(e.origin));
+bprint("\n");
 
 /* deprecated for easy code above
 	if (e.classname == "item_artifact_super_damage")

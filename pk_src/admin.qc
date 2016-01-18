@@ -111,6 +111,33 @@ float (float rl) AdminBitFlag =
 	return(e);
 };
 
+
+// clear screen from admin - exit or failed login after wait
+
+void(entity e) admin_clear =
+{
+	stuffcmd(e, "noadmingamma\n");
+	stuffcmd(e, "noadmin_centertime\n");
+	centerprint(e, "");
+	e.impulse = e.admin = 0;
+	e.takedamage = DAMAGE_AIM;	
+	e.wad = e.message = e.map = e.target = "";
+	e.enemy = world;
+};
+
+// clear | set these for players
+
+void(entity e) pk_admincfg =
+{
+		admin_clear(e);
+
+// set defaults not usually bound by quake
+		stuffcmd(e, "bind 9 \"impulse 9\"\n"); // 9 is cheat in sp - this could be annoying for SP
+		stuffcmd(e, "bind 0 \"impulse 10\"\n");
+		stuffcmd(e, "bind enter \"impulse 11\"\n");
+		stuffcmd(e, "bind backspace \"impulse 12\"\n");
+}
+
 /*
 ==========
 TeamToggle
@@ -179,26 +206,40 @@ void() JumptoNext =
 {
 	local entity ot;
 	ot = find(world, classname, "trigger_changelevel");
-	if (!ot || mapname == "start")
-		self.wad = "\nNextLevel is not defined";
+	nextmap = ot.map;
+
+	if (inHubMap)
+		self.wad = "\nPainkeep hub - level loaded by vote";
+//	else if (world.model == "maps/start.bsp" && world.message == "HUB")
+//		self.wad = "\nPainkeep hub - level loaded by vote";
+//	else if (world.model == "maps/hub2.bsp" || world.model == "maps/hub3.bsp")
+//		self.wad = "\na Painkeep hub - level loaded by vote";
+	else if (mapname == "start")
+		self.wad = "\nOn start map - no next level";
+	else if (!nextmap)
+		self.wad = "\nNext level is not defined";
 	else
 	{
+		admin_clear(self);
 		bprint("Admin executed next level command...\n");
-		bot_changelevel(); // *bot - reload bots on next level, handle intermission
-		changelevel(ot.map);
+		if (!(custom_hub_loaded && nextmap == "start"))
+			PK_ADMINMAP = TRUE; // in custom hub set do not allow loading hub
+		GotoNextMap();
 	}
 };
 
 /*
 ==========
-JumptoNext
+ResetLevel
 ==========
 */
 void() ResetLevel =
 {
+	admin_clear(self);
 	bprint("Admin executed reset level command...\n");
-	bot_changelevel(); // *bot - reload bots on next level, handle intermission
-	changelevel(mapname);
+	nextmap = mapname;
+	PK_ADMINMAP = TRUE; // in custom hub set do not allow loading hub
+	GotoNextMap();
 };
 
 /*
@@ -281,13 +322,12 @@ MapStart
 */
 void() MapStart =
 {
-	local string mp;
 
-	bot_changelevel(); // *bot - reload bots on next level, handle intermission
+	admin_clear(self);
 	bprint("Admin loaded hub / start map...\n");
-	check_custom_hub();
-	mp = hub_select();
-	changelevel(mp);
+
+	nextmap = hub_select();
+	GotoNextMap();
 };
 
 /*
@@ -300,21 +340,21 @@ void() Admin_dmmapmenu2 =
 	self.message =
 					 "\b Painkeep map expansion:\n"
 					 "\b+------------------------+\n"
-						"  01: pkts00   21: pkn1   \n"
-						"  02: pkts01   22: pkn2   \n"
-						"  03: pkts02   23: pkn3   \n"
-						"  04: pkts03   24: pkn4   \n"
-						"  05: pkts04   25: pkn5   \n"
-						"  06: pkts05   26: pkn6   \n"
-						"  07: pkts06   27: pkn7   \n"
-						"  08: pkts07   28: pkn8   \n"
-						"  09: pkts08   29: pkn9   \n"
-						"  10: pkts09   30: pkn10  \n"
-						"  11: pkts10   31: pkn11  \n"
-						"  12: pkts11   32: pkn12  \n"
-						"  13: pkts12   33: pkn13  \n"
-						"  14: pkts13   34: pkn14  \n"
-						"  15: pkts14   35: pkn15  \n"
+						"  01: pkts01   21: pkn1   \n"
+						"  02: pkts02   22: pkn2   \n"
+						"  03: pkts03   23: pkn3   \n"
+						"  04: pkts04   24: pkn4   \n"
+						"  05: pkts05   25: pkn5   \n"
+						"  06: pkts06   26: pkn6   \n"
+						"  07: pkts07   27: pkn7   \n"
+						"  08: pkts08   28: pkn8   \n"
+						"  09: pkts09   29: pkn9   \n"
+						"  10: pkts10   30: pkn10  \n"
+						"  11: pkts11   31: pkn11  \n"
+						"  12: pkts12   32: pkn12  \n"
+						"  13: pkts13   33: pkn13  \n"
+						"  14: pkts14   34: pkn14  \n"
+						"  15: pkts00   35: pkn15  \n"
 						"    :          36: pkn16  \n"
 						"    :          37: pkn17  \n"
 						"  18: hub2 *   38: pkn18  \n"
@@ -333,7 +373,38 @@ void() Admin_dmmapmenu2 =
 
 void() Admin_dmmapmenu =
 {
-	if (PK_ADHUB)
+	if (Q_99)
+	{
+	self.message =
+					 "\b  Quake map Menu:\n"
+					 "\b+------------------------+\n"
+						"    01:  dn1    20: e2m4  \n"
+						"    02:  dm2    21: e2m5 \n"
+						"    03:  dm3    22: e2m6  \n"
+						"    04:  dm4    23: e2m7  \n"
+						"    05:  dm5    24: e3m1  \n"
+						"    06:  dm6    25: e3m2 \n"
+						"    07:  start  26: e3m3  \n"
+						"    08:  end    27: e3m4  \n"
+						"    09:  e1m1   28: e3m5  \n"
+						"    10:  e1m2   29: e3m6  \n"
+						"    11:  e1m3   30: e3m7  \n"
+						"    12:  e1m4   31: e4m1  \n"
+						"    13:  e1m5   32: e4m2  \n"
+						"    14:  e1m6   33: e4m3  \n"
+						"    15:  e1m7   34: e4m4  \n"
+						"    16:  e1m8   35: e4m5  \n"
+						"    17:  e2m1   36: e4m6  \n"
+						"    18:  e2m2   37: e4m7  \n"
+						"    19:  e2m3   38: e4m8  \n"
+//						"    60:  new maps         \n"
+//						"    61:  list hub links   \n"
+						"   666:  main menu        \n"
+						"  admin impulse exits     \n"
+					 "\b+------------------------+\n"
+					 "\b Enter code: ";
+	}
+	else if (PK_ADHUB)
 	{
 	self.message =
 					 "\b  Painkeep map Menu:\n"
@@ -385,6 +456,55 @@ void() Admin_dmmapmenu =
 	self.lefty = 0;
 };
 
+// quake compat mode
+
+string() MapQ99 =
+{
+	local string mname;
+	mname = "";
+	if (self.lefty == 01) mname = "dm1";
+	else if (self.lefty == 02) mname = "dm2";
+	else if (self.lefty == 03) mname = "dm3";
+	else if (self.lefty == 04) mname = "dm4";
+	else if (self.lefty == 05) mname = "dm5";
+	else if (self.lefty == 06) mname = "dm6";
+	else if (self.lefty == 07) mname = "start";
+	else if (self.lefty == 08) mname = "end";
+	else if (self.lefty == 09) mname = "e1m1";
+	else if (self.lefty == 10) mname = "e1m2";
+	else if (self.lefty == 11) mname = "e1m3";
+	else if (self.lefty == 12) mname = "e1m4";
+	else if (self.lefty == 13) mname = "e1m5";
+	else if (self.lefty == 14) mname = "e1m6";
+	else if (self.lefty == 15) mname = "e1m7";
+	else if (self.lefty == 16) mname = "e1m8";
+	else if (self.lefty == 17) mname = "e2m1";
+	else if (self.lefty == 18) mname = "e2m2";
+	else if (self.lefty == 19) mname = "e2m3";
+	else if (self.lefty == 20) mname = "e2m4";
+	else if (self.lefty == 21) mname = "e2m5";
+	else if (self.lefty == 22) mname = "e2m6";
+	else if (self.lefty == 23) mname = "e2m7";
+	else if (self.lefty == 24) mname = "e3m1";
+	else if (self.lefty == 25) mname = "e3m2";
+	else if (self.lefty == 26) mname = "e3m3";
+	else if (self.lefty == 27) mname = "e3m4";
+	else if (self.lefty == 28) mname = "e3m5";
+	else if (self.lefty == 29) mname = "e3m6";
+	else if (self.lefty == 30) mname = "e3m7";
+	else if (self.lefty == 31) mname = "e4m1";
+	else if (self.lefty == 32) mname = "e4m2";
+	else if (self.lefty == 33) mname = "e4m3";
+	else if (self.lefty == 34) mname = "e4m4";
+	else if (self.lefty == 35) mname = "e4m5";
+	else if (self.lefty == 36) mname = "e4m6";
+	else if (self.lefty == 37) mname = "e4m7";
+	else if (self.lefty == 38) mname = "e4m8";
+//	else if (self.lefty == 39) mname = "";
+
+	return(mname);
+};
+
 // new pk maps in conv pack - return map name
 
 string() MapDM2 =
@@ -392,21 +512,21 @@ string() MapDM2 =
 	local string mname;
 	mname = "";
 	if (self.lefty == 41) mname = "painkeep2";
-	else if (self.lefty == 01) mname = "pkts00";
-	else if (self.lefty == 02) mname = "pkts01";
-	else if (self.lefty == 03) mname = "pkts02";
-	else if (self.lefty == 04) mname = "pkts03";
-	else if (self.lefty == 05) mname = "pkts04";
-	else if (self.lefty == 06) mname = "pkts05";
-	else if (self.lefty == 07) mname = "pkts06";
-	else if (self.lefty == 08) mname = "pkts07";
-	else if (self.lefty == 09) mname = "pkts08";
-	else if (self.lefty == 10) mname = "pkts09";
-	else if (self.lefty == 11) mname = "pkts10";
-	else if (self.lefty == 12) mname = "pkts11";
-	else if (self.lefty == 13) mname = "pkts12";
-	else if (self.lefty == 14) mname = "pkts13";
-	else if (self.lefty == 15) mname = "pkts14";
+	else if (self.lefty == 01) mname = "pkts01";
+	else if (self.lefty == 02) mname = "pkts02";
+	else if (self.lefty == 03) mname = "pkts03";
+	else if (self.lefty == 04) mname = "pkts04";
+	else if (self.lefty == 05) mname = "pkts05";
+	else if (self.lefty == 06) mname = "pkts06";
+	else if (self.lefty == 07) mname = "pkts07";
+	else if (self.lefty == 08) mname = "pkts08";
+	else if (self.lefty == 09) mname = "pkts09";
+	else if (self.lefty == 10) mname = "pkts10";
+	else if (self.lefty == 11) mname = "pkts11";
+	else if (self.lefty == 12) mname = "pkts12";
+	else if (self.lefty == 13) mname = "pkts13";
+	else if (self.lefty == 14) mname = "pkts14";
+	else if (self.lefty == 15) mname = "pkts00";
 //	else if (self.lefty == 16) mname = "pkts15";
 	else if (self.lefty == 21) mname = "pkn1";
 	else if (self.lefty == 22) mname = "pkn2";
@@ -430,8 +550,9 @@ string() MapDM2 =
 	else if (self.lefty == 40) mname = "pkn20";
 	else if (self.lefty == 42)
 	{
+		admin_clear(self);
 		mname = "";
-//		bot_changelevel(); // *bot - reload bots on next level, handle intermission
+		bot_changelevel(); // *bot - reload bots on next level, handle intermission
 		bprint("Admin loaded custom hub / start map...\n");
 		check_custom_hub(); 
 	}
@@ -452,7 +573,8 @@ float() MapDM =
 {
 	local string mname;
 
-	if (PK_ADHUB && self.cnt && self.lefty < 60) mname = MapDM2();
+	if (Q_99) mname = MapQ99();
+	else if (PK_ADHUB && self.cnt && self.lefty < 60) mname = MapDM2();
 	else if (self.lefty == A_PAINKEEP) mname = "painkeep";
 	else if (self.lefty == A_PK0) mname = "pk0";
 	else if (self.lefty == A_PK1) mname = "pk1";
@@ -539,6 +661,7 @@ float() MapDM =
 	bprint(mname);
 	bprint("\n");
 
+	admin_clear(self);
 	admin_sv_cfg();
 	bot_changelevel(); // *bot - reload bots on next level, handle intermission
 	changelevel(mname);
@@ -557,12 +680,12 @@ void() find_Kick =
 	self.enemy = find(self.enemy, classname, self.target);
 	if (!self.enemy) // end of list - 1st switch
 	{
-		if (self.target == "player") self.target = "jafo";
+		if (self.target == "player") self.target = OBSERVER;
 		else self.target = "player";
 		self.enemy = find(world, classname, self.target);
 		if (!self.enemy) // 2nd list no good - try looping
 		{
-			if (self.target == "player") self.target = "jafo";
+			if (self.target == "player") self.target = OBSERVER;
 			else self.target = "player";
 			self.enemy = find(world, classname, self.target);
 		}
@@ -673,11 +796,16 @@ void() Admin_itembits =
 
 	if (! pk_itemovr & CON_ANY)
 	{
-		self.wad = "\nNo bits are set in item override.";
+		bprint("\b--------------------------------\n");
+		self.wad = "\nNo bits are set in item override!";
+		bprint("\b--------------------------------\n");
 		return;
 	}
-	self.wad = "\nBits set in item override listed.";
-	bprint("--------------------------------\n");
+	if (pk_itemovr & ITEM_ANY)
+	{
+		self.wad = "\nBits set in item override listed.";
+		bprint("\b--------------------------------\n");
+	}
 	f = 1;
 	adv = "Bit set";
 	if (pk_itemovr & CON_CYC) adv = "Cycle";
@@ -704,15 +832,59 @@ void() Admin_itembits =
 		}
 		f = f * 2;
 	}
-	bprint("--------------------------------\n");
+	f = 0;
+	bprint("\b--------------------------------\n");
+// display control bits
+	if (pk_itemovr & CON_ONLY)
+	{
+		f = f + 1;
+		bprint("Only these items will be loaded\n");
+	}
+	if (pk_itemovr & CON_NONE)
+	{
+		f = f + 1;
+		bprint("None of these items will be loaded\n");
+	}
+	if (pk_itemovr & CON_CYC)
+	{
+		f = f + 1;
+		bprint("Cycle items in each section\n");
+		bprint("- cycle timer = ");
+		bprint(ftos(CYC_TIME));
+		bprint("\n");
+	}
+// display modifier bits
+	if (pk_itemovr & CON_SUBS)
+	{
+		bprint("Substitute removed items\n");
+		if (!(pk_itemovr & CON_NONE) && !(pk_itemovr & CON_ONLY))
+			bprint("\b- nothing to substitute!\n");
+	}
+	if (pk_itemovr & CON_INF)
+	{
+		bprint("Infinite ammo on selected weapons\n");
+		if (pk_itemovr & WEP_WEPSQ) bprint("\b- no weapon bits set!\n");
+		if (PK & (pk_itemovr & WEP_PKI)) bprint("- sub pk items for ammo boxes\n");
+	}
+	if (!f) bprint("\n\bNo control bits!\n\n");
+	else
+	{
+		if (! pk_itemovr & ITEM_ANY) bprint("\bNo items selected!\n");
+//		if (f == 3) bprint("\bItem Cha*s selected...\n");
+//		else
+		if (f > 1) bprint("\bPossible control conflict!\n");
+	}
+	bprint("\b--------------------------------\n");
 };
 
 void() Admin_itemmenu =
 {
+	if (Q_99)
+	{
 	self.message =
 				       "\b     Admin Items Menu:     \n"
 				       "\b+--------------------------+\n"
-							"  +------- weapons ------+  \n"
+							"  +------- \bweapons\b ------+  \n"
 							"  01: Double shotgun        \n" // 1
 							"  02: Nailgun               \n" // 2
 							"  03: Preforator            \n" // 4
@@ -720,20 +892,20 @@ void() Admin_itemmenu =
 							"  05: Rocket launcher       \n" // 16
 							"  06: Lightning gun         \n" // 32
 							"  07: Painkeep items        \n" // 64
-							"  +------ artifacts -----+  \n" 
+							"  +------ \bartifacts\b -----+  \n" 
 							"  08: Quad damage           \n" // 128
 							"  09: Invulnerability       \n" // 256
 							"  10: Radiation suit        \n" // 512
 							"  11: Ring of shadows       \n" // 1024
-							"  +-------- armor -------+  \n" 
+							"  +-------- \barmor\b -------+  \n" 
 							"  12: Green Armor           \n" // 2048
 							"  13: Yellow Armor          \n" // 4096
 							"  14: Red Armor             \n" // 8192
-//							"  +------- health -------+  \n" 
-//							"  15: 15 Health             \n" // 16384
-//							"  16: 25 Health             \n" // 32768
-//							"  17: Mega Health           \n" // 65536
-							"  +------ controls ------+  \n" 
+							"  +------- \bhealth\b -------+  \n" 
+							"  15: 15 Health             \n" // 16384
+							"  16: 25 Health             \n" // 32768
+							"  17: Mega Health           \n" // 65536
+							"  +------ \bcontrols\b ------+  \n" 
 							"  18: Only these items      \n" // 131072
 							"  19: None of these items   \n" // 262144
 							"  20: Substitute removed    \n" // 542288
@@ -746,7 +918,47 @@ void() Admin_itemmenu =
 							" admin impulse: exit admin  \n"
 				       "\b+--------------------------+\n"
 						 "\b  Enter code: ";
-
+	}
+	else
+	{
+	self.message =
+				       "\b     Admin Items Menu:     \n"
+				       "\b+--------------------------+\n"
+							"  +------- \bweapons\b ------+  \n"
+							"  01: Double shotgun        \n" // 1
+							"  02: Nailgun               \n" // 2
+							"  03: Preforator            \n" // 4
+							"  04: Grenade launcher      \n" // 8
+							"  05: Rocket launcher       \n" // 16
+							"  06: Lightning gun         \n" // 32
+//							"  07: Painkeep items        \n" // 64
+							"  +------ \bartifacts\b -----+  \n" 
+							"  08: Quad damage           \n" // 128
+							"  09: Invulnerability       \n" // 256
+							"  10: Radiation suit        \n" // 512
+							"  11: Ring of shadows       \n" // 1024
+							"  +-------- \barmor\b -------+  \n" 
+							"  12: Green Armor           \n" // 2048
+							"  13: Yellow Armor          \n" // 4096
+							"  14: Red Armor             \n" // 8192
+							"  +------- \bhealth\b -------+  \n" 
+							"  15: 15 Health             \n" // 16384
+							"  16: 25 Health             \n" // 32768
+							"  17: Mega Health           \n" // 65536
+							"  +------ \bcontrols\b ------+  \n" 
+							"  18: Only these items      \n" // 131072
+							"  19: None of these items   \n" // 262144
+							"  20: Substitute removed    \n" // 542288
+							"  21: Infinite ammo         \n" // 1048576
+							"  22: Cycle selected items  \n" // 2097152
+							"  29: All bits off          \n" 
+							"  30: Show item bits        \n" 
+							"  31: Update map now        \n"
+							" 666:  main menu            \n"
+							" admin impulse: exit admin  \n"
+				       "\b+--------------------------+\n"
+						 "\b  Enter code: ";
+	}
 	self.wad = "";
 	self.admin = 26;
 	self.lefty = 0;
@@ -759,6 +971,23 @@ Painkeep impulses
 */
 void() Admin_pkmenu =
 {
+	if (PK_100)
+	self.message =
+				       "\b    Admin Painkeep Menu:    \n"
+				       "\b+--------------------------+\n"
+							"  01: SFX toggle            \n"
+							"  02: HUB mode toggle       \n"
+							"  03: Duty check toggle     \n"
+							"  04: settings list         \n"
+//							"  05: PK dynamic items      \n"
+//							"  06: Spike traps           \n"
+							"    : PK Compatibility      \n"
+//							"  07: Extra sound           \n"
+							" 666:  main menu            \n"
+							" admin impulse: exit admin  \n"
+				       "\b+--------------------------+\n"
+						 "\b  Enter code: ";
+	else
 	self.message =
 				       "\b    Admin Painkeep Menu:    \n"
 				       "\b+--------------------------+\n"
@@ -768,6 +997,7 @@ void() Admin_pkmenu =
 							"  04: settings list         \n"
 							"  05: PK dynamic items      \n"
 							"  06: Spike traps           \n"
+							"    : PK Compatibility      \n"
 //							"  07: Extra sound           \n"
 							" 666:  main menu            \n"
 							" admin impulse: exit admin  \n"
@@ -786,7 +1016,67 @@ AdminCommands
 */
 void() Admin_mainmenu =
 {
-	if (PK) // menu with PK only entries
+	if (Q_99)
+	{
+	self.message =
+					 "\b   Administration Menu:    \n"
+					 "\b+-------------------------+\n"
+						"  01:  toggle deathmatch   \n"
+						"  02:  toggle teamplay     \n"
+						"  03:  toggle coop         \n"
+						"  04:  toggle no exit      \n"
+						"  05:  goto next level     \n"
+						"  06:  reset level         \n"
+						"  07:  start map load      \n"
+						"  10:  server frag limit   \n"
+						"  11:  server time limit   \n"
+						"  12:  server gravity      \n"
+						"  13:  server friction     \n"
+						"  22:  map control         \n"
+						"  23:  bot control         \n"
+//						"  24:  painkeep control    \n"
+						"  25:  item control        \n"
+						"  30:  kick players        \n"
+//						"  60:  PK mode toggle      \n"
+//						"  ---  PK mode = TRUE      \n"
+						"  97:  exit menu only      \n"
+						"  98:  observer            \n"
+						"  99:  respawn (exits)     \n"
+						" admin impulse: exit admin \n"
+					 "\b+-------------------------+\n"
+					 "\b Enter code: ";
+	}
+	else if (PK_100)
+	{
+	self.message =
+					 "\b   Administration Menu:    \n"
+					 "\b+-------------------------+\n"
+						"  01:  toggle deathmatch   \n"
+						"  02:  toggle teamplay     \n"
+						"  03:  toggle coop         \n"
+						"  04:  toggle no exit      \n"
+						"  05:  goto next level     \n"
+						"  06:  reset level         \n"
+						"  07:  hub map load        \n"
+						"  10:  server frag limit   \n"
+						"  11:  server time limit   \n"
+						"  12:  server gravity      \n"
+						"  13:  server friction     \n"
+						"  22:  map control         \n"
+						"  23:  bot control         \n"
+						"  24:  painkeep control    \n"
+//						"  25:  item control        \n"
+						"  30:  kick players        \n"
+//						"  60:  PK mode toggle      \n"
+						"  ---  PK mode = TRUE      \n"
+						"  97:  exit menu only      \n"
+						"  98:  observer            \n"
+						"  99:  respawn (exits)     \n"
+						" admin impulse: exit admin \n"
+					 "\b+-------------------------+\n"
+					 "\b Enter code: ";
+	}
+	else if (PK) // menu with PK only entries
 	{
 	self.message =
 					 "\b   Administration Menu:    \n"
@@ -958,10 +1248,20 @@ void() AdminCommands =
 		}
 		else
 		if (self.lefty == A_BOTS) Admin_botmenu(); else
-		if (self.lefty == A_PKCON) Admin_pkmenu(); else
-		if (self.lefty == A_ITEM) Admin_itemmenu(); else
+		if (self.lefty == A_PKCON)
+		{
+			if (!Q_99)  Admin_pkmenu();
+		}
+		else
+		if (self.lefty == A_ITEM)
+		{
+			if (!PK_100) Admin_itemmenu();
+		}	
+		else
 		if (self.lefty == A_PKMOD)
 		{
+		  if (!PK_100 && !Q_99)
+		 {
 			f = pk_flags & PK_MAP;
 			pk_flags = pk_flags - f;
 			if (f & PK_ALWAYS)
@@ -987,6 +1287,7 @@ void() AdminCommands =
 			admin_sv_cfg();
 			Admin_mainmenu();
 			self.wad = str;
+		 }
 		}
 		else
 		if (self.lefty == A_SKICK)
@@ -1004,8 +1305,8 @@ void() AdminCommands =
 			centerprint(self, "");
 			self.takedamage = DAMAGE_AIM;
 			self.impulse = 0;
-			localcmd("noadmingamma\n"); // set gamma level
-			localcmd("noadmin_centertime\n");
+			stuffcmd(self, "noadmingamma\n"); // set gamma level
+			stuffcmd(self, "noadmin_centertime\n");
 			sprint(self,"Entering live game admin mode - timeout is: ");
 			if (pk_admintime < 60)
 			{
@@ -1299,12 +1600,15 @@ void() AdminCommands =
 			else
 				sprint(self, "Custom Maps Off\n");
 
-			if (pk_flags & PK_DYNAMIC)
-				sprint(self, "Dynamic Painkeep items On\n");
-			else
-				sprint(self, "Dynamic Painkeep items Off\n");
+			if (!PK_100)
+			{
+				if (pk_flags & PK_DYNAMIC)
+					sprint(self, "Dynamic Painkeep items On\n");
+				else
+					sprint(self, "Dynamic Painkeep items Off\n");
+			}
 		}
-		else if (self.lefty == 5)
+		else if (self.lefty == 5 && !PK_100)
 		{
 			if (pk_flags & PK_DYNAMIC)
 			{
@@ -1327,7 +1631,7 @@ void() AdminCommands =
 				}
 			}
 		}
-		else if (self.lefty == 6)
+		else if (self.lefty == 6 && !PK_100)
 		{
 			if (pk_flags & PK_SPIKER)
 			{
@@ -1370,6 +1674,7 @@ void() AdminCommands =
 		{
 			self.lefty = self.lefty - 1;
 			f = AdminBitFlag(self.lefty);
+			if (Q_99  && self.lefty == 6) f = 0;
 			if (pk_itemovr & f)
 				pk_itemovr = pk_itemovr - (pk_itemovr & f);
 			else
@@ -1397,25 +1702,14 @@ void() AdminCommands =
 		centerprint3(self, self.message, "->", self.wad);
 };
 
-// clear screen from admin - exit or failed login after wait
-
-void() admin_clear =
-{
-	localcmd("noadmingamma\n");
-	localcmd("noadmin_centertime\n");
-	centerprint(self, "");
-	self.impulse = self.admin = 0;
-	self.takedamage = DAMAGE_AIM;	
-	self.wad = self.message = self.map = self.target = "";
-	self.enemy = world;
-};
-
 /*
 ============
 Admin Impulse code
 ============
 
 a series of ents to think data from alias assignments.
+
+this allows for live (frequent) data change without recompiling!
 */
 
 void() PK_SetAdmin =
@@ -1430,23 +1724,27 @@ void() PK_SetAdmin =
 	{
 		pk_admincode = cvar("saved2");
 		if ( ! pk_admincode) pk_admincode = -1;
-// access impulse now
-		localcmd(ADMINIMPULSE);
-		e.classname = "adminimp";
 		if (pk_admincode == -1) PK_ADMIN = 0;
+		else
+		{
+			localcmd(ADMINIMPULSE);	// access impulse now
+			e.classname = "adminimp";
+		}
 	}
 	else if (self.classname == "adminimp") 
 	{
 		pk_adminimp = cvar("saved2");
 		if ( ! pk_adminimp) pk_adminimp = 255;
 		if (pk_adminimp == -1) PK_ADMIN = 0;
-		localcmd(ADMINTIME);
-		e.classname = "admintime";
+		else
+		{
+			localcmd(ADMINTIME);
+			e.classname = "admintime";
+		}
 	}
 	else if (self.classname == "admintime") 
 	{
 		pk_admintime = cvar("saved2");
-		localcmd("saved2 0\n");
 		remove(e);
 if (0) // devmsg
 {
@@ -1459,9 +1757,18 @@ bprint(ftos(pk_admintime));
 bprint("\n");
 }
 	}
+/* more input
+	else if (self.classname == "admin") 
+	{
+		pk_admin = cvar("saved2");
+		localcmd("saved2 0\n");
+		remove(e);
+	}
+*/
 	else
 		remove(e);
 
+	if (!PK_ADMIN) remove(e);
 	remove(self);
 };
 
@@ -1604,10 +1911,12 @@ void() PK_AdminImpulse =
 
 	if (self.admin == USER_MENU) // process user menu (impulse 39) here
 	{
+		if (Q_100 | Q_99) return; // Cataboligne - 8.16.9 - quake compatability mode
+
 		if (self.message == "")
 		{
-			localcmd("usergamma\n");
-			localcmd("admin_centertime\n");
+			stuffcmd(self, "usergamma\n");
+			stuffcmd(self, "admin_centertime\n");
 			admin_timer(FALSE, USER_TIMEOUT);
 			self.impulse = 0;
 			self.message = "USER_MENU";
@@ -1671,7 +1980,7 @@ void() PK_AdminImpulse =
 		User_menu();
 //		centerprint3(self, self.message, "", "");
 		if (self.button0 || self.button1 || self.button2 || self.impulse)
-			admin_clear();
+			admin_clear(self);
 
 // NOTE: if the impulses change - this code must change
 		if (f == 11) // admin enter
@@ -1721,7 +2030,7 @@ void() PK_AdminImpulse =
 				remove(self.goalentity);
 				self.goalentity = world;
 			}
-			admin_clear();
+			admin_clear(self);
 			self.attack_finished = time + 0.3; // clear keypress
 			return;
 		}
@@ -1739,8 +2048,8 @@ void() PK_AdminImpulse =
 			}
 			self.lefty = 0;
 			self.takedamage = DAMAGE_NO;
-			localcmd("admingamma\n"); // set gamma level
-			localcmd("admin_centertime\n");
+			stuffcmd(self, "admingamma\n"); // set gamma level
+			stuffcmd(self, "admin_centertime\n");
 		}
 	}
 // code allows us to act like regular keypad entry, heh heh
@@ -1837,7 +2146,7 @@ float() admin_postthink =
 	{
 		if (self.admin != LIVE_ADMIN && (self.admin < 0 || (self.impulse && self.admin)))
 		{
-			if (self.admin == ADMIN_FAILED_LOGIN) admin_clear(); // failed login - clear wait msg
+			if (self.admin == ADMIN_FAILED_LOGIN) admin_clear(self); // failed login - clear wait msg
 			else PK_AdminImpulse();
 
 			if (pk_admintime > 0)

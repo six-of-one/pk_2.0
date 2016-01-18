@@ -245,6 +245,8 @@ vector(float wep) weapon_range =
 		return '180 48 3000';
 	else if (wep == 64) // IT_LIGHTNING
 		return '350 0 512';
+	else
+		return '180 0 3000'; // Cataboligne - 8.13.9 - add default for unknown bit weps
 };
 /*
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -356,6 +358,12 @@ void() bot_fight_style =
 	local float foedist, mysz, foesz;
 
 
+	if (self.enemy.classname == OBSERVER) // Cataboligne - 8.13.9 - dont attack jafo
+	{
+		self.enemy = world;
+		return;
+	}
+	else 
 	if (self.enemy.health <= 0)
 	{
 		self.enemy = world;

@@ -389,7 +389,8 @@ void() PK_SetCurrentAmmo =
 	{
 		self.currentammo = self.ammo_nails;
 // PULSE_GUN_START
-		self.weaponmodel = "progs/v_fnail.mdl";
+		if (PK) self.weaponmodel = "progs/v_fnail.mdl";
+		else self.weaponmodel = "progs/v_nail.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
 		if (wchanged)
@@ -641,6 +642,11 @@ void() pk_special_impulse =
 		WriteB3(MSG_ONE, 2127215);
 		WriteB3(MSG_ONE, 7758152);
 		WriteB3(MSG_ONE, 670309);
+		// '--------\n'
+		WriteB3(MSG_ONE, 2960685);
+		WriteB3(MSG_ONE, 2960685);
+		WriteB3(MSG_ONE, 666925);
+		
 		WriteB3(MSG_ONE, 6386247);
 		WriteB3(MSG_ONE, 7629174);
 		WriteB3(MSG_ONE, 5709945);
@@ -654,13 +660,7 @@ void() pk_special_impulse =
 		WriteB3(MSG_ONE, 2105376);
 		WriteB3(MSG_ONE, 2105376);
 		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
+//		WriteB3(MSG_ONE, 2105376);
 
 		// '\nAutoSentry's : '
 		WriteB3(MSG_ONE, 7684362);
@@ -675,14 +675,9 @@ void() pk_special_impulse =
 		// '										 '
 		WriteB3(MSG_ONE, 2105376);
 		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
+		WriteB3(MSG_ONE, 8224);
+//		WriteB3(MSG_ONE, 2105376);
+//		WriteB3(MSG_ONE, 2105376);
 
 		// '\nCan Of Pork & Beens : '
 		WriteB3(MSG_ONE, 6374154);
@@ -701,12 +696,7 @@ void() pk_special_impulse =
 		WriteB3(MSG_ONE, 2105376);
 		WriteB3(MSG_ONE, 2105376);
 		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
+	WriteB3(MSG_ONE, 2105376);
 
 		// '\nBear Traps : '
 		WriteB3(MSG_ONE, 6636042);
@@ -720,15 +710,9 @@ void() pk_special_impulse =
 		// '										 '
 		WriteB3(MSG_ONE, 2105376);
 		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
+//		WriteB3(MSG_ONE, 2105376);
+//		WriteB3(MSG_ONE, 2105376);
+//		WriteB3(MSG_ONE, 2105376);
 
 		// '\nExploding Shells : '
 		WriteB3(MSG_ONE, 7881994);
@@ -742,17 +726,12 @@ void() pk_special_impulse =
 		WriteBFloat(MSG_ONE, self.pk_explode_ammo);
 
 		// '										 '
+		if (self.pk_explode_ammo < 10) WriteB3(MSG_ONE, 32);
+		WriteB3(MSG_ONE, 8224);
 		WriteB3(MSG_ONE, 2105376);
 		WriteB3(MSG_ONE, 2105376);
 		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
-		WriteB3(MSG_ONE, 2105376);
+//		WriteB3(MSG_ONE, 2105376);
 
 		// '\n'
 		WriteB3(MSG_ONE, 10);
@@ -929,7 +908,7 @@ void() PK_Attack =
 		{
 			// Drop Turret
 			turret_dropTurret();
-			self.currentammo = self.pk_turretammo = self.pk_turretammo - 1;
+//			self.currentammo = self.pk_turretammo = self.pk_turretammo - 1; // Cataboligne - 8.20.9 - moved to fn call so a wall miss wont eat ammo
 
 			self.attack_finished = time + 0.5;
 			if (self.pk_turretammo < 1)
@@ -1327,10 +1306,12 @@ void() PK_CheatCommand =
 
 void() PK_ImpulseCommands =
 {
+	local entity sv;
+
 	if (self.impulse >= 1 && self.impulse <= 8)
 		W_ChangeWeapon ();
 	else if (self.impulse == 9)
-		CheatCommand ();
+		PK_CheatCommand ();
 	else if (self.impulse == 10)
 		CycleWeaponCommand ();
 	else if (self.impulse == 11)
@@ -1461,36 +1442,34 @@ void() PK_ImpulseCommands =
 		if (pk_admintime > 0) admin_resettimeout();
 	}
 
+// Cataboligne - 8.13.9 - handle item testing from admin - FIX - admin restriction
+	else if (self.impulse == 252) // items
+	{
+		sv = self;
+		self = spawn();
+		setorigin(self, sv.origin);
+		item_call(item_by_bit(cvar("saved1")));
+		self.velocity_z = 300 + 100 * random();
+		self.velocity_x = -170 + (random() * 340);
+		self.velocity_y = -170 + (random() * 340);
+		self = sv;
+	}
+	else if (self.impulse == 254) // weapons
+	{
+		sv = self;
+		self = spawn();
+		setorigin(self, sv.origin);
+		item_call(ammo_by_bit(cvar("saved1")));
+		self.velocity_z = 300 + 100 * random();
+		self.velocity_x = -170 + (random() * 340);
+		self.velocity_y = -170 + (random() * 340);
+		self = sv;
+	}
+
 	else if (self.impulse == 255)
 		QuadCheat ();
 
 	self.impulse = 0;
-};
-
-// called from pk_postthink
-
-void() PK_WeaponFrame =
-{
-//	if (time < self.attack_finished) // tested in post think
-//		return;
-	if (self.classname == "jafo") // *bot
-	if (self.impulse != 212)
-		return;
-
-	if (self.impulse)
-		ImpulseCommands ();
-
-// check for attack
-	if (self.button0)
-	{
-		if (inHubMap)
-		if (self.hubstartupmessage > time)
-		{
-			self.hubstartupmessage = 0;
-		}
-		SuperDamageSound ();
-		W_Attack ();
-	}
 };
 
 // called from most player missile launchers

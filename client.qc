@@ -46,9 +46,8 @@ void () SetChangeParms =
 {
 	if (self.health <= 0)
 	{
-		SetNewParms ();
-		if (PK)
-			SetNewPKParms ();
+		SetNewParms_PK();
+		if (PK || custom_hub_loaded) parm16 = parm16 | 256; // Cataboligne - 8.22.9 - pk orig oper
 		return ;
 	}
 
@@ -73,10 +72,12 @@ void () SetChangeParms =
 	parm7 = self.ammo_cells;
 	parm8 = self.weapon;
 	parm9 = self.armortype * 100;
-	if (PK) PK_ChangeParms();
+	parm10 = parm11 = parm15 = parm16 = 0;
+//	if (PK) PK_ChangeParms();
+//	else if (!Q_100 && !Q_99 && ((self.pk_items & PK_IT_RANGE) | self.pk_explode_ammo | self.pk_turretammo | self.pk_canpabammo | self.pk_beartrapammo | self.pk_gravitywellammo))
+	if (!Q_100 && !Q_99) PK_ChangeParms(); // always encoding now
 	if (find(world,classname,"pk*bot")) bot_changeParms();
 //	bot_skinParms();
-	if (self.classname == "pk*bot") dprint("pk*bot in setchangeparms\n");
 
 // Cataboligne 9.11.3 purify - chase cam
 	cam_parms(0);
@@ -93,7 +94,8 @@ void () SetNewParms =
 	parm7 = 0;
 	parm8 = 1;
 	parm9 = 0;
-	if (PK) PK_SetNewParms();
+	if (PK || custom_hub_loaded) 
+		PK_SetNewParms();
 
 // Cataboligne 9.11.3 purify - chase cam
 	cam_parms(2);
@@ -118,7 +120,9 @@ void () DecodeLevelParms =
 	self.ammo_cells = parm7;
 	self.weapon = parm8;
 	self.armortype = parm9 * 0.01;
-	if (PK) PK_DecodeLevelParms();
+//	if (PK)  // fixed - possible to go from PK level to non PK level w/ custom hub - keep pk gooides
+	if (!Q_100 && !Q_99)
+		PK_DecodeLevelParms();
 
 // Cataboligne 9.11.3 purify - chase cam
 	cam_parms(1);
@@ -168,8 +172,10 @@ entity () FindIntermission =
 string nextmap;
 void () GotoNextMap =
 {
-	if (PK)
-	if (pk_flags & PK_TP_USERMAPON)
+	bot_changelevel(); // *bot - reload bots on next level, handle intermission
+
+	if (PK &&  !PK_ADMINMAP)
+	if (pk_flags & PK_TP_USERMAPON) // *pk - user supplied map loop deal
 	{
 		if (!execed)
 		{
@@ -178,6 +184,13 @@ void () GotoNextMap =
 		}
 		return;
 	}
+
+	if(!PK_100 && !PK_ADMINMAP) 
+	{
+		if (check_custom_hub()) // *pk --- Cataboligne - 8.16.9 - do custom hub load from any exit here
+			return;
+	}
+
 	if (cvar("samelevel"))	// if samelevel is set, stay on same level
 		changelevel (mapname);
 	else
@@ -282,6 +295,7 @@ When the player presses attack or jump, change to the next level
 */
 void () IntermissionThink =
 {
+	stuffcmd( self, "fov 110\n" ); // special intermission view - lock pov
 	if (time < intermission_exittime)
 		return ;
 
@@ -323,10 +337,10 @@ void () execute_changelevel =
 		other.voteIntermission = 0; // *pk - hub ops
 		setorigin (other,pos.origin);
 		other = find (other,classname,"player");
+		if (other.ishuman) test_parms(other, 16); // *pk TESTING
 	}
 
 	WriteByte (MSG_ALL,SVC_INTERMISSION);
-	bot_changelevel(); // *bot - reload bots on next level, handle intermission
 };
 
 
@@ -350,8 +364,8 @@ void () changelevel_touch =
 	}
 
 	nextmap = self.map;
-	check_custom_hub();
-	if (PK || !PK_HUBEXIT)
+
+	if (PK)
 	if (pk_flags & PK_SF_HUB) // *pk - using voting / hub system - nextmap is always hub
 		nextmap = hub_select(); //"start"; // *pk - if we're working with the hub system, then let's override this and go to the hub
 
@@ -400,6 +414,7 @@ void () respawn =
 	if (coop)
 	{
 		// make a copy of the dead body for appearances sake
+		if (self.model != "progs/null.mdl") // Cataboligne - 8.14.9 - dead cam etc
 		CopyToBodyQue (self);
 		// get the spawn parms as they were at level start
 		setspawnparms (self);
@@ -409,10 +424,12 @@ void () respawn =
 	else if (deathmatch)
 	{
 		// make a copy of the dead body for appearances sake
+		if (self.model != "progs/null.mdl") // Cataboligne - 8.14.9 - dead cam etc
 			CopyToBodyQue (self);
 		// set default spawn parms
-		if (PK) SetNewPKParms (); // *pk parms
-		else
+			if (PK) // Cataboligne - 8.22.9 - pk orig oper
+				SetNewParms_PK();
+			else
 			SetNewParms ();
 		// respawn
 			PutClientInServer ();
@@ -589,7 +606,7 @@ void () PutClientInServer =
 	}
 
 	spawn_tdeath (self.origin,self);
-	if (PK) PK_CIS(); // *pk - set client pk elements
+	if (!Q_100 && !Q_99) PK_CIS(); // *pk - set client pk elements
 	self.admin = 0;
 	set_initBotLevel(); // *bot
 
@@ -706,10 +723,10 @@ void () NextLevel =
 		}
 	}
 
-	check_custom_hub();
-	if (PK || !PK_HUBEXIT)
+	if (PK)
 	if (pk_flags & PK_SF_HUB) // *pk - using voting / hub system - nextmap is always hub
 		o.map = hub_select(); //"start"; // *pk - if we're working with the hub system, then let's override this and go to the hub
+
 	nextmap = o.map;
 	gameover = TRUE;
 
@@ -847,6 +864,8 @@ WaterMove
 
 void () WaterMove =
 {
+	if (self.classname == OBSERVER) // Cataboligne 8.9.9 purify - chase cam (dead) & observer - no water stuff
+		return;
 //dprint (ftos(self.waterlevel));
 	if (self.movetype == MOVETYPE_NOCLIP)
 		return;
@@ -870,7 +889,7 @@ void () WaterMove =
 			self.dmg = self.dmg + 2;
 			if (self.dmg > 15)
 				self.dmg = 10;
-			ignorearmor = TRUE; // *pk - no armor taken when drowning
+			if (!Q_100 && !Q_99) ignorearmor = TRUE; // *pk - no armor taken when drowning
 			T_Damage (self, world, world, self.dmg);
 			ignorearmor = FALSE;
 			self.pain_finished = time + 1;
@@ -986,7 +1005,7 @@ void () PlayerPreThink =
 
 	makevectors (self.v_angle);		// is this still used
 
-	if (PK)
+	if (PK || custom_hub_loaded)
 	{
 		pk_pre_think();
 		return;
@@ -997,6 +1016,14 @@ void () PlayerPreThink =
 
 	if (self.waterlevel == 2)
 		CheckWaterJump ();
+
+//		if (!Q_100 && !PK_100)
+	if (self.waterlevel)
+	if (! self.flags & FL_WATERJUMP)
+	if (self.dest2_x & CHSCAM_ON)
+	{
+		cam_waterjump();  // Cataboligne 8.22.9 purify - chase cam
+	}
 
 	if (self.deadflag >= DEAD_DEAD)
 	{
@@ -1034,7 +1061,14 @@ Check for turning off powerups
 */
 void () CheckPowerups =
 {
-	if (self.classname == "deadcam") return; // Cataboligne 8.9.9 purify - chase cam
+	if (self.classname == OBSERVER) // Cataboligne 8.9.9 purify - chase cam (dead) & observer - clear all effects
+	{
+		self.super_damage_finished = self.invisible_finished = self.invincible_finished = self.radsuit_finished = 0;
+		self.super_time = self.invisible_time = self.invincible_time = self.rad_time = 0;
+		self.items = self.items - (self.items & (IT_QUAD | IT_SUIT | IT_INVISIBILITY | IT_INVULNERABILITY));
+		self.effects = 0;
+		return;
+	}						// NOTE: great place for some interesting chaos effects
 
 	if (self.health <= 0)
 		return;
@@ -1217,7 +1251,7 @@ void () PlayerPostThink =
 	if (ammo_frame < framecount)
 		infinite_ammo();
 
-	if (PK)
+	if (PK || custom_hub_loaded)
 	{
 		pk_post_think();
 		return;
@@ -1230,6 +1264,7 @@ void () PlayerPostThink =
 
 	W_WeaponFrame ();
 
+	if (self.classname != OBSERVER) // Cataboligne - 8.16.9 - dont need this for observers
 // check to see if player landed and play landing sound	
 	if ((self.jump_flag < -300) && (self.flags & FL_ONGROUND) && (self.health > 0))
 	{

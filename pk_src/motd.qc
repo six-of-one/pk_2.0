@@ -9,14 +9,23 @@ void() extraWeaponsDisplay;
 // ConnectMessage - display a message on connect.
 void() connectmessage =
 {
-	local string Line3;
+	local string Line3,Line5,Line7;
 
-	Line3 = "Version 1.2\n";
+// web site promo & id
+	Line3 = "\\/ersion \b2\b.\b0\b\n\n";
+	Line5 = "\nsee:           \nhttp://www.moddb.com/mods/";
+	Line7 = "\n              for details";
+//	\b_-=\b* \bC\bataboligne\n
+//	\bpainkeep-source-update\b
 
 if (self.classname != "pk*bot" && (!FRIKBOT ||self.ishuman))
 {
 	// The welcome message
-	if (self.msgcount == 1)
+	if (self.msgcount == 0)
+	{
+	  centerprint7(self, "\n", "\n\n", Line3,"\b*\n","\nsee:           \nthe following website","",Line7);
+	}
+	else if (self.msgcount == 1)
 	{
 	  // Anti bots messges.
 	  if (DONTALLOWBOTS == 1)
@@ -26,92 +35,95 @@ if (self.classname != "pk*bot" && (!FRIKBOT ||self.ishuman))
 	    sprint(self,"Humans Only Please\n");
 	  }
 
-	  centerprint3(self, "W\n", "\nT\n", Line3);
-
+	  centerprint7(self, "W\n", "\nT\n", Line3,"\b=*\n",Line5,"\bp\b",Line7);
 	}
 	else if (self.msgcount == 2)
 	{
-	  centerprint3(self, "We\n", "\nT\n", Line3);
+	  centerprint7(self, "We\n", "\nT\n", Line3,"\b-=*\n",Line5,"\bpa\b",Line7);
 	}
 	else if (self.msgcount == 3)
 	{
-	  centerprint3(self, "Wel\n", "\nTe\n", Line3);
+	  centerprint7(self, "Wel\n", "\nTe\n", Line3,"\b_-=*\n",Line5,"\bpai\b",Line7);
 	}
 	else if (self.msgcount == 4)
 	{
-	  centerprint3(self, "Welc\n", "\nTe\n", Line3);
+	  centerprint7(self, "Welc\n", "\nTe\n", Line3,"\b_-=\b*\n",Line5,"\bpain\b",Line7);
 	}
 	else if (self.msgcount == 5)
 	{
-	  centerprint3(self, "Welco\n", "\nTea\n", Line3);
+	  centerprint7(self, "Welco\n", "\nTea\n", Line3,"\b_-=\b* \n",Line5,"\bpaink\b",Line7);
 	}
 	else if (self.msgcount == 5)
 	{
-	  centerprint3(self, "Welcom\n", "\nTea\n", Line3);
+	  centerprint7(self, "Welcom\n", "\nTea\n", Line3,"\b_-=\b* C\n",Line5,"\bpainke\b",Line7);
 	}
 	else if (self.msgcount == 6)
 	{
-	  centerprint3(self, "Welcome\n", "\nTeam\n", Line3);
+	  centerprint7(self, "Welcome\n", "\nTeam\n", Line3,"\b_-=\b* Ca\n",Line5,"\bpainkee\b",Line7);
 	}
 	else if (self.msgcount == 7)
 	{
-	  centerprint3(self, "Welcome \n", "\nTeam\n", Line3);
+	  centerprint7(self, "Welcome \n", "\nTeam\n", Line3,"\b_-=\b* Cat\n",Line5,"\bpainkeep-\b",Line7);
 	}
 	else if (self.msgcount == 8)
 	{
-	  centerprint3(self, "Welcome t\n", "\nTeam E\n", Line3);
+	  centerprint7(self, "Welcome t\n", "\nTeam E\n", Line3,"\b_-=\b* Cata\n",Line5,"\bpainkeep-s\b",Line7);
 	}
 	else if (self.msgcount == 9)
 	{
-	  centerprint3(self, "Welcome to\n", "\nTeam E\n", Line3);
+	  centerprint7(self, "Welcome to\n", "\nTeam E\n", Line3,"\b_-=\b* Catab\n",Line5,"\bpainkeep-so\b",Line7);
 	}
 	else if (self.msgcount == 10)
 	{
-	  centerprint3(self, "Welcome to \n", "\nTeam Ev\n", Line3);
+	  centerprint7(self, "Welcome to \n", "\nTeam Ev\n", Line3,"\b_-=\b* Catabo\n",Line5,"\bpainkeep-sou\b",Line7);
 	}
 	else if (self.msgcount == 11)
 	{
-	  centerprint3(self, "Welcome to Ð\n", "\nTeam Ev\n", Line3);
+	  centerprint7(self, "Welcome to Ð\n", "\nTeam Ev\n", Line3,"\b_-=\b* Catabol\n",Line5,"\bpainkeep-sour\b",Line7);
 	}
 	else if (self.msgcount == 12)
 	{
-	  centerprint3(self, "Welcome to Ða\n", "\nTeam Evo\n", Line3);
+	  centerprint7(self, "Welcome to Ða\n", "\nTeam Evo\n", Line3,"\b_-=\b* Cataboli\n",Line5,"\bpainkeep-sourc\b",Line7);
 	}
 	else if (self.msgcount == 13)
 	{
-	  centerprint3(self, "Welcome to Ðai\n", "\nTeam Evo\n", Line3);
+	  centerprint7(self, "Welcome to Ðai\n", "\nTeam Evo\n", Line3,"\b_-=\b* Catabolig\n",Line5,"\bpainkeep-source-\b",Line7);
 	}
 	else if (self.msgcount == 14)
 	{
-	  centerprint3(self, "Welcome to Ðain\n", "\nTeam Evol\n", Line3);
+	  centerprint7(self, "Welcome to Ðain\n", "\nTeam Evol\n", Line3,"\b_-=\b* Catabolign\n",Line5,"\bpainkeep-source-u\b",Line7);
 	}
 	else if (self.msgcount == 15)
 	{
-	  centerprint3(self, "Welcome to ÐainË\n", "\nTeam Evol\n", Line3);
+	  centerprint7(self, "Welcome to ÐainË\n", "\nTeam Evol\n", Line3,"\b_-=\b* Cataboligne\n",Line5,"\bpainkeep-source-up\b",Line7);
 	}
 	else if (self.msgcount == 16)
 	{
-	  centerprint3(self, "Welcome to ÐainËe\n", "\nTeam Evolv\n", Line3);
+	  centerprint7(self, "Welcome to ÐainËe\n", "\nTeam Evolv\n", Line3,"\b_-=*\b Cataboligne\n",Line5,"\bpainkeep-source-upd\b",Line7);
 	}
 	else if (self.msgcount == 17)
 	{
-	  centerprint3(self, "Welcome to ÐainËee\n", "\nTeam Evolv\n", Line3);
+	  centerprint7(self, "Welcome to ÐainËee\n", "\nTeam Evolv\n", Line3,"\b_-=\b* Cataboligne\n",Line5,"\bpainkeep-source-upda\b",Line7);
 	}
 	else if (self.msgcount == 18)
 	{
-	  centerprint3(self, "Welcome to ÐainËeep\n", "\nTeam Evolve\n", Line3);
+	  centerprint7(self, "Welcome to ÐainËeep\n", "\nTeam Evolve\n", Line3,"\b_-=*\b Cataboligne\n",Line5,"\bpainkeep-source-updat\b",Line7);
 	}
 	else if (self.msgcount == 19)
 	{
-	  centerprint3(self, "Welcome to ÐainËeep!\n", "\nTeam Evolve\n", Line3);
+	  centerprint7(self, "Welcome to ÐainËeep!\n", "\nTeam Evolve\n", Line3,"\b_-=\b* Cataboligne\n",Line5,"\bpainkeep-source-update\b",Line7);
 	}
 	else if (self.msgcount <= 20)
 	{
-	  centerprint3(self, "Welcome to ÐainËeep!\n", "\nTeam Evolve\n", Line3);
+	  centerprint7(self, "Welcome to ÐainËeep!\n", "\nTeam Evolve\n", Line3,"\b_-=*\b Cataboligne\n",Line5,"painkeep-source-update",Line7);
 	}
+	else if (self.msgcount > 20 && (time & 1))
+	  centerprint7(self, "Welcome to ÐainËeep!\n", "\nTeam Evolve\n", Line3,"\b_-=\b* Cataboligne\n",Line5,"\bpainkeep-source-update\b",Line7);
+	else
+	  centerprint7(self, "Welcome to ÐainËeep!\n", "\nTeam Evolve\n", Line3,"\b_-=*\b Cataboligne\n",Line5,"painkeep-source-update",Line7);
 }
 
-	self.msgcount = self.msgcount + 1;
+	if (time & 3 == 3) self.msgcount = self.msgcount + 1;
 };
 
 
@@ -119,6 +131,9 @@ if (self.classname != "pk*bot" && (!FRIKBOT ||self.ishuman))
 
 void() updateStatusDisplay =
 {
+	local string Line3,Line5;
+
+	if (inHubMap) // Cataboligne - 8.22.9 - custom hubs can cause this message on non pk / non hub maps
 	if (self.msgcount <= MOTDTIME)
 	{
 	  connectmessage();
@@ -133,11 +148,19 @@ void() updateStatusDisplay =
 	if (inHubMap)
 	if (self.hubstartupmessage > time)
 	{
-	  if (self.revotemsg)
-	    centerprint(self, "Vote Cancelled.\n\nYou must recast your vote");
-	  else
-	    centerprint(self, "To cast your vote, enter the \nteleporter for the level you \nwish to play. Once all players have \nvoted, the winning level will begin.\n\nPress ÆÉÒÅ To Remove This Message");
-	  self.messagetimeout = time + 1;
+// web site promo
+		Line3 = "\n\n[\\/\b2\b.\b0\b] \b_-=\b* \bC\bataboligne\n\nhttp://www.moddb.com/mods/\bpainkeep-source-update\n\n";
+// heh heh - scroll wheel of pain!
+		if (time & 3 == 0) Line5 = "|";
+		else if (time & 3 == 1) Line5 = "\\";
+		else if (time & 3 == 2) Line5 = "-";
+		else if (time & 3 == 3) Line5 = "/";
+
+		if (self.revotemsg)
+			centerprint(self, "Vote Cancelled.\n\nYou must recast your vote");
+		else
+			centerprint3(self, "To cast your vote, enter the \nteleporter for the level you \nwish to play. Once all players have \nvoted, the winning level will begin.\n\nPress ÆÉÒÅ To Remove This Message",Line3,Line5);
+		self.messagetimeout = time + 1;
 	}
 	
 	if (self.laststattime > time)

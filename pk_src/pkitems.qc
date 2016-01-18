@@ -135,6 +135,12 @@ new QUAKED weapon_airfist (0 .5 .8) (-15 -9 25) (17 9 43)
 
 void () weapon_airfist =
 {
+	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+	{
+		remove(self);
+		return;
+	}
+
 	precache_model ("progs/g_airgun.mdl");
 	setmodel (self,"progs/g_airgun.mdl");
 	self.pk_currentitem = PK_IT_AIRGUN;
@@ -160,6 +166,12 @@ void () weapon_rmine =
 
 void () weapon_chainlg =
 {
+	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+	{
+		remove(self);
+		return;
+	}
+
 	precache_model ("progs/g_clight.mdl");
 	setmodel (self,"progs/g_clight.mdl");
 	self.pk_currentitem = PK_IT_CLIGHT;
@@ -177,6 +189,12 @@ void () weapon_chainlg =
 
 void () weapon_grapgun =
 {
+	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+	{
+		remove(self);
+		return;
+	}
+
 	self.touch = painkeep_weapon_touch;
 
 	precache_model ("progs/g_harp.mdl");
@@ -295,7 +313,6 @@ void() pk_ammo_touch =
 	SUB_UseTargets();				// fire all targets / killtargets
 	if (pk_flags & PK_DYNAMIC) pk_dyn_touch();
 };
-
 
 // The touch func for our new items
 
@@ -463,6 +480,12 @@ else bprint(" )\n");}
 */
 void () item_painkeep_gwell =
 {
+	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+	{
+		remove(self);
+		return;
+	}
+
 	self.touch = painkeep_touch;
 
 	self.noise = "items/protect.wav";
@@ -480,6 +503,12 @@ void () item_painkeep_gwell =
 */
 void () item_painkeep_turret =
 {
+	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+	{
+		remove(self);
+		return;
+	}
+
 	self.touch = painkeep_touch;
 
 	precache_model2 ("progs/tpower.mdl");
@@ -505,6 +534,12 @@ void () item_painkeep_lantern =
 */
 void () item_painkeep_can =
 {
+	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+	{
+		remove(self);
+		return;
+	}
+
 	self.touch = painkeep_touch;
 
 	precache_model ("progs/beans.mdl");
@@ -521,6 +556,12 @@ void () item_painkeep_can =
 */
 void () item_painkeep_beartrap =
 {
+	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+	{
+		remove(self);
+		return;
+	}
+
 	self.touch = painkeep_touch;
 
 	precache_model ("progs/bearpick.mdl");
@@ -540,6 +581,12 @@ Currently exactly the same as a small wall torch
 */
 void () light_painkeep_candle =
 {
+	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+	{
+		remove(self);
+		return;
+	}
+
 	precache_model ("progs/candle.mdl");
 	setmodel (self,"progs/candle.mdl");
 	FireAmbient ();
@@ -553,6 +600,12 @@ void () light_painkeep_candle =
 
 void () item_painkeep_expshells =
 {
+	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+	{
+		remove(self);
+		return;
+	}
+
 	self.touch = ammo_touch;
 
 	precache_model ("maps/b_eshel0.bsp");
@@ -990,7 +1043,7 @@ string (float bt) item_by_bit =
 	if (bt == ARM_YEL) return("item_armor2");
 	if (bt == ARM_RED) return("item_armorInv");
 	if (bt == HEAL_15) return("item_health_15");
-	if (bt == HEAL_25) return("item_health_25");
+	if (bt == HEAL_25) return("item_health");
 	if (bt == HEAL_100) return("item_health_mega");
 
 	return("");
@@ -1008,6 +1061,10 @@ string (float bt) ammo_by_bit =
 	if (bt == WEP_ROCKET) return("item_rockets");
 	if (bt == WEP_THUNDER) return("item_cells");
 	if (bt == WEP_PKI) return("pki");
+
+	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+		return("");
+	
 // pk item subs by special bits
 	if (bt == WEP_GWELL) return("item_painkeep_gwell");
 	if (bt == WEP_TURRET) return("item_painkeep_turret");
@@ -1016,6 +1073,7 @@ string (float bt) ammo_by_bit =
 	if (bt == WEP_GRAP) return("weapon_grapgun");
 	if (bt == WEP_AIRG) return("weapon_airfist");
 	if (bt == WEP_CPNB) return("item_painkeep_can");
+	if (PK_ART) return(pk_art_ammo_by_bit(bt)); // Cataboligne 8.12.9 purify - pk artifacts
 
 	return("");
 };
@@ -1043,10 +1101,9 @@ void(string cls) item_call =
 	else if (cls == "item_armor1") item_armor1();
 	else if (cls == "item_armor2") item_armor2();
 	else if (cls == "item_armorInv") item_armorInv();
-// note: these dont work as is
-//	else if (cls == "item_health_15") item_health();
-//	else if (cls == "item_health_25") item_health();
-//	else if (cls == "item_health_mega") item_health();
+	else if (cls == "item_health_15") { self.spawnflags = H_ROTTEN; item_health(); }
+	else if (cls == "item_health") item_health();
+	else if (cls == "item_health_mega") { self.spawnflags = H_MEGA; item_health(); }
 	else if (cls == "item_painkeep_gwell") item_painkeep_gwell();
 	else if (cls == "item_painkeep_turret") item_painkeep_turret();
 	else if (cls == "item_painkeep_beartrap") item_painkeep_beartrap();
@@ -1054,6 +1111,7 @@ void(string cls) item_call =
 	else if (cls == "weapon_grapgun") weapon_grapgun();
 	else if (cls == "weapon_airfist") weapon_airfist();
 	else if (cls == "item_painkeep_can") item_painkeep_can();
+	else if (PK_ART) { if (! pk_art_item_call(cls)) return; }// Cataboligne 8.12.9 purify - pk artifacts
 	else return;
 	self.mdl = self.model;
 	if (self.classname != "dyn_item") // dont do these for dyn items
@@ -1267,11 +1325,11 @@ bprint("\n");
 				e = lvl = ARM_STOP;
 				f = lvls = ARM_GRN;
 			}
-//			else if (lvl < HEAL_STOP)
-//			{
-//				e = lvl = HEAL_STOP;
-//				f = lvls = HEAL_15;
-//			}
+			else if (lvl < HEAL_STOP)
+			{
+				e = lvl = HEAL_STOP;
+				f = lvls = HEAL_15;
+			}
 		}
 	}
 	if (pk_itemovr & CON_CYC) // next item cycle
@@ -1395,6 +1453,12 @@ void() dyn_item =
 {
 	float cd;
 	entity e;
+
+	if (PK_100) // Cataboligne - 8.15.9 - pk compat mode, just in case
+	{
+	remove(self);
+	return;
+	}
 
 	if (self.classname != "dyn_spawner")
 	{

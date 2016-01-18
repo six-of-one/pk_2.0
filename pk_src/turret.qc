@@ -45,6 +45,10 @@ void() turret_dropTurret =
 	  return;
 	}
 
+	if (self.flags & FL_CLIENT) // some qualification
+		self.currentammo = self.pk_turretammo = self.pk_turretammo - 1; // Cataboligne - 8.20.9 - moved here to wall fail doesnt eat ammo
+									// NOTE: self must always then be firing entity
+
 	turret = spawn ();
 	turret.owner = self;
 	turret.movetype = MOVETYPE_STEP;
@@ -162,14 +166,15 @@ void() turret_findTarget =
 	while(head)
 	{
 		if (head.health > 1)
-	  if (head.takedamage)
-	  if (head != self)
+		if (head.takedamage)
+		if (head != self)
 		if (head.classname != "beartrap")
-	  if (!((head.classname == "turret") && (head.owner == self.owner)))
-	  if (head.classname != "turret_base")
+		if (!((head.classname == "turret") && (head.owner == self.owner)))
+		if (head.classname != "turret_base")
+		if (pk_art_movshot_ck(head, "turret")) // Cataboligne 8.12.9 purify - pk artifacts
 	  //if (!(head.classname == "turret"))
 	  //if (!(head.classname == "turret_base"))
-	  if (self.turret_ownertimeout < time || head != self.owner)
+		if (self.turret_ownertimeout < time || head != self.owner)
 	 	if (head.classname != "player" || !(head.items & IT_INVISIBILITY))
 	  {
 	    tempDist = vlen(head.origin - self.origin);

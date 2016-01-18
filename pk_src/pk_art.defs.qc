@@ -28,8 +28,14 @@ void(entity oth, float acnt) pk_art_backpack_touch;
 void(entity itm) pk_art_backpack_drop;
 float() pk_art_checkpwr;
 float(entity trg, entity infl, entity atkr) pk_art_obit;
- void(entity en) pk_art_ck_lava;
- 
+void(entity en) pk_art_ck_lava;
+void (entity targ, entity inflictor, entity attacker, float damage) pk_art_T_Damage;
+float(entity ck, string prv) pk_art_movshot_ck;
+float(entity ck) pk_art_actor_ck;
+string (float bt) pk_art_ammo_by_bit;
+float(string cls) pk_art_item_call;
+float(string mapNamed) pk_art_hubmapmsg;
+
  // prototypes - from
  // splash.qc
 void () tombdie;
@@ -98,17 +104,23 @@ deprecated - already in pk_bot
 .float pkplus_actorskin;
 .float pkplus_phoneammo;
 
+// for admin item management - follows ammo by bit stuff
+
+float WEP_EGO					= 16384;
+float WEP_TOMB					= 65536;
+float WEP_ACTOR				= 131072;
+float WEP_PHONE				= 262144;
+
 
 // qc needing mods for support via pk 2.x
 
 /*
 actor.qc			***
 client.qc		***
-combat.qc
+combat.qc		***
 ego.qc			***
-grap.qc
-gravity.qc
-horn.qc
+gravity.qc		***
+horn.qc			***
 items.qc			***
 phone.qc			***
 pkpitems.qc		***
@@ -116,7 +128,7 @@ player.qc		***
 splash.qc		***
 subs.qc			***
 tomb.qc			***
-turret.qc
+turret.qc		***
 weapons.qc		***
 
 */

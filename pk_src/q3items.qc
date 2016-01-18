@@ -277,6 +277,7 @@ void() item_health_large =
 
 	local entity e;
 
+	self.classname = "item_health";
 	item_health();
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 
@@ -291,6 +292,7 @@ void() item_health_large =
 
 void() item_health_mega =
 {
+	self.classname = "item_health";
 	self.spawnflags = self.spawnflags | 2;
 	item_health();
 
@@ -299,6 +301,7 @@ void() item_health_mega =
 
 void() item_quad =
 {
+	self.classname = "item_artifact_super_damage";
 	item_artifact_super_damage();
 
 	if (self.spawnflags & SUSPENDED) q3_suspend();
@@ -306,6 +309,7 @@ void() item_quad =
 
 void() item_regen =
 {
+	self.classname = "item_artifact_invulnerability";
 	item_artifact_invulnerability();
 
 	if (self.spawnflags & SUSPENDED) q3_suspend();
@@ -313,6 +317,7 @@ void() item_regen =
 
 void() item_invis =
 {
+	self.classname = "item_artifact_invisibility";
 	item_artifact_invisibility();
 
 	if (self.spawnflags & SUSPENDED) q3_suspend();
@@ -320,6 +325,7 @@ void() item_invis =
 
 void() item_enviro =
 {
+	self.classname = "item_artifact_envirosuit";
 	item_artifact_envirosuit();
 
 	if (self.spawnflags & SUSPENDED) q3_suspend();

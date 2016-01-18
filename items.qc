@@ -171,6 +171,12 @@ void () health_touch =
 	local float amount;
 	local string s;
 
+	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
+	if (other.classname != "player")
+	{
+		grap_checkIfGrap ();
+		return ;
+	}
 	if (other.classname != "player")
 			return;
 
@@ -256,6 +262,12 @@ void () armor_touch =
 {
 	local	float	type, value, bit;
 
+	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
+	if (other.classname != "player")
+	{
+		grap_checkIfGrap ();
+		return ;
+	}
 	if (other.health <= 0)
 		return;
 	if (other.classname != "player")
@@ -417,6 +429,12 @@ void () weapon_touch =
 	local entity stemp;
 	local float leave;
 
+	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
+	if (other.classname != "player")
+	{
+		grap_checkIfGrap ();
+		return ;
+	}
 	if (other.classname != "player") // *bot
 			return;
 
@@ -625,6 +643,12 @@ void () ammo_touch =
 	local entity stemp;
 	local float best;
 
+	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
+	if (other.classname != "player")
+	{
+		grap_checkIfGrap ();
+		return ;
+	}
 	if (other.classname != "player")
 			return ;
 	if (other.health <= 0)
@@ -897,6 +921,12 @@ void () key_touch =
 	local entity stemp;
 	local float best;
 
+	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
+	if (other.classname != "player")
+	{
+		grap_checkIfGrap ();
+		return ;
+	}
 	if (other.classname != "player")
 			return;
 	if (other.health <= 0)
@@ -1033,6 +1063,12 @@ void () sigil_touch =
 	local entity stemp;
 	local float best;
 
+	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
+	if (other.classname != "player")
+	{
+		grap_checkIfGrap ();
+		return ;
+	}
 	if (other.classname != "player")
 			return;
 	if (other.health <= 0)
@@ -1103,6 +1139,12 @@ void () powerup_touch =
 	local entity stemp;
 	local float best;
 
+	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
+	if (other.classname != "player")
+	{
+		grap_checkIfGrap ();
+		return ;
+	}
 	if (other.classname != "player")
 			return;
 	if (other.health <= 0)
@@ -1258,7 +1300,7 @@ PLAYER BACKPACKS
 
 void () BackpackTouch =
 {
-	if (PK)
+	if (PK || custom_hub_loaded)
 	{
 		PK_BackpackTouch();
 		return;
@@ -1366,7 +1408,7 @@ DropBackpack
 */
 void () DropBackpack =
 {
-	if (PK)
+	if (PK || custom_hub_loaded)
 	{
 		PK_DropBackpack();
 		bot_BackpackSetup(newmis); // *bot - includes PK

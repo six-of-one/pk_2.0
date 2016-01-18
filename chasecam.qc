@@ -1,219 +1,7 @@
 /*
 chasecam file
-player entity variables used:
-.dest_x      (HK WEAP)
-.dest1_x     (HUD)
-.dest1_y      (MSKIN PRO)
-.dest2_x,y,z  (CAM)
 
-  chase cam mod 
- Rob Albin, 09 Sep 96
-
- orig functions modified:
-	WEAPONS.QC
-		W_SetCurrentAmmo
-		ImpulseCommands
-	CLIENT.QC
-		SetChangeParms
-		SetNewParms
-		DecodeLevelParms
-		PutClientInServer
-
-// player.dest2_x = bit-flag variable
-// player.dest2_y = chasecam distance
-// player.dest2_z = chasecam zmult (height offset)
-
-********************************************************************
-
-Cataboligne 9.11.3 - chasecam easy merge code
-
-following notes detail quake-c v106 files that need modified to use this code:
-
-********************************************************************
-
-took out laser target calls - it seemed to malfunction in PK
-
-
-=============
-chasecam_b cam code
-=============
-
-(*) weapons
-********************************************************************
-
-
-*** place this code:
-
-// Cataboligne 9.11.3 purify
-	// disable model in chase view
-	if ( (self.dest2_x & CHSCAM_ON) )
-	{
-		self.weaponmodel = "";
-	}
-
-*** after this code:
-
-	{
-		self.currentammo = 0;
-		self.weaponmodel = "";
-		self.weaponframe = 0;
-	}
-
-*** in fn(W_SetCurrentAmmo) of weapons.qc:
-
-====================================================================
-
-###### see fn below, this handles all this mods goodies!
-
-*** place this code at the beginning of weapons.qc:
-
-// Cataboligne 9.11.3 purify proto
-void () ccb_impulse_check;
-
-*** place this code:
-
-// Cataboligne 9.11.3 purify
-ccb_impulse_check();
-
-*** after this code:
-
-	if (self.impulse == 12)
-		CycleWeaponReverseCommand ();
-
-*** in fn(ImpulseCommands) of weapons.qc:
-
-====================================================================
-
-
-(*) ai
-********************************************************************
-
-
-*** place this code:
-
-// Cataboligne 9.11.3 purify
-// cam death view workaround
-	if (client.solid == SOLID_NOT)
-		return FALSE;
-
-*** after this code:
-
-	if (client.flags & FL_NOTARGET)
-		return FALSE;
-	if (client.items & IT_INVISIBILITY)
-		return FALSE;
-
-*** in fn(FindTarget) of ai.qc:
-
-====================================================================
-
-*** replace this code:
-
-	if (self.enemy.health <= 0)
-
-*** with this code:
-
-// Cataboligne 9.11.3 purify
-	// change detection method so monsters won't keep attacking
-	// a dead player with health reset to one (no view tilting hack for cam view)
-	if (self.enemy.solid == SOLID_NOT)
-	//if (self.enemy.health <= 0)
-
-*** and this code:
-
-		if (self.oldenemy.health > 0)
-
-*** with this code:
-
-// Cataboligne 9.11.3 purify
-		if (self.oldenemy.solid != SOLID_NOT)
-		//if (self.oldenemy.health > 0)
-
-*** in fn(ai_run) of ai.qc:
-
-====================================================================
-
-
-(*) world
-********************************************************************
-
-
-*** place this code:
-
-// Cataboligne 9.11.3 purify
-	precache_model ("progs/cross1.mdl" ); // lasertargeter
-
-*** after this code:
-
-	lightstyle(63, "a");
-
-*** in fn(worldspawn) of world.qc:
-
-====================================================================
-
-
-(*) client
-********************************************************************
-
-
-*** place this code at the beginning of client.qc:
-
-// Cataboligne 9.11.3 purify proto
-void() cam_defaults;
-void() cam_decode;
-
-*** place this code:
-
-// Cataboligne 9.11.3 purify
-	cam_defaults();
-	
-*** after this code:
-	
-	parm8 = 1;
-	parm9 = 0;
-
-*** in fn(SetNewParms) of client.qc:
-
-====================================================================
-
-*** place this code:
-
-// Cataboligne 9.11.3 purify
-	cam_decode();
-	
-*** after this code:
-
-	self.weapon = parm8;
-	self.armortype = parm9 * 0.01;
-
-*** in fn(DecodeLevelParms) of client.qc:
-
-====================================================================
-
-
-(*) combat
-********************************************************************
-
-
-*** place this code at the beginning of combat.qc:
-
-// Cataboligne 9.11.3 purify proto
-void() dead_cam_set;
-
-*** place this code:
-
-// Cataboligne 9.11.3 purify
-dead_cam_set();
-
-*** after this code:
- 
-	self.takedamage = DAMAGE_NO;
-	self.touch = SUB_Null;
-
-	monster_death_use();
-	self.th_die ();
-
-*** in fn(Killed) of combat.qc:
+--- see original for instructional comment - Cataboligne
 
 ====================================================================
 
@@ -291,6 +79,11 @@ void( entity cam_owner, vector vpos ) Start_chase_cam =
 
 	local entity	chase_cam;
 
+	if (Q_100 || PK_100) // Cataboligne - 8.16.9 - quake compatability mode
+	{
+		return;
+	}
+
 	stuffcmd( cam_owner, "fov 80\n" );
 
 	chase_cam = spawn();
@@ -340,11 +133,12 @@ void() Reable_chase_cam =
 	if (self.owner.solid == SOLID_NOT)
 	{
 		//owner died in water, reset .dest2_x flag for respawn
-		self.owner.dest2_x = self.owner.dest2_x | CHSCAM_ON;
+//		self.owner.dest2_x = self.owner.dest2_x | CHSCAM_ON;
 		remove( self );
 		return;
 	}
 
+	if (self.owner.classname == OBSERVER) return;
 	if (self.owner.admin) return; // pk mods
 
 	if ((CHSCAM_NO_WATER == TRUE) & (self.owner.waterlevel != 0))
@@ -400,118 +194,94 @@ void( float opt ) Remove_chase_cam =
 
 };
 
-// fn(cam_bodycopy) - copy players body after death, so we can move deathcam without dead body
 
-void (entity cpy) cam_bodycopy =
+// fn(bot_renew) - do button push for bots on think or call
+
+// NOTE: does this need to be in a bot file?
+
+void() bot_renew =
 {
-	local entity nself;
-
-	nself = spawn();
-	setorigin(nself, cpy.origin);
-	nself.modelindex = cpy.modelindex;
-	setmodel(nself, cpy.model);
-	nself.frame = cpy.frame;
-	nself.flags = cpy.flags - (cpy.flags & (FL_CLIENT)); // not, I repeat, NOT...a client
-	nself.solid = cpy.solid;
-	nself.movetype = cpy.movetype;
-	nself.velocity = cpy.velocity;
-	nself.health = cpy.health;
-	nself.netname = cpy.netname;
-	nself.weapon = cpy.weapon;
-	nself.angles = cpy.angles;
-	nself.clientcolors = cpy.clientcolors;
-	nself.v_angle = cpy.v_angle;
-	setsize(nself, cpy.mins, cpy.maxs); 
+		self.owner.health = -1;
+		self.owner.deadflag = DEAD_RESPAWNABLE;
+		self.think = SUB_Remove;
+		setorigin(self.owner, self.oldorigin);
+		self.owner.velocity = ' 0 0 0';
+		if (!intermission_running) 
+		{
+			self.owner.think = respawn;
+			self.owner.nextthink = time + 0.5;
+		}
 }
 
-// fn(cam_playerdying) - player is dying, set up death cam mover code
-// called from player_die, before dead_cam_set
-
-void () cam_playerdying =
-{
-	local entity dcam;
-
-//	self.nextthink = -1; 
-//	self.deadflag = DEAD_DEAD;
-// death cam start
-	dcam = spawn();
-	dcam.classname = "deathmovethink";
-	dcam.nextthink = time + 5.0;
-	dcam.think = cam_deathmove;
-	dcam.owner = self;
-};
-
-// fn(cam_deathmove) - allow dead player to move view - I'm dead...and I say I move
-
-// pself is player
+// fn(cam_deathmove) - enable death move
 
 void () cam_deathmove =
 {
-	local entity pself;
+	self.nextthink = time + 0.2;
+	local float cn, pn;
 
-	pself = self.owner;
-	setmodel(pself, "progs/null.mdl");
-
-	if (pself.solid != SOLID_NOT)
+	if (self.owner.solid != SOLID_NOT)
+	{
 		remove( self);
-	else if (pself.deadflag == DEAD_NO || intermission_running) // we died. need to respawn
-	{
-	stuffcmd( pself, "fov 130\n" ); // force crow vision
-	pself.flags = pself.flags | FL_ONGROUND;
-	if (self.cnt)
-		{ // set cam ent size when not in solid - doesnt work in every case - better method?
-		if ((pointcontents (pself.origin + '-32 -32 -32') != CONTENT_SOLID) &&
-			(pointcontents (pself.origin + ' 32 -32 -32') != CONTENT_SOLID) &&
-			(pointcontents (pself.origin + '-32 32 32') != CONTENT_SOLID) &&
-			(pointcontents (pself.origin + ' 32 32 32') != CONTENT_SOLID))
-			{
-			setsize (pself,'-4 -4 -4', ' 4 4 4'); //veddy veddy shmall...
-			self.cnt = 0;
-			}
-		}
-	if ( pself.button2 || pself.button1 || pself.button0 || intermission_running ) // respawn
-		{
-		pself.health = -1;
-		pself.deadflag = DEAD_DEAD; // really die & respawn
-		set_viewport( pself, pself);
-		stuffcmd( pself, "fov 90\n" );
-//		stuffcmd(pself,"scr_centertime 5\n");
-		remove(self);
 		return;
-		}
 	}
-	else // purgatory gate - died & need view
+	else if ( self.owner.button2 || self.owner.button1 || self.owner.button0 || intermission_running ) // respawn
 	{
-	self.cnt = 1;
-	pself.classname = "deadcam"; // monster fix - if they were already in chase, they dont stop following?!
-	pself.attack_finished = -1;
-
-// dead ents dont have possesions
-	pself.weapon = 0;
-	pself.items = pself.currentammo = pself.ammo_shells = pself.ammo_nails = pself.ammo_rockets = pself.ammo_cells = 0;
-// movement deal
-	cam_bodycopy(pself);
-	pself.health = 1;
-	pself.view_ofs_z = -1;
-	pself.weaponmodel = "";
-	pself.solid = SOLID_NOT;
-	pself.movetype = MOVETYPE_FLY; // camera in flight - in case we died frozen or death code had funny business
-	pself.deadflag = DEAD_NO;
-	pself.flags = pself.flags | FL_ONGROUND;
-	set_viewport( pself, pself);
-	setsize (pself,' 0 0 0',' 0 0 0');
-	if (pself.aiment != world)
+		self.owner.health = -1;
+		self.owner.deadflag = DEAD_RESPAWNABLE; // really die & respawn
+//		stuffcmd(self.owner,"scr_centertime 5\n");
+//		stuffcmd(self.owner,"scr_centertime 240\n");
+		self.think = SUB_Remove;
+//		self = self.owner;
+		setorigin(self.owner, self.oldorigin);
+		self.owner.velocity = ' 0 0 0';
+		if (!intermission_running) 
 		{
-		setorigin(pself,pself.aiment.origin); //hijack chasecam deathview
-		pself.angles = pself.aiment.angles;
-		pself.velocity = pself.aiment.velocity;
+			self.owner.think = respawn;
+			self.owner.nextthink = time + 0.5;
 		}
-	stuffcmd( pself, "fov 130\n" ); // I see short dead dudes - FIX - lock out for tenebrae?
-//	stuffcmd(pself,"scr_centertime 240\n");
-	sprint(pself," your spirit is free!\n");
+		return;
 	}
-	self.nextthink = time + 0.1;
-}
+	else if (self.owner.classname == "pk*bot" || ! self.owner.ishuman) // handle bots here
+	{
+		cn = cnt_ent(world, "classname", OBSERVER); // count observers
+		pn = cn + cnt_ent(world, "classname", "player") + cnt_ent(world, "classname", "pk*bot"); // count total players - need better way?
+		if ((pn > 4 && cn < 2) || (pn > 8 && cn < 3))
+		{
+			self.nextthink = time + 5 + random() * 20 + pn * 2 * random();
+			self.think = bot_renew;
+		}
+		else
+			bot_renew();
+		return;
+	}
+// observers are very poor - no possesions
+	if (self.owner.frame || self.owner.effects || self.owner.weapon || self.owner.currentammo || self.owner.model != "progs/null.mdl")
+	{
+		self.owner.invincible_time = self.owner.super_damage_finished = self.owner.radsuit_finished = self.owner.invisible_finished = self.owner.invincible_finished = 0;
+		self.owner.effects = self.owner.items = 0; // self.owner.frame = 
+//		self.owner.items = self.owner.items - (self.owner.items & (IT_QUAD | IT_SUIT | IT_INVISIBILITY | IT_INVULNERABILITY));
+		self.owner.weapon = self.owner.currentammo = self.owner.ammo_shells = self.owner.ammo_nails = self.owner.ammo_rockets = self.owner.ammo_cells = 0;
+	}
+
+	if (self.owner.model != "progs/null.mdl")
+	{
+		CopyToBodyQue (self.owner);
+		setmodel(self.owner, "progs/null.mdl");
+		setsize (self.owner,'-4 -4 -4', ' 4 4 4');
+		self.owner.movetype = MOVETYPE_FLY; // set camera flight pattern delta
+		self.owner.takedamage = DAMAGE_NO;
+		self.owner.wait = 0;
+		self.owner.view_ofs_z = 1;
+		self.oldorigin = self.owner.origin;
+		setorigin(self.owner, self.origin);
+		set_viewport(self.owner, self.owner);
+		sprint(self.owner,"your spirit is free!\n");
+	}
+	stuffcmd( self.owner, "fov 130\n" ); // I see short dead dudes - enforce crow vision
+	self.owner.weaponmodel = "";
+	self.owner.flags = self.owner.flags | FL_ONGROUND;
+};
 
 // fn(cam_deathview) - view of recently deceased
 // create new cam, or hijack chasecam to get here
@@ -520,11 +290,24 @@ void () cam_deathview =
 {
 	self.nextthink = time + 0.1;
 
+	if (!self.wait && self.owner.model != "progs/null.mdl")
+	{
+		self.wait = time + 4;
+	}
+
+	if (self.wait < time) // when timed out go to deathmove code
+	{
+		self.think = cam_deathmove;
+	}
+
 	if (self.owner.solid != SOLID_NOT)
 	{
 		remove( self);
 		return;
 	}
+
+	if (self.owner.classname != "pk*bot")
+		self.owner.classname = OBSERVER;
 
 	traceline( self.owner.origin, self.origin, TRUE, self.owner);
 
@@ -542,6 +325,7 @@ void () cam_deathview =
 			self.velocity = '0 0 0';
 	}
 
+	self.owner.health = 1;
 	self.owner.weaponmodel = "";
 };
 
@@ -553,6 +337,7 @@ void() cam_startdeathview =
 {
 	local entity e;
 	local vector goal, ang;
+
 	ang = self.v_angle;
 	ang_x = 30; // pretend was a slight down aim
 	self.weaponmodel = "";
@@ -598,16 +383,6 @@ void() Keep_cam_chasing_owner =
 	local vector owner_vec, goal, dir;
 	local float  dist, cap, f_f;
 
-
-	//debug var
-	//local string s;
-
-	//bprint( "\n\n\nz velocity = " );
-	//s = ftos( self.owner.velocity_z);
-	//bprint( s);
-	//bprint( "\n");
-	// (results) velocity_z does move when running on sloped ground
-
 	self.nextthink = time + 0.1;
 
 	// check if player toggled
@@ -619,7 +394,7 @@ void() Keep_cam_chasing_owner =
 
 	if (self.owner.solid == SOLID_NOT)
 	{
-		stuffcmd( self.owner, "fov 90\n" );
+//		stuffcmd( self.owner, "fov 90\n" );
 
 		if (intermission_running)
 		{
@@ -642,7 +417,7 @@ void() Keep_cam_chasing_owner =
 		return;
 	}
 
-	if (self.owner.admin) // pk mods
+	if (self.owner.admin) // pk mods - note: this is slightly annoying in operation
 	{
 		Remove_chase_cam( FALSE );
 		return;
@@ -881,11 +656,10 @@ void() Keep_cam_chasing_owner =
 void() Toggle_chase_cam =
 {
 	if (self.admin) return; // pk mods
+	if (self.classname == OBSERVER) return;
 
-	if ((CHSCAM_NO_WATER == TRUE) & (self.owner.waterlevel != 0))
+	if ((CHSCAM_NO_WATER == TRUE) & (self.waterlevel != 0))
 		return;
-
-	if (self.classname == "deadcam") return;
 
 	if( (self.dest2_x & CHSCAM_ON) )
 	{
@@ -927,8 +701,7 @@ void() Chase_cam_level_start =
 	e.owner = self;
 	e.nextthink = time + 0.2;
 	e.think = Chase_cam_lvlstart_think;
-
-	stuffcmd( self, "fov 90\n" ); // incase we died & had dead view last time
+	stuffcmd(self, "fov 90\n" ); // incase of crow vision
 };
 
 
@@ -1012,25 +785,28 @@ void(float opt) Chase_cam_read_temp1 =
 
 void(float sel) cam_parms =
 {
+	if (Q_100 || PK_100) return; // Cataboligne - 8.16.9 - quake compatability mode
 
 	if (!sel)
 		{
 // holds current state of cam and targeter between levels
 		parm14 = self.dest2_x + (self.dest2_y & 255) * 256 + ((self.dest2_z * 100) & 255) * 65536; // bit flags, cam distance, cam height
-		parm15 = self.dest1_y;
+//		parm15 = self.dest1_y;
 		}
 	else if (sel == 1)
 		{
 		self.dest2_x = parm14 & 255;
 		self.dest2_y = (parm14 & 65280)/256;
 		self.dest2_z = ((parm14 & 16711680)/65536)  * 0.01;
-		self.dest1_y = parm15;
+//		self.dest1_y = parm15;
 		}
 	else
 		{
 	// only reset if zeroed  (so DM/COOP respawns don't reset)
-
-		parm14 = CAM_DEF + CAM_DIST * 256 + CAM_Z * 65536; // bit flags, cam distance, cam height
+		if (self.deadflag == DEAD_RESPAWNABLE)
+			parm14 = self.dest2_x + (self.dest2_y & 255) * 256 + ((self.dest2_z * 100) & 255) * 65536; // bit flags, cam distance, cam height
+		else
+			parm14 = CAM_DEF + CAM_DIST * 256 + CAM_Z * 65536; // bit flags, cam distance, cam height
 		}
 };
 
@@ -1039,21 +815,19 @@ void(float sel) cam_parms =
 	// QC has already initiated all death processes
 void () dead_cam_set =
 {
-	if ((self.flags & FL_CLIENT))
+	if (Q_100 || PK_100) return; // Cataboligne - 8.16.9 - quake compatability mode
+
+	if (self.flags & FL_CLIENT)
 	{
-		if ((self.dest2_x & CHSCAM_ON))
-			self.health = 1;
-		else //if ( (CHSCAM_NO_WATER == FALSE) | (self.waterlevel == 0))
-		{
-			self.health = 1;
+		if (! self.dest2_x & CHSCAM_ON)
 			cam_startdeathview();
-		}
 	}
 };
 
 void () ccb_impulse_check =
 {
 //chase cam code
+	if (Q_100 || PK_100) return; // Cataboligne - 8.16.9 - quake compatability mode
 
 	if (self.impulse == 230) Toggle_chase_cam();
 //	else if (self.impulse == 231) LaserTargeterToggle( self );
@@ -1066,4 +840,50 @@ void () ccb_impulse_check =
 	else if (self.impulse == 238) Chase_cam_read_temp1(0); // read cvar temp1 into player.dest2_y (cam distance)
 	else if (self.impulse == 239) Chase_cam_read_temp1(1); // read cvar temp1 into player.dest2_z (cam height)
 
+};
+
+// Cataboligne - 8.22.9 - fix jump out of water with chasecam
+
+void (vector ts) cam_CheckWaterJump =
+{
+	local vector start, end;
+
+// check for a jump-out-of-water
+	makevectors (self.angles);
+	start = self.origin + ts;
+	v_forward_z = 0;
+	normalize(v_forward);
+	end = start + v_forward*24;
+	traceline (start, end, TRUE, self);
+	if (trace_fraction < 1)
+	{	// solid at waist
+		start_z = start_z + self.maxs_z - 8;
+		end = start + v_forward*24;
+		self.movedir = trace_plane_normal * -50;
+		traceline (start, end, TRUE, self);
+		if (trace_fraction == 1)
+		{	// open at eye level
+			self.flags = self.flags | FL_WATERJUMP;
+			self.velocity_z = 225;
+			self.flags = self.flags - (self.flags & FL_JUMPRELEASED);
+			self.teleport_time = time + 2;	// safety net
+			return;
+		}
+	}
+};
+
+void() cam_waterjump =
+{
+//	if (! self.flags & FL_WATERJUMP)
+	cam_CheckWaterJump (' 0 0 -8');
+	if (! self.flags & FL_WATERJUMP)
+		cam_CheckWaterJump (' 0 0 -4');
+	if (! self.flags & FL_WATERJUMP)
+		cam_CheckWaterJump (' 0 0 4');
+	if (! self.flags & FL_WATERJUMP)
+		cam_CheckWaterJump (' 0 0 8');
+//		if (! self.flags & FL_WATERJUMP)
+//			cam_CheckWaterJump (' 0 0 10');
+//		if (! self.flags & FL_WATERJUMP)
+//			cam_CheckWaterJump (' 0 0 12');
 };

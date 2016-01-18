@@ -10,9 +10,6 @@
  *
  */
 
-// Cataboligne 9.11.3 purify proto - chase cam
-void() dead_cam_set;
-
 void () T_MissileTouch;
 void () info_player_start;
 void(entity targ, entity attacker) ClientObituary;
@@ -96,7 +93,7 @@ void(entity targ, entity attacker) Killed =
 	if (self.classname == "pk*bot" || attacker.classname == "pk*bot") 
 		bot_kill(self, attacker); // *bot - tie in to count bot kills / deaths
 	else
-	if (PK) PK_ClientObituary(self, damage_inflictor, attacker);
+	if (PK || custom_hub_loaded) PK_ClientObituary(self, damage_inflictor, attacker);
 	else
 	ClientObituary(self, attacker);
 
@@ -106,8 +103,7 @@ void(entity targ, entity attacker) Killed =
 	monster_death_use ();
 	self.th_die ();
 
-// Cataboligne 9.11.3 purify - chase cam
-	dead_cam_set();
+	dead_cam_set(); // Cataboligne 9.11.3 purify - chase cam
 
 	self = oself;
 };
@@ -130,6 +126,12 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 
 	if (!targ.takedamage)
 		return;
+
+	if (PK_ART || custom_hub_loaded)
+	{
+		pk_art_T_Damage(targ, inflictor, attacker, damage); // Cataboligne 8.12.9 purify - pk artifacts
+		return;
+	}
 
 // used by buttons and triggers to set activator for target firing
 	damage_attacker = attacker;

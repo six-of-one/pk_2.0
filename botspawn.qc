@@ -356,7 +356,7 @@ void () PutBotInServer =
 	{
 		dprint ("Seems like sv_aim isn't 0.93\n");
 	}
-	if (PK) PK_CIS(); // *pk - set client pk elements
+	if (!Q_100 && !Q_99) PK_CIS(); // *pk - set client pk elements
 };
 
 void () SpawnNewBot =
@@ -662,6 +662,7 @@ void (float skl) AddAnotherBot =
 	newbot.b_clientno = newbot.id;
 	newbot.b_shirt = rint(top);
 	newbot.b_pants = rint(bottom);
+	newbot.ishuman = FALSE; // frik stuff - make sure
 	UpdateClient(newbot);
 /*
 	WriteByte (MSG_ALL,MSG_UPDATENAME);

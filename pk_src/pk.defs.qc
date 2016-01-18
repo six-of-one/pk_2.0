@@ -10,11 +10,18 @@ float PK_DYNAMIC				= 8192;	// bit *	= TRUE --- when always in painkeep mode & n
 												// items include  - bear trap, can o' beans, gravity well, harpoon, turret, airfist, exploding shot, XXX - chain thunderbolt, pulse nailgun
 float PK_SPIKER				= 16384;	// bit *	= FALSE -- allow spike traps, set to true for original pk treatment of spike shooters - they are removed
 float PK_XSOUND				= 32768;	// bit * = TRUE --- use extra pk sound set
+// compatability modes for the purists out there
+float PK_100;								// painkeep compatability mode - if true run 100% true to pk v1.11, no extras (has menus)
+float PK_99						= FALSE;	// painkeep 99% compatability mode - if true pk (main mod) works as pk but extra env effects are disabled
+float Q_100						= FALSE;	// quake 1 compatability mode - if true run 100% true to quake 1, why? just for kicks...
+float Q_99						= FALSE;	// quake 1 99% compatability mode - if true pk stuff is removed, but admin, item enhancements & env remain
 
 float PK_HUB2					= 131072; // bit if TRUE, using custom hub - only used for level transtion from hub vote
 //float PK_HUB3					= 262144; // bit if TRUE, using hub3 - reload at hub loads - deprecated
 float PK_ADHUB					= 1;		// set to 0 PK_mapmode and admin menu will ignore new maps - item load can still set PK mode for any pk map
-float PK_HUBEXIT				= FALSE;	// TRUE - loading a non PK map while running a custom hub exits the hub loop, FALSE - always return to a custom hub from any map load
+//float PK_HUBEXIT;							// TRUE - loading a non PK map while running a custom hub exits the hub loop, FALSE - always return to a custom hub from any map load
+float PK_ADMINMAP;						// if true this is an admin map command that overrides custom hub call from GotoNextMap
+//float PK_CUSTOMHUB;						// if TRUE, level running is a custom hub
 
 string st_hub2					= "hub2"; // map names for 2nd & 3rd hub
 string st_hub3					= "hub3";
@@ -46,8 +53,11 @@ string ADMINCODE				= "float1\n"; // local command that loads admin security pas
 													  //- obscured to keep anyone with casual console access from divining its true meaning
 string ADMINIMPULSE			= "float2\n"; // load the impulse
 string ADMINTIME				= "float3\n"; // load the time out
+string ADMINMAPCMD			= "_mapcmd\n"; // append to mapname for alias cmd
+float pk_mapcmd				= 1; // TOD: admin option later
+float pk_mapcfg				= 1; // TOD: admin option later
 
-// item admin
+// item override admin
 
 float WEP_SSHOT				= 1; 	 // admin of super shotgun
 float WEP_NAILGUN				= 2; 	 // admin of nailgun
@@ -67,7 +77,7 @@ float WEP_BTRAP				= 512;
 float WEP_EXPSH				= 1024;
 float WEP_GRAP					= 2048;
 float WEP_AIRG					= 4096;
-float WEP_CPNB					= 8193;
+float WEP_CPNB					= 8192;
 
 float ART_QUAD					= 128;  // admin of quad
 float ART_INV					= 256;  // admin of invulnerable
@@ -89,20 +99,23 @@ float HEAL_100					= 65536;  // admin of heal 100
 float HEAL_HEALS				= 114688; // all health bits						= 000000000000000111
 float HEAL_STOP				= 131072;
 
-float CON_ANY					= 2097087; // any bit set in this mask	- any above + controls (all bits - 64)
-float CON_STOP					= 16384; //131072;  // stop replace / remove cycle here
+float ITEM_ANY					= 131071; // any item bits set
+
+float CON_ANY					= 8388607; // any bit set in this mask	- any above + controls (all bits - 64)
+float CON_STOP					= 131072;  // stop replace / remove cycle here
 // CON_* entries
 float CON_ONLY					= 131072;  // only the selected items will be loaded
 float CON_NONE					= 262144;  // none of the selected items will be loaded
 float CON_SUBS					= 524288;  // substitute something for removed items
 float CON_INF					= 1048576; // infinite ammo to all weps with bit set above - except carryables
 float CON_CYC					= 2097152; // cycle selected bits in thier group
+float CON_CHAOS				= 2490368; // item chaos it all 3 control bits set
 float CON_RUN					= 4063232; // any control bit CON_* entries above - used by autorun
 float CYC_TIME					= 60; // TEST - 240; // seconds for cycle base - 4 mins +|- 2 mins
+
 void() item_loop;
 float ammo_frame;
 void() infinite_ammo;
-
 // **************************************
 // painkeep protos
 
@@ -144,6 +157,7 @@ void(entity client, string s, string s1, string s2, string s3, string s4, string
 // items
 .float pk_items;	// Items used for impulse 1
 .float pk_currentitem;
+float pk_attack;		// bit 1 = can make a pk attack on any map, bit 2 = pk_artifacts attack
 
 // Items used in impulse 1
 float PK_IT_AXE				= 1;
@@ -155,6 +169,8 @@ float PK_IT_AIRGUN			= 32;
 float PK_IT_CLIGHT			= 64;
 float PK_IT_BEARTRAP			= 128;
 float PK_IT_EXTRADISP		= 4096; //= 256; - pk artifacts support recode
+
+float PK_IT_RANGE				= 112; // range weps - grap, airgun, chainthunder
 /*
 Impulse 1 will toggle between Axe, Bear Trap, CoPB, AS, and GW.
 
@@ -287,13 +303,14 @@ float PK_SF_HUB				= 1024;	// moved to pk_flags
 float PK_TP_TIMEMASK			= 63;
 float inHubMap;
 float custom_hub_loaded;				// if TRUE custom hub is used
+float custom_hub_fail;				// if TRUE custom hub was removed but inhubmap may be set
 
 .float voteIntermission;
 string() hub_select;
-void() check_custom_hub;
+float() check_custom_hub;
 
 // MOTD
-float MOTDTIME					= 70;		// The amount of "frames" for the motd message (minimum should be 20)
+float MOTDTIME					= 120;		// The amount of "frames" for the motd message (minimum should be 20)
 float DONTALLOWBOTS			= 1;		// If we want to show anti bots messages at startup
 .float msgcount;
 void() updateStatusDisplay;
@@ -336,16 +353,18 @@ float(string mp) PK_mapmode;
 void() PK_SetAdmin;
 void() PK_AdminImpulse;
 void() admin_sv_cfg;
-void() admin_clear;
 void() Admin_mainmenu;
 float() admin_postthink;
 void() admin_resettimeout;
-void () observer; // *bot
+void() observer; // *bot
+void() observer_off;
+string OBSERVER = "jafo"; // nod to Blue Thunder : "just another fucking observer"
 float pk_flags_ck;
 float pk_itemovr_ck;
 float (float rl) AdminBitFlag;
 void() dyn_item;
 void() pk_cphub;
+void(entity e) pk_admincfg
 
 float PK_TP_STATUSON			= 256;
 .float hubstartupmessage;
@@ -384,7 +403,6 @@ void() grap_maintainHarpoon;
 void() bolt_checkTargets;
 void() player_conduitJerk;
 void() copb_checkFart;
-void() SetNewPKParms;
 void(entity targ, entity inflictor, entity attacker) PK_ClientObituary;
 
 // item code
@@ -405,8 +423,10 @@ void() PK_BackpackTouch;
 
 // player code
 void() bolt_fire;
-void()	bolt_s_explode1;
+void() bolt_s_explode1;
 void(entity grapOwner) grap_remove;
+void() pk_stand_frames;
+void() pk_run_frames;
 
 // added
 void() pk_harpoon_frames;
@@ -433,7 +453,7 @@ void(float ox) W_FirePulseSpikes;
 void() PK_SetCurrentAmmo;
 float(float weaponnum, float pknum) CanSelect;
 float(float weaponnum, float pknum) HasAmmo;
-void() PK_WeaponFrame;
+//void() PK_WeaponFrame;
 float() PK_BestWeapon;
 float() PK_CheckNoAmmo;
 void() PK_ChangeWeapon;
@@ -457,6 +477,9 @@ void() pk_placeitem;
 .string group;
 .string event;
 .float      duration;
+
+
+void() dead_cam_set; // Cataboligne 9.11.3 purify proto - chase cam
 
 /*
 

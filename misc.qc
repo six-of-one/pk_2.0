@@ -349,7 +349,7 @@ Laser is only for REGISTERED.
 void () trap_spikeshooter =
 {
 	if (PK)
-	if (pk_flags & PK_SPIKER) // *pk - original pk removed spike shooters
+	if (PK_100 || (pk_flags & PK_SPIKER)) // *pk - original pk removed spike shooters
 	{
 	remove(self);
 	return;
@@ -376,7 +376,7 @@ Continuously fires spikes.
 void () trap_shooter =
 {
 	if (PK)
-	if (pk_flags & PK_SPIKER) // *pk - original pk removed spike shooters
+	if (PK_100 || (pk_flags & PK_SPIKER)) // *pk - original pk removed spike shooters
 	{
 	remove(self);
 	return;

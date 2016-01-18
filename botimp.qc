@@ -92,6 +92,10 @@ void() end_observer =
 	observer_off();
 };
 
+// Cataboligne - 8.16.9 - observer fix - move fast while flying - using cam_deathmove
+
+// FIX - do something with body so it doesnt just "vanish"
+
 void () observer =
 {
 	local entity e;
@@ -108,16 +112,20 @@ void () observer =
 			e.enemy = self;
 		}
 	}
-	self.classname = "jafo";
-	self.frame = 0;
-	self.solid = SOLID_NOT;
+	cam_startdeathview(); // get a cam ent
+	set_viewport(self, self); // dont really need death view
+	setmodel(self, "progs/null.mdl");
+	setsize (self,'-4 -4 -4', ' 4 4 4'); // dont look in floors / walls
 	self.movetype = MOVETYPE_FLY;
+	self.health = self.view_ofs_z = 1;
+	self.aiment.oldorigin = self.origin;
+	self.aiment.think = cam_deathmove; // straight to death move, do not collect $200
+	self.classname = OBSERVER;
+	self.owner.frags = 0; // woo - loose score?
+	self.solid = SOLID_NOT;
 	self.takedamage = DAMAGE_NO;
-	self.frags = 0;
-	self.weaponmodel = "";
-	setmodel (self,string_null);
-	setsize (self, ' 0 0 0', ' 0 0 0');
-	bprint ("Observer mode activated\n");
+	centerprint (self,"Observer mode activated\nPress \bFIRE\b to exit and respawn\n");
+	self.wad = "\nObserver mode activated\nPress \bFIRE\b to exit and respawn\n";
 };
 
 void () observer_off =
@@ -129,7 +137,7 @@ void () observer_off =
 
 void () setobserverMode =
 {
-	if (self.classname == "jafo")
+	if (self.classname == OBSERVER)
 	{
 		observer_off ();
 		return ;

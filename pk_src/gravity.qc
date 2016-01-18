@@ -56,6 +56,7 @@ void() gravity_pull =
 		if (visible(e))
 		if (e.classname != "gravity") // don't yank on any other gravity wells
 		if (e.classname != "beartrap")
+		if (pk_art_movshot_ck(e, "grav")) // Cataboligne 8.12.9 purify - pk artifacts
 		//if (e != self.owner)
 		if (e.movetype != MOVETYPE_NONE) // anything that can move
 		if (e.movetype != MOVETYPE_PUSH)

@@ -697,11 +697,10 @@ float(entity targ, entity inflictor) CanDamage;
 
 
 // Cataboligne 9.11.3 purify - chase cam
-void() cam_deathmove;
-void() cam_playerdying;
 void() chase_cam_precache;
 void(float sel) cam_parms;
 void() Chase_cam_level_start;
+void() cam_waterjump;
 
 // message protocol defines
 float SVC_SETVIEWPORT	= 5;
@@ -717,3 +716,7 @@ float LASERTARG_LIT		= 32;
 // moved here due to v106 tones
 
 .float	 healtype;
+
+// server flags command off, compile on for dev
+
+float SERVERFLAGS		= 0;

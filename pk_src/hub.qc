@@ -48,7 +48,6 @@ void() hub_teleport_touch =
 
 		self.think = execute_changelevel;
 		self.nextthink = time + 0.1;
-//		changelevel(self.map);
 		return;
 	}
 
@@ -112,6 +111,10 @@ void() hub_teleport =
 	}
 
 	InitTrigger ();
+
+	if (Q_100 || Q_99) // Cataboligne - 8.16.9 - q compat mode
+		self.touch = changelevel_touch; // else hubs are broke
+	else
 	self.touch = hub_teleport_touch;
 
 	self.th_weight = triggerweight; // *bot
@@ -141,20 +144,23 @@ string() hub_select =
 	return ("start");
 };
 
-// fn(check_custom_hub) - check for return to a custom hub when exiting or admin reseting hub
+// fn(check_custom_hub) - check for return to a custom hub when in GotoNextMap or admin reseting hub
 
-void() check_custom_hub =
+float() check_custom_hub =
 {
+	PK_ADMINMAP = FALSE; // always reset this
+
 	if (custom_hub_loaded) //pk_flags & PK_HUB2)
 	{
 //		pk_flags = pk_flags - (pk_flags & PK_HUB2);
 //		admin_sv_cfg();
 		if (pk_flags & PK_SF_HUB)
 		{
-			bot_changelevel(); // *bot - reload bots on next level, handle intermission
 			localcmd("hubmap\n");  // custom hub - use alias to reload
+			return TRUE;
 		}
 	}
+	return FALSE;
 };
 
 // fn(hub_custom) - implement the custom hub - portal
@@ -164,11 +170,19 @@ void() hub_custom =
 	local entity e;
 	local vector v;
 
+	if (PK_100 || Q_100 || Q_99) // Cataboligne - 8.15.9 - pk compat mode, q compat mode
+	{
+		custom_hub_fail = TRUE; // fail it - dumb hub
+		inHubMap = FALSE;
+		remove(self);
+		return;
+	}
+
 	if (!self.map)
 	{
 		bprint("*** Custom hub without map designation - setting = Hub.");
 		self.map = "start";
-		self.message = "Start Hub!";
+		self.message = "Painkeep Hub!";
 	}
 	if (!self.message) self.message = "Mystery Map"; // doh
 
@@ -250,7 +264,7 @@ void() pk_cphub =
 	else
 	{
 		bprint("{\n\"classname\" \"hub_custom\"\n\"targetname\" \"votes\"\n\"map\" \"start\"\n");
-		bprint("\"message\" \"Start Hub\"\n\"delay\" \"0\"\n");
+		bprint("\"message\" \"Painkeep Hub\"\n\"delay\" \"0\"\n");
 		bprint("\"wait\" \"0\"\n\"style\" \"1\"\n\"origin\" \"");
 	}
 	bprint(vtos(self.origin + ' 0 0 -20'));
@@ -413,12 +427,13 @@ void() hub_control_use =
 		}
 	}
 
+	PK_ADMINMAP = TRUE; // we may be a custom hub set - do not allow re loading hub
+
 	nextmap = highest.map;
 	gameover = TRUE;
 
 	self.think = execute_changelevel;
 	self.nextthink = time + 0.1;
-//	changelevel (highest.map);
 	if (custom_hub_loaded) // || self.map
 	{
 		pk_flags = PK_HUB2 | pk_flags; // return to custom hub after this map
@@ -605,10 +620,16 @@ void() hub_control_status =
 
 			pl = find(pl, classname, srch);
 			if (!pl)
-			if (srch != "pk*bot") // *bot - search out bots too
+			if (srch != "pk*bot" && srch != OBSERVER) // *bot - search out bots too
 			{
 				srch = "pk*bot";
-				pl = find(pl, classname, srch);
+				pl = find(world, classname, srch);
+			}
+			if (!pl)
+			if (srch == "pk*bot") // find jafo now
+			{
+				srch = OBSERVER;
+				pl = find(world, classname, srch);
 			}
 		}
 
@@ -624,6 +645,13 @@ void() hub_control =
 {
 	local entity timer;
 	local float temp1;
+
+	if (Q_100 || Q_99 || custom_hub_fail) // Cataboligne - 8.16.9 - q compat mode
+	{
+		inHubMap = FALSE;
+		remove(self); // no hub controls in q mode, would be confusing
+		return;
+	}
 
 	// if we're not in deathmatch, then we remove this thing
 	if (!deathmatch)
@@ -643,7 +671,7 @@ void() hub_control =
 	}
 	theHub = self;
 
-	// either triggered to by time
+// either triggered to by time
 	if (self.targetname)
 	{
 		self.use = hub_control_use;
@@ -673,7 +701,7 @@ void() hub_control =
 //	self.nextthink = time + 30.0;
 
 // custom hub check - set alias if map is defined
-	if (world.model == "maps/hub2.bsp")
+	if (world.model == "maps/hub2.bsp") // allow renamed start.bsp from expansion pack & pk artifacts to work thru custom hub
 	{
 		self.map = "hub2";
 	}
@@ -866,6 +894,10 @@ void(string mapName) findAndPrintMapName =
 	}
 	else
 	{
+		if (PK_ART)
+			if (pk_art_hubmapmsg(mapName)) // Cataboligne 8.19.9 purify - pk artifacts
+				return;
+
 		// 'Unknown Map, Please Extend Print Routine'
 		WriteB3(MSG_ONE, 7040597);
 		WriteB3(MSG_ONE, 7827310);

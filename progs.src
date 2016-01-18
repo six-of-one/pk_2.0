@@ -9,6 +9,9 @@ pk_src/pk.defs.qc
 bot.defs.qc
 bot_tally.qc
 
+// chaos code
+chaos.qc
+
 frikbot/map_dm1.qc
 frikbot/map_dm2.qc
 frikbot/map_dm3.qc

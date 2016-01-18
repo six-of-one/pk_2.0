@@ -83,6 +83,7 @@ void(entity ent) target_add =
 {
 	if (ent == world)
 		return;
+	if (ent.classname == OBSERVER) return; // Cataboligne - 8.13.9 - dont target jafo, he's a nice guy
 	if (target_onstack(ent))
 		return;
 	self.target4 = self.target3;

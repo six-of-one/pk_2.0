@@ -56,6 +56,39 @@ $frame axattd1 axattd2 axattd3 axattd4 axattd5 axattd6
 
 // pk player code moved here for adaptive code 
 
+void() pk_stand_frames =
+{
+	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
+	{
+		if (self.walkframe >= 12)
+			self.walkframe = 0;
+		self.frame = $axstnd1 + self.walkframe;
+	}
+	else
+	{
+		if (self.walkframe >= 5)
+			self.walkframe = 0;
+		self.frame = $stand1 + self.walkframe;
+	}
+};
+
+void() pk_run_frames =
+{
+	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
+	{
+		if (self.walkframe == 6)
+			self.walkframe = 0;
+		self.frame = $axrun1 + self.walkframe;
+	}
+	else
+	{
+		if (self.walkframe == 6)
+			self.walkframe = 0;
+		self.frame = self.frame + self.walkframe;
+	}
+};
+
+
 // harpoon frame control
 
 void() pk_harpoon_frames =
@@ -541,10 +574,7 @@ void() PK_PlayerDie =
 	if (self.velocity_z < 10)
 		self.velocity_z = self.velocity_z + random()*300;
 
-// Cataboligne 8.9.9 purify - chase cam
-	cam_playerdying();
-
-	if (self.health < -40 || pointcontents(self.origin) == CONTENT_LAVA) // TEST - new feature, need full height test
+	if (self.health < -40 || (!PK_100 && !PK_99 && !Q_100 && pointcontents(self.origin) == CONTENT_LAVA)) // TEST - new feature, need full height test
 	{
 		GibPlayer();
 		return;

@@ -90,16 +90,11 @@ void() player_run;
 
 void()	player_stand1 =[	$axstnd1,	player_stand1	]
 {
-	if (PK) pk_harpoon_frames();
+	if (PK || custom_hub_loaded) pk_harpoon_frames();
 	else
 	self.weaponframe=0;
 
-	if (PK && self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
-	{
-		if (self.walkframe >= 12)
-			self.walkframe = 0;
-		self.frame = $axstnd1 + self.walkframe;
-	}
+	if (PK) pk_stand_frames();
 	else
 	if (self.weapon == IT_AXE)
 	{
@@ -129,12 +124,7 @@ void()	player_run =[	$rockrun1,	player_run	]
 	else
 	self.weaponframe=0;
 
-	if (PK && self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
-	{
-		if (self.walkframe == 6)
-			self.walkframe = 0;
-		self.frame = $axrun1 + self.walkframe;
-	}
+	if (PK) pk_run_frames();
 	else
 	if (self.weapon == IT_AXE)
 	{
@@ -366,8 +356,13 @@ void() player_pain =
 	if (self.invisible_finished > time)
 		return;		// eyes don't have pain frames
 
-	if (PK && self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
-		player_axpain1 (); // *pk - run pk axe frames
+	if (PK)
+	{
+		if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
+			player_axpain1 (); // *pk - run pk axe frames
+		else
+			player_pain1 ();
+	}
 	else
 	if (self.weapon == IT_AXE)
 		player_axpain1 ();
@@ -568,7 +563,7 @@ void() GibPlayer =
 
 void() PlayerDie =
 {
-	if (PK)
+	if (PK || custom_hub_loaded)
 	{
 		PK_PlayerDie();
 		return;
@@ -594,10 +589,7 @@ void() PlayerDie =
 	if (self.velocity_z < 10)
 		self.velocity_z = self.velocity_z + random()*300;
 
-// Cataboligne 8.9.9 purify - chase cam
-	cam_playerdying();
-
-	if (self.health < -40)
+	if (self.health < -40 || (!PK_100 && !PK_99 && !Q_100 && pointcontents(self.origin) == CONTENT_LAVA)) // TEST - new feature, need full height test
 	{
 		GibPlayer ();
 		return;

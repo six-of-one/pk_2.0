@@ -163,9 +163,21 @@ void() PK_precache =
 
 	precache_model ("progs/null.mdl"); // Cataboligne 8.8.9 purify - chase cam
 
+// PK_100 - fix - needs to be admin toggle
+
+	PK_100 = FALSE; // if true run 100% true to pk v1.11
+
+	PK_ART = PK_ART_DEF & !PK_100; // Cataboligne - 8.12.9 - pk artifacts support init - FIX - needs to read admin var
 	if (PK_ART) pk_art_precache(); // Cataboligne 8.12.9 purify - pk artifacts
 
 	PK_ADMIN = 6; // code sets allow admin here - can be disabled by admin menu, 3 is base menu set
+
+	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake compatability mode starts here
+	{
+		if (!Q_99) PK_ADMIN = 0;
+//		else Q_100 = 0; // constant right now
+		PK_ART = PK_100 = 0;
+	}
 
 	local entity e;
 
@@ -180,22 +192,14 @@ void() PK_precache =
 		localcmd(ADMINCODE);
 		pk_admincode = pk_adminimp = -1;
 		pk_adminpwdmask = TRUE;
-
-		localcmd("noadmingamma\n"); // set gamma level
-		localcmd("noadmin_centertime\n");
-
-// set defaults not usually bound by quake
-		localcmd ("bind 9 \"impulse 9\"\n"); // 9 is cheat in sp - this could be annoying for SP
-		localcmd ("bind 0 \"impulse 10\"\n");
-		localcmd ("bind enter \"impulse 11\"\n");
-		localcmd ("bind backspace \"impulse 12\"\n");
 	}
 
+  if (!PK_100 && !Q_100)
+ {
 	pk_itemovr = pk_itemovr_ck = cvar("saved3"); // admin override of map items
 
 // causes item overrides to happen on map load
 
-//	if (FALSE) // disabled TEST
 	if (pk_itemovr & CON_RUN) // change some items - admin override
 	{
 		e = spawn();
@@ -205,6 +209,7 @@ void() PK_precache =
 			e.nextthink = time + 2; // do this well after items spawn
 		}
 	}
+ }
 
 // set PK mode based on engine var | saved2
 
@@ -213,7 +218,11 @@ void() PK_precache =
 
 // got mode, set PK master switch
 	PK = FALSE;
-	if (pk_flags & PK_ALWAYS)
+
+  if (!Q_100 && !Q_99) // Cataboligne - 8.16.9 - quake compatability mode
+ {
+	if (PK_100) PK = TRUE;
+	else if (pk_flags & PK_ALWAYS)
 		PK = TRUE;
 	else if (pk_flags & PK_NEVER)
 		PK = FALSE;
@@ -222,21 +231,20 @@ void() PK_precache =
 		PK = PK_mapmode(world.model);
 	}
 
-	PK_ART = PK_ART_DEF; // Cataboligne - 8.12.9 - pk artifacts support init - FIX - needs to read admin var
-
-	custom_hub_loaded = pk_flags & PK_HUB2; // see if we came from a custom hub
-// run this and a non PK map loaded with map command exits custom hub loop as with normal hub under v1.2
-	if (PK_HUBEXIT) pk_flags = pk_flags - (pk_flags & PK_HUB2);
-	admin_sv_cfg();
+	if (!PK_100) custom_hub_loaded = pk_flags & PK_HUB2; // see if we came from a custom hub
 	if (world.model == "maps/start.bsp" && world.message == "HUB")
 	{
+		pk_flags = pk_flags - (pk_flags & PK_HUB2);
 		custom_hub_loaded = FALSE;
 		localcmd("alias hubmap \"bf\"\n"); // always deactivate
 	}
+	admin_sv_cfg();
+ }
 
 // setup dynamic items
 
-	if (PK)
+	if (PK | Q_99)
+	if (!PK_100 && !Q_100)
 	if (pk_flags & PK_DYNAMIC)
 	{
 		pk_ditems = 0;
@@ -494,6 +502,52 @@ void(vector org) spawn_tfog2 =
 	WriteCoord (MSG_BROADCAST, org_z);
 };
 
+// special parms - for respawn
+
+void(entity e, float pt) test_parms =
+{
+// TESTING
+	stuffcmd (e, "alias");
+	stuffcmd (e, " parm1");
+//	stuffcmd (e, ftos(e.id));
+	stuffcmd (e," \"");
+	stuffcmd (e, "saved2 ");
+	stuffcmd (e, ftos(pt));
+	stuffcmd (e, "\"\n");
+
+	stuffcmd (e, "alias");
+	stuffcmd (e, " parm2");
+//	stuffcmd (e, ftos(e.id));
+	stuffcmd (e," \"");
+	stuffcmd (e, "saved2 ");
+	stuffcmd (e, ftos(e.items));
+	stuffcmd (e, "\"\n");
+
+	stuffcmd (e, "alias");
+	stuffcmd (e, " parm3");
+//	stuffcmd (e, ftos(e.id));
+	stuffcmd (e," \"");
+	stuffcmd (e, "saved2 ");
+	stuffcmd (e, ftos(e.pk_items));
+	stuffcmd (e, "\"\n");
+}
+
+void() SetNewParms_PK =
+{
+	parm1 = IT_SHOTGUN | IT_AXE;
+	parm2 = 100;
+	parm4 = 25;
+	parm3 = parm5 = parm6 = parm7 = parm9 = 0;
+	parm8 = 1;
+	parm16 = MOTDTIME + 1;
+
+	parm10 = parm11 = 0;
+	if(self.pk_items & PK_IT_EXTRADISP)
+	{
+		parm16 = parm16 | PK_IT_EXTRADISP;
+	}
+};
+
 // called from SetChangeParms - saves off pk parms for level change
 
 void() PK_ChangeParms =
@@ -505,7 +559,7 @@ void() PK_ChangeParms =
 
 	if (PK_ART) pk_art_parms(0); // Cataboligne 8.12.9 purify - pk artifacts
 	// do hub message.
-	parm16 = self.msgcount | 256 | (self.pk_items & PK_IT_EXTRADISP);
+	parm16 = self.msgcount | 256; // | (self.pk_items & PK_IT_EXTRADISP);
 };
 
 // called from SetNewParms - clears pk parms
@@ -514,7 +568,7 @@ void() PK_SetNewParms =
 {
 //	parm10 = PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP; // deprecated - not really used
 //	parm11 = parm12 = parm13 = parm14 = parm15 = 0; // chasecam change
-		parm11 = parm12 = parm13 = 0;
+		parm10 = parm11 = 0;
 // do hub message.
 	parm16 = 256;
 
@@ -538,20 +592,6 @@ void() PK_DecodeLevelParms =
 	self.msgcount = (parm16 & 255);
 
 	if (PK_ART) pk_art_parms(1); // Cataboligne 8.12.9 purify - pk artifacts
-};
-
-// called from SetChangeParms with health < 0 - sets MOTD time in parm 16, & checks user enabled extra disp
-
-void() SetNewPKParms =
-{
-/* deprecated - new mode
-	parm1 = IT_SHOTGUN | IT_AXE;
-	parm2 = 100;
-	parm3 = parm5 = parm6 = parm7 = parm9 = 0;
-	parm4 = 25;
-	parm8 = 1;
-*/
-	parm16 = (MOTDTIME + 1) | 256 | (self.pk_items & PK_IT_EXTRADISP); // do hub message.
 };
 
 // called from PutClientInServer
@@ -660,11 +700,36 @@ entity() PK_SelectSpawnPoint =
 
 };
 
+// config players for admin on spawn & map for players if cfg avail
+
+void() pk_plcfg =
+{
+	if (self.ishuman)
+	{
+		pk_admincfg(self);
+		if (pk_mapcmd)
+		{
+			stuffcmd(self, mapname);
+			stuffcmd(self, ADMINMAPCMD);
+		}
+		if (pk_mapcfg)
+		{
+			stuffcmd(self, "exec ");
+			stuffcmd(self, mapname);
+			stuffcmd(self, ".cfg\n");
+		}
+	}
+};
+
 // called from PutClientInServer
 
 void() PK_CIS =
 {
 // previously in CIS
+	pk_plcfg();
+	self.pk_items = self.pk_items | PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP
+																	| PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // Cataboligne 8.12.9 purify - pk artifacts
+
 	grap_releaseHarpoon();
 	self.pk_currentInventory = self.pk_currentitem = PK_IT_AXE;
 	self.beartrap_time = 0;
@@ -702,6 +767,12 @@ void() PK_CIS =
 	self.pklastweapon = self.pk_currentitem;
 	self.pkprevweapon = self.pk_currentitem;
 
+	stuffcmd(self, CL_BOBAMT); // restore bobing - may have come from a hub vote
+
+	self.pkplus_actortype = 0; // Cataboligne 8.12.9 purify - pk artifacts
+
+	if (!PK) return;
+
 	if (inHubMap)
 	{ // give the respawn guy a fighting chance...
 		self.items = self.items | IT_INVULNERABILITY;
@@ -720,13 +791,6 @@ void() PK_CIS =
 
 	// PAINKEEP Fix the velocity on respawn bug
 	self.velocity = '0 0 0';
-
-	localcmd(CL_BOBAMT); // restore bobing - may have come from a hub vote
-
-	self.pk_items = self.pk_items | PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP
-																	| PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // Cataboligne 8.12.9 purify - pk artifacts
-
-	self.pkplus_actortype = 0; // Cataboligne 8.12.9 purify - pk artifacts
 };
 
 /*
@@ -776,6 +840,7 @@ void() pk_gasp_sound =
 	}
 }
 */
+
 // called from playerprethink - diverts
 
 void() pk_pre_think =
@@ -792,14 +857,32 @@ void() pk_pre_think =
 
 	 if (self.waterlevel == 2)
 		CheckWaterJump ();
+
+//		if (!Q_100 && !PK_100)
+		if (self.waterlevel)
+		if (! self.flags & FL_WATERJUMP)
+		if (self.dest2_x & CHSCAM_ON)
+		{
+			cam_waterjump();  // Cataboligne 8.22.9 purify - chase cam
+		}
+
 	}
 	else if (time > self.pk_dutychecking)
 	{
 		CheckRules ();
 		WaterMove ();
 
-	 if (self.waterlevel == 2)
+	if (self.waterlevel == 2)
 		CheckWaterJump ();
+
+//		if (!Q_100 && !PK_100)
+		if (self.waterlevel)
+		if (! self.flags & FL_WATERJUMP)
+		if (self.dest2_x & CHSCAM_ON)
+		{
+			cam_waterjump();  // Cataboligne 8.22.9 purify - chase cam
+		}
+
 	}
 
 	if (self.deadflag >= DEAD_DEAD)
@@ -869,8 +952,9 @@ void() pk_post_think =
 
 // do weapon stuff
 
-	if (self.attack_finished < time) PK_WeaponFrame ();
+	if (self.attack_finished < time) W_WeaponFrame ();
 
+	if (self.classname != OBSERVER) // Cataboligne - 8.16.9 - dont need this for observers
 // check to see if player landed and play landing sound
 	if ((self.jump_flag < -300) && (self.flags & FL_ONGROUND) && (self.health > 0))
 	{
@@ -904,8 +988,13 @@ void() pk_post_think =
 	{
 	 bolt_checkTargets();
 
-		if (PK_ART) if (!pk_art_checkpwr()) // Cataboligne 8.12.9 purify - pk artifacts
-		CheckPowerups ();
+		if (PK_ART)
+		{
+			if (!pk_art_checkpwr()) // Cataboligne 8.12.9 purify - pk artifacts
+				CheckPowerups ();
+		}
+		else
+			CheckPowerups ();
 		if (self.copb_timeout)
 		{
 			if (self.copb_timeout >= time)
@@ -927,8 +1016,13 @@ void() pk_post_think =
 	{
 		bolt_checkTargets();
 
-		if (PK_ART) if (!pk_art_checkpwr()) // Cataboligne 8.12.9 purify - pk artifacts
-		CheckPowerups ();
+		if (PK_ART)
+		{
+			if (!pk_art_checkpwr()) // Cataboligne 8.12.9 purify - pk artifacts
+				CheckPowerups ();
+		}
+		else
+			CheckPowerups ();
 		if (self.copb_timeout)
 		{
 			if (self.copb_timeout >= time)

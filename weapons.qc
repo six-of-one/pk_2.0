@@ -283,7 +283,7 @@ void () W_FireShotgun =
 {
 	local vector dir;
 
-	if (!(PK && self.pk_explode_ammo))
+	if (!((PK || custom_hub_loaded) && self.pk_explode_ammo))
 		sound (self,CHAN_WEAPON,"weapons/guncock.wav",1 ,ATTN_NORM);
 	else
 	{
@@ -317,7 +317,7 @@ void () W_FireSuperShotgun =
 		return ;
 	}
 
-	if (!(PK && self.pk_explode_ammo))
+	if (!((PK || custom_hub_loaded) && self.pk_explode_ammo))
 		sound (self,CHAN_WEAPON,"weapons/shotgn2.wav",1 ,ATTN_NORM);
 	else
 	{
@@ -523,7 +523,7 @@ void () W_FireLightning =
 	if (self.ammo_cells < 1)
 	{
 		self.weapon = W_BestWeapon ();
-		if (PK) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
+		if (PK || custom_hub_loaded) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
 		W_SetCurrentAmmo ();
 		if (self.classname == "pk*bot")
 		{
@@ -749,7 +749,7 @@ void(float ox) W_FireSpikes =
 	if (self.ammo_nails < 1)
 	{
 		self.weapon = W_BestWeapon ();
-		if (PK) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
+		if (PK || custom_hub_loaded) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
 		W_SetCurrentAmmo ();
 		if (self.classname == "pk*bot")
 		{
@@ -863,7 +863,7 @@ PLAYER WEAPON USE
 
 void () W_SetCurrentAmmo =
 {
-	if (PK || (self.dest2_x & CHSCAM_ON)) // Cataboligne 8.8.9 purify - cc thru pk code - chase cam
+	if (PK || custom_hub_loaded || (self.dest2_x & CHSCAM_ON)) // Cataboligne 8.8.9 purify - cc thru pk code - chase cam
 	{
 		PK_SetCurrentAmmo(); // *pk - handle ammo for all pk items
 		return;
@@ -940,7 +940,7 @@ void () W_SetCurrentAmmo =
 float () W_BestWeapon =
 {
 	local float it;
-	if (PK)
+	if (PK || custom_hub_loaded)
 		return(PK_BestWeapon());  // *pk - best wep including pk items
 
 	it = self.items;
@@ -960,7 +960,7 @@ float () W_BestWeapon =
 
 float () W_CheckNoAmmo =
 {
-	if (PK)
+	if (PK || custom_hub_loaded)
 	{
 		return(PK_CheckNoAmmo());
 	}
@@ -996,7 +996,7 @@ void () player_rocket1;
 
 void () W_Attack =
 {
-	if (PK)
+	if (PK || custom_hub_loaded)
 	{
 		PK_Attack();
 		return;
@@ -1071,7 +1071,7 @@ W_ChangeWeapon
 */
 void () W_ChangeWeapon =
 {
-	if (PK)
+	if (PK || custom_hub_loaded)
 	{
 		PK_ChangeWeapon();
 		return;
@@ -1156,11 +1156,6 @@ CheatCommand
 */
 void () CheatCommand =
 {
-	if (PK)
-	{
-		PK_CheatCommand();
-		return;
-	}
 	if (deathmatch || coop)
 		return;
 
@@ -1194,12 +1189,13 @@ Go to the next weapon with ammo
 */
 void () CycleWeaponCommand =
 {
-	if (PK)
+	if (PK || custom_hub_loaded)
 	{
 		PK_CycleWeaponCommand();
 		return;
 	}
-	local	float	it, am;
+	local	float	it, am, sf;
+	sf = 50;
 	
 	it = self.items;
 	self.impulse = 0;
@@ -1254,7 +1250,16 @@ void () CycleWeaponCommand =
 			if (self.ammo_cells < 1)
 				am = 1;
 		}
-	
+
+// fix loop bug - we hope
+		if (sf < 1)
+		{
+			self.weapon = IT_AXE;
+			W_SetCurrentAmmo();
+			return;
+		}
+		sf=sf - 1;
+
 		if ((it & self.weapon) && am == 0)
 		{
 			W_SetCurrentAmmo ();
@@ -1273,12 +1278,13 @@ Go to the prev weapon with ammo
 */
 void () CycleWeaponReverseCommand =
 {
-	if (PK)
+	if (PK || custom_hub_loaded)
 	{
 		PK_CycleWeaponReverseCommand();
 		return;
 	}
-	local	float	it, am;
+	local	float	it, am, sf;
+	sf = 50;
 	
 	it = self.items;
 	self.impulse = 0;
@@ -1333,6 +1339,15 @@ void () CycleWeaponReverseCommand =
 			if (self.ammo_cells < 1)
 				am = 1;
 		}
+
+// fix loop bug - we hope
+		if (sf < 1)
+		{
+			self.weapon = IT_AXE;
+			W_SetCurrentAmmo();
+			return;
+		}
+		sf=sf - 1;
 	
 		if ((it & self.weapon) && am == 0)
 		{
@@ -1352,7 +1367,7 @@ Just for development
 */
 void () ServerflagsCommand =
 {
-	serverflags = serverflags * 2 + 1;
+	if (SERVERFLAGS) serverflags = serverflags * 2 + 1;
 };
 
 void () QuadCheat =
@@ -1377,7 +1392,7 @@ void () ImpulseCommands =
 // Cataboligne 9.11.3 purify - chase cam
 	if (self.impulse > 229 && self.impulse < 240) ccb_impulse_check();
 
-	if (PK)
+	if (PK || custom_hub_loaded)
 	{
 		PK_ImpulseCommands();
 		return;
@@ -1412,8 +1427,7 @@ void () W_WeaponFrame =
 	if (time < self.attack_finished)
 		return;
 
-	if (self.classname == "jafo") // *bot - no commands when observing except stop observing
-	if (self.impulse != 212)
+	if (self.classname == OBSERVER && (self.impulse != 212)) // *bot - no commands when observing except stop observing
 		return;
 
 	if (self.impulse)
@@ -1422,6 +1436,7 @@ void () W_WeaponFrame =
 // check for attack
 	if (self.button0)
 	{
+		if (inHubMap) if (self.hubstartupmessage > time) self.hubstartupmessage = 0; // *pk - clear hub message
 		SuperDamageSound ();
 		W_Attack ();
 	}
