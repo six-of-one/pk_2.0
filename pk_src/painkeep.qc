@@ -133,10 +133,10 @@ void() PK_precache =
 	precache_sound ("weapons/btrap/btrap_3.wav");
 	precache_model ("progs/beartrap.mdl");
 	precache_model ("progs/bearbld.mdl");
-	precache_model2 ("progs/beargib1.mdl");
-	precache_model2 ("progs/beargib2.mdl");
-	precache_model2 ("progs/beargib3.mdl");
-	precache_model2 ("progs/beargib4.mdl");
+	precache_model ("progs/beargib1.mdl");
+	precache_model ("progs/beargib2.mdl");
+	precache_model ("progs/beargib3.mdl");
+	precache_model ("progs/beargib4.mdl");
 
 // EXPLODESHELLS_START
 	precache_model ("progs/v_eshot.mdl");
@@ -163,6 +163,80 @@ void() PK_precache =
 
 	precache_model ("progs/null.mdl"); // Cataboligne 8.8.9 purify - chase cam
 
+// relocated (pkitems.qc) for dynamic items
+	precache_model ("progs/tpower.mdl");
+	precache_model ("progs/beans.mdl");
+	precache_model ("progs/bearpick.mdl");
+	precache_model ("maps/b_eshel0.bsp");
+	precache_model ("progs/g_airgun.mdl");
+	precache_model ("progs/g_clight.mdl");
+	precache_model ("progs/g_harp.mdl");
+
+// relocated (pkpitems.qc) for dynamic items
+	precache_model ("progs/ego.mdl");
+	precache_model ("progs/tomb.mdl");
+	precache_model ("progs/actor.mdl");
+	precache_model ("progs/phone.mdl");
+
+// relocated (items.qc) for dynamic items
+// heal
+	precache_model ("maps/b_bh10.bsp");
+	precache_sound ("items/r_item1.wav");
+	precache_model ("maps/b_bh100.bsp");
+	precache_sound ("items/r_item2.wav");
+	precache_model ("maps/b_bh25.bsp");
+	precache_sound ("items/health1.wav");
+// armor
+	precache_model ("progs/armor.mdl");
+// weps
+	precache_model ("progs/g_shot.mdl");
+	precache_model ("progs/g_nail.mdl");
+	precache_model ("progs/g_nail2.mdl");
+	precache_model ("progs/g_rock.mdl");
+	precache_model ("progs/g_rock2.mdl");
+	precache_model ("progs/g_light.mdl");
+// ammo
+	precache_model ("maps/b_shell1.bsp");
+	precache_model ("maps/b_shell0.bsp");
+	precache_model ("maps/b_nail1.bsp");
+	precache_model ("maps/b_nail0.bsp");
+	precache_model ("maps/b_rock1.bsp");
+	precache_model ("maps/b_rock0.bsp");
+	precache_model ("maps/b_batt1.bsp");
+	precache_model ("maps/b_batt0.bsp");
+// keys
+	precache_sound ("misc/medkey.wav");
+	precache_sound ("misc/runekey.wav");
+	precache_sound ("misc/basekey.wav");
+	precache_model ("progs/w_s_key.mdl");
+	precache_model ("progs/m_s_key.mdl");
+	precache_model ("progs/b_s_key.mdl");
+	precache_model ("progs/w_g_key.mdl");
+	precache_model ("progs/m_g_key.mdl");
+	precache_model ("progs/b_g_key.mdl");
+// sigil
+	precache_sound ("misc/runekey.wav");
+	precache_model ("progs/end1.mdl");
+	precache_model ("progs/end2.mdl");
+	precache_model ("progs/end3.mdl");
+	precache_model ("progs/end4.mdl");
+// artifacts
+	precache_model ("progs/invulner.mdl");
+	precache_sound ("items/protect.wav");
+	precache_sound ("items/protect2.wav");
+	precache_sound ("items/protect3.wav");
+	precache_model ("progs/suit.mdl");
+	precache_sound ("items/suit.wav");
+	precache_sound ("items/suit2.wav");
+	precache_model ("progs/invisibl.mdl");
+	precache_sound ("items/inv1.wav");
+	precache_sound ("items/inv2.wav");
+	precache_sound ("items/inv3.wav");
+	precache_model ("progs/quaddama.mdl");
+	precache_sound ("items/damage.wav");
+	precache_sound ("items/damage2.wav");
+	precache_sound ("items/damage3.wav");
+
 // visible weapon support - bit masks for inventory
 
 	precache_model ("progs/v2_nail.mdl");
@@ -174,14 +248,14 @@ void() PK_precache =
 
 	viswep_pre();
 
-	chaos = 0; // no engine right now that supports this
+	chaos = cvar("chaos"); // glquake mod engine
 	DARKPLACES = cvar("pr_checkextension"); // check for dp engine
 	
 	qweps = IT_AXE | IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN | IT_SUPER_NAILGUN | IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER | IT_LIGHTNING;
 	pkweps = PK_IT_AXE | PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT	| PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB
 							 | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // pk plus weps
 
-	VW_ARMOR = FALSE; /// has issues - can be turned on in dp with sv_vw_armor 1 // TRUE; // should only ever be 1 or 0 - used in conditionals
+	VW_ARMOR = FALSE; /// has issues - can be turned on with sv_vw_armor 1 // TRUE; // should only ever be 1 or 0 - used in conditionals
 	VW = TRUE;
 
 // testing
@@ -272,16 +346,18 @@ void() PK_precache =
 
 // setup dynamic items
 
-	if (PK | Q_99)
+	if (PK || Q_99 || DYN_FORCE || DYN_ARTFR)
 	if (!PK_100 && !Q_100)
-	if (pk_flags & PK_DYNAMIC)
+	if (pk_flags & PK_DYNAMIC || DYN_OVR || DYN_FORCE || DYN_ARTFR)
 	{
+		if (!(pk_flags & PK_DYNAMIC) && !DYN_OVR && !DYN_FORCE) DYN_ARTFR_ONLY = DYN_ARTFR;
+//		if (DYN_FORCE || DYN_ARTFR) PK = TRUE;
 		pk_ditems = 0;
 		e = spawn();
 		if (e)
 		{
 			e.think = dyn_item;
-			e.nextthink = time + 1; // do this well after items spawn
+			e.nextthink = time + DYN_START_TIME; // do this well after items spawn
 		}
 	}
 // extra sounds by...are apparently not supplied, except gib_?.wav
@@ -354,6 +430,35 @@ void() PK_precache =
 	}
 	*/
 };
+
+// fn (precache_sound) -- dynamic item takeovers - because some engines cannot precache after map load
+// fn(precache_model)
+
+string (string s) precache_sound =
+{
+	if (time < DYN_START_TIME)
+		return(precache_sound__(s));
+};
+
+string (string s) precache_model =
+{
+/// moved here to simplify code (pkitems.qc)
+
+	if (s == "progs/g_airgun.mdl" || s == "progs/g_clight.mdl" || s == "progs/g_harp.mdl" || s == "progs/tpower.mdl" || s == "progs/beans.mdl" || s == "progs/bearpick.mdl" || s == "maps/b_eshel0.bsp" )
+	{
+		if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+		pk_ditems = pk_ditems + 1;
+	}
+
+	if (s == "progs/ego.mdl" || s == "progs/tomb.mdl" || s == "progs/actor.mdl" || s == "progs/phone.mdl") // pkpitems.qc
+	{
+		if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+		pk_ditems = pk_ditems + 1;
+	}
+
+	if (time < DYN_START_TIME)
+		return(precache_model__(s));
+}; 
 
 // set mode based on map name
 
@@ -513,10 +618,23 @@ void() pk_srvcmd_load =
 	VW_ARMOR = cvar("sv_vw_armor");
 	PK_100 = cvar("sv_pk100");
 	PK_ART_DEF  = cvar("sv_pk_art");
+	PK_100_OBJERR = cvar("sv_pk100_objerr");
+// q1
+	Q_100 = cvar("sv_q100");
+	Q_100_OBJERR = cvar("sv_q100_objerr");
+// dynamic items
+	DYN_OVR = cvar("sv_dyn_ovr");
+	DYN_ART = cvar("sv_dyn_art");
+	if (!DYN_OVR && !(pk_flags & PK_DYNAMIC)) DYN_FORCE = cvar("sv_dyn_force");
+	DYN_ARTFR = cvar("sv_dyn_art_force");
+	DYN_FORCE_CNT = cvar("sv_dyn_force_cnt");
 
 // check for botmatch changes
 	if (cvar("sv_botmatch") != 0)
 	{
+		local float bcnt;
+		bcnt = cvar("sv_botmatch");
+		cvar_set("sv_botmatch", "0");
 		if (bot_count > 0 || NUMBOTS > 0) return; // have bots, go back
 
 		e = spawn();
@@ -524,7 +642,7 @@ void() pk_srvcmd_load =
 		{
 			e.think = botmatch;
 			e.nextthink = time + 3 + 4 * random(); // make em wait a few secs, build suspense
-			e.cnt = cvar("sv_botmatch");
+			e.cnt = bcnt;
 			if (e.cnt == 1) e.cnt = 6; // default load = 6 bots
 			if (e.cnt < 0) e.cnt = 0 - e.cnt; // default load -{number} runs {number} bots
 		}
@@ -535,7 +653,18 @@ void() pk_srvcmd_load =
 void() pk_srvcmd_set =
 {
 	PK_ART_DEF  = TRUE;
+// dynamic defaults
+	DYN_OVR = FALSE;
+	DYN_ART = TRUE;
+	DYN_FORCE = FALSE;
+	DYN_ARTFR = FALSE;
+	DYN_FORCE_CNT = 6;
 
+	PK_100_OBJERR = FALSE;
+
+	Q_100 = FALSE;
+	Q_100_OBJERR = FALSE;
+	
 	if (!DARKPLACES && !chaos) return;
 
 // new server controls
@@ -546,11 +675,21 @@ void() pk_srvcmd_set =
 		registercvar("sv_vw", "1");
 		registercvar("sv_vw_armor", "0");
 		registercvar("sv_pk100", "0");
+		registercvar("sv_pk100_objerr", "0");
 		registercvar("sv_pk_art", "1");
 		registercvar("sv_cam_off", "0"); // set to 1 to turn cam off entirely
 		registercvar("sv_cam_def", "1"); // set to 0 to default to no cam view
 		registercvar("sv_botmatch", "0"); // load bots without admin
-
+// dynamic item controls
+		registercvar("sv_dyn_ovr", "0"); // if set over-ride bit in control flag - gets set by menu command
+		registercvar("sv_dyn_art", "1"); // add artifacts to dyn items
+		registercvar("sv_dyn_force", "0"); // force dynamic items on any map - must set PK true, has no effect if dyn already on
+		registercvar("sv_dyn_art_force", "0"); // force artifacts on map if no dynamic spawner, if spawner exists this is the same as sv_dyn_art
+		registercvar("sv_dyn_force_cnt", "6"); // max force cnt - because forcing can exceed load max for dyn items
+// q1
+		registercvar("sv_q100", "0");
+		registercvar("sv_q100_objerr", "0");
+		
 // new client controls
 		registercvar("cl_cam_off", "0"); // set to 1 to turn cam off entirely
 		registercvar("cl_cam_def", "1"); // set to 0 to default to no cam view
@@ -1053,7 +1192,7 @@ void() pk_pre_think =
 //		if (!Q_100 && !PK_100)
 		if (self.waterlevel)
 		if (! self.flags & FL_WATERJUMP)
-		if (self.dest2_x & CHSCAM_ON)
+		if (self.cam_x & CHSCAM_ON)
 		{
 			cam_waterjump();  // Cataboligne 8.22.9 purify - chase cam
 		}
@@ -1070,7 +1209,7 @@ void() pk_pre_think =
 //		if (!Q_100 && !PK_100)
 		if (self.waterlevel)
 		if (! self.flags & FL_WATERJUMP)
-		if (self.dest2_x & CHSCAM_ON)
+		if (self.cam_x & CHSCAM_ON)
 		{
 			cam_waterjump();  // Cataboligne 8.22.9 purify - chase cam
 		}

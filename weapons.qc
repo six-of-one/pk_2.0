@@ -568,6 +568,7 @@ void () W_FireLightning =
 		self.t_width = time + 0.6;
 	}
 	self.punchangle_x = -2;
+	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
 
 	self.currentammo = self.ammo_cells = self.ammo_cells - 1;
 
@@ -747,6 +748,7 @@ void () W_FireSuperSpikes =
 	setmodel (newmis,"progs/s_spike.mdl");
 	setsize (newmis,VEC_ORIGIN,VEC_ORIGIN);
 	self.punchangle_x = -2;
+	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
 };
 
 void(float ox) W_FireSpikes =
@@ -793,6 +795,7 @@ void(float ox) W_FireSpikes =
 		launch_spike (self.origin + v_up * VWZ_NAILG + v_right * ox + v_right * VWY_NAILG + v_forward * VWX_NAILG, dir);
 
 	self.punchangle_x = -2;
+	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
 };
 
 
@@ -883,7 +886,7 @@ PLAYER WEAPON USE
 
 void () W_SetCurrentAmmo =
 {
-	if (PK || custom_hub_loaded || (self.dest2_x & CHSCAM_ON)) // Cataboligne 8.8.9 purify - cc thru pk code - chase cam
+	if (PK || custom_hub_loaded || (self.cam_x & CHSCAM_ON)) // Cataboligne 8.8.9 purify - cc thru pk code - chase cam
 	{
 		PK_SetCurrentAmmo(); // *pk - handle ammo for all pk items
 		return;
@@ -1093,6 +1096,8 @@ void () W_Attack =
 		self.attack_finished = time + 0.1;
 		sound (self, CHAN_AUTO, "weapons/lstart.wav", 1, ATTN_NORM);
 	}
+
+	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
 };
 
 /*

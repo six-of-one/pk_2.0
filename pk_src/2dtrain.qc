@@ -46,7 +46,16 @@ void() func_train_2d_blocked =
 void() func_train_2d_use =
 {
 	   if (!other.cnt)
-	        objerror("func_train_2d_use: button does not specify direction in cnt");
+		{
+	        if (PK_100 && PK_100_OBJERR) objerror("func_train_2d_use: button does not specify direction in cnt");
+	        else
+			  {
+				  bprint("\n*** warning:\nfunc_train_2d_use: button does not specify direction in cnt - removing\n\n");
+				  MAP_OBSTR = TRUE;
+				  remove(self);
+				  return;
+			  }
+		}
 
 	   if (self.think == func_train_2d_find)
 	        func_train_2d_next(other.cnt);
@@ -72,21 +81,48 @@ void(float n) func_train_2d_next =
 	        if (targ.target1)
 	             self.target = targ.target1;
 	        else
-	             objerror("func_train_2d_next: path_corner has no target1");
+			  {
+					if (PK_100 && PK_100_OBJERR) objerror("func_train_2d_next: path_corner has no target1");
+					else
+					{
+						bprint("\n*** warning:\nfunc_train_2d_next: path_corner has no target1 - removing\n\n");
+						MAP_OBSTR = TRUE;
+						remove(self);
+						return;
+					}
+			  }
 	   }
 	   else if (n == 2)
 	   {
 	        if (targ.target2)
 	             self.target = targ.target2;
 	        else
-	             objerror("func_train_2d_next: path_corner has no target2");
+			  {
+					if (PK_100 && PK_100_OBJERR) objerror("func_train_2d_next: path_corner has no target2");
+					else
+					{
+						bprint("\n*** warning:\nfunc_train_2d_next: path_corner has no target2 - removing\n\n");
+						MAP_OBSTR = TRUE;
+						remove(self);
+						return;
+					}
+			  }
 	   }
 
 	   // find the next one in sequence
 	   targ = find (world, targetname, self.target);
 
 	   if (!self.target)
-	      objerror ("func_train_2d_next: no next target");
+			{
+					if (PK_100 && PK_100_OBJERR) objerror("func_train_2d_next: no next target");
+					else
+					{
+						bprint("\n*** warning:\nfunc_train_2d_next: no next target - removing\n\n");
+						MAP_OBSTR = TRUE;
+						remove(self);
+						return;
+					}
+			}
 
 	   self.wait = 0;
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
@@ -108,7 +144,16 @@ void() func_train_2d =
 	   if (!self.speed)
 		self.speed = 100;
 	if (!self.target)
-	      objerror ("func_train_2d without a target");
+			{
+					if (PK_100 && PK_100_OBJERR) objerror("func_train_2d without a target");
+					else
+					{
+						bprint("\n*** warning:\nfunc_train_2d without a target - removing\n\n");
+						MAP_OBSTR = TRUE;
+						remove(self);
+						return;
+					}
+			}
 	if (!self.dmg)
 		self.dmg = 2;
 

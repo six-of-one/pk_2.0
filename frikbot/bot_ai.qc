@@ -899,8 +899,15 @@ void() BotAI =
 	// health < 1 is used because fractional healths show up as 0 on normal player
 	// status bars, and the mod probably already compensated for that
 
+	if (self.solid == SOLID_NOT)
+	if (inHubMap && self.map != "")						// Cataboligne - 5.12.10 - bot voted for a level in pk hub, mostly stay voted
+	if (random() < 0.96) return;
+
 	if (self.health < 1)
 	{ 
+		if (time > 15)
+		if (bot_vote(0.7)) return;
+
 		self.button0 = floor(random() * 2);
 		self.button2 = 0;
 		self.keys = 0;

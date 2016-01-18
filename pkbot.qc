@@ -412,7 +412,7 @@ void () bot_nail2 = [ $lightfatt2, bot_nail1 ]
 		self.weaponframe = 1;
 	}
 	SuperDamageSound ();
-	W_FireSpikes (CONTENT_SLIME);
+	W_FireSpikes (-4);
 	ai_botnailcharge (BOTSPEED);
 	self.attack_finished = (time + 0.2);
 	BotPostThink ();
@@ -687,6 +687,8 @@ void () bot_diee1;
 void () bot_die_ax1;
 void () BotDead =
 {
+	if (bot_vote(0.7)) return;
+
 	self.nextthink = ((time + 0.3) + ((random () * (NUMBOTS + 3)) * 0.1));
 	if (teamplay)
 	{

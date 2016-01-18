@@ -96,6 +96,33 @@ void() admin_sv_cfg =
 
 // return 2^rl, bounded by 2^0 (lowest bit, 1) to 2^23 (highest bit, 8388608)
 
+/*  code table:
+1					0
+2					1
+4					2
+8					3
+16					4
+32					5
+64					6
+128				7
+256				8
+512				9
+1024				10
+2048				11
+4096				12
+8192				13
+16384				14
+32768				15
+65536				16
+131072			17
+262144			18
+524288			19
+1048576			20
+2097152			21
+4194304			22
+8388608			23
+*/
+
 float (float rl) AdminBitFlag =
 {
 	local float f, e;
@@ -1667,6 +1694,7 @@ void() AdminCommands =
 			{
 				self.wad = "\nDynamic Painkeep items OFF";
 				pk_flags = pk_flags - PK_DYNAMIC;
+				if (DARKPLACES || chaos) cvar_set("sv_dyn_ovr","0"); // set this var if it exists
 			}
 			else
 			{
@@ -1682,6 +1710,7 @@ void() AdminCommands =
 						z.nextthink = time + 1; // do this well after items spawn
 					}
 				}
+				if (DARKPLACES || chaos) cvar_set("sv_dyn_ovr","1");
 			}
 		}
 		else if (self.lefty == 6 && !PK_100)

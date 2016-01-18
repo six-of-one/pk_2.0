@@ -19,7 +19,7 @@
 entity theHub; // variable holding the hub
 entity (string aMap) findMap;
 void() hub_control_use;
-void() WaitForVotes;
+void(entity e) WaitForVotes;
 
 
 
@@ -33,7 +33,7 @@ void() hub_teleport_touch =
 	local string str;
 
 	// make sure the thing is the player
-	if (other.classname != "player" && other.classname != "pk*bot" && other.classname != OBSERVER) // *bot
+	if (other.classname != "player" && other.classname != "pk*bot")  /// && other.classname != OBSERVER) // *bot - NOTE: observer check fails
 		return;
 
 	// make sure we don't gib the last player!!!
@@ -79,12 +79,29 @@ void() hub_teleport_touch =
 	// check to see if everyone has finished
 	spot = find(world, classname, "player");
 	local float notDone;
+	local string srch;
+	srch = "player";
 	notDone = 0;
 	while (spot != world)
 	{
 		if (spot.disconnectPlayer == 0 && spot.map == "")
 			notDone = 1;
-		spot = find(spot, classname, "player");
+		spot = find(spot, classname, srch);
+		if (!spot)
+		if (srch != "pk*bot" && srch != OBSERVER) // *bot - search out bots too
+		{
+			srch = "pk*bot";
+			spot = find(world, classname, srch);
+		}
+
+/// sad but true - ignoring observers (scc) because they can't trigger hub vote portal
+//		if (!spot)
+//		if (srch == "pk*bot") // find jafo now
+//		{
+//			srch = OBSERVER;
+//			spot = find(world, classname, srch);
+//		}
+
 	}
 
 	if (!notDone)
@@ -97,7 +114,7 @@ void() hub_teleport_touch =
 		hub_control_use();
 		return;
 	}
-	WaitForVotes();
+	WaitForVotes(other);
 };
 
 void() hub_teleport =
@@ -107,7 +124,10 @@ void() hub_teleport =
 	// error check
 	if (!self.map)
 	{
-		objerror("hub_teleport without map");
+		if (PK_100 && PK_100_OBJERR) objerror("hub_teleport without map");
+		bprint("\n*** warning:\nhub_teleport without map - removing, this portal will not cull votes.\n\n");
+		remove(self);
+		return;
 	}
 
 	InitTrigger ();
@@ -677,10 +697,10 @@ void() hub_control =
 
 	if (theHub)
 	{
-//		objerror("Only 1 hub may be in existance.");
+		if (PK_100 && PK_100_OBJERR) objerror("Only 1 hub may be in existance.");
 // Cataboligne 10.2.8 - improvment:
 // already have a hub - why not remove and continue?
-		bprint("Map tried to create a second hub - removing.");
+		bprint("\n*** warning:\nMap tried to create a second hub - removing.\n\n");
 		remove(self);
 		return;
 	}
@@ -1139,6 +1159,8 @@ void() WaitForVotesThink =
 	if (self.voteIntermission == 0)
 		return;
 
+	dead_cam_set(); // Cataboligne - 5.12.10 - dead cam while voted
+
 	// next think
 	self.nextthink = time + 0.1;
 
@@ -1226,8 +1248,8 @@ void() WaitForVotesThink =
 	GoBack ();
 };
 
-// other is the player
-void() WaitForVotes =
+// e is the player / bot
+void(entity e) WaitForVotes =
 {
 	local entity	pos;
 
@@ -1236,27 +1258,104 @@ void() WaitForVotes =
 	pos = SelectSpawnPoint ();
 	ClearSpawnPoint(pos);
 
-	other.view_ofs = '0 0 0';
-	other.angles = other.v_angle = pos.angles;
-	other.fixangle = TRUE;		// turn this way immediately
-	other.takedamage = DAMAGE_NO;
-	other.solid = SOLID_NOT;
-	other.movetype = MOVETYPE_NONE;
-	other.invincible_finished = 0;
-	other.modelindex = 0;
-	other.attack_state = 1;
- 	other.aflag = 0;
-	other.laststattime = time + 8.0;
-	setorigin (other, pos.origin);
+	e.view_ofs = '0 0 0';
+	e.angles = e.v_angle = pos.angles;
+	e.fixangle = TRUE;		// turn this way immediately
+	e.takedamage = DAMAGE_NO;
+	e.solid = SOLID_NOT;
+	e.movetype = MOVETYPE_NONE;
+	e.invincible_finished = 0;
+	e.modelindex = 0;
+	e.attack_state = 1;
+ 	e.aflag = 0;
+	e.laststattime = time + 8.0;
+	setorigin (e, pos.origin);
 
-	other.currentammo = 0;
-	other.weaponmodel = "";
-	other.weaponframe = 0;
+	e.currentammo = 0;
+	e.weaponmodel = "";
+	e.weaponframe = 0;
 
 	// wait a second before allowing coming back
-	other.nextthink = time + 0.1;
-	other.think = WaitForVotesThink;
-	other.voteIntermission = 1;
+	e.nextthink = time + 0.1;
+	e.think = WaitForVotesThink;
+	e.voteIntermission = 1;
 };
 
 
+// Cataboligne - 5.12.10 - special, bot voting
+
+// fn(bot_votereveal) - id bot vote
+// fn(bot_vote) - chance for bot to vote
+// cn - random 0 - 1 for bot to vote - .12 of this for copy cat
+// returns true if bot voted - so ai can stop other stuff
+
+void() bot_votereveal =
+{
+	bprint("\b");
+	bprint(self.netname);
+	bprint(": I just voted for ");
+	bprint(self.map);
+	bprint("\n");
+};
+
+// Cataboligne - 5.12.10 - sneak in bot votes (since they dont seem to be real keen on going to the polls...)
+
+// NOTE: if not dead, find way to hide bot disappearance from players view
+
+float(float cn) bot_vote =
+{
+	local entity e;
+	local string mpv;
+	local float f, r;
+
+	if (self.classname != "player" && self.netname != "pk*bot") return(FALSE); // not eligible
+	if (self.netname == "") return(FALSE); // who are you?
+	if (!inHubMap) return(FALSE); // not on hub
+	if (self.map != "") return(FALSE); // voted
+
+	if (random() < (0.12 * cn))													// copy cat - bot copies some players vote
+	{
+		e = find(world, classname, "player");
+		while (e)
+		{
+			if (e.map != "")
+			{
+				if (mpv == "") mpv = e.map; // take first we find
+				else if (random() < 0.5) mpv = e.map; // randomly take others
+			}
+			e = find(e, classname, "player");
+		}
+		if (mpv != "")
+		{
+			e = findMap (mpv);
+			if (e)
+			{
+				e.cnt = e.cnt + 1;
+				self.map = mpv;
+				bot_votereveal();
+//				WaitForVotes(self);
+				self.nextthink = -1;
+				return(TRUE);
+			}
+		}
+	}
+	if (random() < cn)													// bot has unique vote
+	{
+		f = countMaps();
+		if (f > 0)
+		{
+			r = random() * f;
+			e = getMap(r);
+			if (e)
+			{
+				e.cnt = e.cnt + 1;
+				self.map = e.map;
+				bot_votereveal();
+//				WaitForVotes(self);
+				self.nextthink = -1;
+				return(TRUE);
+			}
+		}
+	}
+	return(FALSE);
+};

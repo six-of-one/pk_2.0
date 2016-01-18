@@ -44,6 +44,10 @@ void () info_intermission =
 
 void () SetChangeParms =
 {
+	if (find(world,classname,"pk*bot")) bot_changeParms();
+// Cataboligne 9.11.3 purify - chase cam
+	cam_parms(0);
+
 	if (self.health <= 0 || self.classname == OBSERVER) // Cataboligne - 5.3.10 - fix level change issue when in dead observer or admin observer
 	{
 		SetNewParms_PK();
@@ -52,8 +56,7 @@ void () SetChangeParms =
 	}
 
 // remove items
-	self.items = self.items - (self.items &
-	(IT_KEY1 | IT_KEY2 | IT_INVISIBILITY | IT_INVULNERABILITY | IT_SUIT | IT_QUAD));
+	self.items = self.items - (self.items & (IT_KEY1 | IT_KEY2 | IT_INVISIBILITY | IT_INVULNERABILITY | IT_SUIT | IT_QUAD));
 
 // cap super health
 	if (self.health > 100)
@@ -76,11 +79,8 @@ void () SetChangeParms =
 //	if (PK) PK_ChangeParms();
 //	else if (!Q_100 && !Q_99 && ((self.pk_items & PK_IT_RANGE) | self.pk_explode_ammo | self.pk_turretammo | self.pk_canpabammo | self.pk_beartrapammo | self.pk_gravitywellammo))
 	if (!Q_100 && !Q_99) PK_ChangeParms(); // always encoding now
-	if (find(world,classname,"pk*bot")) bot_changeParms();
 //	bot_skinParms();
 
-// Cataboligne 9.11.3 purify - chase cam
-	cam_parms(0);
 };
 
 void () SetNewParms =
@@ -172,8 +172,6 @@ entity () FindIntermission =
 string nextmap;
 void () GotoNextMap =
 {
-	bot_changelevel(); // *bot - reload bots on next level, handle intermission
-
 	if (PK && !PK_ADMINMAP)
 	if (pk_flags & PK_TP_USERMAPON) // *pk - user supplied map loop deal
 	{
@@ -339,6 +337,7 @@ void () execute_changelevel =
 		other = find (other,classname,"player");
 	}
 
+	if (find(world,classname,"pk*bot")) bot_changelevel(); // *bot - reload bots on next level, handle intermission
 	WriteByte (MSG_ALL,SVC_INTERMISSION);
 };
 
@@ -1019,7 +1018,7 @@ void () PlayerPreThink =
 //		if (!Q_100 && !PK_100)
 	if (self.waterlevel)
 	if (! self.flags & FL_WATERJUMP)
-	if (self.dest2_x & CHSCAM_ON)
+	if (self.cam_x & CHSCAM_ON)
 	{
 		cam_waterjump();  // Cataboligne 8.22.9 purify - chase cam
 	}

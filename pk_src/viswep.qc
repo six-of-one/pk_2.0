@@ -56,11 +56,11 @@ float(float qw, float pkw) FL_MELEE =
 	Q_MELEE = IT_AXE;
 	PK_MELEE = PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE;
 
-	if (PK_100) PK_MELEE = PK_IT_AXE;
+	if (PK_100 || !VW) PK_MELEE = PK_IT_AXE;
 
 	c = FALSE;
 
-	if (pkw)
+	if (pkw && !Q_100)
 	{
 		if (pkw & PK_MELEE) c = TRUE;
 		return(c);
@@ -80,17 +80,12 @@ float(float qw, float pkw) FL_RANGE =
 	Q_RANGE = IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN | IT_SUPER_NAILGUN | IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER | IT_LIGHTNING;
 	PK_RANGE = PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT;
 
-	if (PK_100) PK_RANGE = PK_RANGE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE;
+	if (PK_100 || !VW) PK_RANGE = PK_RANGE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE;
 
 	c = FALSE;
 
-	if (pkw)
-	{
-		if (pkw & PK_RANGE) c = TRUE;
-		return(c);
-	}
-
-	if (qw & Q_RANGE) c = TRUE;
+	if ((pkw & PK_RANGE) && !Q_100) c = TRUE;
+	else if (qw & Q_RANGE) c = TRUE;
 
 	return(c);
 };
@@ -139,6 +134,7 @@ entity(entity e) vw_chain =
 	{
 		if (f.owner.deadflag || f.owner.classname == OBSERVER || f.owner.view_ofs == '0 0 0' || f.owner.model == "") // wep found with non owner - should not happen
 		{
+//			f.model = "";
 			f.vwepent = world;
 			remove(f);
 			rck = TRUE;
@@ -292,7 +288,7 @@ void(entity e, float pkbt) vwep_firecary =
 
 	if (f)
 	{
-		f.model = f.mdl = "";
+		f.vwepent = world;
 		remove(f);
 		vw_chain(e);
 	}
@@ -309,11 +305,11 @@ void(entity e, float pkbt) vwep_firecary =
 void(entity e, float cd) viswep_ld =
 {
 	local entity tr, pr;
-	local float pkbits, bts, pkts, f, at;
+	local float pkbits, bts, pkts, f, at, rmv;
 
 	tr = e.vwepent;
 	pr = e;
-	at = pkts = bts = 0;
+	rmv = at = pkts = bts = 0;
 
 	pkbits = mk_pkbits(e);
 
@@ -324,12 +320,16 @@ void(entity e, float cd) viswep_ld =
 		{
 			pr = tr;
 			tr = tr.vwepent;
-			pr.mdl = "";
+//			pr.mdl = "";
+			pr.vwepent = world;
 			remove(pr);
 		}
 		if (e) // because we may come here with self = first viswep ent
-		if (e.classname != "viswep")
-			e.vwepent = world;
+		{
+			vw_chain(e);
+			if (e.classname != "viswep")
+				e.vwepent = world;
+		}
 
 
 //		if (cd == -3)
@@ -339,11 +339,12 @@ void(entity e, float cd) viswep_ld =
 //		}
 		return;
 	}
+
 // have items & check for inventory
 	while (tr)
 	{
 		pr = world;
-		if (tr.armortype)
+		if (tr.armortype && VW_ARMOR)
 		{
 			at = e.armortype;
 			if (!at)
@@ -353,7 +354,9 @@ void(entity e, float cd) viswep_ld =
 //				tr.nextthink = time + 0.01;
 //				tr.model = "";
 				pr = tr.vwepent;
+				tr.vwepent = world;
 				remove(tr);
+				rmv = TRUE;
 			}
 			if (at > 0.6) tr.skin = 2;
 			else if (at <= 0.6) tr.skin = 1;
@@ -371,7 +374,9 @@ void(entity e, float cd) viswep_ld =
 //				tr.model = "";
 //				pr.vwepent = tr.vwepent;
 				pr = tr.vwepent;
+				tr.vwepent = world;
 				remove(tr);
+				rmv = TRUE;
 				}
 			else
 				bts = bts | tr.weapon;
@@ -386,7 +391,9 @@ void(entity e, float cd) viswep_ld =
 //				tr.model = "";
 //				pr.vwepent = tr.vwepent;
 				pr = tr.vwepent;
+				tr.vwepent = world;
 				remove(tr);
+				rmv = TRUE;
 			}
 			else
 				pkts = pkts | tr.pk_currentitem;
@@ -395,6 +402,7 @@ void(entity e, float cd) viswep_ld =
 		if (pr) tr = pr;
 		else if (tr) tr = tr.vwepent;
 	}
+	if (rmv) vw_chain(e);
 
 	if (VW_ARMOR)
 	if (e.armortype && !at)
@@ -491,17 +499,21 @@ void() viswep_post =
 
 //	qld = FALSE;
 
-	if (PK_100 || Q_100)
+	if (PK_100 || Q_100 || !VW)
 	{
 		if (!vhead)
 		{
 			vload(self, 8388608);
-			if (self.weapon == IT_AXE && (Q_100 || self.pk_currentitem == PK_IT_AXE))
+			if (!FL_RANGE(self.weapon, self.pk_currentitem))
+//			if (self.weapon == IT_AXE && (Q_100 || !PK || self.pk_currentitem == PK_IT_AXE))
 				vload(self, IT_AXE);
 		}
 		else
 		{
-			if (self.weapon == IT_AXE && (Q_100 || self.pk_currentitem == PK_IT_AXE))
+			if (!FL_RANGE(self.weapon, self.pk_currentitem))
+//			else if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
+//			if (self.weapon == IT_AXE && (Q_100 || !PK || self.pk_currentitem == PK_IT_AXE))
+//			if (self.weapon == IT_AXE && (Q_100 || PK && self.pk_currentitem == PK_IT_AXE))
 			{
 				if (!self.vwepent.vwepent) vload(self, IT_AXE);
 			}
@@ -509,16 +521,14 @@ void() viswep_post =
 			{
 				if (self.vwepent.vwepent.weapon == IT_AXE)
 				{
-					self.vwepent.vwepent.mdl = "";
-					self.vwepent.vwepent = world;
 					remove(self.vwepent.vwepent);
+					self.vwepent.vwepent = world;
 				}
 				else if (self.vwepent.weapon == IT_AXE)
 				{
 					self.vwepent = vhead.vwepent;
-					vhead.mdl = "";
-					vhead.vwepent = world;
 					remove(vhead);
+					self.vwepent.vwepent = world;
 				}
 			}
 		}
@@ -530,7 +540,8 @@ void() viswep_post =
 		viswep_ld(self, 1);
 	else
 	{
-		if (self.items & qweps != vhead.items || vhead.armorvalue != self.armortype * VW_ARMOR) qld = TRUE;
+		if (self.items & qweps != vhead.items) qld = TRUE;
+		if (!qld && vhead.armorvalue != self.armortype) qld = VW_ARMOR;
 
 		pkbits = mk_pkbits(self);
 		if (vhead.pk_items != pkbits || qld) viswep_ld(self, 1);
@@ -544,7 +555,7 @@ void() viswep_post =
 	vhead = self.vwepent;
 	vhead.items = self.items & qweps;
 	vhead.pk_items = pkbits;
-	vhead.armorvalue = self.armortype * VW_ARMOR;
+	vhead.armorvalue = self.armortype;
 
 // run viswep frame match
 
@@ -579,10 +590,10 @@ void() viswep_post =
 																		// adjust for gremlin flying frames & carried gun, pretty hackish isnt it?
 //			if (vhead.owner.model == "progs/gremlin-fly.mdl" && vhead.owner._stand == gremlin_hover && vhead.owner.frame >= grem_fly_frame) gremlin_frame_adjust = grem_fly_frame;
 	
-			if( ! (vhead.owner.dest2_x & CHSCAM_ON) ) vhead.exteriormodeltoclient = vhead.owner; // darkplaces - works for dp!
+			if( ! (vhead.owner.cam_x & CHSCAM_ON) ) vhead.exteriormodeltoclient = vhead.owner; // darkplaces - works for dp!
 			else vhead.exteriormodeltoclient = world;
 
-			if (PK_100 || Q_100)
+			if (PK_100 || Q_100 || !VW)
 			{
 				if (vhead.weapon != IT_AXE && dwep != IT_AXE) qld = TRUE;
 				else if (vhead.pk_currentitem != PK_IT_AXE && pkdwep != PK_IT_AXE) qld = TRUE;

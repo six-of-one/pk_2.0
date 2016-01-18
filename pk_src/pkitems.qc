@@ -77,7 +77,15 @@ void () painkeep_weapon_touch =
 		new = PK_IT_CLIGHT;
 	}
 	else
-		objerror ("painkeep_weapon_touch: unknown classname");
+	{
+		if (PK_100 && PK_100_OBJERR) objerror("painkeep_weapon_touch: unknown classname");
+		else
+		{
+			bprint("\n*** warning:\npainkeep_weapon_touch: unknown classname - ignoring\n\n");
+			self.touch = SUB_Null;
+			return;
+		}
+	}
 
 	sprint (other,"You got the ");
 	sprint (other,self.netname);
@@ -149,8 +157,6 @@ void () weapon_airfist =
 	setsize (self,'-16 -16 0','16 16 56');
 	//setsize (self, '-15 -9 25', '17 9 43');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-	pk_ditems = pk_ditems + 1;
 };
 
 /*QUAKED weapon_rmine (0 .5 .8) (-16 -16 0) (16 16 32)
@@ -179,8 +185,6 @@ void () weapon_chainlg =
 	self.touch = painkeep_weapon_touch;
 	setsize (self,'-16 -16 0','16 16 56');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-	pk_ditems = pk_ditems + 1;
 };
 
 
@@ -203,8 +207,6 @@ void () weapon_grapgun =
 	self.netname = "Harpoon Gun";
 	setsize (self,'-16 -16 0','16 16 56');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-	pk_ditems = pk_ditems + 1;
 };
 
 // dynamic items go away when touched
@@ -472,14 +474,13 @@ void () item_painkeep_gwell =
 	self.touch = painkeep_touch;
 
 	self.noise = "items/protect.wav";
+	precache_model ("progs/cubsmall.mdl");
 	setmodel (self,"progs/cubsmall.mdl");
 	self.netname = "Gravity Well";
 	self.pk_items = PK_IT_GRAVITYWELL;
 	//setsize (self, '-32 -32 -32', '32 32 32');
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-	pk_ditems = pk_ditems + 1;
 };
 
 /*QUAKED item_painkeep_turret (0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -494,15 +495,13 @@ void () item_painkeep_turret =
 
 	self.touch = painkeep_touch;
 
-	precache_model2 ("progs/tpower.mdl");
+	precache_model ("progs/tpower.mdl");
 	setmodel (self,"progs/tpower.mdl");
 	self.netname = "AutoSentry";
 	self.pk_items = PK_IT_TURRET;
 
 	setsize (self,'-7 -7 -7','4 7 21');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-	pk_ditems = pk_ditems + 1;
 };
 
 /*QUAKED item_painkeep_lantern (0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -531,8 +530,6 @@ void () item_painkeep_can =
 	self.pk_items = PK_IT_CANPAB;
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-	pk_ditems = pk_ditems + 1;
 };
 
 /*QUAKED item_painkeep_beartrap(0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -553,8 +550,6 @@ void () item_painkeep_beartrap =
 	self.pk_items = PK_IT_BEARTRAP;
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-	pk_ditems = pk_ditems + 1;
 };
 
 
@@ -570,7 +565,7 @@ void () light_painkeep_candle =
 		return;
 	}
 
-	precache_model ("progs/candle.mdl");
+	precache_model("progs/candle.mdl");
 	setmodel (self,"progs/candle.mdl");
 	FireAmbient ();
 	makestatic (self);
@@ -599,8 +594,6 @@ void () item_painkeep_expshells =
 	self.netname = "Exploding Shells";
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
-	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-	pk_ditems = pk_ditems + 1;
 };
 
 // moved from items.qc - Cataboligne - 3.27.8
@@ -1387,6 +1380,12 @@ void() dyn_spawn =
 	rseu = sv;
 	self.origin = sv.origin + ' 0 0 16';
 // give players notice
+	bprint("*** Dynamic item spawned: ");
+	bprint(self.wad);
+	bprint(" near: ");
+	bprint(sv.classname);
+	bprint("\n");
+
 	item_call(self.wad);
 	sv = spawn();
 	sv.enemy = self;
@@ -1398,10 +1397,10 @@ void() dyn_spawn =
 
 void() dyn_item =
 {
-	float cd;
+	float cd, f, b;
 	entity e;
 
-	if (PK_100) // Cataboligne - 8.15.9 - pk compat mode, just in case
+	if (PK_100 || Q_100) // Cataboligne - 8.15.9 - pk compat mode, just in case
 	{
 	remove(self);
 	return;
@@ -1412,12 +1411,24 @@ void() dyn_item =
 		self.classname = "dyn_spawner";
 		self.nextthink = time + 5;// TEST 40 + 20 * crandom();
 		self.count = 4 + 4 * random();
-		if (pk_ditems > 6) remove(self);
+		if (DYN_FORCE || DYN_ARTFR_ONLY) self.count = pk_ditems + DYN_FORCE_CNT;
+		if (!DYN_FORCE && !DYN_ARTFR && pk_ditems > 6) remove(self);
 		else
-			bprint("Dynamic items will spawn on this map - keep an eye out\n");
+		{
+			if ((pk_flags & PK_DYNAMIC) || DYN_OVR)
+			if (DYN_FORCE || DYN_ARTFR_ONLY)
+			{
+				bprint("*** Warning - dynamic items: force flags overlap normal flags, items may not spawn!\n");
+				return;
+			}
+			bprint("***   Dynamic items will spawn on this map - keep an eye out\n");
+		}
 	}
-	else if (!PK || !pk_flags & PK_DYNAMIC) // got turned off go away
-		remove(self);
+	else if (!DYN_FORCE && !DYN_ARTFR_ONLY)
+	{		
+		if (!PK || (!(pk_flags & PK_DYNAMIC) && !DYN_OVR)) // got turned off go away
+			remove(self);
+	}
 	else
 	{
 	if (pk_ditems < 0) pk_ditems = 0;
@@ -1432,7 +1443,15 @@ void() dyn_item =
 				e.think = dyn_spawn;
 				e.nextthink = 3 + 12 * random(); // time spread
 				e.classname = "dyn_item";
-				e.cnt = AdminBitFlag(floor(7 + 6.4 * random())); // item to spawn
+				b = 7;
+				f = 6.4; // painkeep items bits (7 - 13) = 128 - 8192
+				if (DYN_ART || DYN_ARTFR) f = 10.4; // add in (14 - 17) 16384 - 131072
+				if (DYN_ARTFR_ONLY) // only (14 - 17) 16384 - 131072
+				{
+					b = 14;
+					f = 3.4;
+				}
+				e.cnt = AdminBitFlag(floor(b + f * random())); // item to spawn
 				e.wad = ammo_by_bit(e.cnt); // classname to spawn
 				if (random() < 0.027)  // small chance of clg + ammo
 				{

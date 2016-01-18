@@ -377,6 +377,12 @@ If "deathtype" is set with a string, this is the message that will appear when a
 
 void() func_rotate_entity =
    {
+	if (Q_100 || PK_100)			// Cataboligne - 5.7.10 - these should not exsist under q100 rule
+	{
+		remove(self);
+		return;
+	}
+
    self.solid    = SOLID_NOT;
    self.movetype = MOVETYPE_NONE;
 
@@ -422,6 +428,12 @@ void() func_rotate_entity =
 */
 void() path_rotate =
    {
+	if (Q_100 || PK_100)			// Cataboligne - 5.7.10 - these should not exsist under q100 rule
+	{
+		remove(self);
+		return;
+	}
+
    if ( self.noise )
       {
       precache_sound( self.noise );
@@ -549,7 +561,13 @@ void() rotate_train_next =
    current = self.goalentity;
    targ = find (world, targetname, self.path );
    if ( targ.classname != "path_rotate" )
-      objerror( "Next target is not path_rotate" );
+      {
+		if (Q_100 && Q_100_OBJERR) objerror( "Next target is not path_rotate" );
+		bprint( "\n*** warning:\nNext target is not path_rotate - removed.\n\n" );
+		MAP_OBSTR = TRUE;
+		remove(self);
+		return;
+      }
 
    if ( self.goalentity.noise1 )
       {
@@ -560,7 +578,13 @@ void() rotate_train_next =
    self.goalentity = targ;
    self.path = targ.target;
    if (!self.path )
-      objerror ("rotate_train_next: no next target");
+      if (Q_100 && Q_100_OBJERR) objerror ("rotate_train_next: no next target");
+      {
+		bprint( "\n*** warning:\nrotate_train_next: no next target - removed.\n\n" );
+	  MAP_OBSTR = TRUE;
+		remove(self);
+		return;
+      }
 
    if ( targ.spawnflags & STOP )
       {
@@ -659,7 +683,11 @@ void() rotate_train_next =
             self.speed = current.speed;
 
          if (!self.speed)
-            objerror("No speed is defined!");
+			{
+				if (Q_100 && Q_100_OBJERR) objerror("No speed is defined!");
+				bprint( "\n*** warning:\nNo speed is defined - default 50.\n\n" );
+				self.speed = 50;
+			}
 
          // divide by speed to get time to reach dest
          traveltime = len / self.speed;
@@ -710,7 +738,13 @@ void() rotate_train_find =
    // the second target is the path.
    targ = find ( world, targetname, self.path);
    if ( targ.classname != "path_rotate" )
-      objerror( "Next target is not path_rotate" );
+      {
+      if (Q_100 && Q_100_OBJERR) objerror( "Next target is not path_rotate" );
+		bprint( "\n*** warning:\nNext target is not path_rotate - removed.\n\n" );
+	  MAP_OBSTR = TRUE;
+		remove(self);
+		return;
+      }
 
    // Save the current entity
    self.goalentity = targ;
@@ -771,16 +805,38 @@ sounds
 */
 
 void() rotate_train =
-   {
-   objerror ("rotate_train entities should be changed to rotate_object with\nfunc_rotate_train controllers\n");
-   };
+{
+	if (Q_100 || PK_100)			// Cataboligne - 5.7.10 - these should not exsist under q100 rule
+	{
+		remove(self);
+		return;
+	}
+
+   if (Q_100 && Q_100_OBJERR) objerror ("rotate_train entities should be changed to rotate_object with\nfunc_rotate_train controllers\n");
+	bprint("\n*** warning:\n");
+	bprint("\brotate_train entities should be changed to rotate_object with\nfunc_rotate_train controllers\n\n");
+	MAP_OBSTR = TRUE;
+	remove(self);
+};
 
 void() func_rotate_train =
    {
+	if (Q_100 || PK_100)			// Cataboligne - 5.7.10 - these should not exsist under q100 rule
+	{
+		remove(self);
+		return;
+	}
+
    if (!self.speed)
 		self.speed = 100;
 	if (!self.target)
-      objerror ("rotate_train without a target");
+      {
+		if (Q_100 && Q_100_OBJERR) objerror ("rotate_train without a target");
+		bprint( "\n*** warning:\nrotate_train without a target - removed.\n\n" );
+	  MAP_OBSTR = TRUE;
+		remove(self);
+		return;
+      }
 
    if ( !self.noise )
       {
@@ -910,6 +966,12 @@ NONBLOCKING makes the brush non-solid.  This is useless if VISIBLE is set.
 */
 void() func_movewall =
    {
+	if (Q_100 || PK_100)			// Cataboligne - 5.7.10 - these should not exsist under q100 rule
+	{
+		remove(self);
+		return;
+	}
+
    self.angles = '0 0 0';
    self.movetype = MOVETYPE_PUSH;
    if ( self.spawnflags & NONBLOCKING )
@@ -940,6 +1002,12 @@ This defines an object to be rotated.  Used as the target of func_rotate_door.
 */
 void() rotate_object =
    {
+	if (Q_100 || PK_100)			// Cataboligne - 5.7.10 - these should not exsist under q100 rule
+	{
+		remove(self);
+		return;
+	}
+
    self.classname = "rotate_object";
    self.solid = SOLID_NOT;
    self.movetype = MOVETYPE_NONE;
@@ -1116,9 +1184,19 @@ once door from closing again when it's blocked.
 
 void() func_rotate_door =
    {
+	if (Q_100 || PK_100)			// Cataboligne - 5.7.10 - these should not exsist under q100 rule
+	{
+		remove(self);
+		return;
+	}
+
    if (!self.target)
       {
-      objerror( "rotate_door without target." );
+      if (Q_100 && Q_100_OBJERR) objerror( "rotate_door without target." );
+		bprint( "\n*** warning:\nrotate_door without target - removed.\n\n" );
+	  MAP_OBSTR = TRUE;
+		remove(self);
+		return;
       }
 
    self.dest1 = '0 0 0';

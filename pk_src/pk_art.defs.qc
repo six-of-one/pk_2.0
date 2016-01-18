@@ -108,9 +108,9 @@ deprecated - already in pk_bot
 // for admin item management - follows ammo by bit stuff
 
 float WEP_EGO					= 16384;
-float WEP_TOMB					= 65536;
-float WEP_ACTOR				= 131072;
-float WEP_PHONE				= 262144;
+float WEP_TOMB					= 32768;
+float WEP_ACTOR				= 65536;
+float WEP_PHONE				= 131072;
 
 
 // qc needing mods for support via pk 2.x

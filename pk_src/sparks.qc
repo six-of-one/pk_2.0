@@ -97,10 +97,10 @@ void() light_sparks =
 	self.cnt = 0;
 
 	// precaches
-	precache_model2("progs/sparks.spr");
-	precache_sound2("misc/spark/spark_4.wav");
-	precache_sound2("misc/spark/spark_5.wav");
-	precache_sound2("misc/spark/spark_6.wav");
+	precache_model ("progs/sparks.spr");
+	precache_sound ("misc/spark/spark_4.wav");
+	precache_sound ("misc/spark/spark_5.wav");
+	precache_sound ("misc/spark/spark_6.wav");
 
 	// glow at the origin as well makes it look a bit more realistic
 	//setmodel(self, "progs/sparks.spr");

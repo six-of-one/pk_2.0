@@ -68,6 +68,8 @@ float (entity a, entity b) IsUpstream =
 	return (0);
 };
 
+float sf_cacheRoute;
+
 void (entity node, entity targ, float len, entity item) cacheRouteTarget;
 void (entity a, entity b, float recurse) updateRouteCache =
 {
@@ -100,6 +102,8 @@ void (entity a, entity b, float recurse) updateRouteCache =
 
 void (entity a, entity b) addTarget =
 {
+	sf_cacheRoute = 5000; // Cataboligne - 5.11.10 - prevent infinite loop in recursive calls
+
 	if (a == b)
 	{
 		return ;
@@ -456,6 +460,13 @@ void (entity node, entity targ, float len, entity item) cacheRoute =
 
 void (entity node, float len, entity item) cacheRouteMsg =
 {
+	sf_cacheRoute = sf_cacheRoute - 1; // Cataboligne - 5.11.10 - prevent recursive loop
+	if (sf_cacheRoute < 1)
+	{
+		if (sf_cacheRoute == 0) bprint("\n*** Warning: pk*bot cacheRoute recursive loop hit 5000.\n\n");
+		return;
+	}
+	
 	if (item.th_cache)
 	{
 		if (!item.th_cache (node,len,item))

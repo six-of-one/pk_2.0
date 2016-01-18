@@ -588,8 +588,8 @@ void (vector v1, vector v2, float nomonsters, entity forent) traceline = #16;
 
 entity() checkclient				= #17;	// returns a client to look for
 entity (entity start, .string fld, string match) find = #18; 
-string (string s) precache_sound = #19; 
-string (string s) precache_model = #20; 
+//string (string s) precache_sound = #19;  // Cataboligne - 5.11.10 - dynamic items take over for engines that can't precache after map load (i.e. glquake)
+//string (string s) precache_model = #20; 
 //void (entity client, string s) stuffcmd = #21;  // *frikbot takeover
 entity (vector org, float rad) findradius = #22; 
 void (string s) bprint = #23; 

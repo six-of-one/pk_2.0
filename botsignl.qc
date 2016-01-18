@@ -38,7 +38,10 @@ void () t_botmovetarget =
 	}
 	if (self.classname != "BotTarget")
 	{
-		objerror ("bad bot target in bot_touch! 1\n");
+		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_touch! 1\n");
+		bprint("\n*** warning:\nbad bot target in bot_touch - 1.\n\n");
+		ai_botstand();
+		return;
 	}
 	if (self.goalentity.classname != "player")
 	{
@@ -115,7 +118,10 @@ void () t_botmovetarget =
 	}
 	if (self.classname != "BotTarget")
 	{
-		objerror ("bad bot target in bot_touch! 2\n");
+		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_touch! 2\n");
+		bprint("\n*** warning:\nbad bot target in bot_touch - 2.\n\n");
+		ai_botstand();
+		return;
 	}
 	setorigin (self,pth.origin);
 	other.search_time = (time + 4);
@@ -160,7 +166,10 @@ void (entity bot) bot_triggered =
 		org_z = (Botgoal.goalentity.absmin_z + 1);
 		if (Botgoal.classname != "BotTarget")
 		{
-			objerror ("bad bot target in bot_touch! 3\n");
+			if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_touch! 3\n");
+			bprint("\n*** warning:\nbad bot target in bot_touch - 3.\n\n");
+			ai_botstand();
+			return;
 		}
 		setorigin (Botgoal,org);
 		Botgoal.goalentity.lastbot = bot;
@@ -182,7 +191,10 @@ void () bot_touched =
 	self = other.goalentity;
 	if (self.classname != "BotTarget")
 	{
-		objerror ("bad bot target in bot_touch! 4\n");
+		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_touch! 4\n");
+		bprint("\n*** warning:\nbad bot target in bot_touch - 4.\n\n");
+		ai_botstand();
+		return;
 	}
 	if (self.goalentity == tmp)
 	{
@@ -235,7 +247,10 @@ void () enemy_touched =
 		self.search_time = (time + 4);
 		if (self.goalentity.classname != "BotTarget")
 		{
-			objerror ("bad bot target in bot_touch! 5\n");
+			if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_touch! 5\n");
+			bprint("\n*** warning:\nbad bot target in bot_touch - 5.\n\n");
+			ai_botstand();
+			return;
 		}
 		setorigin (self.goalentity,org);
 		self = tmp;
@@ -243,7 +258,10 @@ void () enemy_touched =
 	}
 	if (self.goalentity.classname != "BotTarget")
 	{
-		objerror ("ERROR - bad bot target!\n");
+			if (Q_100 && Q_100_OBJERR) objerror ("bad bot target!\n");
+			bprint("\n*** warning:\nbad bot target.\n\n");
+			ai_botstand();
+			return;
 	}
 	setorigin (self.goalentity,org);
 	self.goalentity.goalentity = self.enemy;

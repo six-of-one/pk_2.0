@@ -24,14 +24,14 @@ void() use_pkitem =
 	{
 		if (self.health < 40) drp = 1;
 		else drp = random();
-		if (drp < 0.3) drp = 0.9;
-		else if (drp < 0.6) drp = 0.8;
+		if (drp < 0.1) drp = 0.9;
+		else if (drp < 0.2) drp = 0.8;
 	}
 	else if (random() < 0.3)
 	{
 		drp = random();
 		if (drp < 0.1) drp = 0.9;
-		else if (drp < 0.3) drp = 0.8;
+		else if (drp < 0.2) drp = 0.8;
 	}
 
 	if (drp)
@@ -54,10 +54,28 @@ void() use_pkitem =
 			self.pk_currentitem = PK_IT_TURRET;
 			PK_Attack();
 		}
-		else if (self.pk_beartrapammo > 0)
+		else if (self.pk_beartrapammo > 0 && drp > 0.6)
 		{
 			self.weapon = IT_AXE;
 			self.pk_currentitem = PK_IT_BEARTRAP;
+			PK_Attack();
+		}
+		else if (self.pkplus_phoneammo > 0 && drp > 0.5) // Cataboligne - 5.8.10 - bots use pkplus artefacts items now - YAY!  (no Gir, thats bad...)
+		{
+			self.weapon = IT_AXE;
+			self.pk_currentitem = PKPLUS_IT_PHONE;
+			PK_Attack();
+		}
+		else if (self.pkplus_egoammo > 0 && drp > 0.4)
+		{
+			self.weapon = IT_AXE;
+			self.pk_currentitem = PKPLUS_IT_EGO;
+			PK_Attack();
+		}
+		else if (self.pkplus_tombammo > 0)
+		{
+			self.weapon = IT_AXE;
+			self.pk_currentitem = PKPLUS_IT_TOMB;
 			PK_Attack();
 		}
 	}
@@ -126,7 +144,10 @@ void () CallForHelp =
 								BotFoundTarget ();
 								if (self.goalentity.classname != "BotTarget")
 								{
-									objerror ("bad bot target in bot_ai! 1\n");
+									if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 1\n");
+									bprint("\n*** warning:\nbad bot target in bot_ai - 1.\n\n");
+									ai_botstand();
+									return;
 								}
 								setorigin (self.goalentity,p.origin);
 								self = tmp;
@@ -162,7 +183,9 @@ float () RunAway =
 			bprint (self.netname);
 			bprint (": Run for it, ");
 			bprint (self.enemy.netname);
-			if (random() < 0.7)
+			if (random() < 0.6)
+				bprint (" has got a Pentagram and is not afraid to use it!\n");
+			else if (random() < 0.2)
 				bprint (" is the freaking Anti-Christ!\n");
 			else
 				bprint (" has nasty pointy teeth!\n"); // Cat - 4.5.10 - Python mods
@@ -270,7 +293,10 @@ void () BotHuntTarget =
 	}
 	if (self.goalentity.classname != "BotTarget")
 	{
-		objerror ("bad bot target in bot_ai! 2\n");
+		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 2\n");
+		bprint("\n*** warning:\nbad bot target in bot_ai - 2.\n\n");
+		ai_botstand();
+		return;
 	}
 	setorigin (self.goalentity,self.enemy.origin);
 	self.think = self.th_run;
@@ -579,6 +605,10 @@ float () BotfindBot =
 
 float () BotFindTarget =
 {
+/// put hub start inv check here?
+	if (inHubMap && self.invincible_finished > time)
+	if (random() < 0.7) return(0);
+
 	local entity client;
 	local float len;
 	local float bw;
@@ -591,6 +621,9 @@ float () BotFindTarget =
 	{
 		return(BotfindBot ());
 	}
+	if (inHubMap && client.invincible_finished > time) // Cataboligne - 5.12.10 - on a hub and this enemy is invincible still
+	if (random() < 0.9) return(0);
+
 	if (client == self.enemy)
 	{
 		return (0);
@@ -929,7 +962,10 @@ void (float dist) ai_botcharge =
 		oldrng = vlen (self.goalentity.origin - self.origin);
 		if (self.goalentity.classname != "BotTarget")
 		{
-			objerror ("bad bot target in bot_ai! 3\n");
+			if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 3\n");
+			bprint("\n*** warning:\nbad bot target in bot_ai - 3.\n\n");
+			ai_botstand();
+			return;
 		}
 		setorigin (self.goalentity,self.enemy.origin);
 		if (self.enemyrun > 0)
@@ -1005,7 +1041,10 @@ void (float dist) ai_botrun =
 		if (self.goalentity.classname != "BotTarget")
 		{
 			eprint (self.goalentity);
-			objerror ("bad bot target in bot_ai! 4\n");
+			if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 4\n");
+			bprint("\n*** warning:\nbad bot target in bot_ai - 4.\n\n");
+			ai_botstand();
+			return;
 		}
 		setorigin (self.goalentity,self.enemy.origin);
 		self.search_time = (time + 7);
@@ -1072,7 +1111,10 @@ void () aibot_setupchase =
 	pth = BestChaseRoute (self,self.enemy);
 	if (self.goalentity.classname != "BotTarget")
 	{
-		objerror ("bad bot target in bot_ai! 1\n");
+		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 1\n");
+		bprint("\n*** warning:\nbad bot target in bot_ai - 1.\n\n");
+		ai_botstand();
+		return;
 	}
 	if (pth != self.enemy)
 	{
@@ -1106,7 +1148,10 @@ void (float dist) aibot_chase =
 	{
 		if (self.goalentity.classname != "BotTarget")
 		{
-			objerror ("bad bot target in bot_ai! 1\n");
+			if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 1\n");
+			bprint("\n*** warning:\nbad bot target in bot_ai - 1.\n\n");
+			ai_botstand();
+			return;
 		}
 		setorigin (self.goalentity,self.enemy.origin);
 		self.search_time = (time + 5);
@@ -1260,7 +1305,10 @@ float (float minweight) aibot_checkforGoodies =
 		{
 			if (botTarget.classname != "BotTarget")
 			{
-				objerror ("bad bot target in bot_ai! 6\n");
+				if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 6\n");
+				bprint("\n*** warning:\nbad bot target in bot_ai - 6.\n\n");
+				ai_botstand();
+				return(0);
 			}
 			setorigin (botTarget,botTarget.goalentity.origin);
 			self.lefty = (self.lefty | GETGOODY);
@@ -1280,7 +1328,10 @@ void (float dist) ai_endgetGoody =
 	}
 	if (self.goalentity.classname != "BotTarget")
 	{
-		objerror ("bad bot target in bot_ai! 7\n");
+		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 7\n");
+		bprint("\n*** warning:\nbad bot target in bot_ai - 7.\n\n");
+		ai_botstand();
+		return;
 	}
 	setorigin (self.goalentity,self.lastseenpos);
 	self.goalentity.goalentity = self.enemy;
@@ -1386,7 +1437,10 @@ void (float dist) ai_botgetGoody =
 	}
 	if (self.goalentity.classname != "BotTarget")
 	{
-		objerror ("bad bot target in bot_ai! 8\n");
+		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 8\n");
+		bprint("\n*** warning:\nbad bot target in bot_ai - 8.\n\n");
+		ai_botstand();
+		return;
 	}
 	setorigin (self.goalentity,self.lastseenpos);
 	self.goalentity.goalentity = self.enemy;

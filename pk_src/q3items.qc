@@ -425,11 +425,11 @@ void() misc_teleporter_dest =
 	self.origin = self.origin + '0 0 27';
 	if (!self.targetname)
 	{
-//		if (Q1_MODE) objerror ("no targetname");
+		if (Q_100 && Q_100_OBJERR) objerror ("no targetname");
 		bprint("q3 - misc_teleporter_dest missing name! please repair the map...\n");
 		self.targetname = ftos(floor(random() * 65535));
 	}
-	
+
 };
 
 // altarbetas teleporter for some reason - works in q3

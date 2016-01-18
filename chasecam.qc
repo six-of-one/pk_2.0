@@ -8,6 +8,8 @@ chasecam file
 */
 // vars
 
+//.vector cam; // all chase cam data - moved for pre compile
+
 // darkplaces deal
 .float clientcolors; //controls coloring on scoreboard (this determines player colors exactly like the "color" command, except for using a single number that contains pants and shirt colors (pants + shirt * 16, 0-255 potentially), so be sure to set it for a bot)
 
@@ -44,8 +46,8 @@ void( float opt ) Remove_chase_cam;
 
 // (moved to defs.qc)
 //float chasecam_dist = 118, chasecam_zmult = 0.30000;
-// changed to player.dest2_y (distance)
-// player.dest2_z (zmult)
+// changed to player.cam_y (distance)
+// player.cam_z (zmult)
 // set in client.qc for initial values
 
 // Resets weapon model after changing view
@@ -79,7 +81,7 @@ void( entity player_ent ) Chase_cam_setweapon =
 
 	e = self;
 	self = player_ent;
-	if ( (self.dest2_x & CHSCAM_ON) )
+	if ( (self.cam_x & CHSCAM_ON) )
 	{
 		self.weaponmodel = "";
 		cam_setbob("");
@@ -120,7 +122,7 @@ void( entity cam_owner, vector vpos ) Start_chase_cam =
 	chase_cam.owner=cam_owner;
 
 	// turn on bit-flag
-	chase_cam.owner.dest2_x = chase_cam.owner.dest2_x | CHSCAM_ON;
+	chase_cam.owner.cam_x = chase_cam.owner.cam_x | CHSCAM_ON;
 
 	chase_cam.solid = SOLID_NOT;
 	chase_cam.movetype = MOVETYPE_FLY;
@@ -149,7 +151,7 @@ void( entity cam_owner, vector vpos ) Start_chase_cam =
 
 	Chase_cam_setweapon( cam_owner );
 	// distance clipping
-	chase_cam.ammo_shells = cam_owner.dest2_y / 3;
+	chase_cam.ammo_shells = cam_owner.cam_y / 3;
 
 };
 
@@ -161,8 +163,8 @@ void() Reable_chase_cam =
 	//if (self.owner.health <= 0)
 	if (self.owner.solid == SOLID_NOT)
 	{
-		//owner died in water, reset .dest2_x flag for respawn
-//		self.owner.dest2_x = self.owner.dest2_x | CHSCAM_ON;
+		//owner died in water, reset .cam_x flag for respawn
+//		self.owner.cam_x = self.owner.cam_x | CHSCAM_ON;
 		remove( self );
 		return;
 	}
@@ -173,7 +175,7 @@ void() Reable_chase_cam =
 	if ((CHSCAM_NO_WATER == TRUE) & (self.owner.waterlevel != 0))
 		return;
 
-	self.owner.dest2_x = self.owner.dest2_x | CHSCAM_ON;
+	self.owner.cam_x = self.owner.cam_x | CHSCAM_ON;
 	Chase_cam_setweapon( self.owner );
 
 	self.skin = 1; // flag temp. disabled flag so track function-
@@ -183,7 +185,7 @@ void() Reable_chase_cam =
 	setmodel (self, CAM_MODEL);
 	setsize (self, '0 0 0', '0 0 0');
 	setorigin( self, self.owner.origin);
-	self.ammo_shells = self.owner.dest2_y / 3; // distance clipping
+	self.ammo_shells = self.owner.cam_y / 3; // distance clipping
 	self.think = Keep_cam_chasing_owner;
 	//Start_chase_cam( self.owner, '0 0 0' );
 	//remove( self );
@@ -200,7 +202,7 @@ void( float opt ) Remove_chase_cam =
 	stuffcmd( self.owner, STD_FOV );
 
 	// turn off bit-flag-
-	self.owner.dest2_x = self.owner.dest2_x - (self.owner.dest2_x & CHSCAM_ON);
+	self.owner.cam_x = self.owner.cam_x - (self.owner.cam_x & CHSCAM_ON);
 
 	// set view-point back to normal
 	set_viewport( self.owner, self.owner);
@@ -411,7 +413,7 @@ void() Keep_cam_chasing_owner =
 	self.nextthink = time + 0.1;
 
 	// check if player toggled
-	if (! (self.owner.dest2_x & CHSCAM_ON))
+	if (! (self.owner.cam_x & CHSCAM_ON))
 	{
 		Remove_chase_cam( TRUE );
 		return;
@@ -479,8 +481,8 @@ void() Keep_cam_chasing_owner =
 
 	// increment fade-back variable
 	self.ammo_shells = self.ammo_shells + 4.5;
-	if (self.ammo_shells > self.owner.dest2_y)
-		self.ammo_shells = self.owner.dest2_y;
+	if (self.ammo_shells > self.owner.cam_y)
+		self.ammo_shells = self.owner.cam_y;
 
 	makevectors( self.owner.v_angle );
 
@@ -490,7 +492,7 @@ void() Keep_cam_chasing_owner =
 	//	-68.9 (max up aim)
 
 	goal = owner_vec - (v_forward * self.ammo_shells);
-	goal_z = goal_z + 14 + (self.ammo_shells * self.owner.dest2_z);
+	goal_z = goal_z + 14 + (self.ammo_shells * self.owner.cam_z);
 
 	// adjust initial goal
 	//////////////////////////////////////////////////
@@ -686,11 +688,11 @@ void() Toggle_chase_cam =
 	if ((CHSCAM_NO_WATER == TRUE) & (self.waterlevel != 0))
 		return;
 
-	if( (self.dest2_x & CHSCAM_ON) )
+	if( (self.cam_x & CHSCAM_ON) )
 	{
 		// will be noticed by next think-
 		// of player's chase cam entity
-		self.dest2_x = self.dest2_x - CHSCAM_ON;
+		self.cam_x = self.cam_x - CHSCAM_ON;
 	}
 	else
 		Start_chase_cam( self, '0 0 0' );
@@ -700,13 +702,13 @@ void() Toggle_chase_cam =
 void() Chase_cam_lvlstart_think =
 {
 
-	if ( (self.owner.dest2_x & CHSCAM_ON) )
+	if ( (self.owner.cam_x & CHSCAM_ON) )
 		Start_chase_cam( self.owner, '0 0 0' );
 
 /*
-	if ( (self.owner.dest2_x & LASERTARG_ON) )
+	if ( (self.owner.cam_x & LASERTARG_ON) )
 	{
-		self.owner.dest2_x = self.owner.dest2_x - LASERTARG_ON;
+		self.owner.cam_x = self.owner.cam_x - LASERTARG_ON;
 		LaserTargeterToggle( self.owner );
 	}
 */
@@ -715,7 +717,7 @@ void() Chase_cam_lvlstart_think =
 
 
 // called in CLIENT.QC by void() PutClientInServer-
-// player.dest2_x is set and saved between levels using parm16
+// player.cam_x is set and saved between levels using parm16
 // in CLIENT.QC
 void() Chase_cam_level_start =
 {
@@ -736,23 +738,23 @@ void() Chase_cam_level_start =
 // 0 = minus
 // 1 = plus
 // 2 = read cvar temp1 for value
-// (player.dest2_y holds cam distance)
+// (player.cam_y holds cam distance)
 void(float opt) Chase_cam_change_dist =
 {
 
 	if (!opt)
 	{
-		self.dest2_y = self.dest2_y - 2;
-		if (self.dest2_y < 10)
-			self.dest2_y = 10;
+		self.cam_y = self.cam_y - 2;
+		if (self.cam_y < 10)
+			self.cam_y = 10;
 	}
 	else if (opt == 1)
-		self.dest2_y = self.dest2_y + 2;
+		self.cam_y = self.cam_y + 2;
 	else
-		self.dest2_y = cvar( "temp1" );
+		self.cam_y = cvar( "temp1" );
 
 	sprint( self, "chasecam distance = " );
-	sprint( self, ftos(self.dest2_y) );
+	sprint( self, ftos(self.cam_y) );
 	sprint( self, "\n" );
 
 
@@ -762,31 +764,31 @@ void(float opt) Chase_cam_change_dist =
 // 0 = minus
 // 1 = plus
 // 2 = read cvar temp1 for value
-// (player.dest2_z holds zmult)
+// (player.cam_z holds zmult)
 void(float opt) Chase_cam_change_zmult =
 {
 	local float f;
 
 	if (!opt)
 	{
-		self.dest2_z = self.dest2_z - 0.02;
-		if (self.dest2_z < 0)
-			self.dest2_z = 0;
+		self.cam_z = self.cam_z - 0.02;
+		if (self.cam_z < 0)
+			self.cam_z = 0;
 	}
 	else if (opt == 1)
-		self.dest2_z = self.dest2_z + 0.02;
+		self.cam_z = self.cam_z + 0.02;
 	else
 	{
 		f = cvar( "temp1" );
-		self.dest2_z = f * 0.01;
+		self.cam_z = f * 0.01;
 	}
 
 
 	// convert and strip for display
 	// apparantly,
-	//	.dest2_z = .dest2_z +- 0.02;
+	//	.cam_z = .cam_z +- 0.02;
 	// don't _exactly_ add/sub 0.02
-	f = self.dest2_z * 100;
+	f = self.cam_z * 100;
 	f = rint( f );
 
 	sprint( self, "chasecam verticle offset = " );
@@ -797,8 +799,8 @@ void(float opt) Chase_cam_change_zmult =
 /*
 Reads current values of cvar temp1:
 opt:
-	0 = into player.dest2_y (chasecam distance)
-	1 = into player.dest2_z (zmult)
+	0 = into player.cam_y (chasecam distance)
+	1 = into player.cam_z (zmult)
 */
 void(float opt) Chase_cam_read_temp1 =
 {
@@ -833,21 +835,21 @@ void(float sel) cam_parms =
 	if (!sel)
 		{
 // holds current state of cam and targeter between levels
-		parm14 = self.dest2_x + (self.dest2_y & 255) * 256 + ((self.dest2_z * 100) & 255) * 65536; // bit flags, cam distance, cam height
+		parm14 = self.cam_x + (self.cam_y & 255) * 256 + ((self.cam_z * 100) & 255) * 65536; // bit flags, cam distance, cam height
 //		parm15 = self.dest1_y;
 		}
 	else if (sel == 1)
 		{
-		self.dest2_x = parm14 & 255;
-		self.dest2_y = (parm14 & 65280)/256;
-		self.dest2_z = ((parm14 & 16711680)/65536)  * 0.01;
+		self.cam_x = parm14 & 255;
+		self.cam_y = (parm14 & 65280)/256;
+		self.cam_z = ((parm14 & 16711680)/65536)  * 0.01;
 //		self.dest1_y = parm15;
 		}
 	else
 		{
 	// only reset if zeroed  (so DM/COOP respawns don't reset)
 		if (self.deadflag == DEAD_RESPAWNABLE)
-			parm14 = self.dest2_x + (self.dest2_y & 255) * 256 + ((self.dest2_z * 100) & 255) * 65536; // bit flags, cam distance, cam height
+			parm14 = self.cam_x + (self.cam_y & 255) * 256 + ((self.cam_z * 100) & 255) * 65536; // bit flags, cam distance, cam height
 		else
 			parm14 = CAM_DEF + CAM_DIST * 256 + CAM_Z * 65536; // bit flags, cam distance, cam height
 		}
@@ -884,7 +886,7 @@ void() bot_renew =
 	// QC has already initiated all death processes
 void () dead_cam_set =
 {
-	viswep_ld(self.vwepent, -2);
+	viswep_ld(self, -2);
 
 //	if (DARKPLACES || chaos)
 //	{
@@ -922,9 +924,18 @@ void () dead_cam_set =
 	
 	if (self.flags & FL_CLIENT)
 	{
-		if (! self.dest2_x & CHSCAM_ON)
+		if (! self.cam_x & CHSCAM_ON)
 			cam_startdeathview();
 	}
+};
+
+// fn(cam_punch) - zero punchangle_x if cam active when firing weps
+
+// self is player ent
+
+void() cam_punch =
+{
+	if (self.cam_x & CHSCAM_ON) self.punchangle_x = 0;
 };
 
 void () ccb_impulse_check =
@@ -951,8 +962,8 @@ void () ccb_impulse_check =
 	else if (self.impulse == 234) Chase_cam_change_dist(0); // minus
 	else if (self.impulse == 235) Chase_cam_change_dist(1); // plus
 
-	else if (self.impulse == 238) Chase_cam_read_temp1(0); // read cvar temp1 into player.dest2_y (cam distance)
-	else if (self.impulse == 239) Chase_cam_read_temp1(1); // read cvar temp1 into player.dest2_z (cam height)
+	else if (self.impulse == 238) Chase_cam_read_temp1(0); // read cvar temp1 into player.cam_y (cam distance)
+	else if (self.impulse == 239) Chase_cam_read_temp1(1); // read cvar temp1 into player.cam_z (cam height)
 
 };
 

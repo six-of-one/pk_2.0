@@ -141,7 +141,7 @@ void() pk_harpoon_frames =
 		{
 			self.weaponframe = 8;
 			if (!PK_100)
-			if ( !(self.dest2_x & CHSCAM_ON) ) //stuffcmd( self, CL_BOBSET );
+			if ( !(self.cam_x & CHSCAM_ON) ) //stuffcmd( self, CL_BOBSET );
 				cam_setbob(CL_BOBSET);
 		}
 	}
@@ -149,7 +149,7 @@ void() pk_harpoon_frames =
 	{
 		self.weaponframe=0;
 		if (!PK_100)
-		if ( !(self.dest2_x & CHSCAM_ON) ) //stuffcmd( self, CL_BOBSET );
+		if ( !(self.cam_x & CHSCAM_ON) ) //stuffcmd( self, CL_BOBSET );
 				cam_setbob(CL_BOBSET);
 	}
 

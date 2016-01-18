@@ -14,8 +14,14 @@ float PK_XSOUND				= 32768;	// bit * = TRUE --- use extra pk sound set
 // compatability modes for the purists out there
 float PK_100;								// painkeep compatability mode - if true run 100% true to pk v1.11, no extras (has menus)
 float PK_99						= FALSE;	// painkeep 99% compatability mode - if true pk (main mod) works as pk but extra env effects are disabled
-float Q_100						= FALSE;	// quake 1 compatability mode - if true run 100% true to quake 1, why? just for kicks...
+float Q_100;								// quake 1 compatability mode - if true run 100% true to quake 1, why? just for kicks...
 float Q_99						= FALSE;	// quake 1 99% compatability mode - if true pk stuff is removed, but admin, item enhancements & env remain
+
+												// many object errors are tweaked to simply remove the offending component - if these 2 vars are set true, and objerror will be generated
+float PK_100_OBJERR;						// if true objerr that would have exited game (and have since been fixed) will cause an objerr
+float Q_100_OBJERR;						// if true objerr that would have exited game (and have since been fixed) will cause an objerr
+float MAP_OBSTR;							// object errors -> warnings that remove map items should set this. so map repair (tbd) can init an emergency exit
+float MAP_REPAIR;							// if true map repairs will execute
 
 float PK_HUB2					= 131072; // bit if TRUE, using custom hub - only used for level transtion from hub vote
 //float PK_HUB3					= 262144; // bit if TRUE, using hub3 - reload at hub loads - deprecated
@@ -36,6 +42,8 @@ float pk_ditems;							// count painkeep items for dyn_items code
 float PK_DYNTO					= 120;	// timeout in 120 secs
 float PK_DYNRAD				= 8000;	// dynamic radius search 8000 units
 float DARKPLACES;							// for detecting darkplaces - modded engine sets cvar("chaos") to this value
+
+float CHAOS_ENG			= 10100010110111; // chaos engine id
 float chaos;
 
 float PK_ADMIN;							// allow admin - set this to 0 to completely disable all admin
@@ -64,6 +72,13 @@ float pk_srvcfg				= 1; // TOD: admin option later
 void() pk_srvcmd_set;
 
 // item override admin
+float DYN_OVR;
+float DYN_ART;
+float DYN_FORCE;
+float DYN_ARTFR;
+float DYN_ARTFR_ONLY; // if set true dynamic only adds artifacts to map
+float DYN_FORCE_CNT; // max forced items to load
+float DYN_START_TIME			= 5;	// seconds till dynamic spawner starts its thing - precache must cutoff before this, leave a couple secs for map load
 
 float WEP_SSHOT				= 1; 	 // admin of super shotgun
 float WEP_NAILGUN				= 2; 	 // admin of nailgun
@@ -139,6 +154,11 @@ float(string name, string value) registercvar = #93;
 float MOVETYPE_FOLLOW = 12;
 
 // relocated from defs.qc
+
+string (string s) precache_sound__ = #19;  // dynamic items deal
+string (string s) precache_model__ = #20; 
+string (string s) precache_sound;
+string (string s) precache_model; 
 
 // hijacked for pk_mode running non pk maps with non pk sounds
 //void(entity e, float chan, string samp, float vol, float atten) pk_sound = #8;
@@ -333,6 +353,7 @@ float custom_hub_fail;				// if TRUE custom hub was removed but inhubmap may be 
 .float voteIntermission;
 string() hub_select;
 float() check_custom_hub;
+float(float cn) bot_vote;			// bot...vote
 
 // MOTD
 float MOTDTIME					= 120;		// The amount of "frames" for the motd message (minimum should be 20)
@@ -505,9 +526,11 @@ void() pk_placeitem;
 .float duration;
 
 
-void() dead_cam_set; // Cataboligne 9.11.3 purify proto - chase cam
-float DCAMTO					= 0; // testing 120; // timeout for death cam 2 mins
-float DCAMTOACT				= 0; // action after timeout 0 = respawn, 1 = disconnect
+.vector cam; // all chase cam data
+void() cam_punch;						// return punchangle if passed parm - otherwise set self. var
+void() dead_cam_set;					// Cataboligne 9.11.3 purify proto - chase cam
+float DCAMTO					= 0;	// testing 120; // timeout for death cam 2 mins
+float DCAMTOACT				= 0;	// action after timeout 0 = respawn, 1 = disconnect
 
 // cam vision field settings
 float DCAM_FOV					= 130; // dead cam crow vision
@@ -525,7 +548,7 @@ float VWX_SHOTGUN				= 11;
 float VWY_SHOTGUN				= 9;
 float VWZ_SHOTGUN				= 9;
 
-float VWX_VEL_SHOTGUN		= 8; // cart eject velocity
+float VWX_VEL_SHOTGUN		= 8;	// cart eject velocity
 float VWY_VEL_SHOTGUN		= 48;
 float VWZ_VEL_SHOTGUN		= 16;
 

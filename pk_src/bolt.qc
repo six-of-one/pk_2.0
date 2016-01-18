@@ -46,6 +46,7 @@ void() bolt_fire =
 		self.t_width = time + 1;
 	}
 	self.punchangle_x = -2;
+	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
 
 //	org = self.origin + '0 0 16';
 
@@ -59,6 +60,7 @@ void() bolt_fire =
 		self.currentammo = self.ammo_cells = self.ammo_cells - 2;
 
 		self.punchangle_x = -2;
+		cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
 
 	if (PK_100 || Q_100)
 		org = self.origin + '0 0 16';
@@ -443,7 +445,7 @@ void() bolt_checkTargets =
 	{
 	// Cataboligne 9.11.3 purify - chase cam
 	// disable model in chase view
-		if ( !(self.dest2_x & CHSCAM_ON) )
+		if ( !(self.cam_x & CHSCAM_ON) )
 		self.weaponmodel = "progs/v_cl_off.mdl";
 	}
 

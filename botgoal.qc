@@ -481,7 +481,10 @@ void () goForAir =
 	botTarget.goalentity = botTarget;
 	if (self.goalentity.classname != "BotTarget")
 	{
-		objerror ("bad bot target in botgoal! 1\n");
+		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in botgoal! 1\n");
+		bprint("\n*** warning:\nbad bot target in botgoal - 1.\n\n");
+		ai_botstand();
+		return;
 	}
 	setorigin (botTarget,bestorg);
 };
@@ -825,7 +828,10 @@ void () aibot_chooseGoal =
 	}
 	if (botTarget.classname != "BotTarget")
 	{
-		objerror ("bad bot target in botgoal! 2\n");
+		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in botgoal! 2\n");
+		bprint("\n*** warning:\nbad bot target in botgoal - 2.\n\n");
+		ai_botstand();
+		return;
 	}
 	setorigin (botTarget,bestorg);
 };

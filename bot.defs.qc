@@ -162,6 +162,7 @@ void(float con) bot_con;
 void(entity targ, entity attacker) bot_kill;
 void() bot_changeParms;
 void() bot_changelevel;
+void() ai_botstand;
 
 // item links
 void(entity e) bot_item_linx;

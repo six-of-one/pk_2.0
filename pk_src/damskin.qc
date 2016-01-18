@@ -8,6 +8,7 @@
 void(entity targ)	pk_setDamageSkin =
 {
 	if (targ.classname == "player" || targ.classname == "pk*bot")
+	if (targ.solid != SOLID_NOT ) // Cataboligne - 5.11.10 - doent set skin for dead cam player
 	{
 		if (targ.health > 75)
 	  {

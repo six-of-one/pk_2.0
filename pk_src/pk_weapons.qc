@@ -234,6 +234,7 @@ void(float ox) W_FirePulseSpikes =
 	newmis.angles = vectoangles(dir);
 	setsize (newmis, ' 0 0 0', ' 0 0 0');
 	self.punchangle_x = -2;
+	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
 
 	// time limit
 	newmis.think = SUB_Remove;
@@ -265,7 +266,8 @@ void() PK_SetCurrentAmmo =
 		wchanged = TRUE;
 	}
 
-	wchanged = wchanged & ((self.items & IT_INVISIBILITY) || (self.dest2_x & CHSCAM_ON));
+	wchanged = wchanged & ((self.items & IT_INVISIBILITY) || (self.cam_x & CHSCAM_ON));
+	if (DARKPLACES && cvar("chase_active")) wchanged = TRUE;
 
 	if (wchanged)
 		sprint(self, "You have selected the ");
@@ -471,7 +473,7 @@ void() PK_SetCurrentAmmo =
 
 // Cataboligne 8.8.9 purify - chase cam
 	// disable model in chase view
-		if ( (self.dest2_x & CHSCAM_ON) || self.classname == OBSERVER)
+		if ( (self.cam_x & CHSCAM_ON) || self.classname == OBSERVER)
 		{
 			self.weaponmodel = "";
 		}
@@ -1007,7 +1009,7 @@ void() PK_Attack =
 // BOLT_START
 	// Cataboligne 8.8.9 purify - chase cam
 	// disable model in chase view
-		if ( !(self.dest2_x & CHSCAM_ON) )
+		if ( !(self.cam_x & CHSCAM_ON) )
 			self.weaponmodel = "progs/v_cl_on.mdl"; // change to fire model...
 			player_bolt1();
 			self.attack_finished = time + 0.1;
@@ -1054,6 +1056,8 @@ void() PK_Attack =
 		self.attack_finished = time + 0.1;
 		sound (self, CHAN_AUTO, "weapons/lstart.wav", 1, ATTN_NORM);
 	}
+
+	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
 };
 
 // called below
@@ -1504,7 +1508,8 @@ void() PK_ImpulseCommands =
 	}
 
 	else if (self.impulse == 255)
-		QuadCheat ();
+//		QuadCheat ();
+		botmatch();			// TEST TEST REMOVE
 
 	self.impulse = 0;
 };

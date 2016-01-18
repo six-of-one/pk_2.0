@@ -471,10 +471,10 @@ void (float skl) AddAnotherBot =
 		{
 			if (SKINSMODE == 2)
 			{
-				st = ftos ((newbot.skil & MOVETYPE_WALK) + 1);
+				st = ftos ((newbot.skil & 3) + 1);
 				dprint (st);
 				dprint ("= skil skin\n");
-				skinChange (newbot,((newbot.skil & MOVETYPE_WALK) + 1));
+				skinChange (newbot,((newbot.skil & 3) + 1));
 			}
 		}
 	}
