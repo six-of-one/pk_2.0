@@ -64,13 +64,19 @@ float MC_AROCKETS_LG			= 126;
 float MC_ACELLS				= 127;
 float MC_ACELLS_LG			= 128;
 
-// sigil id - flags
-float MC_SIGIL1				= 129;
-float MC_SIGIL2				= 130;
-float MC_SIGIL4				= 131;
-float MC_SIGIL8				= 132;
+// boom!
+float MC_EXPLOD1				= 129;
+float MC_EXPLOD2				= 130;
 
-float MC_Q1						= 133;
+// sigil id - flags
+float MC_SIGIL1				= 131;
+float MC_SIGIL2				= 132;
+float MC_SIGIL4				= 133;
+float MC_SIGIL8				= 134;
+
+float MC_Q1						= 135;
+float MC_RNDITM				= 32;		// # of q1 items - have to change it items changes
+float MC_NR_RNDITM			= 28;		//   no runes
 
 float MC_SIGIL					= 133;
 
@@ -99,7 +105,57 @@ float MC_PHONE					= 152;
 float MC_MASK					= 153;
 
 float MC_PK						= 154;
+float MC_PK_RNDITM			= 8;		// # of base pk items
+float MC_PKP_RNDITM			= 12;		//   + plus items
 
+
+float MC_T_RNDITM				= 40;		// # of total items
+float MC_TRNSUB				= 6;		// # of total items
+
+/// doom
+
+float MC_D_FIST				= 160;
+float MC_D_SAW					= 161;
+float MC_D_PISTOL				= 162;
+float MC_D_SHOTGUN			= 163;
+float MC_D_BOOMSTICK			= 164;
+float MC_D_CHAINGUN			= 165;
+float MC_D_ROCKETL			= 166;
+float MC_D_PLASMA	 			= 167;
+float MC_D_BFG					= 168;
+
+float MC_D_BERS				= 169;
+float MC_D_INVUL				= 170;
+float MC_D_INVIS				= 171;
+float MC_D_RADSUIT			= 172;
+float MC_D_SOULSPH			= 173;
+float MC_D_MEGASPH			= 174;
+
+float MC_D_ARM_SPR			= 175;
+float MC_D_ARM_GRN			= 176;
+float MC_D_ARM_BLU			= 177;
+
+float MC_D_HBOTTLE			= 178;
+float MC_D_STIMPAK			= 179;
+float MC_D_MEDKIT				= 180;
+
+float MC_D_KEY_RED_SK		= 181;
+float MC_D_KEY_BLU_SK		= 182;
+float MC_D_KEY_YEL_SK		= 183;
+float MC_D_KEY_RED_CR		= 184;
+float MC_D_KEY_BLU_CR		= 185;
+float MC_D_KEY_YEL_CR		= 186;
+
+float MC_D_ASHELLS			= 187;
+float MC_D_ASHELLS_LG		= 188;
+float MC_D_ABULLETS			= 189;
+float MC_D_ABULLETS_LG		= 190;
+float MC_D_AROCKET			= 191;
+float MC_D_AROCKETS_LG		= 192;
+float MC_D_ACELLS				= 193;
+float MC_D_ACELLS_LG			= 194;
+
+float MC_D_BARREL				= 195;
 
 // fn(bit_mcode) - item bit assoc with given mcode
 
@@ -166,6 +222,7 @@ float(float mcv, entity e) bit_mcode =
 	if (mc == MC_MASK)													return(PKPLUS_IT_ACTOR);
 	if (mc == MC_PHONE)													return(PKPLUS_IT_PHONE);
 
+	return(0);
 };
 
 // fn(pk_mcode) - map code for items
@@ -191,20 +248,6 @@ float(string sc, entity e) pk_mcode =
 	else if (tsc == "weapon_grenadelauncher")						mc = MC_GRENADEL;
 	else if (tsc == "weapon_rocketlauncher")						mc = MC_ROCKETL;
 	else if (tsc == "weapon_lightning")								mc = MC_THUNDER;
-// pk
-	else if (tsc == "weapon_airfist")								mc = MC_AIRGUN;
-	else if (tsc == "weapon_chainlg")								mc = MC_CHTHUNDR;
-	else if (tsc == "weapon_grapgun")								mc = MC_GRAP;
-	else if (tsc == "weapon_pulsenail")								mc = MC_PULSE_NAILGUN;
-	else if (tsc == "item_painkeep_gwell")							mc = MC_GRAVITY;
-	else if (tsc == "item_painkeep_turret")						mc = MC_SENTRY;
-	else if (tsc == "item_painkeep_beartrap")						mc = MC_BEARTRAP;
-	else if (tsc == "item_painkeep_expshells")					mc = MC_AEXPLSH;
-	else if (tsc == "item_painkeep_can")							mc = MC_CANOBEANS;
-	else if (tsc == "item_pkplus_ego")								mc = MC_EGO;
-	else if (tsc == "item_pkplus_tomb")								mc = MC_TOMB;
-	else if (tsc == "item_pkplus_actor")							mc = MC_MASK;
-	else if (tsc == "item_pkplus_phone")							mc = MC_PHONE;
 // ammo
 	else if (tsc == "item_shells")									mc = MC_ASHELLS;
 	else if (tsc == "item_spikes")									mc = MC_ANAILS;
@@ -223,6 +266,23 @@ float(string sc, entity e) pk_mcode =
 	else if (tsc == "item_key1")										mc = MC_KEY1;
 	else if (tsc == "item_key2")										mc = MC_KEY2;
 	else if (tsc == "item_sigil")										mc = MC_SIGIL;
+	else if (tsc == "misc_explobox")									mc = MC_EXPLOD1;
+	else if (tsc == "misc_explobox2")								mc = MC_EXPLOD2;
+// pk
+	else if (tsc == "weapon_airfist")								mc = MC_AIRGUN;
+	else if (tsc == "weapon_chainlg")								mc = MC_CHTHUNDR;
+	else if (tsc == "weapon_grapgun")								mc = MC_GRAP;
+	else if (tsc == "weapon_pulsenail")								mc = MC_PULSE_NAILGUN;
+	else if (tsc == "item_painkeep_gwell")							mc = MC_GRAVITY;
+	else if (tsc == "item_painkeep_turret")						mc = MC_SENTRY;
+	else if (tsc == "item_painkeep_beartrap")						mc = MC_BEARTRAP;
+	else if (tsc == "item_painkeep_expshells")					mc = MC_AEXPLSH;
+	else if (tsc == "item_painkeep_can")							mc = MC_CANOBEANS;
+	else if (tsc == "item_pkplus_ego")								mc = MC_EGO;
+	else if (tsc == "item_pkplus_tomb")								mc = MC_TOMB;
+	else if (tsc == "item_pkplus_actor")							mc = MC_MASK;
+	else if (tsc == "item_pkplus_phone")							mc = MC_PHONE;
+
 // q3 - translates classname for now
 //	else if (tsc == "")								mc = MC_;
 
@@ -312,6 +372,9 @@ string (float mc) item_by_mcode =
 	if (mc == MC_ANAILS_LG)												return("item_spikes_lg");
 	if (mc == MC_AROCKETS_LG)											return("item_rockets_lg");
 	if (mc == MC_ACELLS_LG)												return("item_cells_lg");
+
+	if (mc == MC_EXPLOD1)												return("misc_explobox");
+	if (mc == MC_EXPLOD2)												return("misc_explobox2");
 
 	if (Q_100 || Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
 		return("");
@@ -414,19 +477,19 @@ void() func_make =
 	if (self.spawnflags & 1) self.origin = v0;
 
 	d = self.wait;
-	f = 30;
-	if (RUNES && self.wait == -1) f = 26; // dont rndize runes if server on
+	f = MC_RNDITM;
+	if (RUNES && self.wait == -1) f = MC_NR_RNDITM; // dont rndize runes if server on
 	if (self.wait == -1 || self.wait == -2) d = 102 + rint(random() * f);
 
-	f = 8;
-	if (PK_ART || self.wait == -4) f = 12;
+	f = MC_PK_RNDITM;
+	if (PK_ART || self.wait == -4) f = MC_PKP_RNDITM;
 	if (self.wait == -3 || self.wait == -4) d = 141 + rint(random() * f);
 
-	f = 38;
+	f = MC_T_RNDITM;
 	if (self.wait == -5)
 	{
 		d = 102 + rint(random() * f);
-		if (self.wait >= MC_Q1) d = d + 7;
+		if (self.wait >= MC_Q1) d = d + MC_TRNSUB; // gap q1 to pk
 	}
 
 	fn_make(d, self.origin);

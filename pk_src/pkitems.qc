@@ -35,7 +35,7 @@
 void () painkeep_weapon_touch =
 // The touch func for our new items
 {
-	local	float	hadammo, best, new, oldi;
+	local	float best, new;
 	local	entity	stm2;
 	local float leave;
 
@@ -80,7 +80,6 @@ void () painkeep_weapon_touch =
 	{
 		if (leave && (other.items & IT_NAILGUN))
 			return ;
-		hadammo = other.ammo_nails;
 		new = 0;
 		other.items = other.items | IT_NAILGUN; // special for this
 		other.ammo_nails = other.ammo_nails + 30;
@@ -113,7 +112,6 @@ void () painkeep_weapon_touch =
 	bound_other_ammo ();
 
 // change to the weapon
-	oldi = other.pk_items;
 	other.pk_items = other.pk_items | new;
 
 	stm2 = self;
@@ -298,7 +296,7 @@ void() pk_ammo_touch =
 		other.pk_explode_ammo = other.pk_explode_ammo + self.aflag;
 	}	
 	
-	bound_other_ammo ();
+	pk_bound_ammo ();
 
 	sprint (other, "You got the ");
 	sprint (other, self.netname);
@@ -638,6 +636,14 @@ void () item_painkeep_expshells =
 
 void() pk_bound_ammo =
 {
+	if (other.ammo_shells > Q1_SHELLAMMO_MAX)
+		other.ammo_shells = Q1_SHELLAMMO_MAX;
+	if (other.ammo_nails > Q1_NAILAMMO_MAX)
+		other.ammo_nails = Q1_NAILAMMO_MAX;
+	if (other.ammo_rockets > Q1_ROCKETAMMO_MAX)
+		other.ammo_rockets = Q1_ROCKETAMMO_MAX;
+	if (other.ammo_cells > Q1_CELLAMMO_MAX)
+		other.ammo_cells = Q1_CELLAMMO_MAX;
 	if (other.ammo_cells > Q1_CELLAMMO_MAX)
 		other.ammo_cells = Q1_CELLAMMO_MAX;
 

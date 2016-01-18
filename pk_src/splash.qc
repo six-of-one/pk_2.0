@@ -168,9 +168,9 @@ void() CheckWaterLevels =
 				if (e.wait > -888)
 				{
 					e.wait = -888;
-					bprint("*** warning: falling item hit -2011 vel*_z (terminal) - ");
-					bprint(item_ident(e));
-					bprint("\n");
+//					bprint("*** warning: falling item hit -2011 vel*_z (terminal) - ");
+//					bprint(item_ident(e));
+//					bprint("\n");
 				}
 				if ((e.flags & FL_ITEM) && e.ip_orgOrigin != v0) // put items back now
 				{

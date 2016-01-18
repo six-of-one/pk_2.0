@@ -651,7 +651,7 @@ void () W_FireGrenade =
 
 	self.punchangle_x = -2;
 
-	missile = spawn ();
+	newmis = missile = spawn ();
 	missile.owner = self;
 	missile.movetype = MOVETYPE_BOUNCE;
 	missile.solid = SOLID_BBOX;
@@ -981,6 +981,12 @@ void () W_SetCurrentAmmo =
 		self.weaponmodel = "";
 		self.weaponframe = 0;
 	}
+	if (self.eweapon)
+	{
+	//	self.currentammo = self.eweapon.aflag;
+		self.weaponframe = 0;
+		self.weaponmodel = self.eweapon.weaponmodel;
+	}
 };
 
 float () W_BestWeapon =
@@ -1055,6 +1061,11 @@ void () W_Attack =
 	makevectors	(self.v_angle);			// calculate forward angle for velocity
 	self.show_hostile = time + 1;	// wake monsters up
 
+	if (self.eweapon) // removed with !Q_100 full
+	{
+		e_weap_Attack();
+		return;
+	}
 	if (self.weapon == IT_AXE)
 	{
       sound (self, CHAN_WEAPON, "weapons/ax1.wav", 1, ATTN_NORM);

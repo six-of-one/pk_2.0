@@ -84,10 +84,52 @@ void(string cls) item_call =
 {
 	local string scls;
 	local float rd;
+	local entity f;
 
+	f = world;
 	rd = random();
-	if (self.classname != "dyn_item") rd = 1;
-	
+	if (self.classname != "dyn_item")
+	{
+		rd = 1;
+
+		if (self.enemy)
+		if (self.enemy.wad == "item_call_fake")
+			remove(self.enemy);
+
+// restore boom boxes by regen
+		if (cls == "misc_explobox" || cls == "misc_explobox2")
+		if (self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD2)
+		{
+			self.mcode = self.scode;
+			self.think = barrel_regen;
+			self.nextthink = time + 1 + 3 * random();
+			return;
+		}
+
+// to turn a boom box into something or something into a boom box, we need a fake item, hiding the real item with no model | touch
+		if (self.scode)
+		if (cls == "misc_explobox" || cls == "misc_explobox2")
+		if (self.scode != MC_EXPLOD1 && self.scode != MC_EXPLOD2) f = spawn();
+
+		if (cls != "misc_explobox" && cls != "misc_explobox2")
+		if (self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD2) f = spawn();
+
+		if (f)
+		{
+			self.modelindex = 0;
+//			self.touch = SUB_Null;
+			self.solid = SOLID_NOT;
+			self.takedamage = DAMAGE_NO;
+			self.enemy = f;
+
+			f.wad = "item_call_fake";
+			f.ip_orgOrigin = self.ip_orgOrigin;
+			f.origin = self.origin;
+			self = f;
+			self.classname = cls;
+		}
+	}
+
 	scls = cls;
 	if (cls == "weapon_supershotgun") weapon_supershotgun();
 	else if (cls == "weapon_nailgun") weapon_nailgun();
@@ -123,6 +165,16 @@ void(string cls) item_call =
 
 	else if (cls == "item_key1") item_key1();
 	else if (cls == "item_key2") item_key2();
+	else if (cls == "misc_explobox")
+	{
+		misc_explobox();
+		return;
+	}
+	else if (cls == "misc_explobox2")
+	{
+		misc_explobox2();
+		return;
+	}
 
 	else if (cls == "item_sigil1") { self.spawnflags = rune_bit_code(MC_SIGIL1, 0); item_sigil(); scls = "item_sigil"; }
 	else if (cls == "item_sigil2") { self.spawnflags = rune_bit_code(MC_SIGIL2, 0); item_sigil(); scls = "item_sigil"; }
@@ -749,10 +801,10 @@ void() rndize_item =
 	local entity e;
 	local float d, f;
 
-	f = 30;
-	if (RUNES) f = 26; // dont rndize runes if server on
-	d = 8;
-	if (PK_ART) d = 12;
+	f = MC_RNDITM;
+	if (RUNES) f = MC_NR_RNDITM; // dont rndize runes if server on
+	d = MC_PK_RNDITM;
+	if (PK_ART) d = MC_PKP_RNDITM;
 	if (self.owner.mcode > 99 && self.owner.mcode < MC_Q1)
 		self.owner.mcode = 102 + rint(random() * f);
 	else if (self.owner.mcode > 139 && self.owner.mcode < MC_PK)
@@ -840,6 +892,11 @@ void() place_item_control =
 
 	if(self.map == "") self.map = "pic_item";
 
+// have to make sure these got loaded
+	if (!self.mcode) self.mcode = pk_mcode("", self); // put map code on ent
+	if (self.sscode == "") self.sscode = sid_code[(int)(self.mcode - 100) * %4];
+	if (!self.scode) self.scode = self.mcode;
+
 	if (cvar("pk_place_item") == 1)
 	{
 		pic_tsk = 1;
@@ -893,4 +950,13 @@ string(entity e) item_ident =
 	else if (e.sscode != "") f = e.sscode;
 
 	return(f);
+};
+
+void() pic_test =
+{
+	if (!Q_100 && !PK_100)
+	if (chaos || DARKPLACES)
+	if (time < PIC_TO)
+	if (self.map != "nopic")
+		place_item_control();
 };

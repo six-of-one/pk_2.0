@@ -188,6 +188,7 @@ entity(entity e, float fl) vload =
 
 	tr.vwepent.weapon = fl;
 	tr.vwepent.pk_currentitem = 0;
+	tr.vwepent.eweapon = world;
 
 	if (fl == IT_AXE) md = "progs/vw_axe.mdl";
 	else if (fl == IT_SHOTGUN) md = "progs/vw_shot.mdl";
@@ -570,6 +571,7 @@ void() viswep_post =
 //		makevectors(vang);
 		}
 
+//	vhead.owner.eweapon = world;
 	dwep = vhead.owner.weapon; // active wep, or pulled
 	pkdwep = vhead.owner.pk_currentitem;
 //	if (vhead.owner.flags & FL_DROP) dwep = vhead.owner.prev_weapon; // drop this down first
@@ -598,11 +600,19 @@ void() viswep_post =
 				if (vhead.weapon != IT_AXE && dwep != IT_AXE) qld = TRUE;
 				else if (vhead.pk_currentitem != PK_IT_AXE && pkdwep != PK_IT_AXE) qld = TRUE;
 				else if (vhead.weapon == IT_AXE && dwep == IT_AXE || pkdwep == PK_IT_AXE) qld = TRUE;
+// TDO: set eweapon by code
 			}
 			else if (dwep > 0)
 			{
 				if ((vhead.weapon == dwep) && (dwep != IT_AXE)) qld = TRUE; // main weapon - not holstered
 				else if ((vhead.weapon == dwep) && (vhead.pk_currentitem == pkdwep)) qld = TRUE;
+// TDO: set eweapon by vw
+				if (vhead.weapon == dwep)
+				{
+					if (vhead.owner.eweapon && !vhead.eweapon) PK_SetCurrentAmmo();
+					if (!vhead.owner.eweapon && vhead.eweapon) PK_SetCurrentAmmo();
+					vhead.owner.eweapon = vhead.eweapon;
+				}
 			}
 
 			if (qld)

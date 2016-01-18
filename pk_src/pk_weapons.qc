@@ -512,6 +512,14 @@ void() PK_SetCurrentAmmo =
 			sprint(self, "An Unknown Weapon???\n");
 	}
 
+	if (self.eweapon)
+	{
+//		self.currentammo = self.eweapon.aflag;
+		self.weaponframe = 0;
+		self.weaponmodel = self.eweapon.weaponmodel;
+		if (wchanged)
+			sprint(self, self.eweapon.netname);
+	}
 // Cataboligne 8.8.9 purify - chase cam
 	// disable model in chase view
 		if ( (self.cam_x & CHSCAM_ON) || self.classname == OBSERVER)
@@ -1006,6 +1014,12 @@ void() PK_Attack =
 
 	makevectors	(self.v_angle);			// calculate forward angle for velocity
 	self.show_hostile = time + 1;	// wake monsters up
+
+	if (self.eweapon)
+	{
+		e_weap_Attack();
+		return;
+	}
 
 	if (self.weapon == IT_AXE)
 	{

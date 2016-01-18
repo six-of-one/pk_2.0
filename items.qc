@@ -20,6 +20,9 @@ void () SUB_regen =
 {
 	self.model = self.mdl;		// restore original model
 	self.solid = SOLID_TRIGGER;	// allow it to be touched again
+	if (self.noise4 != "")
+		sound (self, CHAN_VOICE, self.noise4, 1, ATTN_NORM);	// play respawn sound - doom / other resp sounds
+	else
 	sound (self, CHAN_VOICE, "items/itembk2.wav", 1, ATTN_NORM);	// play respawn sound
 	if (!Q_100) pk_item_position();  // *pk - reposition moved items (horn & harp effects) on respawn
 	else
@@ -79,11 +82,7 @@ void () PlaceItem =
 	if (!Q_100) pk_placeitem(); // *pk - set item details
 	bot_item_linx(self); // *bot - item tie in
 
-	if (!Q_100 && !PK_100)
-	if (chaos || DARKPLACES)
-	if (time < PIC_TO)
-	if (self.map != "nopic")
-		place_item_control();
+	pic_test();
 };
 
 /*
@@ -366,16 +365,18 @@ WEAPONS
 
 void () bound_other_ammo =
 {
+	if (!Q_100) pk_bound_ammo();  // *pk bound ammo
+	else
+	{
 	if (other.ammo_shells > 100)
 		other.ammo_shells = 100;
 	if (other.ammo_nails > 200)
 		other.ammo_nails = 200;
 	if (other.ammo_rockets > 100)
 		other.ammo_rockets = 100;
-	if (PK) pk_bound_ammo();  // *pk bound ammo
-	else
 	if (other.ammo_cells > 100)
 		other.ammo_cells = 100;
+	}
 };
 
 
@@ -492,7 +493,21 @@ void () weapon_touch =
 		other.ammo_cells = other.ammo_cells + 15;
 	}
 	else
-		objerror ("weapon_touch: unknown classname");
+//		objerror ("weapon_touch: unknown classname");
+	{
+		if (Q_100 && Q_100_OBJERR) objerror("weapon_touch: unknown classname");
+		else
+		{
+			if (WARNING)
+			{
+			bprint("\n*** warning:\nweapon_touch: unknown classname (");
+			bprint(self.classname);
+			bprint(") - ignoring\n\n");
+			}
+			self.touch = SUB_Null;
+			return;
+		}
+	}
 
 	sprint (other,"You got the ");
 	sprint (other,self.netname);

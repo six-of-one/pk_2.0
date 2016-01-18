@@ -112,11 +112,11 @@ float R_HELL;
 float R_BLACK;
 float R_ELDER;
 
-float RUNE_FLG_RS			= 1;
-float RUNE_FLG_DM			= 2;
-float RUNE_FLG_HS			= 4;
-float RUNE_FLG_RG			= 8;
-float RUNE_MASK_ALL		= 15; // because manual config must mask of bad bits
+float RUNE_FLG_RS				= 1;
+float RUNE_FLG_DM				= 2;
+float RUNE_FLG_HS				= 4;
+float RUNE_FLG_RG				= 8;
+float RUNE_MASK_ALL			= 15; // because manual config must mask of bad bits
 
 // item override admin
 float DYN_OVR;
@@ -136,12 +136,18 @@ void() start_loopcyc;
 void(float mc, vector vo) fn_make;
 float(string sc, entity e) pk_mcode;
 void() place_item_control;
+void() pic_test;
 float(float mcv, entity e) bit_mcode;
 
 .float mcode;								// map item code - handle sub lists
 .float scode;								// save item code - for restore
 .string sscode;							// map item code string - for find
 string sid_code;							// list of all codes as string, access = (code - 100) * 4;
+///float item_op;								// item operation currently in progress
+///float IT_CALL					= 16;		// op is item call
+///float IT_MAP					= 8;		// op is map call
+
+float EF_FULLBRIGHT			= 512;
 
 // respawn times
 //float RSP_AMMO; // these are dm 3 rules
@@ -149,6 +155,9 @@ string sid_code;							// list of all codes as string, access = (code - 100) * 4
 //float RSP_ITEM;
 //float RSP_WEP;
 //float RSP_ART;
+
+float EXPLBOX_RESP;			// explode box respawn if true
+void() d_barrel;
 
 float RE_LOC					= -666; // relocate restore point if .delay = this - pk_item_position_init
 float RSP_TIME; // respawn time
@@ -278,9 +287,20 @@ void(entity e, float tm) turret_KillStraker;
 float pk_attack;		// bit 1 = can make a pk attack on any map, bit 2 = pk_artifacts attack
 void() use_pkitem; // bots using pk items
 
+float AMMO_SHELLS				= 101; // gun uses this ammo type
+float AMMO_NAILS				= 103;
+float AMMO_ROCKETS			= 105;
+float AMMO_CELLS				= 107;
+
 // viswep
 float qweps, pkweps; // inventory bit masks for weps
 .entity vwepent; // vis wep entity pointers
+.entity eweapon; // vis wep pointer
+.string vwepmdl; // visible weapon model load
+.void() _attack; // fires weapon - null if fire from frames
+.void() _fr_attack; // starts frame set
+void() e_weap_Attack;
+
 void() viswep_post;
 void() viswep_pre;
 void(entity vh, float cd) viswep_ld;

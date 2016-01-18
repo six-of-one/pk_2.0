@@ -766,6 +766,7 @@ void() pk_liveupd =
 	RSP_TIME = cvar("sv_c_rsp_time");
 	POW_TIME = cvar("sv_c_pow_time");
 
+	EXPLBOX_RESP = cvar("pk_explbox_resp");
 
 // cam stuff
 	DCAMTO = cvar("sv_cam_timeout");
@@ -1051,6 +1052,8 @@ void() pk_srvcmd_set =
 	RSP_TIME = 30;
 	POW_TIME = 30;
 
+	EXPLBOX_RESP = 1;
+
 // q1 ammo
 	Q1_SHELLAMMO_MAX				= 100;
 	Q1_NAILAMMO_MAX					= 200;
@@ -1183,6 +1186,8 @@ void() pk_srvcmd_set =
 		registercvar("pk_dyn_art_force", "0"); // force artifacts on map if no dynamic spawner, if spawner exists this is the same as pk_dyn_art
 		registercvar("pk_dyn_force_cnt", "6"); // max force cnt - because forcing can exceed load max for dyn items
 		registercvar("pk_dyn_func_stop", "0"); // stop func_dynitem operation
+
+		registercvar("pk_explbox_resp", "1"); // respawn boom boxes / barrels
 
 // pk items
 		registercvar("pk_bt_time", "90"); // time for beartraps to live

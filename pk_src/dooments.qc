@@ -5,10 +5,8 @@
 */
 // map item indiv reposition codes
 
-float EF_FULLBRIGHT			= 512;
-
-float HEAL_BOT						= 4; // doom health bottle - ignore normal max, no rot
-float HEAL_SOUL					= 5; // doom health: soul, meta spheres - 200 max, no rot
+float HEAL_BOT					= 4; // doom health bottle - ignore normal max, no rot
+float HEAL_SOUL				= 5; // doom health: soul, mega spheres - 200 max, no rot
 
 float ARM_SPIRIT				= 1; // doom spirit armor
 
@@ -40,6 +38,11 @@ float D_DEF_BLAST				= 2;
 float D_BARREL_BLAST			= 128;
 
 float D_POWER_WAIT			= 60; // seconds major doom powers need to respawn
+
+float d_reps_base				= 57005000; // heh heh - DEAD+
+void () d_thk_reps;
+float() mega_touch;
+void() d_weapon_touch;
 
 void() doom_precache =
 {
@@ -146,53 +149,6 @@ void() doom_precache =
 
 };
 
-//fn(d_thk_reps) - some guns wont appear in map if in correct position - have to load elsewhere and move later
-
-float d_reps_base				= 57005000; // heh heh - DEAD+
-
-void () d_thk_reps =
-{
-	local entity t;
-
-	t = find (world, targetname, self.owner.target);
-	if (t)
-	{
-		setorigin(self.owner, t.origin);
-		self.owner.oldorigin = t.origin;
-	}
-};
-
-float() mega_touch =
-{
-//	health_touch();
-//	armor_touch();
-
-	local float arm, hl;
-	arm = hl = 1;
-
-// supply armor
-	if (other.armorvalue < self.currentammo)
-	{
-			arm = 0; // got armor portion of mega sphere
-			other.armortype = self.state;
-			other.armorvalue = self.currentammo;
-			other.items = other.items - (other.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3)) + self.items;
-		
-	}
-
-// supply health
-	if (T_Heal(other, self.healamount, 1))
-	{
-		if (self.healtype == HEAL_SOUL)
-		if (other.health >= D_SOUL_MAX) // * other.health_modifier)
-			other.health = D_SOUL_MAX; // * other.health_modifier;
-	hl = 0;
-	}
-
-	return(arm & hl);
-};
-
-
 /*
 		+---------------------------------------+
 		|  Map code - Doom                     | SEC-HEAD
@@ -205,7 +161,6 @@ NOTE: this code assumes the translation of doom map entites to quake style defin
 
  uses ypod models for now - may recraft many of these...at least the easy ones
 
-NOTE: there is no entites file for doom in the style of QUAKED
 */
 
 
@@ -329,7 +284,7 @@ void() d_ammo_1rocket =
 	setmodel (self, "progs/d_1rocket.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
-	self.netname = "A Rocket";
+	self.netname = "Rocket";
 	self.currentammo = D_DEF_ROCKETS_SM;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 };
@@ -401,37 +356,10 @@ void() d_ammo_cellpack =
 
 void() d_barrel =
 {
-	local float z1;
-//	misc_explobox();
-	self.solid = SOLID_BBOX;
-	self.movetype = MOVETYPE_TOSS;
-	self.health = 20;
-	self.th_die = barrel_explode;
-	self.takedamage = DAMAGE_AIM;
-
-	self.origin_z = self.origin_z + 2;
-	z1 = self.origin_z;
-	droptofloor(0,0); // Cataboligne 9.17.3 - fix compiler warning
-	if (z1 - self.origin_z > 250)
-	{
-		dprint ("Barrel fell out of level at ");
-		dprint (vtos (self.origin));
-		dprint ("\n");
-		if (PK_100 || Q_100)
-		{
-			remove (self);
-			return ;
-		}
-		else
-			dtf_handle();
-	}
-
-	setmodel (self, "progs/barrel.mdl");
-//	misc_explodbox_set(self, "progs/barrel.mdl", D_BARREL_BLAST + random() * 8, 20 + random() * 15);
 	self.noise = "doom/dsbarexp.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Barrel";
-//	self.currentammo = D_BARREL_BLAST;
+	misc_explodbox_set(self, "progs/barrel.mdl", D_BARREL_BLAST + random() * 8, 20 + random() * 15, MOVETYPE_NONE);
 //	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 };
 
@@ -457,14 +385,25 @@ void() d_weapon_rocketlauncher =
 	mcc = item_by_mcode(MC_ROCKETL);
 	item_call(mcc);
 
+// fn
+	self.touch = d_weapon_touch;
+	self._attack = W_FireRocket;
+	self._fr_attack = player_rocket1;
+// stats
+	self.currentammo = D_DEF_BLAST;
+	self.items = IT_ROCKET_LAUNCHER;
+	self.weaponframe = AMMO_ROCKETS;
+	self.attack_finished = 0.8;
+	self.dmg = 120;
+	self.dmg_save = 1;
+
+// appearances
 	setmodel (self, "progs/d_rock.mdl");
 	self.weaponmodel = "progs/v_d_rock.mdl";
-//	self.vwep = "progs/vw_d_rock.mdl";
+	self.vwepmdl = "progs/vw_d_rock.mdl";
 	self.noise = "doom/dswpnup.wav";
 	self.noise3 = "doom/dsrlaunc.wav";
 	self.noise4 = "doom/dsitembk.wav";
-	self.currentammo = D_DEF_BLAST;
-//	self._hk_major = W_FireRocket;
 };
 
 void() d_weapon_chaingun =
@@ -644,7 +583,7 @@ void() d_art_invisible =
 	self.skin = 3;
 	self.netname = "Invisibilty";
 	self.wait = D_POWER_WAIT;
-	self.delay = 30; // usage time
+	self.delay = POW_TIME; // usage time
 };
 
 void() d_art_radsuit =
@@ -655,7 +594,7 @@ void() d_art_radsuit =
 	item_call(mcc);
 	self.noise = "doom/dsitemup.wav"; // radsuit finish sounds, proper op
 	setmodel (self, "progs/d_radsuit.mdl");
-	self.delay = 30;
+	self.delay = POW_TIME;
 	self.netname = "Radiation Suit";
 	self.wait = D_POWER_WAIT;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
@@ -769,22 +708,42 @@ void() w_weapon_chaingun =
 	self.punchangle = ' 0.065 0.065 0'; // bullet spread out
 };
 
+void() w_fire_motar =
+{
+	W_FireGrenade();
+
+	newmis.touch = T_MissileTouch;
+	newmis.velocity = newmis.velocity * 1.8;
+};
+
 void() w_weapon_mortar =
 {
 	local string mcc;
 	mcc = item_by_mcode(MC_ROCKETL);
 	item_call(mcc);
 
+// fn
+	self.touch = d_weapon_touch;
+	self._attack = w_fire_motar;
+	self._fr_attack = player_rocket1;
+// stats
+	self.currentammo = 5; // W_DEF_BLAST;
+	self.items = IT_ROCKET_LAUNCHER;
+	self.weaponframe = AMMO_ROCKETS;
+	self.attack_finished = 0.8;
+	self.dmg = 120;
+	self.dmg_save = 1;
+// appearances
 	self.netname = "Mortar";
 	setmodel (self, "progs/w_mortar.mdl");
 	self.weaponmodel = "progs/v_w_mortar.mdl";
-//	self.vwep = "progs/vw_w_mortar.mdl";
-//	self.noise3 = "wolf/w_mg.wav";
+	self.vwepmdl = "progs/vw_w_mortar.mdl";
 	self.noise = "wolf/pickup_gn.wav";
+//	self.noise3 = "wolf/w_mg.wav";
 	self.noise3 = "doom/dsrlaunc.wav";
 	self.noise4 = "doom/dsitembk.wav";
+
 	self.effects = self.effects | EF_FULLBRIGHT;
-	self.currentammo = 5; // W_DEF_BLAST;
 };
 
 void() w_weapon_flamer =
@@ -819,3 +778,186 @@ void() w_weapon_pistol =
 	self.attack_finished = 0.465; // 2.15 per
 	self.effects = self.effects | EF_FULLBRIGHT;
 };
+
+// code to run doom ents
+
+
+//fn(d_thk_reps) - some guns wont appear in map if in correct position - have to load elsewhere and move later
+
+void () d_thk_reps =
+{
+	local entity t;
+
+	t = find (world, targetname, self.owner.target);
+	if (t)
+	{
+		setorigin(self.owner, t.origin);
+		self.owner.oldorigin = t.origin;
+	}
+};
+
+float() mega_touch =
+{
+//	health_touch();
+//	armor_touch();
+
+	local float arm, hl;
+	arm = hl = 1;
+
+// supply armor
+	if (other.armorvalue < self.currentammo)
+	{
+			arm = 0; // got armor portion of mega sphere
+			other.armortype = self.state;
+			other.armorvalue = self.currentammo;
+			other.items = other.items - (other.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3)) + self.items;
+		
+	}
+
+// supply health
+	if (T_Heal(other, self.healamount, 1))
+	{
+		if (self.healtype == HEAL_SOUL)
+		if (other.health >= D_SOUL_MAX) // * other.health_modifier)
+			other.health = D_SOUL_MAX; // * other.health_modifier;
+	hl = 0;
+	}
+
+	return(arm & hl);
+};
+
+void() d_weapon_touch =
+{
+	local	float best, new, oldw, camc;
+	local	entity e;
+	local float leave;
+
+	if (other.classname != "player") // *bot
+	{
+		grap_checkIfGrap();
+		return ;
+	}
+
+// if the player was using his best weapon, change up to the new one if better
+	e = self;
+	self = other;
+	best = W_BestWeapon ();
+	self = e;
+
+	if (deathmatch == 2 || deathmatch == 3 || coop)
+		leave = 1;
+	else
+		leave = 0;
+
+// IDEA - always leave for another rl type
+	if (leave && (other.items & self.items))	return ;
+	new = self.items;
+
+	if (self.classname == "weapon_rocketlauncher")
+	{
+	other.ammo_rockets = other.ammo_rockets + self.currentammo; // TDO: ammo type fn
+	camc = other.ammo_rockets;
+	}
+	else
+	{
+		if (PK_100 && PK_100_OBJERR) objerror("d_weapon_touch: unknown classname");
+		else
+		{
+			if (WARNING)
+			{
+			bprint("\n*** warning:\nd_weapon_touch: unknown classname (");
+			bprint(self.classname);
+			bprint(") - ignoring\n\n");
+			}
+			self.touch = SUB_Null;
+			return;
+		}
+	}
+
+	if (!vchk(new, 0, other.vwepent))
+	{
+		e = vload(other, new);
+		e.eweapon = e;
+		e._attack = self._attack;
+		e._fr_attack = self._fr_attack;
+//		e.touch = self.touch;
+
+		e.weapon = e.items = self.items;
+		e.currentammo = self.currentammo;
+		e.weaponframe = self.weaponframe;
+		e.attack_finished = self.attack_finished;
+		e.dmg = self.dmg;
+		e.dmg_save = self.dmg_save;
+		e.aflag = camc;
+
+		e.netname = self.netname;
+		setmodel (e, self.vwepmdl);
+		e.weaponmodel = self.weaponmodel;
+		e.noise3 = self.noise3;
+		e.noise = self.noise;
+		e.noise4 = self.noise4;
+	}
+
+	sprint (other,"You got the ");
+	sprint (other,self.netname);
+	sprint (other,"\n");
+// weapon touch sound
+	if (self.noise != "")
+		sound (other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
+	else
+		sound (other, CHAN_ITEM, "weapons/pkup.wav", 1, ATTN_NORM);
+	stuffcmd (other, "bf\n");
+
+	bound_other_ammo ();
+
+	oldw = other.items;
+	other.items = other.items | new;
+
+	e = self;
+	self = other;
+
+// PK-NOTE: "old" variable above does nothing...what was iD's plan for it?
+	if (!Q_100)
+		PK_Deathmatch_Weapon (new, 0); // *pk - new wep switch rule for higher risk weps
+	else
+	if (!deathmatch)
+		self.weapon = new;
+	else
+		Deathmatch_Weapon (oldw, new);
+
+	W_SetCurrentAmmo ();
+
+	self = e;
+
+	if (leave)
+		return;
+
+// remove it in single player, or setup for respawning in deathmatch
+	self.model = string_null;
+	self.solid = SOLID_NOT;
+	if (deathmatch == 1)
+		self.nextthink = time + RSP_TIME;
+	self.think = SUB_regen;
+
+	activator = other;
+	SUB_UseTargets();				// fire all targets / killtargets
+};
+
+void() e_weap_Attack =
+{
+	local entity e;
+
+	e = self.eweapon;
+
+	if (rune_haste(e.attack_finished / 2))
+		self.attack_finished = time + e.attack_finished;
+
+	if (e._attack != SUB_Null) e._attack();
+	if (e._fr_attack != SUB_Null) e._fr_attack();
+	if (e.noise3 != "")
+		sound (self, CHAN_WEAPON, e.noise3, 1, ATTN_NORM);
+	e.aflag = self.currentammo;
+
+	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
+};
+
