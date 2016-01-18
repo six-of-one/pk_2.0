@@ -282,6 +282,13 @@ void () cam_deathmove =
 		self.owner.effects = self.owner.items = 0; // self.owner.frame = 
 //		self.owner.items = self.owner.items - (self.owner.items & (IT_QUAD | IT_SUIT | IT_INVISIBILITY | IT_INVULNERABILITY));
 		self.owner.weapon = self.owner.currentammo = self.owner.ammo_shells = self.owner.ammo_nails = self.owner.ammo_rockets = self.owner.ammo_cells = 0;
+		self.owner.eweapon = world;
+		self.owner.pkprevweapon = self.owner.pklastweapon = self.owner.prevweapon = self.owner.lastweapon = 0;
+// remove pk items & ammos
+		self.owner.pkplus_egoammo = self.owner.pkplus_tombammo = self.owner.pkplus_actorammo = self.owner.pkplus_phoneammo = 0;
+		self.owner.pk_gravitywellammo = self.owner.pk_turretammo = self.owner.pk_canpabammo = self.owner.pk_beartrapammo = self.owner.pk_explode_ammo = 0;
+// remove x items & ammos
+		self.owner.x_items = self.owner.ammo_bullet = self.owner.ammo_slug = self.owner.ammo_gaspr = self.owner.ammo_hgrenade = 0;
 	}
 
 	if (self.owner.model != "progs/null.mdl")

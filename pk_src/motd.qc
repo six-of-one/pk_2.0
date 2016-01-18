@@ -133,6 +133,9 @@ void() updateStatusDisplay =
 {
 	local string Line3,Line5;
 
+	if (self.classname == "pk*bot" || !self.ishuman) // bots dont get status update
+		return;
+
 	if (inHubMap) // Cataboligne - 8.22.9 - custom hubs can cause this message on non pk / non hub maps
 	if (self.msgcount <= MOTDTIME)
 	{

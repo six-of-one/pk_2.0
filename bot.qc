@@ -101,12 +101,13 @@ void(entity who) UpdateClient =
 
 // fn(IROBOT) - return true if passed ent is a bot - meant to be a bot catch all
 
-// e - ent to test
+// e - ent to test, see if he's a canner (or yul brynner)
 
 float(entity e) IROBOT =
 {
 	float c;
-
+	
+	if (!e) return(FALSE); // testing world
 	if (!e.ishuman && e.classname == "player") c = TRUE; // frikbot found
 	else if (e.classname == "pk*bot") c = TRUE; // pk*bot found
 	else c = FALSE; // maybe human, maybe vegetable, maybe mineral, but not a bot
@@ -192,6 +193,79 @@ float () getrandombotskin =
 	}
 };
 
+// *bot - admin control over bots only for darkplaces & chaos - called by bot code on a think when pk*bots are added or removed
+
+void() bot_saveData =
+{
+	local float offset, toffset, team1;
+	local float nb, nt, pk12, pk13;
+	local entity e;
+
+	e = find(world,classname,"pk*bot");
+	offset = toffset = 1;
+	pk12 = pk13 = 0;
+	team1 = 100;
+	nb = nt = 0;
+	while (e)
+	{
+		if (e.team == 99)
+		{
+			nb = (nb + 1);
+			if (nb < BOT_SAVE_SKILL)
+			{
+				pk12 = (pk12 + ((offset * e.skil) & (offset * 3)));
+
+
+
+if (WARNING)
+{
+	bprint("\n*** dp/c change parms: bot (");
+	bprint(e.netname);
+	bprint(") skill (");
+	bprint(ftos(e.skil));
+	bprint(") stored (");
+	bprint(ftos(pk12));
+	bprint(") \n");
+}
+
+				offset = (offset * 4);
+			}
+		}
+		else
+		{
+			if (team1 == 100)
+			{
+				team1 = e.team;
+			}
+			if (e.team == team1)
+			{
+				nt = (nt + 1);
+				if (nt < BOT_SAVE_SKILL)
+				{
+				pk13 = (pk13 + ((toffset * e.skil) & (toffset * 3)));
+				toffset = (toffset * 4);
+				}
+			}
+		}
+		e = find (e,classname,"pk*bot");
+	}
+
+
+
+if (WARNING)
+{
+	bprint("\n*** bot data set - p12 (");
+	bprint(ftos(pk12));
+	bprint(") p13 (");
+	bprint(ftos(pk13));
+	bprint(") \n");
+}
+
+
+
+	cvar_set("sv_bot_pk", ftos(pk12));
+	cvar_set("sv_bot_pktm", ftos(pk13));
+};
 
 //	*bot skin code - not sure to include - requiers parm mod
 
@@ -203,20 +277,19 @@ void() bot_skinParms =
 	}
 };
 
-//encode bot details for level change
+//encode bot details for level change - allow pk*bots to work on other game engines - TEST
 
 void() bot_changeParms =
 {
 	local float offset, toffset, team1;
-	local float nb, nt, pk12, pk13;
+	local float nb, nt;
 	local entity e;
+
+	if (DARKPLACES || chaos) return;
 
 	e = find(world,classname,"pk*bot");
 	offset = toffset = 1;
-	if (DARKPLACES || chaos)
-		pk12 = pk13 = 0;
-	else
-		parm12 = parm13 = 0; // tuned for painkeep merge
+	parm12 = parm13 = 0; // tuned for painkeep merge
 	team1 = 100;
 	nb = nt = 0;
 	while (e)
@@ -227,10 +300,21 @@ void() bot_changeParms =
 			if (nb < BOT_SAVE_SKILL)
 			{
 //				parm12 = (parm12 + (((offset * e.skil) * 10) & (offset * 31)));
-				if (DARKPLACES || chaos)
-					pk12 = (pk12 + ((offset * e.skil) & (offset * 3)));
-				else
-					parm12 = (parm12 + ((offset * e.skil) & (offset * 3)));
+				parm12 = (parm12 + ((offset * e.skil) & (offset * 3)));
+
+
+
+if (WARNING)
+{
+	bprint("\n*** std change parms: bot (");
+	bprint(e.netname);
+	bprint(") skill (");
+	bprint(ftos(e.skil));
+	bprint(") stored (");
+	bprint(ftos(parm12));
+	bprint(") \n");
+}
+
 				offset = (offset * 4);
 			}
 		}
@@ -246,20 +330,12 @@ void() bot_changeParms =
 				if (nt < BOT_SAVE_SKILL)
 				{
 //				parm13 = (parm13 + (((toffset * e.skil) * 10) & (toffset * 31)));
-				if (DARKPLACES || chaos)
-					pk13 = (pk13 + ((toffset * e.skil) & (toffset * 3)));
-				else
-					parm13 = (parm13 + ((toffset * e.skil) & (toffset * 3)));
+				parm13 = (parm13 + ((toffset * e.skil) & (toffset * 3)));
 				toffset = (toffset * 4);
 				}
 			}
 		}
 		e = find (e,classname,"pk*bot");
-	}
-	if (DARKPLACES || chaos)
-	{
-		cvar_set("sv_bot_pk", ftos(pk12));
-		cvar_set("sv_bot_pktm", ftos(pk13));
 	}
 };
 
@@ -307,7 +383,6 @@ void() set_initBotLevel =
 		{
 			e.cnt = pk12;
 			e.count = pk13;
-			cvar_set("sv_bot_pkset", "0");
 		}
 		else
 		{
@@ -315,6 +390,7 @@ void() set_initBotLevel =
 			e.count = parm13;
 		}
 	}
+	cvar_set("sv_bot_pkset", "0");
 
 // from prev fn() - set_CarriedPath
 	if (self.movetarget == world)
@@ -571,7 +647,7 @@ void(entity e) bot_BackpackSetup =
 	e.classname = "Backpack"; // *bot backpack code follows
 	e.th_weight = backpackweight;
 	e.state = BOT_TOUCHED;
-	if (PK || custom_hub_loaded) e.touch = painkeep_touch; // *pk
+	if (!Q_100) e.touch = painkeep_touch; // *pk
 }
 
 // remove item hooks & put here - code diverts here from PlaceItem

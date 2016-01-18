@@ -1183,7 +1183,7 @@ void() pk_special_impulse =
 		// '\n'
 		WriteB3(MSG_ONE, 10);
 
-		if (PK_ART) pk_art_prinv(); // Cataboligne 8.12.9 purify - pk artifacts
+		pk_art_prinv(); // Cataboligne 8.12.9 purify - pk artifacts
 
 		if (self.pk_items & PK_IT_GRAPGUN)
 		{

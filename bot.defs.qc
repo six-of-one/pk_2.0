@@ -2,53 +2,56 @@
 // bot consts & protos
 // **************************************
 
-float MSG_UPDATENAME		= 13;
+float MSG_UPDATENAME			= 13;
 float MSG_UPDATEFRAGS		= 14;
 float MSG_UPDATECOLORS		= 17;
 
-float FL_OBSERVER			= 65536; // flag for observer restrict
 float observer_time;			// time limit for observer mode
-float UNRESTRICTED			= 4096; // admin - allow anyone to issue bot impulse commands
 
 // if .state ==, call cacheRoute when touching this item
-float CACHE_ROUTE_TOUCH	= -1559742;
+float CACHE_ROUTE_TOUCH		= -1559742;
 // if .state ==, call  bot_toucheditem when touching this item
-float BOT_TOUCHED			= -2479551;
+float BOT_TOUCHED				= -2479551;
 // do both
 float BOT_TOUCHED_CACHE_ROUTE_TOUCH	= -4039293;
 
-float BOT_SAVE_SKILL		= 12; // number of bots that can save skill between levels for 1 players parms
+float BOT_SAVE_SKILL			= 12; // number of bots that can save skill between levels for 1 players parms
+
+// bot mask for flags
+//float UNRESTRICTED			= 4096;
+float BOTS						= 240;		// (serverflags)                 11110000
+float TEAMBOTS					= 3840;		//  (serverflags)            111100000000
+float UNRESTRICTED			= 4096; 		//  (serverflags)           1000000000000 - admin - allow anyone to issue bot impulse commands
+float TEAMFLAG					= 16384;		//  (serverflags)         100000000000000
+float INITLEVEL				= 32768;		//  (serverflags)        1000000000000000 - server - indicate bots need to be spawned after level load
+float FL_OBSERVER				= 65536; 	//  (serverflags)       10000000000000000 - admin - flag for observer restrict
+float DEDICATED				= 4194304;	//  (serverflags) 10000000000000000000000
 
 // orig
-float NORMALSCORE			= 1;
+
+float NORMALSCORE				= 1;
 float MYSCORE					= 2;
 float DONT_WANT				= 0;
 float KINDA_WANT				= 20;
 float WANT						= 35;
 float MUST_HAVE				= 100;
 float SEARCH_RADIUS			= 600;
-float LOOPTIME				= 20;
+float LOOPTIME					= 20;
 float MAXPATHERS				= 16;
 float REGULARTARGET	 		= 0;
 float CARRIED					= 1;
 float DROPPED					= 2;
-float NEVERTARGET			= 3;
-float TELEPORT				= 4;
-float BOTS						= 240;
-float TEAMBOTS				= 3840;
-//float UNRESTRICTED			= 4096;
-float TEAMFLAG				= 16384;
-float INITLEVEL				= 32768;
-float DEDICATED				= 4194304;
+float NEVERTARGET				= 3;
+float TELEPORT					= 4;
 float LOCAL_TIME				= 7;
 float CANTURN					= 1;
 float NOTURN					= 2;
 float STRAFE_DIR				= 16;
-float FAR_SEEK				= 32;
-float WATERUPDOWN			= 64;
+float FAR_SEEK					= 32;
+float WATERUPDOWN				= 64;
 float NODROP					= 128;
 float RUNAWAY					= 256;
-float GETGOODY				= 512;
+float GETGOODY					= 512;
 float ONTRAIN					= 1024;
 float MULTIENEMY				= 2048;
 
@@ -148,7 +151,7 @@ float nearlight;
 //float () FindGood;
 
 // id bots
-float(entity e) IROBOT;
+float(entity e) IROBOT; // whats up canner?
 
 // client links
 float () getrandombotskin;
@@ -199,7 +202,6 @@ void (entity ply, float n) addTeamBots;
 void (entity e, float newskin) skinChange;
 void () NewCarriedPath;
 void (entity a, entity b) addTarget;
-void () initBotLevel;
 void (entity en2) secondEnemy;
 void () bot_toucheditem;
 void (entity node, entity targ, float len, entity item) cacheRoute;

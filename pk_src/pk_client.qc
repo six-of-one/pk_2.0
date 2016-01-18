@@ -199,7 +199,7 @@ void() DecodeLevelParms =
 
 void() PK_GotoNextMap =
 {
-	if (PK && !PK_ADMINMAP)
+	if (!Q_100 && !Q_99 && !PK_ADMINMAP)
 	if (pk_flags & PK_TP_USERMAPON) // *pk - user supplied map loop deal
 	{
 		if (!execed)
@@ -993,7 +993,7 @@ void () PlayerPostThink =
 		}
 
 		if (DARKPLACES || chaos)
-		if (cvar("botlevel")) // hack so alias can load new map & keep pk*bots
+		if (cvar("botlevel")) // hack so alias can load new map & keep pk*bots - set by console command aliases for map & changelevel - bmap & blvl
 		{
 			bot_changelevel(); // map change MUST happen - this clears bots from map!
 	//		bot_changeParms(); // save bots for change
@@ -1592,13 +1592,15 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			}
 			return;
 		}
-		else if (attacker.classname == "CDM") // Cataboligne - 2.20.11 - customized death messages
+		else if (attacker.classname == "CDM" || attacker.class_select == "CDM") // Cataboligne - 2.20.11 - customized death messages
 		{
+			if (attacker.noise1) bprint(attacker.noise1); // pre strings
 			if (attacker.deadflag & 1) bprint(targ.netname); // use targ name
 			if (attacker.netname) bprint(attacker.netname); // main message
-			if (attacker.noise) bprint(targ.noise); // other strings
+			if (attacker.noise) bprint(attacker.noise); // other strings
 			bprint("\n");
 			if (attacker.frags) targ.frags = targ.frags - (attacker.frags * frag_minus(targ)); 
+			if (attacker.deadflag & 2) noenvcide(targ);
 			return;
 		}
 // TURRET_START

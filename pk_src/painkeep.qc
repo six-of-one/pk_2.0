@@ -494,12 +494,23 @@ void(float b) b_launch =
 float st_pk_sfx;			// state vars - so we know when it changes
 float st_pk_hub;
 float st_pk_duty;
+float st_pk_cmap;
 
 // fn(pk_bas_flags) - set basic pk flags, handles cvar update, admin cfg
 //			reworked from old code to include cvar controls with bit flags and handle changes to both
 
 // bt - bit
 // st - state, 1 or 0
+
+// fn(pk_bas_update) - update status of live changes to console
+// brpint cm to console and ON or OFF according to bt state
+
+void(float bt, string cm) pk_bas_update =
+{
+	bprint(cm);
+	if (bt) bprint("ON\n");
+	else bprint("OFF\n");
+};
 
 void(float bt, float st) pk_bas_flags =
 {
@@ -533,6 +544,14 @@ void(float bt, float st) pk_bas_flags =
 		else		pk_flags = pk_flags - (pk_flags & PK_TP_DUTYON);
 		if (DARKPLACES || chaos) cvar_set("sv_pk_duty", ftos(st));
 		st_pk_duty = st;
+	}
+
+	if (bt == PK_TP_USERMAPON) // Cat - 2.28.11 - added to live updates
+	{
+		if (st)	pk_flags = pk_flags | PK_TP_USERMAPON;
+		else		pk_flags = pk_flags - (pk_flags & PK_TP_USERMAPON);
+		if (DARKPLACES || chaos) cvar_set("sv_pk_cmap", ftos(st));
+		st_pk_cmap = st;
 	}
 	admin_sv_cfg();
 };
@@ -609,9 +628,26 @@ void() pk_liveupd =
 
 // pk basics - if a cvar is changed, update status bit
 
-	if (st_pk_sfx != cvar("sv_pk_sfx")) pk_bas_flags(PK_TP_SPARKSFLASH, cvar("sv_pk_sfx"));
-	if (st_pk_hub != cvar("sv_pk_hub")) pk_bas_flags(PK_SF_HUB, cvar("sv_pk_hub"));
-	if (st_pk_duty != cvar("sv_pk_duty")) pk_bas_flags(PK_TP_DUTYON, cvar("sv_pk_duty"));
+	if (st_pk_sfx != cvar("sv_pk_sfx"))
+	{
+		pk_bas_flags(PK_TP_SPARKSFLASH, cvar("sv_pk_sfx"));
+		pk_bas_update(st_pk_sfx, "Painkeep special effects ");
+	}
+	if (st_pk_hub != cvar("sv_pk_hub"))
+	{
+		pk_bas_flags(PK_SF_HUB, cvar("sv_pk_hub"));
+		pk_bas_update(st_pk_hub, "Painkeep Hub mode ");
+	}
+	if (st_pk_duty != cvar("sv_pk_duty"))
+	{
+		pk_bas_flags(PK_TP_DUTYON, cvar("sv_pk_duty"));
+		pk_bas_update(st_pk_duty, "Painkeep duty checking ");
+	}
+	if (st_pk_cmap != cvar("sv_pk_cmap"))
+	{
+		pk_bas_flags(PK_TP_USERMAPON, cvar("sv_pk_cmap"));
+		pk_bas_update(st_pk_cmap, "Painkeep custom server maps ");
+	}
 
 	if (PK_100)
 	{
@@ -874,14 +910,16 @@ void() pk_srvcmd_load =
 
 // set server flag bit stored states
 
-	st_pk_sfx = st_pk_hub = st_pk_duty = 0;
+	st_pk_sfx = st_pk_hub = st_pk_duty = st_pk_cmap = 0;
 	if (!pk_flags & PK_TP_SPARKSFLASH) st_pk_sfx = 1;
 	if (pk_flags & PK_SF_HUB) st_pk_hub = 1;
 	if (pk_flags & PK_TP_DUTYON) st_pk_duty = 1;
+	if (pk_flags & PK_TP_USERMAPON) st_pk_cmap = 1;
 
 	if (st_pk_sfx != cvar("sv_pk_sfx")) pk_bas_flags(PK_TP_SPARKSFLASH, st_pk_sfx);
 	if (st_pk_hub != cvar("sv_pk_hub")) pk_bas_flags(PK_SF_HUB, st_pk_hub);
 	if (st_pk_duty != cvar("sv_pk_duty")) pk_bas_flags(PK_TP_DUTYON, st_pk_duty);
+	if (st_pk_cmap != cvar("sv_pk_cmap")) pk_bas_flags(PK_TP_USERMAPON, st_pk_cmap);
 
 // these all req. map reload for full effectiveness
 	PK_100 = cvar("sv_pk100");
@@ -1159,6 +1197,7 @@ POW_TIME = 30;
 		registercvar("sv_pk_sfx", "1");
 		registercvar("sv_pk_hub", "1");
 		registercvar("sv_pk_duty", "0");
+		registercvar("sv_pk_cmap", "0"); // admin setup custom maps - activate server map loop via pknextmap aliases
 
 // cam controls
 		registercvar("sv_cam_off", "0"); // set to 1 to turn cam off entirely
@@ -1519,8 +1558,13 @@ void() get_teleport_sounds =
 {
 	local	float v;
 
-		v = random() * 4;
-	if (v < 1)
+	v = random() * 4;
+	if (world.wad == "q2.wad")
+	{
+		normalsound = "q2_snd/telep1.wav";
+		reversesound = "q2_snd/telep1.wav";
+	}
+	else if (v < 1)
 	{
 		normalsound = "misc/teleport/tele_1.wav";
 		reversesound = "misc/teleport/tele_1a.wav";

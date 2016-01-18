@@ -90,6 +90,11 @@ float(entity ck, string prv) pk_art_movshot_ck =
 
 void() pk_art_prinv =
 {
+	local float f;
+
+	f = FALSE;
+	if (self.pkplus_egoammo > 0)
+	{
 		WriteB3 (MSG_ONE,2105376);
 		WriteB3 (MSG_ONE,2105376);
 		WriteB3 (MSG_ONE,2105376);
@@ -98,16 +103,28 @@ void() pk_art_prinv =
 		WriteB3 (MSG_ONE,2126703);
 		WriteB3 (MSG_ONE,8250);
 		WriteBFloat (MSG_ONE,self.pkplus_egoammo);
+		f = TRUE;
+	}
+	if (self.pkplus_tombammo > 0)
+	{
 		WriteB3 (MSG_ONE,7296010);
 		WriteB3 (MSG_ONE,7561837);
 		WriteB3 (MSG_ONE,2112032);
 		WriteBFloat (MSG_ONE,self.pkplus_tombammo);
+		f = TRUE;
+	}
+	if (self.pkplus_actorammo > 0)
+	{
 		WriteB3 (MSG_ONE,32);
 		WriteB3 (MSG_ONE,6504714);
 		WriteB3 (MSG_ONE,7499636);
 		WriteB3 (MSG_ONE,3809395);
 		WriteB3 (MSG_ONE,32);
 		WriteBFloat (MSG_ONE,self.pkplus_actorammo);
+		f = TRUE;
+	}
+	if (self.pkplus_phoneammo > 0)
+	{
 		WriteB3 (MSG_ONE,8224);
 		WriteB3 (MSG_ONE,6636298);
 		WriteB3 (MSG_ONE,7695468);
@@ -117,11 +134,16 @@ void() pk_art_prinv =
 		WriteB3 (MSG_ONE,3809395);
 		WriteB3 (MSG_ONE,32);
 		WriteBFloat (MSG_ONE,self.pkplus_phoneammo);
+		f = TRUE;
+	}
+	if (f)
+	{
 		WriteB3 (MSG_ONE,2105376);
 		WriteB3 (MSG_ONE,2105376);
 		WriteB3 (MSG_ONE,2105376);
 		WriteB3 (MSG_ONE,8224);
 		WriteB3 (MSG_ONE,2570);
+	}
 };
 
 // fn(pk_art_precache) - load er up

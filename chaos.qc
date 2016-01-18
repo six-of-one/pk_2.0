@@ -757,3 +757,202 @@ void(float tm, string l1, string l2, string l3, string l4, string l5, float f1, 
 }
 
 // spawn_infot(1, "", "",  "",  "",  "", 0, 0, 0, 0, v0, 0);
+
+/*QUAKED trigger_hurt_switch (.5 .5 .5) ? START_OFF
+Switchable - when target is called .touch will toggle
+wait - time between toggles, if -1 switch is disabled after 1 call
+delay - time elapse before toggle when target called
+Any object touching this will be hurt
+set dmg to damage amount
+defalt dmg = 5
+frags - take away this many upon death, default 0
+noise*  - custom death messages to give
+
+spawnflags & 1 - start off
+deadflag & 2 - use noenvcide if enabled - frags must be set, default is 1
+
+custom message = self.noise - one obituary string
+deadflag & 1 - print target name first
+random:
+noise2, noise3, noise4 - string for obituary
+cnt = rnd chance of 2 vs 3 - default 50%
+style = separate rnd chance of 4 if set - default 10%
+*/
+void() InitTrigger;
+void () hurt_touch;
+
+void() hurt_switch =
+{
+	if (self.classname == "hurt_trigger_delay") // delayed effect
+	{
+		if (self.enemy)
+		if (self.enemy.touch == hurt_touch)
+			self.enemy.touch = SUB_Nop;
+		else
+			self.enemy.touch = hurt_touch;
+		remove(self);
+		return;
+	}
+
+	if (self.attack_finished > time) return; // cant toggle right now
+
+// setup msg - done in map ent
+//	self.deadflag = self.deadflag | 1;
+	if (self.noise2 != "" && self.noise3 != "")
+	{
+		if (self.cnt <= 0) self.cnt = 0.5;
+		if (self.style <= 0) self.style = 0.1;
+		if (random() < self.cnt)
+			self.noise = self.noise2; //" turned into hot slag";
+		else
+			self.noise = self.noise3; // " visits the Volcano God";
+		if (self.noise4 != "")
+		if (random() < self.style)
+			self.noise = self.noise4; // " is playing geologist again";
+	}
+	else
+	if (self.noise == "" && self.noise2 != "" || self.noise3 != "")
+	{
+		if (self.noise2 != "") self.noise = self.noise2;
+		if (self.noise3 != "") self.noise = self.noise3;
+	}
+	if (self.noise != "")
+		self.class_select = "CDM"; // custom death msg
+
+	if (self.wait)
+	{
+		if (self.wait < 0)
+			self.use = SUB_Nop;
+		else
+			self.attack_finished = time + self.wait;
+	}
+
+	if (self.delay)
+	{
+		local entity e;
+		e = spawn();
+		e.classname = "hurt_trigger_delay";
+		e.think = hurt_switch;
+		e.nextthink = time + self.delay;
+		e.enemy = self;
+		return;
+	}
+
+	if (self.touch == hurt_touch)
+		self.touch = SUB_Nop;
+	else
+		self.touch = hurt_touch;
+};
+
+void () trigger_hurt_switch =
+{
+	InitTrigger ();
+	if ((self.spawnflags & 1) && self.targetname != "") // if no targetname is given this becomes a regular hurt trigger!
+		self.touch = SUB_Nop;
+	else
+		self.touch = hurt_touch;
+
+	if (!self.dmg)
+		self.dmg = 5;
+
+	if (self.deadflag & 2)
+	if (!self.frags)
+		self.frags = 1;
+
+	if (self.targetname)
+		self.use = hurt_switch;
+};
+
+/*QUAKED func_fallingwater (0 .5 .8) ?
+moving water illusion - only vertical for now
+appx moving liquid from q2
+Toggle - if targetname set, wait at each end for trigger
+normal - cycle is to move distance then move back in speed time each way
+
+"speed" is how long in seconds it to complete move
+"height" is dist to move - if 0 size_z of model is used (+ lip)
+"lip" added to move distance (height)
+"cnt" - units to move in one time segment - default 1, -1 reverses dir (down)
+"ltime" - time segment to move cnt - calculated from speed & dist if not set
+"delay" - time before triggered move takes place
+"wait" - if not toggled time till return starts, -1 stops, default 1
+"target" - if set gets fired at end of travel
+"killtarget" - hurt trigger will be moved with fallingwater model
+*/
+void() fallingwater_fire;
+
+void() fallingwater_think =
+{
+	local vector v1;
+
+	if (self.state == self.count)
+	{
+		SUB_UseTargets (); // anything we targeted
+
+		if (self.wait < 0) return;
+		if (self.use != fallingwater_fire)
+		{
+			self.nextthink = time + self.wait;
+		}
+		self.state = 0;
+		self.cnt = 0 - self.cnt; // reverse dir
+//		if (self.style >= 1)
+//		{
+//			self.style = self.style - 1;
+//			self.nextthink = time  + self.delay + self.ltime; // fire again - got triggered while moving
+//		}
+		return;
+	}
+	v1 = v0;
+	v1_z = self.cnt;
+	setorigin(self, self.origin + v1);
+//	if (self.killtarget != "") self.enemy = find (world, targetname, self.killtarget);
+//	if (self.enemy) setorigin(self.enemy, self.origin); // move sibling hurt trigger - .enemy should be vetted
+	self.state = self.state  + 1;
+	self.nextthink = time + self.ltime;
+};
+
+void() fallingwater_fire =
+{
+	if (self.state) // dont fire when moving
+	{
+//		if (self.style < 1) self.style = 0;
+//		self.style = self.style + 1; // we want to fire again when done
+		return;
+	}
+	if (self.delay)
+		self.nextthink = time + self.delay;
+	else
+ 		fallingwater_think();
+};
+
+void() func_fallingwater =
+{
+	self.angles = '0 0 0';
+	self.movetype = MOVETYPE_NONE;
+	self.solid = SOLID_NOT;
+	setmodel (self,self.model);
+	self.think = fallingwater_think;
+	self.nextthink = -1;
+
+	if (self.targetname != "")
+		self.use = fallingwater_fire;
+
+	if ( !self.height ) self.height = self.size_z;
+	self.height = fabs(self.height);
+	self.distance = fabs(self.height + self.lip); // actual move dist
+	self.speed = fabs(self.speed);
+	if ( !self.cnt ) self.cnt = 1;
+	if (self.wait < 1) self.wait = 1;
+	self.style = self.state = 0; // state - track actual move units
+	self.count = floor(self.distance / fabs(self.cnt)); // total movement units
+	if (!self.ltime)
+	{
+		self.ltime = self.speed / self.count; // time for each move
+	}
+
+	if (self.use != fallingwater_fire)
+	{
+		self.nextthink = time + 2 * random();
+	}
+};

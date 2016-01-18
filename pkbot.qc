@@ -689,7 +689,6 @@ void () BotDead =
 {
 	self.deadflag = DEAD_DEAD;
 
-// ISSUE - moving corpse to respawn point somehow !?
 	if (bot_vote(0.7)) return;
 
 	self.nextthink = ((time + 0.3) + ((random () * (NUMBOTS + 3)) * 0.1));

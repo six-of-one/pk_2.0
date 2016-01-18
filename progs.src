@@ -84,6 +84,7 @@ hipnotic/hammer.qc
 hipnotic/laser_cannon.qc
 hipnotic/proxmine.qc
 hipnotic/hipnoticents.qc
+hipnotic/hipwater.qc
 
 // runes
 runes.qc

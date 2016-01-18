@@ -101,7 +101,7 @@ float (entity e) triggerweight =
 	local float rnd;
 	weight = (KINDA_WANT - 2);
 	rnd = random ();
-	if (PK)
+//	if (PK)
 	if (e.classname == "hub_teleport")
 	if (world.message == "hub") // *pk - bots need to see hub portals when on hub
 	if (self.map == "")

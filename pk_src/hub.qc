@@ -77,30 +77,38 @@ void() hub_teleport_touch =
 	self.cnt = self.cnt + 1;
 
 	// check to see if everyone has finished
-	spot = find(world, classname, "player");
-	local float notDone;
 	local string srch;
-	srch = "player";
-	notDone = 0;
-	while (spot != world)
-	{
-		if ((spot.disconnectPlayer == 0 || !spot.ishuman) && spot.map == "")
-			notDone = 1;
-		spot = find(spot, classname, srch);
+	spot = find(world, classname, "player");
+	if (!spot)
+		{
+			srch = OBSERVER;
+			spot = find(world, classname, srch);
+		}
 		if (!spot)
-		if (srch != "pk*bot" && srch != OBSERVER) // *bot - search out bots too
 		{
 			srch = "pk*bot";
 			spot = find(world, classname, srch);
 		}
-
-/// sad but true - ignoring observers (scc) because they can't trigger hub vote portal
-//		if (!spot)
-//		if (srch == "pk*bot") // find jafo now
-//		{
-//			srch = OBSERVER;
-//			spot = find(world, classname, srch);
-//		}
+	local float notDone;
+	srch = "player";
+	notDone = 0;
+	while (spot != world)
+	{
+		if ((spot.disconnectPlayer == 0) && spot.map == "")
+			notDone = 1;
+		spot = find(spot, classname, srch);
+		if (!spot)
+		if (srch == "player") // atp all players should be jafo already
+		{
+			srch = OBSERVER;
+			spot = find(world, classname, srch);
+		}
+		if (!spot)
+		if (srch == OBSERVER) // *bot - search out bots too
+		{
+			srch = "pk*bot";
+			spot = find(world, classname, srch);
+		}
 
 	}
 
@@ -548,6 +556,8 @@ void(float maxplayers, float votecast, float timemins, float timesec) playerVote
 float hubStartTime;
 void() hub_control_status =
 {
+	if (!self.ishuman) return;
+
 	// print some information
 	getHighestScores();
 
@@ -577,8 +587,6 @@ void() hub_control_status =
 				str2 = first.map;
 			}
 
-			if (self.classname != "pk*bot" && (!FRIKBOT ||self.ishuman))
-			{
 			if (self.map == string_null)
 			{
 				str3 = ftos(first.cnt);
@@ -588,7 +596,6 @@ void() hub_control_status =
 			{
 				str3 = ftos(first.cnt);
 				centerprint7(self, "\n\n\n\n\n\n\n\n\n\n\nYou Voted For: ", str1, "			 Lead: ", str2, " [", str3, "]");
-			}
 			}
 
 			self.attack_state = 1;
@@ -610,8 +617,6 @@ void() hub_control_status =
 				str2 = second.map;
 			}
 
-			if (self.classname != "pk*bot" && (!FRIKBOT ||self.ishuman))
-			{
 			if (self.map == string_null)
 			{
 				str3 = ftos(second.cnt);
@@ -621,7 +626,6 @@ void() hub_control_status =
 			{
 				str3 = ftos(second.cnt);
 				centerprint7(self, "\n\n\n\n\n\n\n\n\n\n\nYou Voted For: ", str1, "		 Second: ", str2, " [", str3, "]");
-			}
 			}
 			self.attack_state = 2;
 			return;
@@ -646,6 +650,16 @@ void() hub_control_status =
 		// count the numbeer of votes cast
 		srch = "player"; // *bot
 		pl = find(world, classname, "player");
+		if (!pl)
+		{
+			srch = OBSERVER;
+			pl = find(world, classname, srch);
+		}
+		if (!pl) // this shouldnt ever be possible! - even on a dedicated server running only pk*s
+		{
+			srch = "pk*bot";
+			pl = find(world, classname, srch);
+		}
 		maxplayers = votecast = 0;
 		while (pl != world)
 		{
@@ -659,19 +673,18 @@ void() hub_control_status =
 
 			pl = find(pl, classname, srch);
 			if (!pl)
-			if (srch != "pk*bot" && srch != OBSERVER) // *bot - search out bots too
-			{
-				srch = "pk*bot";
-				pl = find(world, classname, srch);
-			}
-			if (!pl)
-			if (srch == "pk*bot") // find jafo now
+			if (srch == "player") // find jafo now
 			{
 				srch = OBSERVER;
 				pl = find(world, classname, srch);
 			}
+			if (!pl)
+			if (srch == OBSERVER) // *bot - search out bots too
+			{
+				srch = "pk*bot";
+				pl = find(world, classname, srch);
+			}
 		}
-
 		playerVotesTimeLeft(maxplayers, votecast, timemins, timedef);
 
 		self.attack_state = 0;
@@ -944,7 +957,7 @@ void(string mapName) findAndPrintMapName =
 	}
 	else
 	{
-		if (PK_ART)
+//		if (PK_ART)
 			if (pk_art_hubmapmsg(mapName)) // Cataboligne 8.19.9 purify - pk artifacts
 				return;
 
@@ -1174,6 +1187,23 @@ void() WaitForVotesThink =
 	if (self.voteIntermission == 0)
 		return;
 
+// NOTE: bots only come here if they touched a vote portal
+	if (self.classname == "pk*bot" || !self.ishuman) // bots dont get status update
+	{
+		self.nextthink = time + 0.333;
+		if (random() < 0.85) // dont let them exit vote often
+		{
+			self.button0 = self.button1 = self.button2 = 0;
+			return;
+		}
+
+		if (!self.button0 && !self.button1 && !self.button2)
+			return;
+
+		GoBack ();
+		return;
+	}
+
 	dead_cam_set(); // Cataboligne - 5.12.10 - dead cam while voted
 
 	// next think
@@ -1190,8 +1220,7 @@ void() WaitForVotesThink =
 				self.attack_state = 0;
 			}
 
-			if (self.classname != "pk*bot" && self.ishuman)
-			centerprint3(self, "You have just voted for ", self.map, ".\n\nPlease wait here while all other \nplayers finish voting.	Once all votes \nhave been cast, the winning \nlevel will start.\n");
+		centerprint3(self, "You have just voted for ", self.map, ".\n\nPlease wait here while all other \nplayers finish voting.	Once all votes \nhave been cast, the winning \nlevel will start.\n");
 
 			return;
 		}
@@ -1218,8 +1247,19 @@ void() WaitForVotesThink =
 
 			// count the numbeer of votes cast
 			local string srch;
+			local entity e;
 			srch = "player";
 			pl = find(world, classname, "player");
+			if (!pl)
+			{
+				srch = OBSERVER;
+				pl = find(world, classname, srch);
+			}
+			if (!pl) // this shouldnt ever be possible! - even on a dedicated server running only pk*s
+			{
+				srch = "pk*bot";
+				pl = find(world, classname, srch);
+			}
 			maxplayers = votecast = 0;
 			while (pl != world)
 			{
@@ -1227,6 +1267,8 @@ void() WaitForVotesThink =
 				{
 					if (pl.map != "")
 						votecast = votecast + 1;
+					else
+						e = pl; // save for the 1 bot scenario
 
 					maxplayers = maxplayers + 1;
 				}
@@ -1234,20 +1276,38 @@ void() WaitForVotesThink =
 				pl = find(pl, classname, srch);
 
 				if (!pl)
-				if (srch != "pk*bot" && srch != OBSERVER) // *bot - search out bots too
+				if (srch == "player") // find jafo now
 				{
-					srch = "pk*bot";
+					srch = OBSERVER;
 					pl = find(world, classname, srch);
 				}
 				if (!pl)
-				if (srch == "pk*bot") // find jafo now
+				if (srch == OBSERVER) // *bot - search out bots too
 				{
-					srch = OBSERVER;
+					srch = "pk*bot";
 					pl = find(world, classname, srch);
 				}
 			}
 
 			playerIntermissionVotesTimeLeft(maxplayers, votecast, timemins, timedef);
+
+// trick when 1 bot is left to vote
+			if ((maxplayers - votecast) == 1)
+			if (!e.ishuman)
+			if (random() < 0.2)
+			{
+				pl = self;
+				self = e;
+				if (bot_vote(0.5))  // if voted, bounce dog
+				{
+					self.voteIntermission = 1;
+					self = theHub;
+ 					hub_control_use();
+					return;
+				}
+				self = pl;
+			}
+
 		}
 
 		self.messagetimeout = time + 1;
@@ -1326,7 +1386,7 @@ float(float cn) bot_vote =
 	local float f, r;
 
 	if (self.map != "") return(TRUE); // voted
-	if (self.classname != "player" && self.netname != "pk*bot") return(FALSE); // not eligible
+	if (self.classname != "player" && self.classname != "pk*bot") return(FALSE); // not eligible
 	if (self.netname == "") return(FALSE); // who are you?
 	if (!inHubMap) return(FALSE); // not on hub
 

@@ -10,7 +10,8 @@
  *
  */
 
-// because if we call it straight up it missed the bots
+// darkplaces / chaos only
+// thinking - because if we call it straight up it missed the bots
 
 void(float tm) th_bot_changeParms =
 {
@@ -30,10 +31,13 @@ void(float tm) th_bot_changeParms =
 	}
 	else
 	{
-		bot_changeParms();
+//		bot_changeParms();
+		bot_saveData();
 		remove(self);
 	}
 };
+
+float NOSAVE; // init bots on level change - dont re-save old data, only admin & script control of bots should do that
 
 void () initBotLevel =
 {
@@ -45,19 +49,38 @@ void () initBotLevel =
 
 	NOISEQUEUE = noisetarget ();
 	num = ((serverflags & BOTS) / 16);
+
+
+
+// TESTING
+if (0)
+if (WARNING)
+{
+bprint("Entry: initBotLevel: ");
+bprint(ftos(cvar("sv_bot_pk")));
+bprint(" - passed vals pk12:  ");
+bprint(ftos(self.cnt));
+bprint("  pk13:  ");
+bprint(ftos(self.count));
+bprint("  num:  ");
+bprint(ftos(num));
+bprint("\n");
+}
+
+
+
 	serverflags = serverflags - (serverflags & BOTS) - (serverflags & INITLEVEL);
 	NUMBOTS = 0;
 	NUMPATHS = 0;
 	NUMPATHERS = 0;
 	offset = 1;
-	if (self.cnt > 0 && !num)
+	NOSAVE = TRUE;
+	if (self.cnt > 0 && !num) // start bots with skill levels set in .cnt (parm12 or sv_bot_pk) when num is 0
 	{
-		i = BOT_SAVE_SKILL;
+		i = BOT_SAVE_SKILL; // no more than this many
 	}
 	while (num > 0 || i > 0)
 	{
-		if (num > 0) num = (num - 1);
-		if (i > 0) i = (i - 1);
 		c_skill = skill;
 		f = 0;
 		if ((NUMBOTS < (BOT_SAVE_SKILL - 1)) && !(serverflags & DEDICATED))
@@ -65,9 +88,31 @@ void () initBotLevel =
 //			c_skill = ((0.1 * (parm12 & (offset * 31))) / offset);
 			f = c_skill = ((self.cnt & (offset * 3)) / offset);
 		}
+
+
+
+// TESTING
+if (WARNING)
+{
+bprint(" --- adding - skill: ");
+bprint(ftos(c_skill));
+bprint(" - f: ");
+bprint(ftos(f));
+bprint(" - I: ");
+bprint(ftos(i));
+bprint("  - num:  ");
+bprint(ftos(num));
+bprint(" - make test: ");
+bprint(ftos(num || (i && f > 0)));
+bprint("\n");
+}
+
+
 		offset = (offset * 4);
 		if (num || (i && f > 0))
 			AddAnotherBot(c_skill);
+		if (num > 0) num = (num - 1);
+		if (i > 0) i = (i - 1);
 	}
 	if (serverflags & TEAMFLAG)
 	{
@@ -75,6 +120,8 @@ void () initBotLevel =
 		{
 			serverflags = (serverflags - TEAMFLAG);
 			serverflags = (serverflags - (serverflags & TEAMBOTS));
+			if (self.classname == "initBotLevel") remove(self);
+			NOSAVE = FALSE;
 			return ;
 		}
 	}
@@ -84,18 +131,22 @@ void () initBotLevel =
 		{
 			serverflags = (serverflags + TEAMFLAG);
 			serverflags = (serverflags - (serverflags & TEAMBOTS));
+			if (self.classname == "initBotLevel") remove(self);
+			NOSAVE = FALSE;
 			return ;
 		}
 	}
 	if (!teamplay)
 	{
-		if (self.classname == "initBotLevel")
-			remove(self);
+		if (self.classname == "initBotLevel") remove(self);
+		NOSAVE = FALSE;
 		return ;
 	}
 	num = ((serverflags & TEAMBOTS) / 256);
 	if (num == 0)
 	{
+		if (self.classname == "initBotLevel") remove(self);
+		NOSAVE = FALSE;
 		return ;
 	}
 	e = find (world,classname,"player");
@@ -121,8 +172,8 @@ void () initBotLevel =
 	{
 		serverflags = (serverflags - DEDICATED);
 	}
-	if (self.classname == "initBotLevel")
-		remove(self);
+	if (self.classname == "initBotLevel") remove(self);
+	NOSAVE = FALSE;
 };
 
 void () setBotGravity =
@@ -423,6 +474,7 @@ entity () AddBot =
 	local string mycolor;
 	local float plycolor;
 	newbot = spawn ();
+
 	oldself = self;
 	self = newbot;
 	self.think = SpawnNewBot;
@@ -566,139 +618,148 @@ void (float skl) AddAnotherBot =
 	{
 		sf = sf - 1;
 
-	if (n == 1)
-	{
-		top = 1;
-		bottom = 6;
-		if (c_skill > 2)
+		if (n == 1)
 		{
-			top = c_skill;
-			newbot.netname = "Pain [stinger]";
+			top = 1;
+			bottom = 6;
+			if (c_skill > 2)
+			{
+				top = c_skill;
+				bottom = 13;
+				st = "Pain [stinger]";
+			}
+			else
+				st = "Pain [bringer]";
 		}
-		else
-			newbot.netname = "Pain [bringer]";
-	}
-	else if (n == 2)
-	{
-		top = 2;
-		bottom = 13;
-		if (c_skill > 2)
+		else if (n == 2)
 		{
-			top = c_skill + 1 + random();
-			newbot.netname = "Pain [special delivery]";
+			top = 2;
+			bottom = 13;
+			if (c_skill > 2)
+			{
+				top = c_skill + 1 + random();
+				st = "Pain [special delivery]";
+			}
+			else
+				st = "Pain [giver]";
 		}
-		else
-			newbot.netname = "Pain [giver]";
-	}
-	else if (n == 3)
-	{
-		top = 4;
-		bottom = 11;
-		if (c_skill > 2)
+		else if (n == 3)
 		{
-			top = c_skill * 2;
-			newbot.netname = "Pain [master]";
+			top = 4;
+			bottom = 13;
+			if (c_skill > 2)
+			{
+				top = c_skill * 2;
+				st = "Pain [master]";
+			}
+			else
+				st = "Pain [disciple]";
 		}
-		else
-			newbot.netname = "Pain [disciple]";
-	}
-	else if (n == 4)
-	{
-		top = 3;
-		bottom = 12;
-		if (c_skill > 2)
+		else if (n == 4)
 		{
-			top = c_skill * 2 * random();
-			newbot.netname = "Clan LOLZ [|<e |<e]";
+			top = 3;
+			bottom = 12;
+			if (c_skill > 2)
+			{
+				top = c_skill * 2 * random();
+				st = "Clan LOLZ [|<e |<e]";
+			}
+			else
+				st = "Clan LOLZ [w00ps]";
 		}
-		else
-			newbot.netname = "Clan LOLZ [w00ps]";
-	}
-	else if (n == 5)
-	{
-		top = 12;
-		bottom = 13;
-		if (c_skill > 2)
+		else if (n == 5)
 		{
-			top = c_skill * 3 * random();
-			newbot.netname = "Clan LOLZ [u-r-ded]";
+			top = 13;
+			bottom = 12;
+			if (c_skill > 2)
+			{
+				top = c_skill * 3 * random();
+				st = "Clan LOLZ [u-r-ded]";
+			}
+			else
+				st = "Clan LOLZ [d(_)(_)fy]";
 		}
-		else
-			newbot.netname = "Clan LOLZ [d(_)(_)fy]";
-	}
-	else if (n == 6)
-	{
-		newbot.netname = "Codename: blizzard";
-		top = 0 + random() + random();
-		bottom = 4 + random() + random();
-	}
-	else if (n == 7)
-	{
-		newbot.netname = "Rex Felis";
-		top = 1;
-		bottom = 3 * c_skill * random();
-	}
-	else if (n == 8)
-	{
-		newbot.netname = "r00ST3R";
-		top = 4 + random() + random() + random();
-		bottom = 9 + random();
-	}
-	else if (n == 9)
-	{
-		newbot.netname = "M*nstAr";
-		top = 3;
-		bottom = 6 + random() + random() + random() + random();
-	}
-	else if (n == 10)
-	{
-		newbot.netname = "Yesman";
-		top = n;
-		bottom = n;
-	}
-	else if (n == 11)
-	{
-		newbot.netname = "Hard_ware";
-		top = 0 + random();
-		bottom = 13 + random() + random();
-	}
-	else if (n == 12)
-	{
-		newbot.netname = "Ray ---=>";
-		top = 13;
-		bottom = 11;
-	}
-	else if (n == 13)
-	{
-		newbot.netname = "Kill=death+die-dead";
-		top = 12 + random() + random() + random();
-		bottom = 11 + random() + random() + random();
-	}
-	else if (n == 14)
-	{
-		top = 9 + random() + random();
-		bottom = 13;
-		if (c_skill > 2)
+		else if (n == 6)
 		{
-			top = c_skill * 2.2 * random() + random() + random();
-			newbot.netname = "Tweedle-dweeb";
+			st = "Codename: blizzard";
+			top = 0 + random() + random();
+			bottom = 4 + random() + random();
 		}
-			newbot.netname = "Tweedle-dumb";
-	}
-	else if (n >= 15)
-	{
-		newbot.netname = "Pain (*) ----";
-		top = 15 * random();
-		bottom = 15 * random();
-	}
+		else if (n == 7)
+		{
+			st = "Rex Felis";
+			top = 1;
+			bottom = 3 * c_skill * random();
+		}
+		else if (n == 8)
+		{
+			st = "r00ST3R";
+			top = 4 + random() + random() + random();
+			bottom = 9 + random();
+		}
+		else if (n == 9)
+		{
+			st = "M*nstAr";
+			top = 3;
+			bottom = 6 + random() + random() + random() + random();
+		}
+		else if (n == 10)
+		{
+			st = "Yesman";
+			top = n;
+			bottom = n;
+		}
+		else if (n == 11)
+		{
+			st = "Hard_ware";
+			top = 0 + random();
+			bottom = 13 + random() + random();
+		}
+		else if (n == 12)
+		{
+			st = "Ray ---=>";
+			top = 13;
+			bottom = 11;
+		}
+		else if (n == 13)
+		{
+			st = "Kill=death+die-dead";
+			top = 12 + random() + random() + random();
+			bottom = 11 + random() + random() + random();
+		}
+		else if (n == 14)
+		{
+			top = 9 + random() + random();
+			bottom = 13;
+			if (c_skill > 2)
+			{
+				top = c_skill * 2.2 * random() + random() + random();
+				st = "Tweedle-dweeb";
+			}
+				st = "Tweedle-dumb";
+		}
+		else if (n >= 15)
+		{
+			st = "Pain (*) ----";
+			top = 15 * random();
+			bottom = 15 * random();
+		}
 
-		if (find(world,netname,newbot.netname)) // see if name is taken
-			n = 1 + floor(random() * 14.4);
+		if (find(world, netname, st)) // see if name is taken
+		{
+			if (sf == 17) n = 1;
+			else
+			if (sf < 17)
+				n = n + 1; // random no worky - brute force
+			else
+				n = 1 + floor(random() * 14.4);
+		}
 		else
 			sf = 0;
 	}
 
 // merge with frikbot - using frik vars
+	newbot.netname = st;
 	newbot.b_clientno = newbot.id;
 	newbot.b_shirt = rint(top);
 	newbot.b_pants = rint(bottom);
@@ -715,6 +776,7 @@ void (float skl) AddAnotherBot =
 	WriteByte (MSG_ALL,newbot.id);
 	WriteShort (MSG_ALL,newbot.frags);
 */
+	if (!NOSAVE)
 	if (DARKPLACES || chaos) th_bot_changeParms(12.5);
 	if (BOTFREEZE) bot_froze(newbot); // Cataboligne - 6.9.10 - bots get really cold now - dev code
 };
@@ -750,6 +812,7 @@ void (entity ply, float n) addTeamBots =
 			newbot.netname = "[Bot3]";
 		}
 		i = (i - 1);
+		if (!NOSAVE)
 		if (DARKPLACES || chaos) th_bot_changeParms(12.5);
 	}
 };
@@ -779,6 +842,9 @@ void(entity e) removeBot =
 		f.b_pants = 0;
 		f.b_shirt = 0;
 		f.ammo_shells = f.ammo_nails = f.ammo_rockets = f.ammo_cells = 0;
+		f.pkprevweapon = f.pklastweapon = f.prevweapon = f.lastweapon = 0; // pk
+		f.weapon = f.currentammo = f.x_items = f.ammo_bullet = f.ammo_slug = f.ammo_gaspr = f.ammo_hgrenade = 0; // x stuff
+		f.eweapon = world;
 		UpdateClient(f);
 		active_clients = active_clients - (active_clients & ClientBitFlag(f.b_clientno));
 		f.id = f.b_clientno = -1;
@@ -797,15 +863,16 @@ void (entity ply, float n) removeTeamBots =
 	local entity e;
 	i = n;
 	e = find (world,classname,"pk*bot");
+		if (!e)
+		{
+			bprint ("No team bots found.\n");
+			return ;
+		}
 	while (i > 0)
 	{
 		while ((e != world) && (e.team != ply.team))
 		{
 			e = find (e,classname,"pk*bot");
-		}
-		if (!e)
-		{
-			return ;
 		}
 		removeBot(e);
 		i = (i - 1);
@@ -816,12 +883,13 @@ void () removeAllBots =
 {
 	local entity e;
 	e = find (world,classname,"pk*bot");
+	if (!e)
+	{
+		bprint ("No bots found.\n");
+		return ;
+	}
 	while (e)
 	{
-		if (!e)
-		{
-			return ;
-		}
 		removeBot(e);
 		e = find (e,classname,"pk*bot");
 	}

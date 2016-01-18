@@ -149,12 +149,13 @@ entity () FindIntermission =
 string nextmap;
 void () GotoNextMap =
 {
-	PK_GotoNextMap();
-
-	if (cvar("samelevel"))	// if samelevel is set, stay on same level
+	if (cvar("samelevel"))	// if samelevel is set, stay on same level - overrides all pk rules
 		changelevel (mapname);
 	else
+	{
 		changelevel (nextmap);
+		PK_GotoNextMap();
+	}
 };
 
 
@@ -389,7 +390,7 @@ void () respawn =
 		if (self.model != "progs/null.mdl") // Cataboligne - 8.14.9 - dead cam etc
 			CopyToBodyQue (self);
 		// set default spawn parms
-			if (PK) // Cataboligne - 8.22.9 - pk orig oper
+			if (!Q_100) // Cataboligne - 8.22.9 - pk orig oper
 				SetNewParms_PK();
 			else
 			SetNewParms ();
@@ -898,7 +899,7 @@ void () WaterMove =
 		self.dmgtime = 0;
 	}
 
-	if (!PK) // *pk - done elsewhere
+	if (!PK) // *pk - done elsewhere CHECK:
 	if (! (self.flags & FL_WATERJUMP))
 		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
 };

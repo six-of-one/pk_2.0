@@ -104,7 +104,7 @@ void(entity e) admin_clear =
 	centerprint(e, "");
 	e.impulse = e.admin = 0;
 	e.takedamage = DAMAGE_AIM;	
-	e.wad = e.message = e.map = e.target = "";
+	e.wad = e.message = e.path = e.target = "";
 	e.enemy = world;
 };
 
@@ -599,86 +599,91 @@ float() MapDM =
 			local entity e, f, b;
 			local vector v1, v2;
 			local float dx, mm;
-			bprint("---------------------\nHub map set\n---------------------\n\n");
 			e = find(world, classname, "hub_teleport");
-			while (e)
+			if (!e)
+				bprint("---------------------\nHub NOT FOUND\n---------------------\n\n");
+			else
 			{
-				if (e.model == "progs/hub_port.mdl" || e.model == "progs/null.mdl")
+				bprint("---------------------\nHub map set\n---------------------\n\n");
+				while (e)
 				{
-					if (v1 != ' 0 0 0' && mm < 2)
+					if (e.model == "progs/hub_port.mdl" || e.model == "progs/null.mdl")
 					{
-						bprint("\nmixed mode --- custom hub + regular hub!\n\n");
-						mm = 2;
+						if (v1 != ' 0 0 0' && mm < 2)
+						{
+							bprint("\nmixed mode --- custom hub + regular hub!\n\n");
+							mm = 2;
+						}
+						else
+							if (mm < 2) mm = -1;
+						bprint(e.map);
+						bprint(", trg: ");
+						b = e.enemy; // we know trigger messages for custom hubs
+						if (!b) bprint("NO TRIGGER!");
+						else { bprint(b.message); if (fabs(b.origin_z - e.origin_z) > 25) { bprint(" : Z > 25");} }
+						bprint("\n");
+						e = find(e, classname, "hub_teleport");
 					}
 					else
-						if (mm < 2) mm = -1;
-					bprint(e.map);
-					bprint(", trg: ");
-					b = e.enemy; // we know trigger messages for custom hubs
-					if (!b) bprint("NO TRIGGER!");
-					else { bprint(b.message); if (fabs(b.origin_z - e.origin_z) > 25) { bprint(" : Z > 25");} }
-					bprint("\n");
-					e = find(e, classname, "hub_teleport");
-				}
-				else
-			 {
-					if (!v1) bprint("hub_control maps:\n\n");
-					if (mm < 0)
-					{
-						bprint("\nmixed mode --- custom hub + regular hub!\n\n");
-						mm = 2;
-					}
-					bprint(e.map);
-
-// possible target message - list all after this
-				dx = 8001;
-				v1 = (e.absmin + e.absmax) * 0.5;
-				f = findradius(v1, 8000);
-				b = world;
-				while (f)
-				{
-					if (f.classname == "trigger_multiple")
-					if (f.message != "" && f.message != "\n" && f.message != " ")
-					{
-						v2 = (f.mins + f.maxs) * 0.5;
-						if (vlen(v1 - v2) < dx)
+				 {
+						if (!v1) bprint("hub_control maps:\n\n");
+						if (mm < 0)
 						{
-							b = f;
-							dx = vlen(v1 - v2);
+							bprint("\nmixed mode --- custom hub + regular hub!\n\n");
+							mm = 2;
 						}
-					}
-				f = f.chain;
-				}
-				if (b)
-				{
-					bprint(", possible trg: ");
-					bprint(b.message);
-					if (fabs(b.origin_z - e.origin_z) > 25) bprint(" : Z > 25");
-				}
+						bprint(e.map);
 
-
-					bprint("\n");
-					e = find(e, classname, "hub_teleport");
-				if (!e)
-				{
-				bprint("\npossible map messages:\n\n");
-				f = findradius(world.origin, 32000);
-				while (f)
-				{
-					if (f.classname == "trigger_multiple")
-					if (f.message != "" && f.message != "\n" && f.message != " ")
+	// possible target message - list all after this
+					dx = 8001;
+					v1 = (e.absmin + e.absmax) * 0.5;
+					f = findradius(v1, 8000);
+					b = world;
+					while (f)
 					{
-						bprint(f.message);
-						bprint("\n");
+						if (f.classname == "trigger_multiple")
+						if (f.message != "" && f.message != "\n" && f.message != " ")
+						{
+							v2 = (f.mins + f.maxs) * 0.5;
+							if (vlen(v1 - v2) < dx)
+							{
+								b = f;
+								dx = vlen(v1 - v2);
+							}
+						}
+					f = f.chain;
 					}
-				f = f.chain;
-				}
-					
-				}
-			 }
-		  }
+					if (b)
+					{
+						bprint(", possible trg: ");
+						bprint(b.message);
+						if (fabs(b.origin_z - e.origin_z) > 25) bprint(" : Z > 25");
+					}
 
-			bprint("\n---------------------\n");
+
+						bprint("\n");
+						e = find(e, classname, "hub_teleport");
+					if (!e)
+					{
+					bprint("\npossible map messages:\n\n");
+					f = findradius(world.origin, 32000);
+					while (f)
+					{
+						if (f.classname == "trigger_multiple")
+						if (f.message != "" && f.message != "\n" && f.message != " ")
+						{
+							bprint(f.message);
+							bprint("\n");
+						}
+					f = f.chain;
+					}
+						
+					}
+				 }
+			  }
+
+				bprint("\n---------------------\n");
+		  }
 		}
 
 		return(FALSE);
@@ -1017,7 +1022,8 @@ void() Admin_pkmenu =
 							"  04: settings list         \n"
 //							"  05: PK dynamic items      \n"
 //							"  06: Spike traps           \n"
-							"    : PK Compatibility      \n"
+							"  07: Server map loop       \n"
+							"    : PK v1.11 Compatible   \n"
 //							"  07: Extra sound           \n"
 							" 666:  main menu            \n"
 							" admin impulse: exit admin  \n"
@@ -1033,7 +1039,8 @@ void() Admin_pkmenu =
 							"  04: settings list         \n"
 							"  05: PK dynamic items      \n"
 							"  06: Spike traps           \n"
-							"    : PK Compatibility      \n"
+							"  07: Server map loop       \n"
+							"    : PK 2.X server         \n"
 //							"  07: Extra sound           \n"
 							" 666:  main menu            \n"
 							" admin impulse: exit admin  \n"
@@ -1172,7 +1179,7 @@ void() Admin_mainmenu =
 					 "\b Enter code: ";
 	}
 
-	self.target = self.map = self.wad = "";
+	self.target = self.path = self.wad = "";
 	self.admin = 6;
 	self.lefty = 0;
 };
@@ -1238,7 +1245,7 @@ void() AdminCommands =
 			self.lefty = cvar("fraglimit");
 			self.admin = 10;
 			self.lip = 6;
-			self.map = "fraglimit ";
+			self.path = "fraglimit ";
 			self.target = "\nfraglimit changed...";
 		}
 		else
@@ -1248,7 +1255,7 @@ void() AdminCommands =
 			self.lefty = cvar("timelimit");
 			self.admin = 10;
 			self.lip = 6;
-			self.map = "timelimit ";
+			self.path = "timelimit ";
 			self.target = "\ntimelimit changed...";
 		}
 		else
@@ -1336,7 +1343,7 @@ void() AdminCommands =
 		else if (self.lefty == 97)													// live in game admin - not in menu
 		{
 			self.admin = LIVE_ADMIN;
-			self.wad = self.message = self.map = self.target = "";
+			self.wad = self.message = self.path = self.target = "";
 			self.enemy = world;
 			centerprint(self, "");
 			self.takedamage = DAMAGE_AIM;
@@ -1379,19 +1386,19 @@ void() AdminCommands =
 	}
 	else if (self.admin == 9)															// new data value entered
 	{
-		if (self.map == "observer_time")
+		if (self.path == "observer_time")
 		{
 			observer_time = self.lefty;
 		}
 		else
 		{
-			localcmd(self.map);
+			localcmd(self.path);
 			localcmd(ftos(self.lefty));
 			localcmd("\n");
 		}
 		self.admin = self.lip; // admin level we are on
 		self.wad = self.target;
-		self.target = self.map = "";
+		self.target = self.path = "";
 		if (self.lip != 19) self.lefty = 0;
 	}
 	else if (self.admin == 13)														// dm map from painkeep set
@@ -1478,6 +1485,7 @@ void() AdminCommands =
 		else if (self.lefty == 2)
 		{
 			e = NUMBOTS;
+			self.wad = "\nCould not remove a pk*bot from server.";
 			removeBot(world);
 			if (e != NUMBOTS) self.wad = "\nRemoved a pk*bot from server.";
 			self.lefty = 0;
@@ -1485,6 +1493,7 @@ void() AdminCommands =
 		else if (self.lefty == 12)
 		{
 			e = bot_count;
+			self.wad = "\nCould not remove a frikbot from server.";
 			KickABot();
 			if (e != bot_count) self.wad = "\nRemoved a frikbot from server.";
 			self.lefty = 0;
@@ -1532,7 +1541,7 @@ void() AdminCommands =
 			self.lefty = observer_time;
 			self.admin = 10;
 			self.lip = 18;
-			self.map = "observer_time";
+			self.path = "observer_time";
 			self.target = "\nObserver time limit changed...";
 		}
 		else if (self.lefty == 20)
@@ -1550,7 +1559,7 @@ void() AdminCommands =
 	}
 	else if (self.admin == 19)														// variable adjust
 	{
-		self.map = self.noise;
+		self.path = self.noise;
 		if (self.impulse == 9)
 		{
 			self.cnt = 0;
@@ -1572,7 +1581,7 @@ void() AdminCommands =
 		else if (self.impulse == 6) self.lefty = self.lefty - self.cnt;
 		else if (self.impulse == 7)
 		{
-			localcmd(self.map);
+			localcmd(self.path);
 			localcmd(ftos(self.lefty));
 			localcmd("\n");
 		}
@@ -1624,33 +1633,52 @@ void() AdminCommands =
 		else if (self.lefty == 4)
 		{
 			self.wad = "\nSettings printed to console";
-			if (pk_flags & PK_TP_DUTYON)
-				sprint(self, "Duty Checking On\n");
+			sprint(self, "\n\nPainkeep main controls:\n");
+			sprint(self, "\b-----------------------\n");
+			if (!(pk_flags & PK_SF_HUB))
+				sprint(self, "Voting Hub On       --- (sv_pk_hub)\n");
 			else
-				sprint(self, "Duty Checking Off\n");
+				sprint(self, "Voting Hub \bOFF\b      --- (sv_pk_hub)\n");
+
+			if (pk_flags & PK_TP_USERMAPON)
+				sprint(self, "Server map loop \bON\b  --- (sv_pk_cmap)\n");
+			else
+				sprint(self, "Server map loop Off --- (sv_pk_cmap)\n");
+
+			if (pk_flags & PK_TP_DUTYON)
+				sprint(self, "Duty Checking On    --- (sv_pk_duty)\n");
+			else
+				sprint(self, "Duty Checking Off   --- (sv_pk_duty)\n");
 
 			if (!(pk_flags & PK_TP_SPARKSFLASH))
-				sprint(self, "SFX On\n");
+				sprint(self, "SFX On              --- (sv_pk_sfx)\n");
 			else
-				sprint(self, "SFX Off\n");
+				sprint(self, "SFX \bOFF\b             --- (sv_pk_sfx)\n");
 
 			if (pk_flags & PK_TP_STATUSON)
-				sprint(self, "Status On\n");
+				sprint(self, "Status \bON\n");
 			else
 				sprint(self, "Status Off\n");	 
 
-			if (pk_flags & PK_TP_USERMAPON)
-				sprint(self, "Custom Maps On\n");
-			else
-				sprint(self, "Custom Maps Off\n");
-
 			if (!PK_100)
 			{
-				if (pk_flags & PK_DYNAMIC)
-					sprint(self, "Dynamic Painkeep items On\n");
+				if (!(pk_flags & PK_SPIKER))
+					sprint(self, "Spike traps enabled in PK mode\n");
 				else
-					sprint(self, "Dynamic Painkeep items Off\n");
+					sprint(self, "Spike traps DISABLED in PK mode\n");
+
+				if (pk_flags & PK_DYNAMIC)
+					sprint(self, "Dynamic Painkeep items \bON\b  - (pk_dyn_*)\n");
+				else
+					sprint(self, "Dynamic Painkeep items Off - (pk_dyn_*)\n");
 			}
+			else
+			{
+				sprint(self, "PK_100 set:\n");
+				sprint(self, "Spkike traps DISABLED\n");
+				sprint(self, "Dynamic Painkeep items Off\n");
+			}
+			sprint(self, "\b-----------------------\n\n");
 		}
 		else if (self.lefty == 5 && !PK_100)
 		{
@@ -1686,6 +1714,19 @@ void() AdminCommands =
 			{
 				self.wad = "\nSpkike traps disabled in PK mode";
 				pk_flags = pk_flags | PK_SPIKER;
+			}
+		}
+		else if (self.lefty == 7)
+		{
+			if (pk_flags & PK_TP_USERMAPON)
+			{
+				self.wad = "\nServer map loop off";
+				pk_flags = pk_flags - PK_TP_USERMAPON;
+			}
+			else
+			{
+				self.wad = "\nServer map loop ON";
+				pk_flags = pk_flags | PK_TP_USERMAPON;
 			}
 		}
 		else

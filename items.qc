@@ -547,7 +547,7 @@ void () weapon_touch =
 	self = other;
 
 // PK-NOTE: "old" variable above does nothing...what was iD's plan for it?
-	if (PK)
+	if (!Q_100)
 		PK_Deathmatch_Weapon (new, 0); // *pk - new wep switch rule for higher risk weps
 	else
 	if (!deathmatch)
