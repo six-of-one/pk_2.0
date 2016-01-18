@@ -277,8 +277,13 @@ void(string cls) item_call =
 	else if (cls == "w_weapon_mortar") w_weapon_mortar();
 	else if (cls == "w_weapon_flamer") w_weapon_flamer();
 
+	else if (cls == "w_ammo_gas") w_ammo_gas();
 	else if (cls == "w_ammo_clip") w_ammo_clip();
+	else if (cls == "w_item_pack") w_item_pack();
+
 	else if (cls == "w_art_facesphere") w_art_facesphere();
+	else if (cls == "w_heal_medkit") w_heal_medkit();
+
 	else if (cls == "w_key_g") w_key_g();
 	else if (cls == "w_key_b") w_key_b();
 	else if (cls == "w_barrel") w_barrel();

@@ -82,7 +82,34 @@ string(entity e, float TR) map_trans =
 	}
 
 /// multi genre!
-	if (e.scode == MC_D_ROCKETL || e.scode == MC_W_MORTAR || e.scode == MC_ROCKETL)
+	if (e.scode == MC_D_BFG || e.scode == MC_CHTHUNDR || e.scode == MC_Q2_BFG || e.scode == MC_Q3_BFG)
+	{
+		if (TR == FL_TR_WOLF)
+		{
+//			if (!TR_NOT) return("");
+			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
+			else if (TR_NOT == FL_NOTRN_BG)
+			{
+				if (random() > 0.25)
+					return("w_weapon_chaingun"); // most powerful wolf wep is prob dual chg
+				else if (random() > 0.5)
+					return("w_weapon_flamer");
+				else
+					return("w_weapon_motar");
+			}
+			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
+			else if (TR_NOT == FL_NOTRN_RNDANY) return(mcg);
+			return("");
+		}
+		if (TR == FL_TR_DOOM) return("d_weapon_bfg");
+		if (TR == FL_TR_QUAKE) return("weapon_chainlg"); // IDEA: poss. dynamo?
+		if (TR == FL_TR_Q2) return("q2_weapon_bfg");
+		if (TR == FL_TR_Q3) return("q3_weapon_bfg");
+		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_D_ROCKETL || e.scode == MC_W_MORTAR || e.scode == MC_ROCKETL || e.scode == MC_Q2_ROCKETL || e.scode == MC_Q3_ROCKETL)
 	{
 		if (TR == FL_TR_WOLF) return("w_weapon_mortar");
 		if (TR == FL_TR_DOOM) return("d_weapon_rocketlauncher");
@@ -93,7 +120,18 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_PLASMA || e.scode == MC_W_FLAMER || e.scode == MC_THUNDER)
+	else if (e.scode == MC_GRENADEL || e.scode == MC_Q2_GRENADEL || e.scode == MC_Q3_GRENADEL)
+	{
+		if (TR == FL_TR_WOLF) return("w_weapon_mortar");
+		if (TR == FL_TR_DOOM) return("d_weapon_rocketlauncher");
+		if (TR == FL_TR_QUAKE) return("weapon_grenadelauncher");
+		if (TR == FL_TR_Q2) return("q2_weapon_grenadelauncher");
+		if (TR == FL_TR_Q3) return("q3_weapon_grenadelauncher");
+		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_D_PLASMA || e.scode == MC_W_FLAMER || e.scode == MC_THUNDER || e.scode == MC_Q2_HYPBLASTER || e.scode == MC_Q3_PLASMA)
 	{
 		if (TR == FL_TR_WOLF) return("w_weapon_flamer");
 		if (TR == FL_TR_DOOM) return("d_weapon_plasma");
@@ -104,7 +142,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_CHAINGUN || e.scode == MC_W_CHAINGUN || e.scode == MC_SUPER_NAILGUN)
+	else if (e.scode == MC_D_CHAINGUN || e.scode == MC_W_CHAINGUN || e.scode == MC_SUPER_NAILGUN || e.scode == MC_Q2_CHAINGUN || e.scode == MC_Q3_MACHINEGUN)
 	{
 		if (TR == FL_TR_WOLF) return("w_weapon_chaingun");
 		if (TR == FL_TR_DOOM) return("d_weapon_chaingun");
@@ -115,7 +153,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_BOOMSTICK || e.scode == MC_SUPER_SHOTGUN)
+	else if (e.scode == MC_D_BOOMSTICK || e.scode == MC_SUPER_SHOTGUN || e.scode == MC_Q2_DBLSHOTGUN || e.scode == MC_Q3_SHOTGUN)
 	{
 		if (TR == FL_TR_WOLF)
 		{
@@ -142,7 +180,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_SHOTGUN || e.scode == MC_SHOTGUN)
+	else if (e.scode == MC_D_SHOTGUN || e.scode == MC_SHOTGUN || e.scode == MC_Q2_SHOTGUN || e.scode == MC_Q3_SHOTGUN)
 	{
 		if (TR == FL_TR_WOLF)
 		{
@@ -169,18 +207,40 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_SAW || e.scode == MC_W_KNIFE || e.scode == MC_AXE)
+	else if (e.scode == MC_W_MACHGUN || e.scode == MC_NAILGUN)
+	{
+		if (TR == FL_TR_WOLF) return("w_weapon_machinegun");
+		if (TR == FL_TR_DOOM) return("d_weapon_supershotgun");
+		if (TR == FL_TR_QUAKE) return("weapon_nailgun");
+		if (TR == FL_TR_Q2) return("q2_weapon_machinegun");
+		if (TR == FL_TR_Q3) return("q3_weapon_machinegun"); // IDEA: need bg code here?
+		if (TR == FL_TR_RANDIN) return(mcw);
+		if (TR == FL_TR_RANDOM) return(mcg);
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_W_PISTOL || e.scode == MC_D_PISTOL || e.scode == MC_SHOTGUN || e.scode == MC_Q2_BLASTER)
+	{
+		if (TR == FL_TR_WOLF) return("w_weapon_pistol");
+		if (TR == FL_TR_DOOM) return("d_weapon_pistol");
+		if (TR == FL_TR_QUAKE) return("weapon_shotgun");
+		if (TR == FL_TR_Q2) return("q2_blaster");
+		if (TR == FL_TR_Q3) return("weapon_gauntlet");
+		if (TR == FL_TR_RANDIN) return(mcw);
+		if (TR == FL_TR_RANDOM) return(mcg);
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_D_SAW || e.scode == MC_W_KNIFE || e.scode == MC_AXE || e.scode == MC_Q3_GAUNTLET)
 	{
 		if (TR == FL_TR_WOLF) return("w_weapon_knife");
 		if (TR == FL_TR_DOOM) return("d_weapon_saw");
 		if (TR == FL_TR_QUAKE) return("weapon_axe");
-		if (TR == FL_TR_Q2) return("q2_weapon_blaster"); // TDO: map item
+		if (TR == FL_TR_Q2) return("q2_weapon_blaster");
 		if (TR == FL_TR_Q3) return("weapon_gauntlet");
 		if (TR == FL_TR_RANDIN) return(mcg);
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_ASHELLS || e.scode == MC_ASHELLS)
+	else if (e.scode == MC_D_ASHELLS || e.scode == MC_ASHELLS || e.scode == MC_Q2_ASHELLS || e.scode == MC_Q3_ASHELLS)
 	{
 		if (TR == FL_TR_WOLF) return("w_clip"); // IDEA: need bg code here?
 		if (TR == FL_TR_DOOM) return("d_ammo_4shell");
@@ -204,7 +264,7 @@ string(entity e, float TR) map_trans =
 	}
 	else if (e.scode == MC_D_ACELLS || e.scode == MC_ACELLS)
 	{
-		if (TR == FL_TR_WOLF) return("w_weapon_flamer");
+		if (TR == FL_TR_WOLF) return("w_ammo_gas");
 		if (TR == FL_TR_DOOM) return("d_ammo_cellpack");
 		if (TR == FL_TR_QUAKE) return("item_cells");
 		if (TR == FL_TR_Q2) return("q2_ammo_cells");
@@ -213,9 +273,9 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_ACELLS_LG || e.scode == MC_ACELLS_LG)
+	else if (e.scode == MC_D_ACELLS_LG || e.scode == MC_ACELLS_LG || e.scode == MC_W_GAS)
 	{
-		if (TR == FL_TR_WOLF) return("w_weapon_flamer"); // TDO: gas can ammo
+		if (TR == FL_TR_WOLF) return("w_ammo_gas");
 		if (TR == FL_TR_DOOM) return("d_ammo_cellbox");
 		if (TR == FL_TR_QUAKE) return("item_cells_lg");
 		if (TR == FL_TR_Q2) return("q2_ammo_cells");
@@ -224,7 +284,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_AROCKET || e.scode == MC_AROCKETS)
+	else if (e.scode == MC_D_AROCKET || e.scode == MC_AROCKETS || e.scode == MC_Q2_AROCKETS || e.scode == MC_Q3_AROCKETS)
 	{
 		if (TR == FL_TR_WOLF) return("w_weapon_mortar");
 		if (TR == FL_TR_DOOM) return("d_ammo_1rocket");
@@ -257,7 +317,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_ABULLETS_LG || e.scode == MC_ANAILS_LG)
+	else if (e.scode == MC_D_ABULLETS_LG || e.scode == MC_ANAILS_LG || e.scode == MC_Q2_ABULLETS || e.scode == MC_Q3_ABULLETS)
 	{
 		if (TR == FL_TR_WOLF) return("w_clip");
 		if (TR == FL_TR_DOOM) return("d_ammo_ammobox");
@@ -268,7 +328,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_SOULSPH || e.scode == MC_HEALTHMEGA)
+	else if (e.scode == MC_D_SOULSPH || e.scode == MC_HEALTHMEGA || e.scode == MC_Q2_MEGA || e.scode == MC_Q3_MEGA)
 	{
 		if (TR == FL_TR_WOLF) return("w_face_sphere");
 		if (TR == FL_TR_DOOM) return("d_art_soulsphere");
@@ -279,9 +339,9 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_MEDKIT || e.scode == MC_HEALTH)
+	else if (e.scode == MC_W_HEALTH || e.scode == MC_D_MEDKIT || e.scode == MC_HEALTH || e.scode == MC_Q2_MEDKIT || e.scode == MC_Q3_HLARGE)
 	{
-		if (TR == FL_TR_WOLF) return(""); // TDO: wolf health
+		if (TR == FL_TR_WOLF) return("w_heal_medkit");
 		if (TR == FL_TR_DOOM) return("d_item_healthmedkit");
 		if (TR == FL_TR_QUAKE) return("item_health");
 		if (TR == FL_TR_Q2) return("q2_item_health_large");
@@ -290,7 +350,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_STIMPAK || e.scode == MC_HEALTHROT)
+	else if (e.scode == MC_D_STIMPAK || e.scode == MC_HEALTHROT || e.scode == MC_Q2_FIRSTAID || e.scode == MC_Q3_HEALTH)
 	{
 		if (TR == FL_TR_WOLF) return("");
 		if (TR == FL_TR_DOOM) return("d_item_healthstimpak");
@@ -301,7 +361,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_HBOTTLE)
+	else if (e.scode == MC_D_HBOTTLE || e.scode == MC_Q2_STIMPAK || e.scode == MC_Q3_HSMALL)
 	{
 		if (TR == FL_TR_WOLF) return(""); // TDO: blood (gibs) - dog food
 		if (TR == FL_TR_DOOM) return("d_item_healthbottle");
@@ -312,181 +372,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-/// doom
-	else if (e.scode == MC_D_BFG)
-	{
-		if (TR == FL_TR_WOLF)
-		{
-//			if (!TR_NOT) return("");
-			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
-			else if (TR_NOT == FL_NOTRN_BG)
-			{
-				if (random() > 0.25)
-					return("w_weapon_chaingun"); // most powerful wolf wep is prob dual chg
-				else if (random() > 0.5)
-					return("w_weapon_flamer");
-				else
-					return("w_weapon_motar");
-			}
-			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
-			else if (TR_NOT == FL_NOTRN_RNDANY) return(mcg);
-			return("");
-		}
-		if (TR == FL_TR_DOOM) return("d_weapon_bfg");
-		if (TR == FL_TR_QUAKE) return("weapon_chainlg"); // IDEA: poss. dynamo?
-		if (TR == FL_TR_Q2) return("q2_weapon_bfg");
-		if (TR == FL_TR_Q3) return("q3_weapon_bfg");
-		if (TR == FL_TR_RANDIN) return(mcd);
-		if (TR == FL_TR_RANDOM) return(mcg);
-		if (TR >= FL_TR_REMOVE) return("RMV");
-	}
-	else if (e.scode == MC_D_BERS)
-	{
-		if (TR == FL_TR_WOLF)
-		{
-//			if (!TR_NOT) return("");
-			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
-			else if (TR_NOT == FL_NOTRN_BG)
-			{
-				return("");
-			}
-			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
-			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
-			return("");
-		}
-		if (TR == FL_TR_DOOM) return("d_art_berserker");
-		if (TR == FL_TR_QUAKE) return("item_artifact_super_damage");
-		if (TR == FL_TR_Q2) return("q2_item_quad");
-		if (TR == FL_TR_Q3) return("q3_item_quad");
-		if (TR == FL_TR_RANDIN) return(mcd);
-		if (TR == FL_TR_RANDOM) return(mcg);
-		if (TR >= FL_TR_REMOVE) return("RMV");
-	}
-	else if (e.scode == MC_D_INVUL)
-	{
-		if (TR == FL_TR_WOLF)
-		{
-//			if (!TR_NOT) return("");
-			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
-			else if (TR_NOT == FL_NOTRN_BG)
-			{
-				return("");
-			}
-			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
-			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
-			return("");
-		}
-		if (TR == FL_TR_DOOM) return("d_art_invulnerable");
-		if (TR == FL_TR_QUAKE) return("item_artifact_invulnerability");
-		if (TR == FL_TR_Q2) return("item_invulnerability");
-		if (TR == FL_TR_Q3)
-		{
-//			if (!TR_NOT) return("");
-			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
-			else if (TR_NOT == FL_NOTRN_BG)
-			{
-				if (random() > 0.4)
-					return("item_regen");
-				else
-					return("q3_item_enviro");
-			}
-			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcq3);
-			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
-			return("");
-		}
-		if (TR == FL_TR_RANDIN) return(mcd);
-		if (TR == FL_TR_RANDOM) return(mcg);
-		if (TR >= FL_TR_REMOVE) return("RMV");
-	}
-	else if (e.scode == MC_D_INVIS)
-	{
-		if (TR == FL_TR_WOLF)
-		{
-//			if (!TR_NOT) return("");
-			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
-			else if (TR_NOT == FL_NOTRN_BG)
-			{
-				return("");
-			}
-			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
-			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
-			return("");
-		}
-		if (TR == FL_TR_DOOM) return("d_art_invisible");
-		if (TR == FL_TR_QUAKE) return("item_artifact_invisibility");
-		if (TR == FL_TR_Q2) return("item_silencer");
-		if (TR == FL_TR_Q3) return("item_invis");
-		if (TR == FL_TR_RANDIN) return(mcd);
-		if (TR == FL_TR_RANDOM) return(mcg);
-		if (TR >= FL_TR_REMOVE) return("RMV");
-	}
-	else if (e.scode == MC_D_RADSUIT)
-	{
-		if (TR == FL_TR_WOLF)
-		{
-//			if (!TR_NOT) return("");
-			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
-			else if (TR_NOT == FL_NOTRN_BG)
-			{
-				return("");
-			}
-			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
-			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
-			return("");
-		}
-		if (TR == FL_TR_DOOM) return("d_art_radsuit");
-		if (TR == FL_TR_QUAKE) return("item_artifact_envirosuit");
-		if (TR == FL_TR_Q2) return("q2_item_enviro");
-		if (TR == FL_TR_Q3) return("q3_item_enviro");
-		if (TR == FL_TR_RANDIN) return(mcd);
-		if (TR == FL_TR_RANDOM) return(mcg);
-		if (TR >= FL_TR_REMOVE) return("RMV");
-	}
-	else if (e.scode == MC_D_ARM_BLU)
-	{
-		if (TR == FL_TR_WOLF)
-		{
-//			if (!TR_NOT) return("");
-			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
-			else if (TR_NOT == FL_NOTRN_BG)
-			{
-				return("");
-			}
-			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
-			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
-			return("");
-		}
-		if (TR == FL_TR_DOOM) return("d_item_armorblue");
-		if (TR == FL_TR_QUAKE) return("item_armorInv");
-		if (TR == FL_TR_Q2) return("q2_item_armor_body");
-		if (TR == FL_TR_Q3) return("q3_item_armor_body");
-		if (TR == FL_TR_RANDIN) return(mcd);
-		if (TR == FL_TR_RANDOM) return(mcg);
-		if (TR >= FL_TR_REMOVE) return("RMV");
-	}
-	else if (e.scode == MC_D_ARM_GRN)
-	{
-		if (TR == FL_TR_WOLF)
-		{
-//			if (!TR_NOT) return("");
-			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
-			else if (TR_NOT == FL_NOTRN_BG)
-			{
-				return("");
-			}
-			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
-			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
-			return("");
-		}
-		if (TR == FL_TR_DOOM) return("d_item_armorgreen");
-		if (TR == FL_TR_QUAKE) return("item_armor2");
-		if (TR == FL_TR_Q2) return("q2_item_armor_combat");
-		if (TR == FL_TR_Q3) return("q3_item_armor_combat");
-		if (TR == FL_TR_RANDIN) return(mcd);
-		if (TR == FL_TR_RANDOM) return(mcg);
-		if (TR >= FL_TR_REMOVE) return("RMV");
-	}
-	else if (e.scode == MC_D_ARM_SPR)
+	else if (e.scode == MC_D_ARM_SPR || e.scode == MC_Q2_ARM_SHARD || e.scode == MC_Q3_ARM_SHARD)
 	{
 		if (TR == FL_TR_WOLF)
 		{
@@ -519,29 +405,179 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
+	else if (e.scode == MC_D_ARM_BLU || e.scode == MC_ARMOR3 || e.scode == MC_Q2_ARM_BODY || e.scode == MC_Q3_ARM_BODY)
+	{
+		if (TR == FL_TR_WOLF)
+		{
+//			if (!TR_NOT) return("");
+			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
+			else if (TR_NOT == FL_NOTRN_BG)
+			{
+				return("");
+			}
+			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
+			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
+			return("");
+		}
+		if (TR == FL_TR_DOOM) return("d_item_armorblue");
+		if (TR == FL_TR_QUAKE) return("item_armorInv");
+		if (TR == FL_TR_Q2) return("q2_item_armor_body");
+		if (TR == FL_TR_Q3) return("q3_item_armor_body");
+		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_D_ARM_GRN || e.scode == MC_ARMOR1 || e.scode == MC_Q2_ARM_COMBAT || e.scode == MC_Q3_ARM_COMBAT)
+	{
+		if (TR == FL_TR_WOLF)
+		{
+//			if (!TR_NOT) return("");
+			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
+			else if (TR_NOT == FL_NOTRN_BG)
+			{
+				return("");
+			}
+			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
+			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
+			return("");
+		}
+		if (TR == FL_TR_DOOM) return("d_item_armorgreen");
+		if (TR == FL_TR_QUAKE) return("item_armor2");
+		if (TR == FL_TR_Q2) return("q2_item_armor_combat");
+		if (TR == FL_TR_Q3) return("q3_item_armor_combat");
+		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_D_BERS || e.scode == MC_QUAD || e.scode == MC_Q2_QUAD || e.scode == MC_Q3_QUAD)
+	{
+		if (TR == FL_TR_WOLF)
+		{
+//			if (!TR_NOT) return("");
+			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
+			else if (TR_NOT == FL_NOTRN_BG)
+			{
+				return("w_art_facesphere");
+			}
+			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
+			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
+			return("");
+		}
+		if (TR == FL_TR_DOOM) return("d_art_berserker");
+		if (TR == FL_TR_QUAKE) return("item_artifact_super_damage");
+		if (TR == FL_TR_Q2) return("q2_item_quad");
+		if (TR == FL_TR_Q3) return("q3_item_quad");
+		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_D_INVUL || e.scode == MC_PENT || e.scode == MC_Q2_INVUL)
+	{
+		if (TR == FL_TR_WOLF)
+		{
+//			if (!TR_NOT) return("");
+			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
+			else if (TR_NOT == FL_NOTRN_BG)
+			{
+				return("w_art_facesphere");
+			}
+			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
+			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
+			return("");
+		}
+		if (TR == FL_TR_DOOM) return("d_art_invulnerable");
+		if (TR == FL_TR_QUAKE) return("item_artifact_invulnerability");
+		if (TR == FL_TR_Q2) return("item_invulnerability");
+		if (TR == FL_TR_Q3)
+		{
+//			if (!TR_NOT) return("");
+			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
+			else if (TR_NOT == FL_NOTRN_BG)
+			{
+				if (random() > 0.4)
+					return("item_regen");
+				else
+					return("q3_item_enviro");
+			}
+			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcq3);
+			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
+			return("");
+		}
+		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_D_INVIS || e.scode == MC_RING|| e.scode == MC_Q2_SILENCE || e.scode == MC_Q3_INVIS)
+	{
+		if (TR == FL_TR_WOLF)
+		{
+//			if (!TR_NOT) return("");
+			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
+			else if (TR_NOT == FL_NOTRN_BG)
+			{
+				return("w_item_pack");
+			}
+			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
+			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
+			return("");
+		}
+		if (TR == FL_TR_DOOM) return("d_art_invisible");
+		if (TR == FL_TR_QUAKE) return("item_artifact_invisibility");
+		if (TR == FL_TR_Q2) return("item_silencer");
+		if (TR == FL_TR_Q3) return("item_invis");
+		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_D_RADSUIT || e.scode == MC_SUIT || e.scode == MC_Q2_ENVIRO || e.scode == MC_Q3_ENVIRO)
+	{
+		if (TR == FL_TR_WOLF)
+		{
+//			if (!TR_NOT) return("");
+			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
+			else if (TR_NOT == FL_NOTRN_BG)
+			{
+				return("w_item_pack");
+			}
+			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
+			else if (TR_NOT == FL_NOTRN_RNDANY) return("");
+			return("");
+		}
+		if (TR == FL_TR_DOOM) return("d_art_radsuit");
+		if (TR == FL_TR_QUAKE) return("item_artifact_envirosuit");
+		if (TR == FL_TR_Q2) return("q2_item_enviro");
+		if (TR == FL_TR_Q3) return("q3_item_enviro");
+		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+/// doom
 /// wolf
-	else if (e.scode == MC_W_MACHGUN)
+/// q2
+/// q3
+	else if (e.scode == MC_Q3_ALIGNTNING)
 	{
-		if (TR == FL_TR_WOLF) return("w_weapon_machinegun");
-		if (TR == FL_TR_DOOM) return("d_weapon_supershotgun");
-		if (TR == FL_TR_QUAKE) return("weapon_nailgun");
-		if (TR == FL_TR_Q2) return("q2_weapon_machinegun");
-		if (TR == FL_TR_Q3) return("q3_weapon_machinegun"); // IDEA: need bg code here?
-		if (TR == FL_TR_RANDIN) return(mcw);
+		if (TR == FL_TR_WOLF) return("w_ammo_gas");
+		if (TR == FL_TR_DOOM) return("d_ammo_cellbox");
+		if (TR == FL_TR_QUAKE) return("item_cells_lg");
+		if (TR == FL_TR_Q2) return("q2_ammo_cells");
+		if (TR == FL_TR_Q3) return("ammo_lightning");
+		if (TR == FL_TR_RANDIN) return(mcg);
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_W_PISTOL)
+	else if (e.scode == MC_Q3_ABFG)
 	{
-		if (TR == FL_TR_WOLF) return("w_weapon_pistol");
-		if (TR == FL_TR_DOOM) return("d_weapon_pistol");
-		if (TR == FL_TR_QUAKE) return("weapon_shotgun");
-		if (TR == FL_TR_Q2) return("q2_blaster");
-		if (TR == FL_TR_Q3) return("weapon_gauntlet");
-		if (TR == FL_TR_RANDIN) return(mcw);
+		if (TR == FL_TR_WOLF) return("w_ammo_gas");
+		if (TR == FL_TR_DOOM) return("d_ammo_cellbox");
+		if (TR == FL_TR_QUAKE) return("item_cells_lg");
+		if (TR == FL_TR_Q2) return("q2_ammo_cells");
+		if (TR == FL_TR_Q3) return("ammo_bfg");
+		if (TR == FL_TR_RANDIN) return(mcg);
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
+
 	return("");
 };
 
