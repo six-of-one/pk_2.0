@@ -1524,7 +1524,7 @@ void() PK_ImpulseCommands =
 	}
 
 	else if (self.impulse == 255)
-//		QuadCheat ();
+		QuadCheat ();
 // TESTING - remove for upload
 		fn_make(cvar("saved1"), self.origin);
 

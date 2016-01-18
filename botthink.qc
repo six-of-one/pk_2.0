@@ -307,5 +307,8 @@ void () BotPostThink =
 		self.nextthink = (time + 5);
 		return ;
 	}
+
+// runes
+	if (self.rune_flag & RUNE_FLG_RG) rune_regen();
 };
 

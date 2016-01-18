@@ -29,7 +29,6 @@ void(entity itm) pk_art_backpack_drop;
 float() pk_art_checkpwr;
 float(entity trg, entity infl, entity atkr) pk_art_obit;
 void(entity en) pk_art_ck_lava;
-void (entity targ, entity inflictor, entity attacker, float damage) pk_art_T_Damage;
 float(entity ck, string prv) pk_art_movshot_ck;
 float(entity ck) pk_art_actor_ck;
 string (float bt) pk_art_ammo_by_bit;

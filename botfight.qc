@@ -379,6 +379,7 @@ void () W_BotAttack =
 				}
 			}
 		}
+		if (rune_haste(0.28))
 		self.attack_finished = ((time + 0.5) + addt);
 	}
 	else
@@ -387,6 +388,7 @@ void () W_BotAttack =
 		{
 			bot_shot1 ();
 			W_FireShotgun ();
+			if (rune_haste(0.28))
 			self.attack_finished = ((time + 0.5) + addt);
 		}
 		else
@@ -395,6 +397,7 @@ void () W_BotAttack =
 			{
 				bot_shot1 ();
 				W_FireSuperShotgun ();
+				if (rune_haste(0.38))
 				self.attack_finished = ((time + 0.7) + addt);
 			}
 			else
@@ -415,6 +418,7 @@ void () W_BotAttack =
 						{
 							bot_rocket1 ();
 							W_FireGrenade ();
+							if (rune_haste(0.3))
 							self.attack_finished = ((time + 0.6) + addt);
 						}
 						else
@@ -423,6 +427,7 @@ void () W_BotAttack =
 							{
 								bot_rocket1 ();
 								W_FireRocket ();
+								if (rune_haste(0.4))
 								self.attack_finished = ((time + 0.8) + addt);
 							}
 							else

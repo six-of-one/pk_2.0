@@ -101,7 +101,7 @@ void() turret_dropTurret =
 	}
 
 	if (self.flags & FL_CLIENT) // some qualification
-		self.currentammo = self.pk_turretammo = self.pk_turretammo - 1; // Cataboligne - 8.20.9 - moved here to wall fail doesnt eat ammo
+		self.currentammo = self.pk_turretammo = self.pk_turretammo - 1; // Cataboligne - 8.20.9 - moved here so wall fail doesnt eat ammo
 									// NOTE: self must always then be firing entity
 
 	turret = spawn ();
@@ -180,10 +180,13 @@ void() turret_dropTurret =
 //	turret.turret_base.solid = SOLID_BBOX;
 	turret.turret_base.solid = SOLID_NOT;
 	turret.turret_base.classname = "turret_base";
-	turret.turret_base.takedamage = TRUE;
-	turret.turret_base.health = rint(PK_TUR_HEAL * 0.667);
-	if (PK_TUR_HEAL > 0) turret.turret_base.th_die = turret_deathAnimBase;
-	else turret.turret_base.th_die = SUB_Null;
+
+// Cataboligne - 6.5.10 - removed base killable because of T_Dam loop deal
+
+//	turret.turret_base.takedamage = TRUE;
+//	turret.turret_base.health = rint(PK_TUR_HEAL * 0.667);
+//	if (PK_TUR_HEAL > 0) turret.turret_base.th_die = turret_deathAnimBase;
+//	else turret.turret_base.th_die = SUB_Null;
 
 	// Throw away from you
 	makevectors (self.angles);
@@ -330,7 +333,6 @@ void() turret_findTarget =
 			if (vlen(self.origin - head.origin) < PK_TUR_DEATHRAD)
 			{
 				self.owner = head;
-bprint("*** *** turret: quad con new ownership\n");
 				return;
 			}
 
@@ -536,7 +538,6 @@ void() turret_attackEnemy =
 			if (vlen(self.origin - head.origin) < PK_TUR_DEATHRAD)
 			{
 				self.owner = head;
-bprint("*** *** turret: quad con new ownership\n");
 				return;
 			}
 
@@ -565,7 +566,6 @@ void() turret_deathAnim =
 					head.delay = CRIT_BLOW;
 					head.think = turret_deathAnim;
 					head.nextthink = 1 + random() * 5; // spread out
-bprint("*** *** turret: crit blow caught one\n");
 			}
 			head = head.chain;
 		}
@@ -828,11 +828,19 @@ void() turret_nailTouch =
 void() turret_checkIfCanBeSolid =
 {
 	local entity head;
+	local float f;
+
+	f = TRUE;
 
 	// see if there are any objects that block the turret from becoming solid
 	head = findradius(self.origin, 28);
+	while (head)
+	{
+		if (head != self.turret_base && head != self) f = FALSE;
+		head = head.chain;
+	}
 
-	if (!head)
+	if (f)
 	{
 		// if can become solid!!!
 		self.turret_base.solid = SOLID_BBOX;

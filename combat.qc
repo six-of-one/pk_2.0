@@ -127,18 +127,13 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	if (!targ.takedamage)
 		return;
 
-	if (PK_ART || custom_hub_loaded)
-	{
-		pk_art_T_Damage(targ, inflictor, attacker, damage); // Cataboligne 8.12.9 purify - pk artifacts
-		return;
-	}
-
 // used by buttons and triggers to set activator for target firing
 	damage_attacker = attacker;
 
 // check for quad damage powerup on the attacker
 	if (!((RUNES > 1) && (attacker.rune_flag & RUNE_FLG_DM))) // rune overpowers quad on higher rule sets 
 	if (attacker.super_damage_finished > time)
+	if (attacker.pkplus_actortype != PKPLUS_ACTORQUAD) // pk art code here
 		damage = damage * 4;
 
 	if (attacker.rune_flag & RUNE_FLG_DM){
@@ -218,6 +213,7 @@ bprint("\n");
 			sound (targ, CHAN_ITEM, "items/protect3.wav", 1, ATTN_NORM);
 			self.invincible_sound = time + 2;
 		}
+		if (targ.pkplus_actortype != PKPLUS_ACTORPENT) // pk art code here
 		return ;
 	}
 
@@ -228,6 +224,7 @@ bprint("\n");
 // do the damage
 	targ.health = targ.health - take;
 
+	if (targ.pkplus_actortype != PKPLUS_ACTORPENT) // pk art code here - fake it for pent acting
 	if (PK) pk_setDamageSkin(targ); // *pk damage skin support
 	if (targ.health <= 0)
 	{
@@ -279,6 +276,7 @@ bprint("\n");
 		}
 	}
 
+	if (self.pkplus_actortype != PKPLUS_ACTORPENT || random() < 0.1) // pk art code here - fake it for pent acting most of the time
 	if (self.th_pain)
 	{
 		self.th_pain (attacker,take);

@@ -253,6 +253,11 @@ entity(vector org) make_waypoint =
 {
 	local entity point;
 
+	if (self.classname == OBSERVER) // Cataboligne - 6.5.10 - none of these for jafo
+	{
+		return(world);
+	}
+
 	if (pointcontents(org) == CONTENT_SOLID) // Cataboligne - 5.31.10 - in case a bot falls out of level
 	{
 		self.cnt = self.cnt + 1;

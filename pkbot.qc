@@ -399,7 +399,7 @@ void () bot_nail1 = [ $lightfatt1, bot_nail2 ]
 	SuperDamageSound ();
 	W_FireSpikes (4);
 	ai_botnailcharge (BOTSPEED);
-	self.attack_finished = (time + 0.2);
+//	self.attack_finished = (time + 0.2);
 	BotPostThink ();
 };
 
@@ -414,7 +414,7 @@ void () bot_nail2 = [ $lightfatt2, bot_nail1 ]
 	SuperDamageSound ();
 	W_FireSpikes (-4);
 	ai_botnailcharge (BOTSPEED);
-	self.attack_finished = (time + 0.2);
+//	self.attack_finished = (time + 0.2);
 	BotPostThink ();
 };
 
