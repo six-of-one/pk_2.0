@@ -67,8 +67,20 @@ void () PlaceItem =
 		remove (self);
 		return ;
 	}
-	if (PK) pk_placeitem(); // *pk - set item details
+	if (PK || custom_hub_loaded) pk_placeitem(); // *pk - set item details, handle custom hub - non pk levels deal
 	bot_item_linx(self); // *bot - item tie in
+
+if (1) 
+if (self.pk_touch == painkeep_touch)
+{
+dprint("hi, code base here, placeitem pk_touch == painkeep_touch ( ");
+dprint(ftos(self.pk_touch == painkeep_touch));
+dprint(" , ");
+dprint(self.classname);
+dprint(" , ");
+dprint(self.netname);
+dprint(" )\n");}
+
 };
 
 /*
@@ -171,12 +183,6 @@ void () health_touch =
 	local float amount;
 	local string s;
 
-	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
-	if (other.classname != "player")
-	{
-		grap_checkIfGrap ();
-		return ;
-	}
 	if (other.classname != "player")
 			return;
 
@@ -262,12 +268,6 @@ void () armor_touch =
 {
 	local	float	type, value, bit;
 
-	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
-	if (other.classname != "player")
-	{
-		grap_checkIfGrap ();
-		return ;
-	}
 	if (other.health <= 0)
 		return;
 	if (other.classname != "player")
@@ -429,12 +429,6 @@ void () weapon_touch =
 	local entity stemp;
 	local float leave;
 
-	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
-	if (other.classname != "player")
-	{
-		grap_checkIfGrap ();
-		return ;
-	}
 	if (other.classname != "player") // *bot
 			return;
 
@@ -643,12 +637,6 @@ void () ammo_touch =
 	local entity stemp;
 	local float best;
 
-	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
-	if (other.classname != "player")
-	{
-		grap_checkIfGrap ();
-		return ;
-	}
 	if (other.classname != "player")
 			return ;
 	if (other.health <= 0)
@@ -921,12 +909,6 @@ void () key_touch =
 	local entity stemp;
 	local float best;
 
-	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
-	if (other.classname != "player")
-	{
-		grap_checkIfGrap ();
-		return ;
-	}
 	if (other.classname != "player")
 			return;
 	if (other.health <= 0)
@@ -1063,12 +1045,6 @@ void () sigil_touch =
 	local entity stemp;
 	local float best;
 
-	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
-	if (other.classname != "player")
-	{
-		grap_checkIfGrap ();
-		return ;
-	}
 	if (other.classname != "player")
 			return;
 	if (other.health <= 0)
@@ -1139,12 +1115,6 @@ void () powerup_touch =
 	local entity stemp;
 	local float best;
 
-	if (!Q_100 && !Q_99 && custom_hub_loaded) // Cataboligne - 8.18.9 - harpoon check when using custom hub
-	if (other.classname != "player")
-	{
-		grap_checkIfGrap ();
-		return ;
-	}
 	if (other.classname != "player")
 			return;
 	if (other.health <= 0)

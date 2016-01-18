@@ -1156,7 +1156,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 
 		if (PK_ART) if (pk_art_obit(targ, inflictor, attacker)) return; // Cataboligne 8.12.9 purify - pk artifacts
 
-		if (attacker.classname == "player")
+		if (attacker.classname == "player" ||  attacker.classname == OBSERVER) // Cataboligne 9.23.9 - attacker could have died & become observer
 		{
 			if (targ == attacker)
 			{

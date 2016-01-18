@@ -1374,7 +1374,7 @@ void(entity targ, entity attacker) ClientObituary =
 			return;
 		}
 
-		if (attacker.classname == "player")
+		if (attacker.classname == "player" ||  attacker.classname == OBSERVER) // Cataboligne 9.23.9 - attacker could have died & become observer
 		{
 			if (targ == attacker)
 			{

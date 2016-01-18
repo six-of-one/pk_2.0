@@ -688,7 +688,7 @@ void (entity targ, entity inflictor, entity attacker, float damage) pk_art_T_Dam
 // do the damage
 	targ.health = targ.health - take;
 
-	if (self.pkplus_actortype != PKPLUS_ACTORPENT) // pk art code here - fake it for pent acting
+	if (targ.pkplus_actortype != PKPLUS_ACTORPENT) // pk art code here - fake it for pent acting
 	if (PK) pk_setDamageSkin(targ); // *pk damage skin support
 	if (targ.health <= 0)
 	{

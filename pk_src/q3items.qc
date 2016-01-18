@@ -160,6 +160,7 @@ void() ammo_bullets =
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 
 	self.spawnflags = self.spawnflags | 1;
+//	setorigin(self, self.origin + ' 0 0 16');
 	item_spikes();
 }
 
@@ -168,6 +169,7 @@ void() ammo_grenades =
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 
 	self.spawnflags = self.spawnflags | 1; // big
+//	setorigin(self, self.origin + ' 0 0 16');
 	item_rockets();
 }
 
@@ -177,11 +179,13 @@ void() ammo_lightning =
 
 	local entity e;
 	self.spawnflags = self.spawnflags | 1;
+//	setorigin(self, self.origin + ' 0 0 16');
 	item_cells();
 	e = spawn();
 	setorigin(e, self.origin);
 	e.spawnflags = self.spawnflags;
 	self = e;
+//	setorigin(self, self.origin + ' 0 0 16');
 	item_cells();
 }
 
@@ -190,6 +194,7 @@ void() ammo_bfg =
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 
 	self.spawnflags = self.spawnflags | 1;
+//	setorigin(self, self.origin + ' 0 0 16');
 	item_cells();
 }
 
@@ -201,6 +206,7 @@ void() ammo_bfg =
 void() spawnfunc_ammo_shells =
 {
 //	self.spawnflags = self.spawnflags | 1;
+//	setorigin(self, self.origin + ' 0 0 16');
 	item_shells();
 
 	if (self.spawnflags & SUSPENDED) q3_suspend();
@@ -208,10 +214,11 @@ void() spawnfunc_ammo_shells =
 
 void() spawnfunc_ammo_rockets =
 {
-//	self.spawnflags = self.spawnflags | 1;
-	item_rockets();
-
 	if (self.spawnflags & SUSPENDED) q3_suspend();
+
+	self.spawnflags = self.spawnflags | 1; // q3 rockets are 10 pk
+//	setorigin(self, self.origin + ' 0 0 16');
+	item_rockets();
 };
 
 void() spawnfunc_ammo_cells =
@@ -219,8 +226,8 @@ void() spawnfunc_ammo_cells =
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 
 	self.spawnflags = self.spawnflags | 1; // big - note conflicts with suspend
+//	setorigin(self, self.origin + ' 0 0 16');
 	item_cells();
-
 };
 
 //ammo_slugs
@@ -228,6 +235,7 @@ void() spawnfunc_ammo_cells =
 void() ammo_slugs =
 {
 	self.classname = "item_painkeep_expshells";
+//	setorigin(self, self.origin + ' 0 0 16');
 	item_painkeep_expshells();
 
 	if (self.spawnflags & SUSPENDED) q3_suspend();

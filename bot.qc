@@ -539,7 +539,7 @@ void(entity e) bot_BackpackSetup =
 	e.classname = "Backpack"; // *bot backpack code follows
 	e.th_weight = backpackweight;
 	e.state = BOT_TOUCHED;
-	if (PK) e.touch = painkeep_touch; // *pk
+	if (PK || custom_hub_loaded) e.touch = painkeep_touch; // *pk
 }
 
 // remove item hooks & put here - code diverts here from PlaceItem

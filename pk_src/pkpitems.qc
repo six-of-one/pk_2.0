@@ -21,7 +21,7 @@ void () pkplus_weapon_touch =
 	local float leave;
 	if ( !(other.flags & FL_CLIENT))
 	{
-		grap_checkIfGrap ();
+		grap_checkIfGrap();
 		return ;
 	}
 	stemp = self;
@@ -102,7 +102,7 @@ void () pkplus_touch =
 
 	if (other.classname != "player") //&& other.classname != "pk*bot")
 	{
-		grap_checkIfGrap ();
+		grap_checkIfGrap();
 		return ;
 	}
 

@@ -1319,7 +1319,7 @@ void() PK_ImpulseCommands =
 	else if (self.impulse == 12)
 		CycleWeaponReverseCommand ();
 
-	else if (self.impulse >= 30 && self.impulse <= 39 || self.impulse == 21 || self.impulse == 22)
+	else if (self.impulse >= 30 && self.impulse <= 39 || self.impulse == 21 || self.impulse == 22) // user impulses
 		pk_special_impulse();
 	else if (PK_ART && self.impulse > 160 && self.impulse < 166) // Cataboligne 8.12.9 purify - pk artifacts
 	{

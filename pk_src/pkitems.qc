@@ -41,7 +41,7 @@ void () painkeep_weapon_touch =
 
 	if (other.classname != "player") // *bot
 	{
-		grap_checkIfGrap ();
+		grap_checkIfGrap();
 		return ;
 	}
 
@@ -339,7 +339,7 @@ bprint(" , ");
 bprint(self.netname);
 bprint(" )\n");}
 		}
-		if (self.pk_touch != painkeep_touch)
+		if (self.pk_touch != painkeep_touch) // bots dont get pktouch stuff yet...
 		{
 			e = other;
 			e.classname = "player";
@@ -367,6 +367,16 @@ bprint(" )\n");}
 		return;
 	}
 
+if (1) {
+bprint("hi, code base here, item pk_touch != painkeep_touch ( ");
+bprint(ftos(self.pk_touch != painkeep_touch));
+bprint(" , ");
+bprint(self.classname);
+bprint(" , ");
+bprint(self.netname);
+bprint(" )\n");}
+
+
 	if (self.pk_touch != painkeep_touch) // all items route through here - handle special cases, other touch fns & return
 	{
 		if (self.pk_touch == ammo_touch) self.pk_touch = pk_ammo_touch; // new fn for ammo collections
@@ -386,7 +396,7 @@ bprint(" )\n");}
 			e.classname = "pk*bot";
 			if (e.think == player_run) e.think = e.th_run;
 			if (e.think == player_stand1) e.think = e.th_stand;
-if (0) {
+if (1) {
 bprint("hi, code base here, in PK bot touched item ( ");
 bprint(self.classname);
 bprint(" , ");
@@ -473,7 +483,6 @@ else bprint(" )\n");}
 	SUB_UseTargets();				// fire all targets / killtargets
 	if (pk_flags & PK_DYNAMIC) pk_dyn_touch();
 };
-
 
 
 /*QUAKED item_painkeep_gwell (0 .5 .8) (-16 -16 -24) (16 16 32)
@@ -663,8 +672,8 @@ void() pk_item_position =
 	self.think = ip_checkForMovement;
 	self.nextthink = time + 60;
 
-	if (self.classname == "dyn_item")
-bprint(" err: dyn in ip ");
+if (self.classname == "dyn_item")
+bprint("********* err: dyn in item position *********");
 
 };
 
@@ -677,8 +686,8 @@ void() pk_item_position_init =
 	self.think = ip_checkForMovement;
 	self.nextthink = time + 60;
 
-	if (self.classname == "dyn_item")
-bprint(" err: dyn in ip ");
+if (self.classname == "dyn_item")
+bprint("******** err: dyn in ip *********");
 
 };
 
@@ -1004,11 +1013,60 @@ void() pk_placeitem =
 		self.velocity_y = -170 + (random() * 340);
 	}
 
+if (1) 
+if (self.touch == painkeep_touch)
+{
+dprint("hi, code base here, at pk_placeitem, self.touch == painkeep_touch ( ");
+dprint(self.classname);
+dprint(" , ");
+dprint(self.netname);
+dprint(" , ");
+dprint(vtos(self.origin));
+dprint(" )\n");}
+
+if (1) 
+if (self.pk_touch == painkeep_touch)
+{
+dprint("hi, code base here, at pk_placeitem, self.pk_touch == painkeep_touch ( ");
+dprint(self.classname);
+dprint(" , ");
+dprint(self.netname);
+dprint(" , ");
+dprint(vtos(self.origin));
+dprint(" )\n");}
+
+if (1) 
+if (self.touch == (void()) 0)
+{
+dprint("hi, code base here, at pk_placeitem, self.touch == NULL ( ");
+dprint(self.classname);
+dprint(" , ");
+dprint(self.netname);
+dprint(" , ");
+dprint(vtos(self.origin));
+dprint(" )\n");}
+
+if (1) 
+if (self.pk_touch != (void()) 0)
+{
+dprint("hi, code base here, at pk_placeitem, self.pk_touch != NULL ( ");
+dprint(self.classname);
+dprint(" , ");
+dprint(self.netname);
+dprint(" , ");
+dprint(vtos(self.origin));
+dprint(" )\n");}
+
+
 // handle extra item stuff
-	self.pk_touch = self.touch;
-	self.touch = painkeep_touch; // route everything here
+	if (self.pk_touch == (void()) 0) // dont swamp pointers
+	{
+		self.pk_touch = self.touch;
+		self.touch = painkeep_touch; // route everything here
+	}
 
 // Cataboligne - added check here because new mode (not permanently PK & loaded a PK map can set PK mode after nailguns get loaded on map
+	if (PK)
 	if (self.classname == "weapon_nailgun" || self.weapon == IT_NAILGUN)
 	if (self.model == "progs/g_nail.mdl")
 	{
@@ -1016,6 +1074,7 @@ void() pk_placeitem =
 		self.netname = "Pulse Rifle";
 	}
 };
+
 
 // fn(item_repm) - replace / remove all items matching with a new item
 // fn(item_bit) - provide item classname string by bit
