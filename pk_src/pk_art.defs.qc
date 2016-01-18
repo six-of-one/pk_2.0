@@ -13,7 +13,23 @@
  float PK_ART_DEF				= 1;	// admin uses to enable / disable artifacts support - compile with 0 to disable artifacts permanently
  float PK_ART;							// admin artifacts toggle - artifacts code works when non 0
  
- /*
+void(float sel) pk_art_parms;
+void() pk_art_precache;
+void() pk_art_attack;
+float(float pkn) pk_art_hasammo;
+void(float pkimp) pk_art_specialimpulse;
+void(float wch) pk_art_setcurrentammo;
+void() pk_art_cycleobjects;
+void() pk_art_cheat;
+void() pk_art_prinv;
+void(entity oth)  pk_art_bound_ammo;
+void () pk_art_powerup_touch;
+void(entity oth, float acnt) pk_art_backpack_touch;
+void(entity itm) pk_art_backpack_drop;
+float() pk_art_checkpwr;
+float(entity trg, entity infl, entity atkr) pk_art_obit;
+ void(entity en) pk_art_ck_lava;
+ 
  // prototypes - from
  // splash.qc
 void () tombdie;
@@ -25,7 +41,7 @@ void () actor_pent_activate;
 void () phone_activate;
 // subs.qc
 void (entity ownerEntity) ego_remove;
-*/
+
 
 // const - subs.qc
 
@@ -86,22 +102,21 @@ deprecated - already in pk_bot
 // qc needing mods for support via pk 2.x
 
 /*
-actor.qc
-client.qc
+actor.qc			***
+client.qc		***
 combat.qc
-ego.qc
+ego.qc			***
 grap.qc
 gravity.qc
 horn.qc
-hub.qc
-items.qc
-phone.qc
-pkpitems.qc
-player.qc
-splash.qc
-subs.qc
-tomb.qc
+items.qc			***
+phone.qc			***
+pkpitems.qc		***
+player.qc		***
+splash.qc		***
+subs.qc			***
+tomb.qc			***
 turret.qc
-weapons.qc
+weapons.qc		***
 
 */

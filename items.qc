@@ -59,7 +59,7 @@ void () PlaceItem =
 	self.velocity = '0 0 0';
 	self.origin_z = self.origin_z + 6;
 	oldz = self.origin_z;
-	if (!droptofloor(0,0)) // Cataboligne 9.17.3 - fix compiler warning
+	if (!droptofloor(0,0)) // Cataboligne 9.17.3 - fixed this compiler warning
 	{
 		dprint ("Bonus item fell out of level at ");
 		dprint (vtos (self.origin));
@@ -1107,6 +1107,12 @@ void () powerup_touch =
 			return;
 	if (other.health <= 0)
 		return ;
+
+	if (PK_ART)
+	{
+		pk_art_powerup_touch(); // Cataboligne 8.12.9 purify - pk artifacts
+		return;
+	}
 
 	sprint (other,"You got the ");
 	sprint (other,self.netname);

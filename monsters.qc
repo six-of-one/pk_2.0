@@ -72,7 +72,7 @@ local string	stemp;
 local entity	etemp;
 
 	self.origin_z = self.origin_z + 1;	// raise off floor a bit
-	droptofloor(0,0); // Cataboligne 9.17.3 - fix compiler warning
+	droptofloor(0,0); // Cataboligne 9.17.3 - fixed this compiler warning
 
 	if (!walkmove(0,0))
 	{

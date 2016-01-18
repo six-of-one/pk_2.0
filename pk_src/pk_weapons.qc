@@ -350,6 +350,8 @@ void() PK_SetCurrentAmmo =
 			if (wchanged)
 				sprint(self, "Chain Thunderbolt\n");
 		}
+
+		if (PK_ART) pk_art_setcurrentammo(wchanged); // Cataboligne 8.12.9 purify - pk artifacts
 	}
 	else if (self.weapon == IT_SHOTGUN)
 	{
@@ -499,6 +501,9 @@ float(float weaponnum, float pknum) HasAmmo =
 			if (self.pk_canpabammo < 1)
 				return FALSE;
 		}
+
+		if (PK_ART) if (pk_art_hasammo(pknum)) // Cataboligne 8.12.9 purify - pk artifacts
+			return FALSE;															// fn return TRUE indicates false code for pk artifacts
 	}
 	else if (weaponnum == IT_SHOTGUN)
 	{
@@ -752,6 +757,8 @@ void() pk_special_impulse =
 		// '\n'
 		WriteB3(MSG_ONE, 10);
 
+		if (PK_ART) pk_art_prinv(); // Cataboligne 8.12.9 purify - pk artifacts
+
 		if (self.pk_items & PK_IT_GRAPGUN)
 		{
 			// 'Harpoon Gun	'
@@ -990,6 +997,8 @@ void() PK_Attack =
 			player_bolt1();
 			self.attack_finished = time + 0.1;
 		}
+		
+		if (PK_ART) pk_art_attack(); // Cataboligne 8.12.9 purify - pk artifacts
 	}
 	else if (self.weapon == IT_SHOTGUN)
 	{
@@ -1035,6 +1044,12 @@ void() PK_Attack =
 
 void() pk_cycleObjects =
 {
+	if (PK_ART)
+	{
+		pk_art_cycleobjects(); // Cataboligne 8.12.9 purify - pk artifacts
+		return;
+	}
+
 	while (1)
 	{
 		if (self.pk_currentitem == PK_IT_AXE)
@@ -1301,6 +1316,8 @@ void() PK_CheatCommand =
 
 	self.pk_items = self.pk_items | PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT;
 
+	if (PK_ART) pk_art_cheat(); // Cataboligne 8.12.9 purify - pk artifacts
+
 	self.weapon = IT_ROCKET_LAUNCHER;
 	self.impulse = 0;
 	W_SetCurrentAmmo();
@@ -1323,6 +1340,11 @@ void() PK_ImpulseCommands =
 
 	else if (self.impulse >= 30 && self.impulse <= 39 || self.impulse == 21 || self.impulse == 22)
 		pk_special_impulse();
+	else if (PK_ART && self.impulse > 160 && self.impulse < 166) // Cataboligne 8.12.9 purify - pk artifacts
+	{
+		pk_art_specialimpulse(self.impulse);
+		return;
+	}
 
 // Select best close combat weapon
 	else if (self.impulse == 46)

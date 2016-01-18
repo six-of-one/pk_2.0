@@ -93,6 +93,11 @@ pk_src/admin.qc
 // pk_src/frames.qc - not in original progs.src
 
 // painkeep artifacts
+pk_src/pkpitems.qc
+pk_src/ego.qc
+pk_src/tomb.qc
+pk_src/actor.qc
+pk_src/phone.qc
 pk_src/pk_artifacts.qc
 
 // support for q3 maps in darkplaces

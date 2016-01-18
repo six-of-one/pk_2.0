@@ -128,6 +128,7 @@ void() CheckWaterLevels =
 	          e.think = turret_deathAnim;
 	          e.nextthink = time + 0.1;
 	        }
+			  if (PK_ART) pk_art_ck_lava(e); // Cataboligne 8.12.9 purify - pk artifacts
 	      }
 	    }
 	      

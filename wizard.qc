@@ -166,7 +166,7 @@ float()	WizardCheckAttack =
 WizardAttackFinished
 =================
 */
-void ()	WizardAttackFinished = // Cataboligne 9.17.3 - fix compiler warning
+void ()	WizardAttackFinished = // Cataboligne 9.17.3 - fixed this compiler warning
 {
 	if (enemy_range >= RANGE_MID || !enemy_vis)
 	{

@@ -154,7 +154,7 @@ float PK_IT_GRAPGUN			= 16;
 float PK_IT_AIRGUN			= 32;
 float PK_IT_CLIGHT			= 64;
 float PK_IT_BEARTRAP			= 128;
-float PK_IT_EXTRADISP		= 256;
+float PK_IT_EXTRADISP		= 4096; //= 256; - pk artifacts support recode
 /*
 Impulse 1 will toggle between Axe, Bear Trap, CoPB, AS, and GW.
 

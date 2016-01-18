@@ -1034,8 +1034,7 @@ Check for turning off powerups
 */
 void () CheckPowerups =
 {
-// Cataboligne 8.9.9 purify - chase cam
-	if (self.classname == "deadcam") return;
+	if (self.classname == "deadcam") return; // Cataboligne 8.9.9 purify - chase cam
 
 	if (self.health <= 0)
 		return;

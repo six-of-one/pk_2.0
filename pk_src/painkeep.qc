@@ -163,6 +163,8 @@ void() PK_precache =
 
 	precache_model ("progs/null.mdl"); // Cataboligne 8.8.9 purify - chase cam
 
+	if (PK_ART) pk_art_precache(); // Cataboligne 8.12.9 purify - pk artifacts
+
 	PK_ADMIN = 6; // code sets allow admin here - can be disabled by admin menu, 3 is base menu set
 
 	local entity e;
@@ -497,30 +499,28 @@ void(vector org) spawn_tfog2 =
 void() PK_ChangeParms =
 {
 	parm10 = PK_IT_AXE | self.pk_items;
-// recode so *bot can have vars for skill level save - provide max inventory of 15 for mod expansion, current max is 3
-// except explode ammo which is not bound
-	parm11 = self.pk_gravitywellammo + (self.pk_turretammo * 16) + (self.pk_canpabammo * 256) + (self.pk_beartrapammo * 4096) + (self.pk_explode_ammo * 65536);
-//	parm11 = self.pk_gravitywellammo;
-//	parm12 = self.pk_turretammo;
-//	parm13 = self.pk_canpabammo;
-//	parm14 = self.pk_beartrapammo;
-//	parm15 = self.pk_explode_ammo;
+// recode so *bot can have vars for skill level save - provide max inventory of 15 for mod expansion, current max is 3 on most except for explode ammo
+
+	parm11 = self.pk_explode_ammo + ((self.pk_turretammo & 3) * 16) + ((self.pk_canpabammo & 3) * 64) + ((self.pk_beartrapammo & 3) * 256) + ((self.pk_gravitywellammo & 3) * 1024);
+
+	if (PK_ART) pk_art_parms(0); // Cataboligne 8.12.9 purify - pk artifacts
 	// do hub message.
-	parm16 = self.msgcount | 256;
+	parm16 = self.msgcount | 256 | (self.pk_items & PK_IT_EXTRADISP);
 };
 
 // called from SetNewParms - clears pk parms
 
 void() PK_SetNewParms =
 {
-	parm10 = PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP;
-	parm11 = parm12 = parm13 = parm14 = parm15 = 0;
+//	parm10 = PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP; // deprecated - not really used
+//	parm11 = parm12 = parm13 = parm14 = parm15 = 0; // chasecam change
+		parm11 = parm12 = parm13 = 0;
 // do hub message.
 	parm16 = 256;
 
 	if (pk_flags & PK_TP_STATUSON)
 	{
-		parm10 = parm10 | PK_IT_EXTRADISP;
+		parm16 = parm16 | PK_IT_EXTRADISP;
 	}
 };
 
@@ -528,17 +528,16 @@ void() PK_SetNewParms =
 
 void() PK_DecodeLevelParms = 
 {
-	self.pk_items = PK_IT_AXE | parm10 | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP; // fix PK mode false map to PK mode true map
-	self.pk_gravitywellammo = parm11 & 15;
-	self.pk_turretammo = floor(parm11 / 16) & 15;
-	self.pk_canpabammo = floor(parm11 / 256) & 15;
-	self.pk_beartrapammo = floor(parm11 / 4096) & 15;
-	self.pk_explode_ammo = floor(parm11 / 65536);// & 15; // unbound for now
-//	self.pk_turretammo = parm12;
-//	self.pk_canpabammo = parm13;
-//	self.pk_beartrapammo = parm14;
-//	self.pk_explode_ammo = parm15;
+	self.pk_items = parm10 | (parm16 & PK_IT_EXTRADISP); // fix PK mode false map to PK mode true map
+	self.pk_explode_ammo = parm11 & 15;
+	self.pk_turretammo = floor(parm11 / 16) & 3;
+	self.pk_canpabammo = floor(parm11 / 64) & 3;
+	self.pk_beartrapammo = floor(parm11 / 256) & 3;
+	self.pk_gravitywellammo = floor(parm11 / 1024) & 3;
+
 	self.msgcount = (parm16 & 255);
+
+	if (PK_ART) pk_art_parms(1); // Cataboligne 8.12.9 purify - pk artifacts
 };
 
 // called from SetChangeParms with health < 0 - sets MOTD time in parm 16, & checks user enabled extra disp
@@ -551,15 +550,8 @@ void() SetNewPKParms =
 	parm3 = parm5 = parm6 = parm7 = parm9 = 0;
 	parm4 = 25;
 	parm8 = 1;
-	parm10 = PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP;
-	parm11 = parm12 = parm13 = parm14 = parm15 = 0;
 */
-	parm16 = (MOTDTIME + 1) | 256; // do hub message.
-
-	if (self.pk_items & PK_IT_EXTRADISP)
-	{
-		parm10 = parm10 | PK_IT_EXTRADISP;
-	}
+	parm16 = (MOTDTIME + 1) | 256 | (self.pk_items & PK_IT_EXTRADISP); // do hub message.
 };
 
 // called from PutClientInServer
@@ -730,6 +722,11 @@ void() PK_CIS =
 	self.velocity = '0 0 0';
 
 	localcmd(CL_BOBAMT); // restore bobing - may have come from a hub vote
+
+	self.pk_items = self.pk_items | PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP
+																	| PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // Cataboligne 8.12.9 purify - pk artifacts
+
+	self.pkplus_actortype = 0; // Cataboligne 8.12.9 purify - pk artifacts
 };
 
 /*
@@ -907,6 +904,7 @@ void() pk_post_think =
 	{
 	 bolt_checkTargets();
 
+		if (PK_ART) if (!pk_art_checkpwr()) // Cataboligne 8.12.9 purify - pk artifacts
 		CheckPowerups ();
 		if (self.copb_timeout)
 		{
@@ -929,6 +927,7 @@ void() pk_post_think =
 	{
 		bolt_checkTargets();
 
+		if (PK_ART) if (!pk_art_checkpwr()) // Cataboligne 8.12.9 purify - pk artifacts
 		CheckPowerups ();
 		if (self.copb_timeout)
 		{
@@ -1060,6 +1059,8 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			targ.frags = targ.frags - 1;
 			return;
 		}
+
+		if (PK_ART) if (pk_art_obit(targ, inflictor, attacker)) return; // Cataboligne 8.12.9 purify - pk artifacts
 
 		if (attacker.classname == "player")
 		{

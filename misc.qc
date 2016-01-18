@@ -197,7 +197,7 @@ void () misc_fireball =
 	self.nextthink = time + (random() * 5);
 	self.think = fire_fly;
 	if (!self.speed)
-		self.speed = 1000; // Cataboligne 9.17.3 - fix compiler warning
+		self.speed = 1000; // Cataboligne 9.17.3 - fixed this compiler warning
 };
 
 void () fire_fly =
@@ -267,7 +267,7 @@ void () misc_explobox =
 
 	self.origin_z = self.origin_z + 2;
 	oldz = self.origin_z;
-	droptofloor(0,0); // Cataboligne 9.17.3 - fix compiler warning
+	droptofloor(0,0); // Cataboligne 9.17.3 - fixed this compiler warning
 	if (oldz - self.origin_z > 250)
 	{
 		dprint ("item fell out of level at ");
@@ -299,7 +299,7 @@ void () misc_explobox2 =
 
 	self.origin_z = self.origin_z + 2;
 	oldz = self.origin_z;
-	droptofloor(0,0); // Cataboligne 9.17.3 - fix compiler warning
+	droptofloor(0,0); // Cataboligne 9.17.3 - fixed this compiler warning
 	if (oldz - self.origin_z > 250)
 	{
 		dprint ("item fell out of level at ");
@@ -566,7 +566,7 @@ void () func_illusionary =
 	self.movetype = MOVETYPE_NONE;
 	self.solid = SOLID_NOT;
 	setmodel (self,self.model);
-	makestatic (self); // Cataboligne 9.17.3 - fix compiler warning
+	makestatic (self); // Cataboligne 9.17.3 - fixed this compiler warning
 };
 
 /*QUAKED func_episodegate (0 .5 .8) ? E1 E2 E3 E4

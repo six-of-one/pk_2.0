@@ -647,6 +647,8 @@ void() pk_bound_ammo =
 
 	if (other.pk_explode_ammo > PK_EXPLODEAMMO_MAX)
 		other.pk_explode_ammo = PK_EXPLODEAMMO_MAX;
+
+	if (PK_ART) pk_art_bound_ammo(other); // Cataboligne 8.12.9 purify - pk artifacts
 };
 
 // called from below - replacement for RankForWeapon - provides rank for some pk stuff
@@ -746,6 +748,8 @@ void() PK_BackpackTouch =
 	other.pk_canpabammo = other.pk_canpabammo + self.pk_canpabammo;
 	other.pk_beartrapammo = other.pk_beartrapammo + self.pk_beartrapammo;
  	other.pk_explode_ammo = other.pk_explode_ammo + self.pk_explode_ammo;
+
+	if (PK_ART) pk_art_backpack_touch(other, acount); // Cataboligne 8.12.9 purify - pk artifacts
 
 	new = self.items;
 	if (!new)
@@ -913,6 +917,8 @@ void() PK_DropBackpack =
 	newmis.pk_canpabammo = self.pk_canpabammo;
 	newmis.pk_beartrapammo = self.pk_beartrapammo;
 	newmis.pk_explode_ammo = self.pk_explode_ammo;
+
+		if (PK_ART) pk_art_backpack_drop(newmis); // Cataboligne 8.12.9 purify - pk artifacts
 
 	newmis.velocity_z = 300;
 	newmis.velocity_x = -100 + (random() * 200);

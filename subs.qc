@@ -9,7 +9,7 @@ void() SUB_Remove = {remove(self);};
 QuakeEd only writes a single float for angles (bad idea), so up and down are
 just constant angles.
 */
-void() SetMovedir =  // Cataboligne 9.17.3 - fix compiler warning
+void() SetMovedir =  // Cataboligne 9.17.3 - fixed this compiler warning
 {
 	if (self.angles == '0 -1 0')
 		self.movedir = '0 0 1';

@@ -492,6 +492,8 @@ void() PK_PlayerDie =
 	self.copb_timeout = 0;
 	self.modelindex = modelindex_player;	// don't use eyes
 
+	self.pkplus_actortype = 0; // Cataboligne 8.12.9 purify - pk artifacts
+
 	self.deadflag = DEAD_DYING;
 	self.movetype = MOVETYPE_TOSS;
 
