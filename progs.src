@@ -69,26 +69,24 @@ oldone.qc
 
 chasecam.qc  //Cataboligne MOD 9.11.3
 
-pk_src/viswep.qc
-
-pk_src/mcode.qc
+xwep/viswep.qc
+xwep/mcode.qc
 
 // hipnotic
 
 hipnotic/hiprubbl.qc
-
-// support for rotating brushes - Ariochs Heaven map
 hipnotic/rotate.qc
 
 // runes
 runes.qc
 
 // support for doom maps ! 
-pk_src/dooments.qc
+xwep/dooments.qc
 
 // extra weapons
 
 xwep/railgun.qc
+xwep/lasers.qc
 xwep/x_firecode.qc
 
 // painkeep code
@@ -130,9 +128,9 @@ pk_src/phone.qc
 pk_src/pk_artifacts.qc
 
 // support for q2 converted maps
-pk_src/q2ents.qc
+xwep/q2ents.qc
 // support for q3 maps in darkplaces
-pk_src/q3ents.qc
+xwep/q3ents.qc
 
 
 bot.qc

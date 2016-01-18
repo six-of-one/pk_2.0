@@ -27,9 +27,6 @@ path_corners need a "target1" "..." and "target2" "..." instead of the single
 
 */
 
-// used by path_corners to specify the 2 possible destinations
-.string target1;
-.string target2;
 
 void(float n) func_train_2d_next;
 void() func_train_2d_find;

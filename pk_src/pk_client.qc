@@ -983,13 +983,14 @@ void () PlayerPostThink =
 
 // do weapon stuff
 
-//	if (WEPHUM)
 	if (!XENV)
+	if (WEPHUM)
 	if (self.eweapon)
-		if (self.chaosweptime < time)
+	if (self.eweapon.noise2 != "")
+	if (self.chaosweptime < time)
 //		if (self.chaosattnoise != HUMLOCAL) 
 //		if (self.eweapon.weapon != MC_AIRGUN)
-			ominous_hum(self.eweapon.noise2, self.eweapon.chaosweptime);
+		ominous_hum(self.eweapon.noise2, self.eweapon.chaosweptime);
 
 	if (time < self.attack_finished)
 		return;

@@ -257,6 +257,9 @@ void() PK_precache =
 	precache_model ("progs/v2_pulsenail.mdl");
 	precache_model ("progs/v2_harp.mdl");
 
+// chaos
+	precache_model ("progs/laser_m.mdl");
+
 	doom_precache();
 	q2_precache();
 	q3_precache();
@@ -1157,6 +1160,8 @@ void() pk_srvcmd_set =
 // weps
 
 	PLASMA_VEL = 600;
+	LASERCAN_VEL = 1000;
+	LASER_VEL = 600;
 	ROCKET_FUSE = 5.0;
 	WEPHUM = 1;
 

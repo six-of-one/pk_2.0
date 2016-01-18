@@ -274,7 +274,7 @@ void() PK_SetCurrentAmmo =
 		self.forcewchange = FALSE;
 
 		wchanged = TRUE;
-		ominous_hum("misc/null.wav", 0);
+		ominous_hum("", 1);
 	}
 
 	wchanged = wchanged & ((self.items & IT_INVISIBILITY) || (self.cam_x & CHSCAM_ON));

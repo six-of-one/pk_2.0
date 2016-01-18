@@ -387,6 +387,8 @@ void() X_FireHitscan;
 void() X_FireRailgun;
 void() player_mgchg1;
 
+float LASERCAN_VEL;
+float LASER_VEL;
 float PLASMA_VEL;
 float ROCKET_FUSE;
 float WEPHUM; // weapons hum
@@ -454,14 +456,15 @@ float(string name, string value) registercvar = #93;
 float MOVETYPE_FOLLOW		= 12;
 
 
-float AMMO_NONE				= 100;
-float AMMO_SHELLS				= 101; // gun uses this ammo type
+float AMMO_NONE				= 100; // mostly melee weps
+float AMMO_SHELLS				= 101; // ranged gun uses this ammo type
 float AMMO_NAILS				= 103;
 float AMMO_ROCKETS			= 105;
 float AMMO_CELLS				= 107;
 float AMMO_BULLETS			= 109;
 float AMMO_SLUGS				= 111;
 float AMMO_GRENADES			= 113;
+float AMMO_GAS					= 115;
 
 // **************************************
 // viswep
@@ -532,6 +535,10 @@ float VWX_PLASMA				= 32;
 float VWY_PLASMA				= 8;
 float VWZ_PLASMA				= 16;
 
+float VWX_LASER				= 28;
+float VWY_LASER				= 8.5;
+float VWZ_LASER				= 16;
+
 // pk weps
 // cell guns
 float VWX_CHTHUNDER			= 20;	// 18
@@ -548,7 +555,7 @@ float VWZ_HARP_RETR			= 0;
 
 // slug weps
 
-float VWX_RAILGUN				= 16;
+float VWX_RAILGUN				= 26;
 float VWY_RAILGUN				= 14;
 float VWZ_RAILGUN				= 15;
 
@@ -667,6 +674,12 @@ void(entity client, string s, string s1, string s2) centerprint3 = #73;	// sprin
 void(entity client, string s, string s1, string s2, string s3, string s4) centerprint5 = #73;	// sprint, but in middle
 //void(entity client, string s, string s1, string s2, string s3, string s4, string s5) centerprint6 = #73;	// sprint, but in middle
 void(entity client, string s, string s1, string s2, string s3, string s4, string s5, string s6) centerprint7 = #73;	// sprint, but in middle
+
+// 2d trains
+
+// used by path_corners to specify the 2 possible destinations
+.string target1;
+.string target2;
 
 // items
 .float pk_items;	// Items used for impulse 1

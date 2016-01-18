@@ -214,7 +214,7 @@ void(string cls) item_call =
 	else if (cls == "d_weapon_saw") d_weapon_saw();
 	else if (cls == "d_weapon_pistol") d_weapon_pistol();
 
-//	else if (cls == "d_art_berserker") d_art_berserker();
+	else if (cls == "d_art_berserker") d_art_berserker();
 	else if (cls == "d_art_invulnerable") d_art_invulnerable();
 	else if (cls == "d_art_invisible") d_art_invisible();
 	else if (cls == "d_art_radsuit") d_art_radsuit();
