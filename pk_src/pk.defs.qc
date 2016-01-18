@@ -248,7 +248,13 @@ float TR_QUAKE;
 float TR_Q2;
 float TR_Q3;
 float TR_ALL;
-float TR_NOT;
+float TR_NOT;						// 0 = no change, 1 = remove, 2 = best guess, 3 = randomize in genre, 4 = randomize to any
+
+float FL_NOTRN_LEAVE		= 0;
+float FL_NOTRN_RMV		= 1;
+float FL_NOTRN_BG			= 2;
+float FL_NOTRN_RNDIN		= 3;
+float FL_NOTRN_RNDANY	= 4;
 
 float FL_TR_RESTORE		= -1; //	restore to original - should only be set by code
 float FL_TR_WOLF			= 1; //	tranlate these items to wolf items
@@ -267,6 +273,10 @@ float NO_PI;					// dont let item_call call place_item
 void() doom_precache;
 void(entity e, float trv) master_item_control;
 void(string tri, float trv) master_item_control_loop;
+
+// q3
+
+void() q3_suspend;
 
 // **************************************
 // painkeep protos
@@ -318,12 +328,21 @@ void(entity client, string s, string s1, string s2, string s3, string s4, string
 .entity turret_base;
 void(entity e, float tm) turret_KillStraker;
 
+float PK_TUR_AMMO; // base cells to fire, 0 = infinite
+float PK_TUR_TIME; // time to live, after which explode, 0 = no timeout
+float PK_TUR_HEAL; // health we get - base = 2/3 this, < 0 = no limit
+float PK_TUR_TARGOWN; // time after which turret shoots owner, 0 = dont target owner
+float PK_TUR_VARIETY; // a variety of turrets - 
+float PK_TUR_QUADCON;
+float PK_TUR_SET; // set non 0 when vars loaded
+
 // items
 .float pk_items;	// Items used for impulse 1
 .float pk_currentitem;
 float pk_attack;		// bit 1 = can make a pk attack on any map, bit 2 = pk_artifacts attack
 void() use_pkitem; // bots using pk items
 
+float AMMO_NONE				= 100; // gun uses this ammo type
 float AMMO_SHELLS				= 101; // gun uses this ammo type
 float AMMO_NAILS				= 103;
 float AMMO_ROCKETS			= 105;

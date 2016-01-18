@@ -130,7 +130,9 @@ void(string cls) item_call =
 	}
 
 	scls = cls;
-	if (cls == "weapon_supershotgun") weapon_supershotgun();
+	if (cls == "weapon_axe") weapon_axe();
+	else if (cls == "weapon_shotgun") weapon_shotgun();
+	else if (cls == "weapon_supershotgun") weapon_supershotgun();
 	else if (cls == "weapon_nailgun") weapon_nailgun();
 	else if (cls == "weapon_supernailgun") weapon_supernailgun();
 	else if (cls == "weapon_grenadelauncher") weapon_grenadelauncher();
@@ -203,8 +205,8 @@ void(string cls) item_call =
 	else if (cls == "d_weapon_rocketlauncher") d_weapon_rocketlauncher();
 	else if (cls == "d_weapon_plasma") d_weapon_plasma();
 	else if (cls == "d_weapon_bfg") d_weapon_bfg();
-//	else if (cls == "d_weapon_saw") d_weapon_saw();
-//	else if (cls == "d_weapon_pistol") d_weapon_pistol();
+	else if (cls == "d_weapon_saw") d_weapon_saw();
+	else if (cls == "d_weapon_pistol") d_weapon_pistol();
 
 //	else if (cls == "d_art_berserker") d_art_berserker();
 	else if (cls == "d_art_invulnerable") d_art_invulnerable();
@@ -224,9 +226,9 @@ void(string cls) item_call =
 	else if (cls == "d_key_redskull") d_key_redskull();
 	else if (cls == "d_key_blueskull") d_key_blueskull();
 	else if (cls == "d_key_yellowskull") d_key_yellowskull();
-//	else if (cls == "d_key_bluecard") d_key_bluecard();
-//	else if (cls == "d_key_redcard") d_key_redcard();
-//	else if (cls == "d_key_yellowcard") d_key_yellowcard();
+	else if (cls == "d_key_redcard") d_key_redcard();
+	else if (cls == "d_key_bluecard") d_key_bluecard();
+	else if (cls == "d_key_yellowcard") d_key_yellowcard();
 
 	else if (cls == "d_ammo_4shell") d_ammo_4shell();
 	else if (cls == "d_ammo_shellbox") d_ammo_shellbox();
@@ -241,9 +243,14 @@ void(string cls) item_call =
 //	else if (cls == "d_item_nightvis") d_item_nightvis();
 //	else if (cls == "d_item_automap") d_item_automap();
 
-	else if (cls == "d_barrel") d_barrel();
+	else if (cls == "d_barrel")
+	{
+		d_barrel();
+		return;
+	}
 
 // wolf
+	else if (cls == "w_weapon_knife") w_weapon_knife();
 	else if (cls == "w_weapon_pistol") w_weapon_pistol();
 	else if (cls == "w_weapon_machinegun") w_weapon_machinegun();
 	else if (cls == "w_weapon_chaingun") w_weapon_chaingun();

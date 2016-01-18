@@ -75,12 +75,12 @@ float MC_SIGIL4				= 133;
 float MC_SIGIL8				= 134;
 
 float MC_Q1						= 135;
-float MC_RNDITM				= 32;		// # of q1 items - have to change it items changes
+float MC_RNDITM				= 32;		// # of q1 items - have to change as items changes
 float MC_NR_RNDITM			= 28;		//   no runes
 
 float MC_SIGIL					= 135;
 
-float MC_BACKPACK				= 134;
+float MC_BACKPACK				= 135;
 
 /// painkeep
 // pk wep ids
@@ -110,7 +110,7 @@ float MC_PKP_RNDITM			= 12;		//   + plus items
 
 
 float MC_T_RNDITM				= 40;		// # of total items
-float MC_TRNSUB				= 6;		// # of total items
+float MC_TRNSUB				= 6;		// skip from q1 - pk
 
 /// doom
 
@@ -161,13 +161,18 @@ float MC_D_AUTOMAP			= 197;
 
 float MC_D_BARREL				= 198;
 
+float MC_D_RNDITM				= 38;		// # of total items
+
 /// wolf 3d
 
-float MC_W_PISTOL				= 199;
-float MC_W_MACHGUN			= 200;
-float MC_W_CHAINGUN			= 201;
-float MC_W_MORTAR				= 202;
-float MC_W_FLAMER				= 203;
+float MC_W_KNIFE				= 199;
+float MC_W_PISTOL				= 200;
+float MC_W_MACHGUN			= 201;
+float MC_W_CHAINGUN			= 202;
+float MC_W_MORTAR				= 203;
+float MC_W_FLAMER				= 204;
+
+float MC_W_RNDITM				= 5;		// # of total items
 
 // fn(bit_mcode) - item bit assoc with given mcode
 
@@ -269,6 +274,7 @@ float(float mcv, entity e) bit_mcode =
 	if (mc == MC_D_ACELLS)												return(IT_CELLS);
 	if (mc == MC_D_ACELLS_LG)											return(IT_CELLS);
 
+	if (mc == MC_W_KNIFE)												return(IT_AXE);
 	if (mc == MC_W_PISTOL)												return(IT_SHOTGUN);
 	if (mc == MC_W_MACHGUN)												return(IT_NAILGUN);
 	if (mc == MC_W_CHAINGUN)											return(IT_SUPER_NAILGUN);
@@ -399,6 +405,7 @@ float(string sc, entity e) pk_mcode =
 	if (tsc == "d_barrel")												return(MC_D_BARREL);
 
 // wolf
+	if (tsc == "w_weapon_knife")										return(MC_W_KNIFE);
 	if (tsc == "w_weapon_pistol")										return(MC_W_PISTOL);
 	if (tsc == "w_weapon_machinegun")								return(MC_W_MACHGUN);
 	if (tsc == "w_weapon_chaingun")									return(MC_W_CHAINGUN);
@@ -438,6 +445,96 @@ void () weapon_pulsenail =
 	StartItem ();
 };
 
+// axe attack - assumes player frames
+
+void() fire_axe =
+{
+	local float r;
+
+	sound (self, CHAN_WEAPON, self.noise1, 1, ATTN_NORM);
+	r = random();
+	if (r < 0.25)
+	  player_axe1 ();
+	else if (r<0.5)
+	  player_axeb1 ();
+	else if (r<0.75)
+	  player_axec1 ();
+	else
+	  player_axed1 ();
+};
+
+/*QUAKED weapon_axe (0 .5 .8) (-16 -16 0) (16 16 32)
+*/
+
+void () weapon_axe =
+{
+	self.touch = weapon_touch;
+	self._attack = SUB_Null;
+	self._fr_attack = fire_axe;
+
+	self.currentammo = 0;
+	self.items = IT_AXE;
+	self.weaponframe = AMMO_NONE;
+	self.attack_finished = 0.5;
+	self.dmg_save = 0;
+
+	self.netname = "War Axe";
+	precache_model ("progs/g_axe.mdl");
+	precache_model ("progs/v_axe.mdl");
+	precache_model ("progs/vw_axe.mdl");
+	setmodel (self,"progs/g_axe.mdl");
+	self.weaponmodel = "progs/v_axe.mdl";
+	self.vwepmdl = "progs/vw_axe.mdl";
+	self.noise1 = "weapons/ax1.wav"; // missed
+	self.noise3 = "player/axhit2.wav"; // hit wall &| solid
+//	self.noise4 = "zombie/z_hit.wav"; // hit flesh
+
+	setsize (self,'-16 -16 0','16 16 56');
+	StartItem ();
+};
+
+/*QUAKED weapon_shotgun (0 .5 .8) (-16 -16 0) (16 16 32)
+*/
+
+void () weapon_shotgun =
+{
+// CIC example - wont do anything for a bit
+	if (world.wad == "q2.wad")
+	{
+//		q2_weapon_shotgun();
+		return;
+	}
+	else if (world.wad == "") // TDO: q3_weapon_shotgun
+	{
+		self.classname = "weapon_supershotgun";
+		weapon_supershotgun(); 
+		if (self.spawnflags & 1) q3_suspend();
+		return;
+	}
+
+	self.touch = weapon_touch;
+	self._attack = W_FireShotgun;
+	self._fr_attack = player_shot1;
+
+	self.currentammo = 25;
+	self.items = IT_SHOTGUN;
+	self.weaponframe = AMMO_SHELLS;
+	self.attack_finished = 0.5;
+	self.dmg_save = 1;
+
+	self.netname = "Shotgun";
+	precache_model ("progs/shotgun.mdl");
+	precache_model ("progs/v2_shot.mdl");
+	precache_model ("progs/vw_shot.mdl");
+	setmodel (self, "progs/shotgun.mdl");
+	self.weaponmodel = "progs/v2_shot.mdl";
+	self.vwepmdl = "progs/vw_shot.mdl";
+//	self.noise1 = "weapons/ax1.wav"; // missed
+	self.noise3 = "weapons/guncock.wav"; 
+
+	setsize (self,'-16 -16 0','16 16 56');
+	StartItem ();
+};
 
 // fn(item_by_mcode) - given map code mc, return call string
 
@@ -550,6 +647,7 @@ string (float mc) item_by_mcode =
 	if (mc == MC_D_BARREL)												return("d_barrel");
 
 // wolf
+	if (mc == MC_W_KNIFE)												return("w_weapon_knife");
 	if (mc == MC_W_PISTOL)												return("w_weapon_pistol");
 	if (mc == MC_W_MACHGUN)												return("w_weapon_machinegun");
 	if (mc == MC_W_CHAINGUN)											return("w_weapon_chaingun");

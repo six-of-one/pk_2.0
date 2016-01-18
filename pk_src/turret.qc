@@ -2,28 +2,23 @@
 
 $frame gunsearch gunfire1 gunfire2 gunfire3 gunfire4 gunmisfire1 gunmisfire2
 
-float PK_TUR_AMMO; // base cells to fire, 0 = infinite
-float PK_TUR_TIME; // time to live, after which explode, 0 = no timeout
-float PK_TUR_HEAL; // health we get - base = 2/3 this, < 0 = no limit
-float PK_TUR_TARGOWN; // time after which turret shoots owner, 0 = dont target owner
+
 float PK_TUR_RELOAD; // chance turret will reload when low on ammo
 float PK_TUR_DEATHRAD;
 float PK_TUR_CRITICALMASS; // too many in rad blows them all up
 float PK_TUR_CRITICALMASS_DIST;
 float CRIT_BLOW = 2;
-float PK_TUR_VARIETY; // a variety of turrets - 
+//float PK_TUR_VARIETY; // a variety of turrets - 
 //															bits:		1 - orange kryptonite nails,	2 - lasers,	4 - pulse nails,	8 - lightning,	16 - rockets,	not done yet - 	32 - railgun,		64 - chaos
 //								fixed percentages:		60%													20%				10%						5%						4%														1%							0.5%
-float PK_TUR_QUADCON;
 float PK_TUR_LIMIT; // max turrets on a given server - used if inf detected
-float PK_TUR_SET; // set non 0 when vars loaded
 
 void() turret_searchForEnemy;
 void() turret_findTarget;
 float (entity e) turret_inFront;
 void() turret_attackEnemy;
 void() turret_deathAnim;
-void() turret_deathAnimBase;
+//void() turret_deathAnimBase;
 void(vector org, vector vec) turret_launchNail;
 void() turret_nailTouch;
 void() turret_checkIfCanBeSolid;
@@ -47,15 +42,18 @@ void() turret_dropTurret =
 	local	entity turret;
 	local vector dir;
 
-	if (self.pk_turretammo <= 0) // NEED: handle chaos item fire, rain of chaos - FL_CLIENT?
+	if (self.flags & FL_CLIENT) // NOTE: if pk*bot is set back to no client flag
 	{
-		return;
-	}
+		if (self.pk_turretammo <= 0)
+		{
+			return;
+		}
 
-	if (!self.button0) // same here
-	{
-		player_run ();
-	  return;
+		if (!self.button0)
+		{
+			player_run ();
+		  return;
+		}
 	}
 
 	if (!PK_TUR_SET)
@@ -289,7 +287,7 @@ void() turret_findTarget =
 		if (head.takedamage)
 		if (head != self)
 		if (head.classname != "beartrap")
-		if (!((head.classname == "turret") && (head.owner == self.owner)))
+		if (!((head.classname == "turret") && (head.owner == self.owner))) // target other players turrets - these things are viscious, has any one seen screamers?
 		if (head.classname != "turret_base")
 		if (pk_art_movshot_ck(head, "turret")) // Cataboligne 8.12.9 purify - pk artifacts
 	  //if (!(head.classname == "turret"))
@@ -567,6 +565,8 @@ void() turret_deathAnim =
 {
 	local float numOfGibs;
 
+	self.th_die = SUB_Null; // just in case - prevent a turret "death" loop
+
 	if (self.delay == CRIT_BLOW) // critical mass check
 	{
 		local entity head;
@@ -617,12 +617,16 @@ void() turret_deathAnim =
 };
 
 
+/*
+
+// deprecated - no longer used
+
 void() turret_deathAnimBase =
 {
 	self = self.owner;
 	turret_deathAnim();
 };
-
+*/
 
 void(string gibname, float dm) turret_throwGib =
 {

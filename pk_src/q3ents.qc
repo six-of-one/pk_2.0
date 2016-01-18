@@ -122,7 +122,8 @@ void() weapon_machinegun =
 };
 
 /*QUAKED weapon_shotgun (0 .5 .8) (-16 -16 0) (16 16 32)
-*/
+
+// moved to mcode for upgrades
 
 void() weapon_shotgun =
 {
@@ -131,7 +132,7 @@ void() weapon_shotgun =
 
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 };
-
+*/
 
 /*QUAKED weapon_grapplinghook (0 .5 .8) (-16 -16 0) (16 16 32)
 */

@@ -422,7 +422,10 @@ void() PK_SetCurrentAmmo =
 
 		} else {
 			self.currentammo = self.ammo_shells;
+			if (PK_100 || Q_100)
 			self.weaponmodel = "progs/v_shot.mdl";
+			else
+			self.weaponmodel = "progs/v2_shot.mdl";
 		}
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
@@ -438,7 +441,10 @@ void() PK_SetCurrentAmmo =
 
 		} else {
 			self.currentammo = self.ammo_shells;
+			if (PK_100 || Q_100)
 			self.weaponmodel = "progs/v_shot2.mdl";
+			else
+			self.weaponmodel = "progs/v2_shot2.mdl";
 		}
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
@@ -650,7 +656,11 @@ void() PK_SetCurrentAmmoOnly =
 
 		} else {
 			self.currentammo = self.ammo_shells;
-			if (!self.eweapon) self.weaponmodel = "progs/v_shot.mdl";
+			if (!self.eweapon)
+			if (PK_100 || Q_100)
+			self.weaponmodel = "progs/v_shot.mdl";
+			else
+			self.weaponmodel = "progs/v2_shot.mdl";
 		}
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
@@ -664,7 +674,11 @@ void() PK_SetCurrentAmmoOnly =
 
 		} else {
 			self.currentammo = self.ammo_shells;
-			if (!self.eweapon) self.weaponmodel = "progs/v_shot2.mdl";
+			if (!self.eweapon)
+			if (PK_100 || Q_100)
+			self.weaponmodel = "progs/v_shot2.mdl";
+			else
+			self.weaponmodel = "progs/v2_shot2.mdl";
 		}
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;

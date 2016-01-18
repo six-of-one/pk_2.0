@@ -248,6 +248,8 @@ void() PK_precache =
 
 // visible weapon support - bit masks for inventory
 
+	precache_model ("progs/v2_shot.mdl");
+	precache_model ("progs/v2_shot2.mdl");
 	precache_model ("progs/v2_nail.mdl");
 	precache_model ("progs/v2_nail2.mdl");
 	precache_model ("progs/v2_rock.mdl");
@@ -853,6 +855,14 @@ void() pk_liveupd =
 
 	PK_MAX_LIVENT = cvar("pk_max_livent");
 
+// turrets
+	if (PK_TUR_AMMO != cvar("pk_tur_ammo") || 
+		PK_TUR_TIME != cvar("pk_tur_time") || 
+		PK_TUR_HEAL != cvar("pk_tur_health") || 
+		PK_TUR_TARGOWN != cvar("pk_tur_targetown") || 
+		PK_TUR_VARIETY != cvar("pk_tur_variety") || 
+		PK_TUR_QUADCON != cvar("pk_tur_quadcon")) PK_TUR_SET = FALSE; // reset
+
 // map translations
 	check_translate();
 
@@ -1249,7 +1259,7 @@ void() pk_srvcmd_set =
 		registercvar("pk_tr_q2", "0");
 		registercvar("pk_tr_q3", "0");
 		registercvar("pk_tr_all", "0");
-		registercvar("pk_tr_not", "0"); // 0 - remove items with no translation, 1 - randomize
+		registercvar("pk_tr_not", "0"); // 0 - leave items with no translation, 1 - remove, 2 - best guess, 3 - randomize
 		registercvar("pk_translate", "0");
 
 // pk items

@@ -95,13 +95,14 @@ void() doom_precache =
 	precache_model ("progs/vw_d_bfg.mdl");
 // wolfenstien
 	precache_model ("progs/w_armor.mdl");
-	precache_model ("progs/w_pistol.mdl"); // NOTE: this a map item?
+	precache_model ("progs/w_knife.mdl"); // NOTE: this a map item
+	precache_model ("progs/w_pistol.mdl"); // NOTE: this a map item
 	precache_model ("progs/w_mgun.mdl");
 	precache_model ("progs/w_chaing.mdl");
 	precache_model ("progs/w_mortar.mdl");
 	precache_model ("progs/w_flamer.mdl");
 
-	precache_model ("progs/vw_w_knife.mdl"); // NOTE: this a map item?
+	precache_model ("progs/vw_w_knife.mdl"); // NOTE: this a map item
 	precache_model ("progs/vw_w_pistol.mdl");
 	precache_model ("progs/vw_w_mgun.mdl");
 	precache_model ("progs/vw_w_chaing.mdl");
@@ -464,7 +465,7 @@ void() d_weapon_saw =
 void() d_weapon_shotgun =
 {
 	d_rep_set();
-	weapon_supershotgun();
+	weapon_shotgun();
 
 	self.touch = d_weapon_touch;
 	self._attack = W_FireShotgun;
@@ -786,6 +787,7 @@ void() w_weapon_flamer =
 {
 	weapon_grenadelauncher();
 
+	self.netname = "Flame Thrower";
 	setmodel (self, "progs/w_flamer.mdl");
 	self.weaponmodel = "progs/v_w_flamer.mdl";
 	self.vwepmdl = "progs/vw_w_flamer.mdl";
@@ -793,6 +795,7 @@ void() w_weapon_flamer =
 	self.noise = "wolf/pickup_gn.wav";
 	self.noise3 = "doom/dsrlaunc.wav";
 	self.noise4 = "doom/dsitembk.wav";
+
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "wolf_item";
 };
@@ -801,14 +804,35 @@ void() w_weapon_pistol =
 {
 	weapon_nailgun();
 
+	self.currentammo = 25;
+	self.attack_finished = 0.465; // 2.15 per
+
+	self.netname = "Luger Pistol";
 	setmodel (self, "progs/w_pistol.mdl");
 	self.weaponmodel = "progs/v_w_pistol.mdl";
 	self.vwepmdl = "progs/vw_w_pistol.mdl";
 	self.noise3 = "wolf/w_pistol.wav";
 	self.noise = "wolf/pickup_gn.wav";
 	self.noise4 = "doom/dsitembk.wav";
-	self.currentammo = 25;
+
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "wolf_item";
+};
+
+void() w_weapon_knife =
+{
+	weapon_axe();
+
 	self.attack_finished = 0.465; // 2.15 per
+
+	self.netname = "Knife";
+	setmodel (self, "progs/w_knife.mdl");
+	self.weaponmodel = ""; //progs/v_w_knife.mdl";
+	self.vwepmdl = "progs/vw_w_knife.mdl";
+	self.noise = "wolf/pickup_gn.wav";
+	self.noise3 = "wolf/w_knife.wav";
+	self.noise4 = "doom/dsitembk.wav";
+
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "wolf_item";
 };
