@@ -127,13 +127,23 @@ float(entity e) mk_pkbits =
 entity(entity e) vw_chain =
 {
 	local entity f, c, ch;
+	local float rck, sf;
 
 	c = world;
 	ch = e;
 	f = find(world,classname,"viswep");
+	sf = 50;
+	rck = FALSE;
 
-	while (f)
+	while (f && sf > 0)
 	{
+		if (f.owner.deadflag || f.owner.classname == OBSERVER || f.owner.view_ofs == '0 0 0' || f.owner.model == "") // wep found with non owner - should not happen
+		{
+			f.vwepent = world;
+			remove(f);
+			rck = TRUE;
+		}
+		else
 		if (f.owner == e)
 		{
 			if (!c) c = f;
@@ -148,6 +158,12 @@ entity(entity e) vw_chain =
 		}
 
 		f = find(f,classname,"viswep");
+
+		if (!f && rck) // do a recheck because we failed owner deleted some vw
+		{
+			f = find(world,classname,"viswep");
+			sf = sf - 1;
+		}
 	}
 	return (c);
 };

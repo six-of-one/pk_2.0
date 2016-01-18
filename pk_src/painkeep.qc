@@ -174,6 +174,7 @@ void() PK_precache =
 
 	viswep_pre();
 
+	chaos = 0; // no engine right now that supports this
 	DARKPLACES = cvar("pr_checkextension"); // check for dp engine
 	
 	qweps = IT_AXE | IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN | IT_SUPER_NAILGUN | IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER | IT_LIGHTNING;
@@ -435,15 +436,21 @@ void() pk_srvcmd_set =
 {
 	PK_ART_DEF  = TRUE;
 
-	if (!DARKPLACES) return;
+	if (!DARKPLACES && !chaos) return;
 
 // new server controls
-	registercvar("sv_vw_armor", "0");
-	registercvar("sv_pk100", "0");
-	registercvar("sv_pk_art", "1");
+	if (DARKPLACES) // reg under darkplaces - chaos engine has pre-reg
+	{
+		registercvar("sv_vw_armor", "0");
+		registercvar("sv_pk100", "0");
+		registercvar("sv_pk_art", "1");
+		registercvar("sv_cam_off", "0"); // set to 1 to turn cam off entirely
+		registercvar("sv_cam_def", "1"); // set to 0 to default to no cam view
 
 // new client controls
-	registercvar("cl_pk_cam", "1"); // set to 0 to turn off cam
+		registercvar("cl_cam_off", "0"); // set to 1 to turn cam off entirely
+		registercvar("cl_cam_def", "1"); // set to 0 to default to no cam view
+	}
 /*
 		if (pk_srvcmd)
 		{
@@ -453,6 +460,8 @@ void() pk_srvcmd_set =
 			localcmd(ADMINSRVCMD);
 		}
 */
+// NOTE: chaos eng doesnt need to store defaults this way - they will save in config.cfg
+
 		if (pk_srvcfg)
 		{
 			localcmd("exec ");

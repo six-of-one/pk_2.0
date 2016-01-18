@@ -18,6 +18,7 @@ string CAM_MODEL = "progs/null.mdl";
 float CAM_DIST		= 100.0;
 float CAM_Z			= 22.0;
 float CAM_DEF; 					// set to 1 for default chase cam
+float NO_CAM; 					// set to 1 to disable chase cam
 
 float CHSCAM_NO_WATER = FALSE; // if true, cam will deactivate in water
 
@@ -25,7 +26,7 @@ float CHSCAM_NO_WATER = FALSE; // if true, cam will deactivate in water
 
 void() chase_cam_precache =
 {
-	precache_model ("progs/cross1.mdl" ); // lasertargeter
+//	precache_model ("progs/cross1.mdl" ); // lasertargeter
 	precache_model (CAM_MODEL);
 };
 
@@ -79,13 +80,11 @@ void( entity player_ent ) Chase_cam_setweapon =
 	if ( (self.dest2_x & CHSCAM_ON) )
 	{
 		self.weaponmodel = "";
-//		stuffcmd( self, "cl_bob 0\n" ); // chase cam - dont bob view
 		cam_setbob("");
 	}
 	else
 	{
 		W_SetCurrentAmmo();
-//		stuffcmd( self, CL_BOBSET ); // fpv - bob back on
 		cam_setbob(CL_BOBSET);
 	}
 	self = e;
@@ -100,7 +99,13 @@ void( entity cam_owner, vector vpos ) Start_chase_cam =
 
 	local entity	chase_cam;
 
-	if (Q_100 || PK_100) // Cataboligne - 8.16.9 - quake compatability mode
+	if (DARKPLACES || chaos)
+	{
+		NO_CAM = cvar("sv_cam_off"); // dp var disables cam
+		if (cvar("cl_cam_off") != NO_CAM) NO_CAM = cvar("cl_cam_off");
+	}
+
+	if (Q_100 || PK_100 || NO_CAM) // Cataboligne - 8.16.9 - quake compatability mode
 	{
 		return;
 	}
@@ -264,6 +269,9 @@ void () cam_deathmove =
 			self.owner.think = respawn;
 			self.owner.nextthink = time + 0.5;
 		}
+// fix - set viewport back if default no
+		if (!cvar("sv_cam_def") || NO_CAM || !cvar("cl_cam_def"))
+			set_viewport(self.owner, self.owner); // NOTE: this was already done, but test code anyway
 		return;
 	}
 	else if (self.owner.classname == "pk*bot" || ! self.owner.ishuman) // handle bots here
@@ -830,7 +838,17 @@ void(float opt) Chase_cam_read_temp1 =
 
 void(float sel) cam_parms =
 {
-	if (Q_100 || PK_100) return; // Cataboligne - 8.16.9 - quake compatability mode
+	CAM_DEF = 1; // compiled default for non dp engines
+	if (DARKPLACES || chaos)
+	{
+		CAM_DEF = cvar("sv_cam_def"); // dp var disables default cam
+		if (cvar("cl_cam_def") != CAM_DEF) CAM_DEF = cvar("cl_cam_def");
+
+		NO_CAM = cvar("sv_cam_off"); // dp var disables cam
+		if (cvar("cl_cam_off") != NO_CAM) NO_CAM = cvar("cl_cam_off");
+	}
+
+	if (Q_100 || PK_100 || NO_CAM) return; // Cataboligne - 8.16.9 - quake compatability mode
 
 	if (!sel)
 		{
@@ -847,8 +865,6 @@ void(float sel) cam_parms =
 		}
 	else
 		{
-			CAM_DEF = 1;
-			if (DARKPLACES) CAM_DEF = cvar("cl_pk_cam"); // dp var disables default cam - FIX - doesnt work, death cam doesnt go back to 1pv always
 	// only reset if zeroed  (so DM/COOP respawns don't reset)
 		if (self.deadflag == DEAD_RESPAWNABLE)
 			parm14 = self.dest2_x + (self.dest2_y & 255) * 256 + ((self.dest2_z * 100) & 255) * 65536; // bit flags, cam distance, cam height
@@ -864,8 +880,16 @@ void () dead_cam_set =
 {
 	viswep_ld(self.vwepent, -2);
 
-	if (Q_100 || PK_100) return; // Cataboligne - 8.16.9 - quake compatability mode
+//	if (DARKPLACES || chaos)
+//	{
+//		NO_CAM = cvar("sv_cam_off"); // dp var disables cam
+//		if (cvar("cl_cam_off") != NO_CAM) NO_CAM = cvar("cl_cam_off");
+//	}
 
+	if (Q_100 || PK_100) return; // || NO_CAM) return; // Cataboligne - 8.16.9 - quake compatability mode
+
+// NOTE: wraith option still needs checked once we have chaos mod morph deal
+	
 	if (self.flags & FL_CLIENT)
 	{
 		if (! self.dest2_x & CHSCAM_ON)
@@ -875,9 +899,15 @@ void () dead_cam_set =
 
 void () ccb_impulse_check =
 {
-//chase cam code
-	if (Q_100 || PK_100) return; // Cataboligne - 8.16.9 - quake compatability mode
+	if (DARKPLACES || chaos)
+	{
+		NO_CAM = cvar("sv_cam_off"); // dp var disables cam
+		if (cvar("cl_cam_off") != NO_CAM) NO_CAM = cvar("cl_cam_off");
+	}
 
+	if (Q_100 || PK_100 || NO_CAM) return; // Cataboligne - 8.16.9 - quake compatability mode
+
+//chase cam code
 	if (self.impulse == 230) Toggle_chase_cam();
 //	else if (self.impulse == 231) LaserTargeterToggle( self );
 
