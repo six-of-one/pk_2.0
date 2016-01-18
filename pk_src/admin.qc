@@ -1810,15 +1810,12 @@ void() AdminCommands =
 			if (pk_flags & PK_DYNAMIC)
 			{
 				self.wad = "\nDynamic Painkeep items OFF";
-				pk_flags = pk_flags - PK_DYNAMIC;
-				DYN_OVR = FALSE;
-				if (DARKPLACES || chaos) cvar_set("pk_dyn_ovr","0"); // set this var if it exists
+				pk_bas_flags(PK_DYNAMIC, 0);
 			}
 			else
 			{
 				self.wad = "\nDynamic Painkeep items ON";
-				pk_flags = pk_flags | PK_DYNAMIC;
-				DYN_OVR = TRUE;
+				pk_bas_flags(PK_DYNAMIC, 1);
 				z = find(world,classname,"dyn_spawner");
 				if (!z)
 				{
@@ -1826,10 +1823,9 @@ void() AdminCommands =
 					if (z)
 					{
 						z.think = dyn_item;
-						z.nextthink = time + 1; // do this well after items spawn
+						z.nextthink = time + 1;
 					}
 				}
-				if (DARKPLACES || chaos) cvar_set("pk_dyn_ovr","1");
 			}
 		}
 		else if (self.lefty == 6 && !PK_100)

@@ -379,6 +379,8 @@ void() painkeep_touch =
 		return;
 	}
 
+	if (self.pk_touch == SUB_Null) // deactivated
+		return;
 	if (self.pk_touch == (void()) 0)
 	{
 		if (WARNING)
@@ -944,6 +946,16 @@ void() PK_DropBackpack =
 			newmis.netname = "AirFist";
 		else if (self.pk_currentitem == PK_IT_CLIGHT)
 			newmis.netname = "Chain Thunderbolt";
+// Cataboligne 8.12.9 purify - pk artifacts
+		else if (self.pk_currentitem == PKPLUS_IT_EGO)
+			newmis.netname = "EGO";
+		else if (self.pk_currentitem == PKPLUS_IT_TOMB)
+			newmis.netname = "Tomb";
+		else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
+			newmis.netname = "Actor";
+		else if (self.pk_currentitem == PKPLUS_IT_PHONE)
+			newmis.netname = "Cell Phone";
+// end pk_art
 	}
 	else if (newmis.items == IT_SHOTGUN)
 		newmis.netname = "Shotgun";
@@ -974,15 +986,6 @@ void() PK_DropBackpack =
 	newmis.pk_explode_ammo = self.pk_explode_ammo;
 
 // Cataboligne 8.12.9 purify - pk artifacts
-	if (self.pk_currentitem == PKPLUS_IT_EGO)
-		newmis.netname = "EGO";
-	else if (self.pk_currentitem == PKPLUS_IT_TOMB)
-		newmis.netname = "Tomb";
-	else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
-		newmis.netname = "Actor";
-	else if (self.pk_currentitem == PKPLUS_IT_PHONE)
-		newmis.netname = "Cell Phone";
-
 	newmis.pkplus_egoammo = self.pkplus_egoammo;
 	newmis.pkplus_tombammo = self.pkplus_tombammo;
 	newmis.pkplus_actorammo = self.pkplus_actorammo;

@@ -262,7 +262,6 @@ void() PK_precache =
 
 	pk_srvcmd_set(); 	// set server controls for qc code
 
-	PK_ART = PK_ART_DEF & !PK_100; // Cataboligne - 8.12.9 - pk artifacts support init - FIX - needs to read admin var
 	pk_art_precache(); // Cataboligne 8.12.9 purify - pk artifacts
 
 	PK_ADMIN = 6; // code sets allow admin here - can be disabled by admin menu, 3 is base menu set
@@ -342,12 +341,11 @@ void() PK_precache =
 // setup dynamic items
 
 	if (!DARKPLACES && !chaos) // admin menu only control
-	if (PK || Q_99 || DYN_FORCE || DYN_ARTFR)
+	if (DYN_FORCE || DYN_ARTFR)
 	if (!PK_100 && !Q_100)
 	if (pk_flags & PK_DYNAMIC || DYN_OVR || DYN_FORCE || DYN_ARTFR)
 	{
 		if (!(pk_flags & PK_DYNAMIC) && !DYN_OVR && !DYN_FORCE) DYN_ARTFR_ONLY = DYN_ARTFR;
-//		if (DYN_FORCE || DYN_ARTFR) PK = TRUE;
 		pk_ditems = 0;
 		e = spawn();
 		if (e)
@@ -684,6 +682,14 @@ float st_pk_duty;
 
 void(float bt, float st) pk_bas_flags =
 {
+	if (bt == PK_DYNAMIC)
+	{
+		if (st)	pk_flags = pk_flags | PK_DYNAMIC;
+		else		pk_flags = pk_flags - (pk_flags & PK_DYNAMIC);
+		if (DARKPLACES || chaos) cvar_set("pk_dyn_ovr", ftos(st));
+		DYN_OVR = st;
+	}
+
 	if (bt == PK_SF_HUB)
 	{
 		if (st)	pk_flags = pk_flags | PK_SF_HUB;
@@ -768,23 +774,38 @@ void() pk_liveupd =
 	VW = cvar("sv_vw");
 	VW_ARMOR = cvar("sv_vw_armor");
 
+// artifacts
+	if (PK_ART  != cvar("sv_pk_art"))
+	{
+		PK_ART  = cvar("sv_pk_art");
+		pkplus_item_control_loop();
+	}
+
 // dynamic items
 	DYN_OVR = cvar("pk_dyn_ovr");
-	DYN_ART = cvar("pk_dyn_art"); // TDO: should resp !pk_art
+	DYN_ART = cvar("pk_dyn_art");
+	DYN_FORCE = FALSE;
 	if (!DYN_OVR) DYN_FORCE = cvar("pk_dyn_force");
 	DYN_ARTFR = cvar("pk_dyn_art_force");
 	DYN_FORCE_CNT = cvar("pk_dyn_force_cnt");
 	DYN_ARTFR_ONLY = FALSE; // yes, has to reset every time
 
-	if (!DYN_OVR && (pk_flags & PK_DYNAMIC)) // got toggled - set pk_flags bit
+	if ((!DYN_OVR && (pk_flags & PK_DYNAMIC)) || (DYN_OVR && !(pk_flags & PK_DYNAMIC))) // got toggled - set pk_flags bit
 	{
-		pk_flags = pk_flags - (pk_flags & PK_DYNAMIC);
-		admin_sv_cfg();
+		pk_bas_flags(PK_DYNAMIC, DYN_OVR);
 	}
-	else if (DYN_OVR && !(pk_flags & PK_DYNAMIC))
+
+	if (!PK_ART && (DYN_ART || DYN_ARTFR))
 	{
-		pk_flags = pk_flags | PK_DYNAMIC;
-		admin_sv_cfg();
+		if (WARNING)
+		{
+			bprint("*** Warning - pk_art deactivated and dynamic controls enabled: ");
+			if (DYN_ART) bprint("DYN_ART ");
+			if (DYN_ARTFR) bprint("DYN_ARTFR ");
+			bprint("- ignored, to use these - set: sv_pk_art 1\n");
+		}
+		DYN_ART = FALSE;
+		DYN_ARTFR = FALSE;
 	}
 
 	local entity e, sv;
@@ -792,13 +813,12 @@ void() pk_liveupd =
 	local float f, k, sf;
 
 // test it
-	if (PK || Q_99 || DYN_FORCE || DYN_ARTFR)
+	if (DYN_FORCE || DYN_ARTFR)
 	if (!PK_100 && !Q_100)
  {
 	if (pk_flags & PK_DYNAMIC || DYN_OVR || DYN_FORCE || DYN_ARTFR)
 	{
 		if (!DYN_OVR && !DYN_FORCE) DYN_ARTFR_ONLY = DYN_ARTFR;
-//		if (DYN_FORCE || DYN_ARTFR) PK = TRUE;
 		if (!find(world,classname,"dyn_spawner"))
 		{
 			pk_ditems = 0;
@@ -815,7 +835,7 @@ void() pk_liveupd =
 		e = find(world,classname,"dyn_spawner");
 		while (e)
 		{
-			if (WARNING) bprint("*** Warning - dynamic items deactivated\n");
+			if (WARNING) bprint("*** Warning - dynamic items deactivated, spawner removed\n");
 			e.nextthink = -1;
 			remove(e);
 			e = find(e,classname,"dyn_spawner");
@@ -869,6 +889,9 @@ run_runes();
 	k = cvar("pk_tog_mcode") - 101;
 	if (k < 1 || k > 17) k = cvar("pk_tog_itemmenu");
 
+	if (k > 0)
+	{
+
 	if (k > 31)
 	{
 		m = build_itemmenu();
@@ -909,6 +932,8 @@ run_runes();
 				bprint("\n");
 			}
 			admin_sv_cfg();
+	}
+
 	}
 
 	cvar_set("pk_tog_mcode", "0");
@@ -957,7 +982,6 @@ void() pk_srvcmd_load =
 // these all req. map reload for full effectiveness
 	PK_99 = cvar("sv_pk99");
 	PK_100 = cvar("sv_pk100");
-	PK_ART_DEF  = cvar("sv_pk_art");
 
 // q1
 	Q_99 = cvar("sv_q99");
@@ -1047,8 +1071,8 @@ void() pk_srvcmd_set =
 
 	PK_MAX_LIVENT = 256; // guessed - need research into where slowdown starts
 
-// user artifacts
-	PK_ART_DEF  = TRUE;
+// pk artifacts
+	PK_ART = TRUE; // Cataboligne - 8.12.9 - pk artifacts support
 
 // sscode
 
@@ -1498,9 +1522,13 @@ void() PK_ChangeParms =
 	parm10 = PK_IT_AXE | self.pk_items;
 // recode so *bot can have vars for skill level save - provide max inventory of 15 for mod expansion, current max is 3 on most except for explode ammo
 
-	parm11 = self.pk_explode_ammo + ((self.pk_turretammo & 3) * 16) + ((self.pk_canpabammo & 3) * 64) + ((self.pk_beartrapammo & 3) * 256) + ((self.pk_gravitywellammo & 3) * 1024);
+	parm11 = self.pk_explode_ammo + ((self.pk_turretammo & 3) * 16) + ((self.pk_canpabammo & 3) * 64) + ((self.pk_beartrapammo & 3) * 256) + ((self.pk_gravitywellammo & 3) * 1024)
 
-	if (PK_ART) pk_art_parms(0); // Cataboligne 8.12.9 purify - pk artifacts
+// Cataboligne 8.12.9 purify - pk artifacts
+//;	if (PK_ART) parm11 = parm11 
+	 + ((self.pkplus_egoammo & 3) * 4096) + ((self.pkplus_tombammo & 3) * 16384) + ((self.pkplus_actorammo & 3) * 65536) + ((self.pkplus_phoneammo & 3) * 262144);
+// end pk_art
+
 	// do hub message.
 	parm16 = self.msgcount | 256; // | (self.pk_items & PK_IT_EXTRADISP);
 };
@@ -1532,9 +1560,17 @@ void() PK_DecodeLevelParms =
 	self.pk_beartrapammo = floor(parm11 / 256) & 3;
 	self.pk_gravitywellammo = floor(parm11 / 1024) & 3;
 
-	self.msgcount = (parm16 & 255);
+// Cataboligne 8.12.9 purify - pk artifacts
+//	if (PK_ART)
+//	{
+	self.pkplus_egoammo = floor(parm11 / 4096) & 3;
+	self.pkplus_tombammo = floor(parm11 / 16384) & 3;
+	self.pkplus_actorammo = floor(parm11 / 65536) & 3;
+	self.pkplus_phoneammo = floor(parm11 / 262144) & 3;
+//	}
+// end pk_art
 
-	if (PK_ART) pk_art_parms(1); // Cataboligne 8.12.9 purify - pk artifacts
+	self.msgcount = (parm16 & 255);
 };
 
 // called from PutClientInServer

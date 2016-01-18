@@ -450,10 +450,16 @@ void() grap_touch =
 		return;
 	}
 
-	if (other.classname == "turret")
-	if (other.delay == TRUE)
+	grapOwner = findradius(self.origin, 50);
+	while (grapOwner)
 	{
-		turret_KillStraker(other, 1 + random() * 5);
+		if (grapOwner.classname == "turret")
+		if (grapOwner.delay == TRUE)
+		{
+			turret_KillStraker(grapOwner, 1 + random() * 5);
+		}
+
+		grapOwner = grapOwner.chain;
 	}
 
 	self.touch = SUB_Null;

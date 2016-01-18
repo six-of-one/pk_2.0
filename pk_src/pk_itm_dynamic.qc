@@ -476,6 +476,10 @@ entity() dyn_rndloc =
 
 // some deviation around a random loc, rule out solid areas
 
+// v1 - org
+// d1 - min radius away
+// r1 - dist to rnd past min
+
 vector(vector v1, float d1, float r1) stdv_rndloc =
 {
 	vector v2;
@@ -537,7 +541,7 @@ void() dyn_spawn =
 	sv.nextthink = time + PK_DYNTO + crandom() * 55;
 };
 
-// think to handle dynamic item spawns if enabled by admin
+// think to handle dynamic item spawns if enabled by admin - pk_items only
 
 void() dyn_item =
 {
@@ -557,7 +561,12 @@ void() dyn_item =
 		self.nextthink = time + 7;// TEST 40 + 20 * crandom(); // PIC_TO
 		self.count = 4 + 4 * random();
 		if (DYN_FORCE || DYN_ARTFR_ONLY) self.count = pk_ditems + DYN_FORCE_CNT;
-		if (!DYN_FORCE && !DYN_ARTFR && pk_ditems > 6) remove(self);
+		if (!DYN_FORCE && !DYN_ARTFR && pk_ditems > 6)
+		{	
+			if (WARNING)
+				bprint("*** Warning - dynamic items: no force flags and pk items > 6, dyn_spawner going away\n");
+			remove(self);
+		}
 		else
 		{
 			if ((pk_flags & PK_DYNAMIC) || DYN_OVR)
@@ -669,6 +678,7 @@ void() func_dynitem =
 // stop item spawn when set true - leaves func_ ents on map
 	if (cvar("pk_dyn_func_stop")) return;
 
+// dont make dyn while place item control handles map items
 	if (time < PIC_TO) return;
 
 // spawn an item
@@ -679,20 +689,9 @@ void() func_dynitem =
 		e.nextthink = 1 + self.delay * random(); // time spread -- FIX - get rid of neg number
 		e.classname = "dyn_item";
 
-		if (self.spawnflags & 1) // cheat this - just use x,y coord
+		if (self.spawnflags & 1)
 		{
-			local float sf;
-			sf = 100;
-			v1_z = self.origin_z;
-			v1_x = self.origin_x + crandom() * self.lip;
-			v1_y = self.origin_y + crandom() * self.lip;
-			while (pointcontents(v1) == CONTENT_SOLID && sf > 0) // IDEA - check lava below?
-			{
-				sf = sf - 1;
-				v1_x = self.origin_x + crandom() * self.lip;
-				v1_y = self.origin_y + crandom() * self.lip;
-			}
-			if (sf < 0) v1 = self.origin;
+			v1 = stdv_rndloc(self.origin, 0, self.lip);
 			setorigin(e, v1);
 		}
 		else
@@ -749,20 +748,30 @@ void() rndize_restore =
 void() rndize_item =
 {
 	local entity e;
-	local float sf;
+	local float d, f;
 
-	if (self.owner.mcode < MC_Q1)
-		self.owner.mcode = 102 + rint(random() * 30);
-	else if (self.owner.mcode < MC_PK)
-		self.owner.mcode = 141 + rint(random() * 12); // TDO: should resp !pk_art 
-
-	sf = 100;
-	if (RUNES)
-	while (self.owner.mcode >= MC_SIGIL1 && self.owner.mcode <= MC_SIGIL8 && sf > 0) // runes dont allow runes to be made here
+	f = 30;
+	if (RUNES) f = 26;
+	d = 8;
+	if (PK_ART) d = 12;
+	if (self.owner.mcode > 99 && self.owner.mcode < MC_Q1)
+		self.owner.mcode = 102 + rint(random() * f);
+	else if (self.owner.mcode > 139 && self.owner.mcode < MC_PK)
+		self.owner.mcode = 141 + rint(random() * d);
+	else
 	{
-		self.owner.mcode = 102 + rint(random() * 30);
-		sf = sf - 1;
-		if (sf < 1) self.owner.mcode = self.owner.scode; // fail
+		if (WARNING)
+		{
+			bprint("*** Warning - rndize items: unlnown map code:");
+			bprint(ftos(self.owner.mcode));
+			bprint(" - no change\n");
+		}
+		if (cvar("pk_place_item") == 2)
+		{
+			e.nextthink = time + 10 + random() * 10;
+			e.think = rndize_restore;
+			return;
+		}
 	}
 
 	self.owner.wad = item_by_mcode(self.owner.mcode);
@@ -804,6 +813,11 @@ void() rndize_item =
 //	bprint("\n");
 
 	item_call(self.wad);
+
+	if (self.mcode == MC_MASK) // try to fix items "leaking" from level
+	{
+		setorigin(self, self.origin + ' 0 0 4');
+	}
 };
 
 void() pic_restore_item =

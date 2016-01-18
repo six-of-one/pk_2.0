@@ -723,6 +723,7 @@ void(vector org, vector vec) turret_launchNail =
 		LaunchLaser(org, vec);
 		sound (self, CHAN_WEAPON, "enforcer/enfire.wav", 1, ATTN_NORM);
 		newmis.dmg = self.dmg;
+		newmis.weapon = PK_IT_TURRET;
 		return;
 	}
 	else if (self.state == 4)
@@ -754,6 +755,7 @@ void(vector org, vector vec) turret_launchNail =
 			setorigin (newmis, org + v_forward * 31);
 			self.attack_finished = time + 0.75;
 			self.currentammo = ca;
+			newmis.weapon = PK_IT_TURRET;
 		}
 		return;
 	}
@@ -764,6 +766,8 @@ void(vector org, vector vec) turret_launchNail =
 	newmis.owner = self;
 	newmis.movetype = MOVETYPE_FLY;
 	newmis.solid = SOLID_BBOX;
+	newmis.classname = "spike"; // Cataboligne - 6.11.10 - these were hard to id in other checks
+	newmis.weapon = PK_IT_TURRET;
 //	newmis.effects = EF_DIMLIGHT;
 
 	setmodel (newmis, "progs/nail.mdl");

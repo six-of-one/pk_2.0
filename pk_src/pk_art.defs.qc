@@ -10,14 +10,12 @@
  *
  */
  
- float PK_ART_DEF;			// admin uses to enable / disable artifacts support - compile with 0 to disable artifacts permanently
  float PK_ART;							// admin artifacts toggle - artifacts code works when non 0
  
-void(float sel) pk_art_parms;
 void() pk_art_precache;
+void() pkplus_item_control_loop;
 void(float pkimp) pk_art_specialimpulse;
 void() pk_art_prinv;
-void () pk_art_powerup_touch;
 float() pk_art_checkpwr;
 float(entity ck, string prv) pk_art_movshot_ck;
 float(entity ck) pk_art_actor_ck;

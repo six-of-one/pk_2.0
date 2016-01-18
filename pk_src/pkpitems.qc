@@ -155,13 +155,67 @@ void () pkplus_touch =
 	SUB_UseTargets ();
 };
 
-void () item_pkplus_ego =
+// handle live pk_art on startup
+
+void(entity e) pkplus_item_control =
 {
-	if (!PK_ART) // ISSUE for chaos
+	if (PK_ART) // turned back on - come here from loop
 	{
-		remove(self);
+		setmodel (e,e.mdl);
+		e.touch = painkeep_touch;
+		e.pk_touch = pkplus_touch;
 		return;
 	}
+
+	if (time < PIC_TO)
+//	if (cvar("pk_place_item") != 0) // pic - just block appearance, rnd does rest - not needed
+	{
+		setmodel (e,"");
+		e.touch = SUB_Null;
+	}
+	else // IDEA: option to turn into rnd regular pk items
+	{
+		if (e.classname == "dyn_item")
+		{
+			if (WARNING) bprint("*** Warning - dynamic items: pk_art is off and dynamic made a pkplus item - hiding\n");
+		}
+		else
+		if (WARNING) bprint("*** Warning - pk_art is off and code made a pkplus item - hiding\n");
+		setmodel (e,"");
+		e.touch = SUB_Null;
+	}
+
+};
+
+// twiddled after map load
+
+void() pkplus_item_control_loop =
+{
+	local entity e, sv;
+	local string sr;
+
+// note: disabled - if rndize makes any that get clobbered we want to restore them
+//	if (cvar("pk_place_item") != 0)
+//		return;
+
+	sr = "150";									// IDEA: get these like this: = ftos(pk_mcode("item_pkplus_ego", world));
+	e = find(world,sscode,sr);
+	while (e)
+	{
+		pkplus_item_control(e);
+		e = find(e,sscode,sr);
+		if (!e)
+		{
+		if (sr == "150") sr = "151";
+		else if (sr == "151") sr = "152";
+		else if (sr == "152") sr = "153";
+		e = find(e,sscode,sr);
+		}
+	}
+};
+
+void () item_pkplus_ego =
+{
 	self.touch = pkplus_touch;
 	precache_model ("progs/ego.mdl");
 	self.noise = "items/protect.wav";
@@ -170,15 +224,11 @@ void () item_pkplus_ego =
 	self.pk_items = PKPLUS_IT_EGO;
 	setsize (self,'-16 -16 -24','16 16 32');
 	StartItem ();
+	if (!PK_ART) pkplus_item_control(self);
 };
 
 void () item_pkplus_tomb =
 {
-	if (!PK_ART)
-	{
-		remove(self);
-		return;
-	}
 	self.touch = pkplus_touch;
 	precache_model ("progs/tomb.mdl");
 	self.noise = "items/protect.wav";
@@ -187,15 +237,11 @@ void () item_pkplus_tomb =
 	self.pk_items = PKPLUS_IT_TOMB;
 	setsize (self,'-16 -16 -24','16 16 32');
 	StartItem ();
+	if (!PK_ART) pkplus_item_control(self);
 };
 
 void () item_pkplus_actor =
 {
-	if (!PK_ART)
-	{
-		remove(self);
-		return;
-	}
 	self.touch = pkplus_touch;
 	precache_model ("progs/actor.mdl");
 	setmodel (self,"progs/actor.mdl");
@@ -203,15 +249,11 @@ void () item_pkplus_actor =
 	self.pk_items = PKPLUS_IT_ACTOR;
 	setsize (self,'-16 -16 -24','16 16 32');
 	StartItem ();
+	if (!PK_ART) pkplus_item_control(self);
 };
 
 void () item_pkplus_phone =
 {
-	if (!PK_ART)
-	{
-		remove(self);
-		return;
-	}
 	self.touch = pkplus_touch;
 	precache_model ("progs/phone.mdl");
 	setmodel (self,"progs/phone.mdl");
@@ -219,6 +261,7 @@ void () item_pkplus_phone =
 	self.pk_items = PKPLUS_IT_PHONE;
 	setsize (self,'-16 -16 -24','16 16 32');
 	StartItem ();
+	if (!PK_ART) pkplus_item_control(self);
 };
 
 

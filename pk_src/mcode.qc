@@ -54,21 +54,21 @@ float MC_HEALTHMEGA			= 118;
 float MC_KEY1					= 119;
 float MC_KEY2					= 120;
 
-// sigil id - flags
-float MC_SIGIL1				= 121;
-float MC_SIGIL2				= 122;
-float MC_SIGIL4				= 123;
-float MC_SIGIL8				= 124;
-
 // ammo ids
-float MC_ASHELLS				= 125;
-float MC_ASHELLS_LG			= 126;
-float MC_ANAILS				= 127;
-float MC_ANAILS_LG			= 128;
-float MC_AROCKETS				= 129;
-float MC_AROCKETS_LG			= 130;
-float MC_ACELLS				= 131;
-float MC_ACELLS_LG			= 132;
+float MC_ASHELLS				= 121;
+float MC_ASHELLS_LG			= 122;
+float MC_ANAILS				= 123;
+float MC_ANAILS_LG			= 124;
+float MC_AROCKETS				= 125;
+float MC_AROCKETS_LG			= 126;
+float MC_ACELLS				= 127;
+float MC_ACELLS_LG			= 128;
+
+// sigil id - flags
+float MC_SIGIL1				= 129;
+float MC_SIGIL2				= 130;
+float MC_SIGIL4				= 131;
+float MC_SIGIL8				= 132;
 
 float MC_Q1						= 133;
 
@@ -91,13 +91,12 @@ float MC_BEARTRAP				= 145;
 float MC_GRAVITY				= 146;
 float MC_SENTRY				= 147;
 float MC_CANOBEANS			= 148;
+float MC_AEXPLSH				= 149;
 // pk plus
-float MC_TOMB					= 149;
-float MC_EGO					= 150;
-float MC_PHONE					= 151;
-float MC_MASK					= 152;
-
-float MC_AEXPLSH				= 153;
+float MC_TOMB					= 150;
+float MC_EGO					= 151;
+float MC_PHONE					= 152;
+float MC_MASK					= 153;
 
 float MC_PK						= 154;
 

@@ -1145,12 +1145,6 @@ void () powerup_touch =
 	if (other.health <= 0)
 		return ;
 
-	if (PK_ART)
-	{
-		pk_art_powerup_touch(); // Cataboligne 8.12.9 purify - pk artifacts
-		return;
-	}
-
 	sprint (other,"You got the ");
 	sprint (other,self.netname);
 	sprint (other,"\n");
@@ -1186,6 +1180,8 @@ void () powerup_touch =
 	{
 		other.invincible_time = 1;
 		other.invincible_finished = time + POW_TIME;
+		if (other.pkplus_actortype == PKPLUS_ACTORPENT) // Cataboligne 8.12.9 purify - pk artifacts
+			other.pkplus_actortype = 0;
 	}
 
 	if (self.classname == "item_artifact_invisibility")
@@ -1198,6 +1194,8 @@ void () powerup_touch =
 	{
 		other.super_time = 1;
 		other.super_damage_finished = time + POW_TIME;
+		if (other.pkplus_actortype == PKPLUS_ACTORQUAD) // Cataboligne 8.12.9 purify - pk artifacts
+			other.pkplus_actortype = 0;
 	}
 
 	activator = other;

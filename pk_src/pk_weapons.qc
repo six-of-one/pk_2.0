@@ -992,16 +992,6 @@ float(float rot) PK_CheckLivEnt =
 	return(FALSE);
 };
 
-// reset wep when carrys run out
-
-void() pk_wep_reset =
-{
-	self.pk_currentInventory = PK_IT_AXE;
-	self.weapon = W_BestWeapon();
-	self.pk_currentitem = W_BestPKWeapon();
-	W_SetCurrentAmmo();
-};
-
 // called from below
 
 void() PK_Attack =
@@ -1286,8 +1276,8 @@ void() pk_cycleObjects =
 			}
 		}
 		else if (self.pk_currentitem == PKPLUS_IT_PHONE)
-			self.pk_currentitem = PK_IT_AXE;
 // end pk_art
+			self.pk_currentitem = PK_IT_AXE;
 		else
 			return;		// get's here when the currentitem == a normal pk weapon
 

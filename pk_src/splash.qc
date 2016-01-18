@@ -155,7 +155,7 @@ void() CheckWaterLevels =
 
 // suspect shot stuff is from bots fallen out & not returned yet
 
-		if (pc == CONTENT_SOLID)
+		if (pc == CONTENT_SOLID || floor(e.velocity_z) == -2011)
 		{
 			if (!e.endtime) e.endtime = time;
 			else
@@ -163,10 +163,11 @@ void() CheckWaterLevels =
 			if (e.velocity_z < -1000)
 			if (e.classname != "player" && e.classname != "pk*bot") // done elsewhere
 			{
-				if (e.flags & FL_MONSTER && e.solid != SOLID_NOT) e.th_die(); // swim monsters dont splash
+				if (e.flags & FL_MONSTER && e.solid != SOLID_NOT) e.th_die(); // note: swim monsters dont set splash
 				else if (e.flags & FL_MONSTER) remove(e); // kill then remove
-				else if (e.touch == pulse_touch) remove(e); // pulse nails
+//				else if (e.touch == pulse_touch) remove(e); // pulse nails
 				else if (e.classname == "beartrap") remove(e);
+				else if (e.classname == "spike") remove(e);
 			}
 		}
 		else

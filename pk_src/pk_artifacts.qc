@@ -18,25 +18,6 @@ in most fn's self must be player ent requiring access to pk artifacts - this cod
 
 */
 
-// fn(pk_art_parms) - deal with change parms for artifacts
-
-void(float sel) pk_art_parms =
-{
-	if (!sel)
-	{
-		parm11 = parm11 + ((self.pkplus_egoammo & 3) * 4096) + ((self.pkplus_tombammo & 3) * 16384) + ((self.pkplus_actorammo & 3) * 65536) + ((self.pkplus_phoneammo & 3) * 262144);
-	}
-	else // if (sel == 1)
-	{
-//		self.pk_items = PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE | parm10 | PK_IT_AXE | PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_CANPAB | PK_IT_BEARTRAP | (parm16 & PK_IT_EXTRADISP);
-//		self.pk_items = self.pk_items | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE;
-		self.pkplus_egoammo = floor(parm11 / 4096) & 3;
-		self.pkplus_tombammo = floor(parm11 / 16384) & 3;
-		self.pkplus_actorammo = floor(parm11 / 65536) & 3;
-		self.pkplus_phoneammo = floor(parm11 / 262144) & 3;
-	}
-};
-
 
 
 // fn(pk_art_specialimpulse) - test for pk artifact impulse codes - note: do not like it done this way
@@ -78,77 +59,6 @@ void(float pkimp) pk_art_specialimpulse =
 };
 
  
-// fn(pk_art_powerup_touch) - pk artifacts powerup touch replacement
-
-// NOTE: dont really like this
-
-void () pk_art_powerup_touch =
-{
-	local float best;
-
-	if (other.classname != "player")
-			return;
-	if (other.health <= 0)
-		return ;
-
-	sprint (other,"You got the ");
-	sprint (other,self.netname);
-	sprint (other,"\n");
-
-	if (!PK || (PK && deathmatch != 4)) // *pk - my new rule, logical extrapolation
-	if (deathmatch)
-	{
-		self.mdl = self.model;
-
-		if ((self.classname == "item_artifact_invulnerability") ||
-			(self.classname == "item_artifact_invisibility"))
-			self.nextthink = time + RSP_TIME * 10;
-		else
-			self.nextthink = time + RSP_TIME * 2;
-
-		self.think = SUB_regen;
-	}
-
-	sound (other, CHAN_VOICE, self.noise, 1, ATTN_NORM);
-	stuffcmd (other, "bf\n");
-	self.solid = SOLID_NOT;
-	other.items = other.items | self.items;
-	self.model = string_null;
-
-// do the apropriate action
-	if (self.classname == "item_artifact_envirosuit")
-	{
-		other.rad_time = 1;
-		other.radsuit_finished = time + POW_TIME;
-	}
-
-	if (self.classname == "item_artifact_invulnerability")
-	{
-		other.invincible_time = 1;
-		other.invincible_finished = time + POW_TIME;
-		if (other.pkplus_actortype == PKPLUS_ACTORPENT) // pk art code here
-			other.pkplus_actortype = 0;
-	}
-
-	if (self.classname == "item_artifact_invisibility")
-	{
-		other.invisible_time = 1;
-		other.invisible_finished = time + POW_TIME;
-	}
-
-	if (self.classname == "item_artifact_super_damage")
-	{
-		other.super_time = 1;
-		other.super_damage_finished = time + POW_TIME;
-		if (other.pkplus_actortype == PKPLUS_ACTORQUAD) // pk art code here
-			other.pkplus_actortype = 0;
-		}
-
-	activator = other;
-	SUB_UseTargets();				// fire all targets / killtargets
-};
-
-
 
 // fn(pk_art_checkpwr) - print pk artifacts run powerups
 

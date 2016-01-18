@@ -9,6 +9,16 @@
 
 void(entity e, float f, float r) rune_print =
 {
+	if (f < 0)
+	{
+		if (fabs(f) == R_EARTH) bprint("Earth rune - ");
+		else if (fabs(f) == R_BLACK) bprint("Black rune - ");
+		else if (fabs(f) == R_HELL) bprint("Hell rune -  ");
+		else if (fabs(f) == R_ELDER) bprint("Elder rune - ");
+		else bprint("Unkown rune - ");
+		return;
+	}
+
 	if (e)
 	{
 	if (r)
@@ -17,7 +27,7 @@ void(entity e, float f, float r) rune_print =
 	else if (f == R_BLACK) sprint(e, "Black rune - ");
 	else if (f == R_HELL) sprint(e, "Hell rune - ");
 	else if (f == R_ELDER) sprint(e, "Elder rune - ");
-	else if (f == R_ELDER) sprint(e, "Elder rune - ");
+	else bprint("Unkown rune - ");
 	}
 
 	if (f == RUNE_FLG_RS) sprint(e, "Resistance = 1/2 damage all attacks.\n");
@@ -54,6 +64,20 @@ float(float mc, float bc) rune_bit_code =
 	else if (bc == R_ELDER) f = MC_SIGIL;
 
 	return(f);
+};
+
+void(float b) rune_map_print =
+{
+	local float f;
+
+	f = 0 - b;
+	rune_print(world, f, FALSE);
+	bprint("(mc:");
+	bprint(ftos(rune_bit_code(0, b)));
+	bprint(" bit:");
+	bit_print(RUNE_MASK_ALL, b);
+	bprint(") ");
+	rune_print(world, b, FALSE);
 };
 
 // one cvar implementation of manual rune cfg
@@ -467,22 +491,10 @@ void() run_runes =
 		bit_print(RUNE_MASK_ALL, RUNE_MASK_ALL);
 		bprint("\nwhere 0 indicates a forbidden rune\n\n");
 
-		bprint("earth magic | (mc:121 bit:");
-		bit_print(RUNE_MASK_ALL, R_EARTH);
-		bprint(") ");
-		rune_print(world, R_EARTH, FALSE);
-		bprint("black magic | (mc:122 bit:");
-		bit_print(RUNE_MASK_ALL, R_BLACK);
-		bprint(") ");
-		rune_print(world, R_BLACK, FALSE);
-		bprint("hell magic  | (mc:123 bit:");
-		bit_print(RUNE_MASK_ALL, R_HELL);
-		bprint(") ");
-		rune_print(world, R_HELL, FALSE);
-		bprint("elder magic | (mc:124 bit:");
-		bit_print(RUNE_MASK_ALL, R_ELDER);
-		bprint(") ");
-		rune_print(world, R_ELDER, FALSE);
+		rune_map_print(R_EARTH);
+		rune_map_print(R_BLACK);
+		rune_map_print(R_HELL);
+		rune_map_print(R_ELDER);
 		bprint("\n");
 		cvar_set("pk_runemap", "0");
 	}
