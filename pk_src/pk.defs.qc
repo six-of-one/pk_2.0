@@ -716,6 +716,8 @@ void() viswep_togl;
 void() viswep_pre;
 void(entity vh, float cd) viswep_ld;
 float(string wpm) ver_weaponmodel;
+void vw_range_base(float v_frm);
+void vw_melee_base(float v_frm);
 void() player_nail3;
 float VW; // viswep support - set to 0 to return to generic gun / axe
 float VW_ARMOR; // viswep armor support - eventually admin controlled & cvar

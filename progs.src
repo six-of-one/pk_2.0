@@ -72,6 +72,7 @@ oldone.qc
 chasecam.qc  //Cataboligne MOD 9.11.3
 
 xwep/viswep.qc
+xwep/vw_seq.qc
 xwep/mcode.qc
 xwep/flyers.qc
 
