@@ -12,7 +12,7 @@ void() copb_eatCan =
 	other = self;
 	T_Heal(other, 100, 1);
 
-	self.copb_timeout = time + 30;
+	self.copb_timeout = time + POW_TIME;
 	self.search_time = time + (random() * 2);
 };
 

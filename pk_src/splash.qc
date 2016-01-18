@@ -4,6 +4,7 @@ float SOLID_TIME = 120; // secs certain things can spend in solids
 
 float NOT_IN_WATER = 0;
 float pc;								// The content type the last entity to be checked just entered
+float pcc;								// solid check below
 float splash_count;			// The amout of splashes around. Used to keep the number down so we do'nt get any "No Free Edicts" messages
 
 .float inwater;					// The water type the entity was in at last check
@@ -86,7 +87,7 @@ void(entity e) MakeSplash =
 // Used to tell if an entity is in water
 float(entity e) inWater =
 {
-	pc = pointcontents(e.origin);
+	pcc = pc = pointcontents(e.origin);
 
 	if (!(pc == CONTENT_WATER || pc == CONTENT_SLIME || pc == CONTENT_LAVA))
 		pc = NOT_IN_WATER;
@@ -132,7 +133,7 @@ void() CheckWaterLevels =
 	          e.think = turret_deathAnim;
 	          e.nextthink = time + 0.1;
 	        }
-			  else if (e.map  == "rune")
+			  else if (e.map  == "rune" && e.classname == "item_sigil")
 			  {
 				  local entity f;
 	          e.think = SUB_Remove;
@@ -155,19 +156,58 @@ void() CheckWaterLevels =
 
 // suspect shot stuff is from bots fallen out & not returned yet
 
-		if (pc == CONTENT_SOLID || floor(e.velocity_z) == -2011)
+		if (pcc == CONTENT_SOLID || ceil(e.velocity_z) == -2011)
 		{
+			local float d;
+			d = FALSE;
+
+			if (ceil(e.velocity_z) == -2011)
+			{
+				d = TRUE;
+				if (WARNING)
+				{
+					bprint("*** warning: falling item hit -2011 vel*_z (terminal) - ");
+					bprint(item_ident(e));
+					bprint("\n");
+				}
+				if ((e.flags & FL_ITEM) && e.ip_orgOrigin != v0) // put items back now
+				{
+					setorigin (e, e.ip_orgOrigin + ' 0 0 24');
+					if (!droptofloor(0,0))
+						setorigin (e, e.ip_orgOrigin + ' 0 0 36');
+					e.velocity_z = 100;
+					e.think = ip_checkForMovement;
+					e.nextthink = time + CFM_TIME;
+					d = FALSE;
+				}
+			}
+
 			if (!e.endtime) e.endtime = time;
 			else
 			if (e.endtime + SOLID_TIME < time)
 			if (e.velocity_z < -1000)
-			if (e.classname != "player" && e.classname != "pk*bot") // done elsewhere
+			if (e.classname != "player" || IROBOT(e))
+				d = TRUE;
+
+		if (d)
 			{
 				if (e.flags & FL_MONSTER && e.solid != SOLID_NOT) e.th_die(); // note: swim monsters dont set splash
 				else if (e.flags & FL_MONSTER) remove(e); // kill then remove
 //				else if (e.touch == pulse_touch) remove(e); // pulse nails
 				else if (e.classname == "beartrap") remove(e);
+				else if (e.classname == "turret")
+				{
+					remove(e.turret_base);
+					remove(e);
+				}
 				else if (e.classname == "spike") remove(e);
+				else if (IROBOT(e)) T_Damage(e, e, e, 10000); // TDO: obit for this - nocide
+				else if (WARNING)
+				{
+					bprint("*** warning: falling item exited level? - ");
+					bprint(item_ident(e));
+					bprint("\n");
+				}
 			}
 		}
 		else

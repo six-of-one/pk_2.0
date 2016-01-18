@@ -1032,7 +1032,7 @@ void() ip_checkForMovement =
 
 	if (self.solid != SOLID_NOT)
  {
-	if (self.map == "rune" && RUNES && self.classname != "dyn_item" && self.delay > -1)  // !chaos
+	if (self.map == "rune" && RUNES && e.classname == "item_sigil")// && self.delay > -1)  // !chaos
 	{
 		self.cnt = self.cnt + 1;
 		self.delay = self.delay + 1;
@@ -1067,12 +1067,19 @@ void() ip_checkForMovement =
 	if (self.ip_orgOrigin != v0)
 	if (self.ip_orgOrigin != self.origin)
 	{ // position has changed... repawn after x minutes..
+		if (self.mcode != self.scode) // item was changed by rndize
+		{
+			self.nextthink = time + CFM_TIME;
+			if (self.ip_orgOrigin_x == self.origin_x)
+			if (self.ip_orgOrigin_y == self.origin_y) return;
+		}
+
 		self.think = ip_regen;
 		self.nextthink = time + (ip_timeout * (RSP_TIME * 2));
 		return;
 	}
  }
-	self.nextthink = time + 60;
+	self.nextthink = time + CFM_TIME;
 };
 
 // called from SUB_regen - restors position, rethinks
@@ -1081,41 +1088,20 @@ void() pk_item_position =
 {
 	self.owner = world;
 
-// deprecated - .oldorigin never set
-//	if (self.ip_orgOrigin == ' 0 0 0' && self.oldorigin != ' 0 0 0') // Cataboligne - in case mode was set to PK after some map items got loaded
-//		self.ip_orgOrigin = self.oldorigin;
+	self.think = ip_checkForMovement;
+	self.nextthink = time + CFM_TIME;
 
+	if (self.mcode != self.scode) // item was changed by rndize
+	{
+		if (self.ip_orgOrigin_x == self.origin_x)
+		if (self.ip_orgOrigin_y == self.origin_y) return;
+	}
+
+	if (self.ip_orgOrigin != self.origin)
 	if (self.ip_orgOrigin != v0) // Cataboligne - tweak: in case this doesnt get set, we dont want to put any item like this at 0, 0, 0
 		setorigin (self, self.ip_orgOrigin);
 	else
 		setorigin (self, self.origin);
-
-	self.think = ip_checkForMovement;
-	self.nextthink = time + 60;
-
-// dynamic items should not end up here
-//if (self.classname == "dyn_item")
-//bprint("********* error: dynamic in item position *********");
-
-};
-
-// called from PlaceItem, starts position think checks
-// chaos mod vector
-
-void() pk_item_position_init =
-{
-	if (WARNING) if (!PK) bprint("*** warning: pk_item_position_init called when not in PK mode.\n");
-
-	if (self.ip_orgOrigin == v0 || self.delay == RE_LOC)
-		self.ip_orgOrigin = self.origin;
-
-	self.think = ip_checkForMovement;
-	self.nextthink = time + 60;
-
-// dynamic items should not end up here
-	if (WARNING)  if (self.classname == "dyn_item")
-		bprint("*** warning: dynamic item in pk_item_position_init() \n");
-
 };
 
 // give tossed items eject velocity
@@ -1125,6 +1111,32 @@ void(entity e, vector v1) item_eject =
 	e.velocity_z = v1_z + 100 * random();
 	e.velocity_x = crandom() * v1_x;
 	e.velocity_y = crandom() * v1_y;
+
+};
+
+// called from PlaceItem, starts position think checks
+// chaos mod vector
+
+void() pk_item_position_init =
+{
+//	if (WARNING) if (!PK) bprint("*** warning: pk_item_position_init called when not in PK mode.\n");
+
+	if (self.mcode != self.scode) // item was changed by rndize
+	{
+		item_eject(self, ' 0 0 400'); // shoot up
+	}
+
+	if (self.ip_orgOrigin == v0 || self.delay == RE_LOC)
+		self.ip_orgOrigin = self.origin;
+
+	if (self.delay == RE_LOC) self.delay = 0;
+
+	self.think = ip_checkForMovement;
+	self.nextthink = time + CFM_TIME;
+
+// dynamic items should not end up here
+	if (WARNING)  if (self.classname == "dyn_item")
+		bprint("*** warning: dynamic item in pk_item_position_init() \n");
 
 };
 
@@ -1163,5 +1175,6 @@ void() pk_placeitem =
 //	self.sscode = ftos(self.mcode);
 	self.sscode = sid_code[(int)(self.mcode - 100) * %4];
 	if (!self.scode) self.scode = self.mcode;
-};
 
+	AddToSplashBig(self); // Cataboligne - 6.11.10 - items move so they should & restore on fall from grace
+};

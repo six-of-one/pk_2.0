@@ -157,7 +157,6 @@ void(string cls) item_call =
 		self.nextthink = time + 1 + 3 * random(); // spread em out
 		self.model = string_null;
 	}
-	if (self.map  == "rune") self.delay = 0; 
 	self.solid = SOLID_NOT;
 //	bot_item_linx(self); // *bot - item tie in - needs checked for use here -- FIX
 };
@@ -751,7 +750,7 @@ void() rndize_item =
 	local float d, f;
 
 	f = 30;
-	if (RUNES) f = 26;
+	if (RUNES) f = 26; // dont rndize runes if server on
 	d = 8;
 	if (PK_ART) d = 12;
 	if (self.owner.mcode > 99 && self.owner.mcode < MC_Q1)
@@ -814,10 +813,6 @@ void() rndize_item =
 
 	item_call(self.wad);
 
-	if (self.mcode == MC_MASK) // try to fix items "leaking" from level
-	{
-		setorigin(self, self.origin + ' 0 0 4');
-	}
 };
 
 void() pic_restore_item =
@@ -884,4 +879,18 @@ void() place_item_control_loop =
 		e = find(e,map,"pic_item");
 	}
 	self = sv;
+};
+
+// give best ident of an item possible
+
+string(entity e) item_ident =
+{
+	local string f;
+
+	f = "item has no identity!";
+	if (e.netname != "") f = e.netname;
+	else if (e.classname != "") f = e.classname;
+	else if (e.sscode != "") f = e.sscode;
+
+	return(f);
 };

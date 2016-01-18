@@ -342,14 +342,23 @@ string (float mc) item_by_mcode =
 
 // fn_make - make an item from map code value
 
+// handles map call - set wait to valid map code
+
 void(float mc, vector vo) fn_make =
 {
 	local string sc;
 	local entity e, sv;
 	local vector v1;
 
+	sv = self;
 	sc = item_by_mcode(mc);
-  if (sc != "")
+
+	if (self.classname != "fn_make") // map call
+		self = spawn();
+	else
+		sc = item_by_mcode(self.wait);
+
+ if (sc != "")
  {
 	v1 = vo;
   if (vo == v0) // no origin sent, get random one around some other object
@@ -366,15 +375,16 @@ void(float mc, vector vo) fn_make =
 		v1 = stdv_rndloc(e.origin + ' 0 0 16', 50, 100);
   }
 
-	sv = self;
-	self = spawn();
 	self.wad = sc;
 
 	setorigin(self, v1);
 	item_call(sc);
+
 	self.velocity_z = 300 + 100 * random();
 	self.velocity_x = -170 + (random() * 340);
 	self.velocity_y = -170 + (random() * 340);
+
+	self.map = ""; // rune server deal
 
 	bprint("\b*** fn_make item spawned: ");
 	bprint(self.wad);

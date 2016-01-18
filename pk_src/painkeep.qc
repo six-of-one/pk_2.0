@@ -341,9 +341,8 @@ void() PK_precache =
 // setup dynamic items
 
 	if (!DARKPLACES && !chaos) // admin menu only control
-	if (DYN_FORCE || DYN_ARTFR)
 	if (!PK_100 && !Q_100)
-	if (pk_flags & PK_DYNAMIC || DYN_OVR || DYN_FORCE || DYN_ARTFR)
+	if (pk_flags & PK_DYNAMIC || DYN_OVR || DYN_FORCE || DYN_ARTFR) // wont see DYN_* stuff here unless it is compiler set
 	{
 		if (!(pk_flags & PK_DYNAMIC) && !DYN_OVR && !DYN_FORCE) DYN_ARTFR_ONLY = DYN_ARTFR;
 		pk_ditems = 0;
@@ -813,7 +812,6 @@ void() pk_liveupd =
 	local float f, k, sf;
 
 // test it
-	if (DYN_FORCE || DYN_ARTFR)
 	if (!PK_100 && !Q_100)
  {
 	if (pk_flags & PK_DYNAMIC || DYN_OVR || DYN_FORCE || DYN_ARTFR)
@@ -846,7 +844,7 @@ void() pk_liveupd =
 
 
 // runes
-run_runes();
+	run_runes();
  
 // check for botmatch changes
 	if (deathmatch || coop)
@@ -1860,10 +1858,34 @@ void() pk_gasp_sound =
 }
 */
 
-// called from playerprethink - diverts
 
-void() pk_pre_think =
+float intermission_running;
+void () IntermissionThink;
+
+//void() pk_pre_think =
+
+void () PlayerPreThink =
 {
+	if (FRIKBOT)
+	if (BotPreFrame ())
+		return ;
+
+	if (Q_100)
+	{
+		q100_PlayerPreThink();
+		return;
+	}
+
+	if (intermission_running)
+	{
+		IntermissionThink ();	// otherwise a button could be missed between
+		return;					// the think tics
+	}
+
+	if (self.view_ofs == '0 0 0')
+		return;		// intermission or finale
+
+	makevectors (self.v_angle);		// is this still used
 
 // removed from WaterMove, it has to be done every frame.
 	if (! (self.flags & FL_WATERJUMP))
@@ -1898,7 +1920,6 @@ void() pk_pre_think =
 	if (self.waterlevel == 2)
 		CheckWaterJump ();
 
-//		if (!Q_100 && !PK_100)
 		if (self.waterlevel)
 		if (! self.flags & FL_WATERJUMP)
 		if (self.cam_x & CHSCAM_ON)
@@ -1952,10 +1973,53 @@ void() pk_pre_think =
 	}
 };
 
-// called from playerpostthink - diverts
 
-void() pk_post_think =
+//void() pk_post_think =
+void () PlayerPostThink =
 {
+	if (FRIKBOT)
+	if (BotPostFrame ())
+		return ;
+
+	if (find(world,classname,"pk*bot"))
+  {
+	if (!(self.view_ofs == '0 0 0') && !self.deadflag)
+	if (CheckDropPath ()) // *bot
+	{
+		DropBotPath ();
+	}
+
+	if (DARKPLACES || chaos)
+	if (cvar("botlevel")) // hack so alias can load new map & keep pk*bots
+	{
+		bot_changelevel();
+		cvar_set("botlevel", "0");
+	}
+
+  }
+
+//	if (self.weapon || self.vwepent) 
+	viswep_post(); // Cataboligne - 9.26.9 - viswep code link - always have to run this for 1 player + pk*bots deal
+
+	if (Q_100)
+	{
+		q100_PlayerPostThink();
+		return;
+	}
+
+
+	if (self.view_ofs == '0 0 0')
+		return;		// intermission or finale
+
+	if ((PK_ADMIN && !ADMINLOCK) || self.admin == USER_MENU) // *pk - run admin for both modes - any deactivation will 0 this || make sure user menu always works
+	if (self.admin || (self.impulse == pk_adminimp))
+	if (pk_adminframe != framecount)
+	if (admin_postthink()) return;
+
+
+// runes
+	if (self.rune_flag & RUNE_FLG_RG) rune_regen();
+
 	if (self.deadflag)
 	// BOLT_START
 	{
@@ -1966,6 +2030,19 @@ void() pk_post_think =
 		}
 		return;	 // dying, so do nothing
 	}
+
+	if (chaos)
+		if (!(self.dest2_x & CHSCAM_ON))  // Cataboligne - 5.14.10 - cam purify - custom engine dont display vw_ for 1pv
+			{
+//			if (!(self.flags & FL_NDISMDL)) bprint("switching to not display vwep\n");
+			self.flags = self.flags | FL_NDISMDL; // old self.flags method, replacing with:
+			}
+		else
+			{
+//			if (self.flags & FL_NDISMDL) bprint("switching to display vwep\n");
+			self.flags = self.flags - (self.flags & FL_NDISMDL);
+			}
+
 
 // do weapon stuff
 
@@ -2005,13 +2082,9 @@ void() pk_post_think =
 	{
 	 bolt_checkTargets();
 
-		if (PK_ART)
-		{
-			if (!pk_art_checkpwr()) // Cataboligne 8.12.9 purify - pk artifacts
-				CheckPowerups ();
-		}
-		else
+		if (!pk_art_checkpwr()) // Cataboligne 8.12.9 purify - pk artifacts
 			CheckPowerups ();
+
 		if (self.copb_timeout)
 		{
 			if (self.copb_timeout >= time)
@@ -2033,13 +2106,9 @@ void() pk_post_think =
 	{
 		bolt_checkTargets();
 
-		if (PK_ART)
-		{
-			if (!pk_art_checkpwr()) // Cataboligne 8.12.9 purify - pk artifacts
-				CheckPowerups ();
-		}
-		else
+		if (!pk_art_checkpwr()) // Cataboligne 8.12.9 purify - pk artifacts
 			CheckPowerups ();
+
 		if (self.copb_timeout)
 		{
 			if (self.copb_timeout >= time)

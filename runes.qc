@@ -124,10 +124,9 @@ void(entity e, entity p) rune_id =
 	f = 1;
 
 	if (WARNING)
-	if (RUNES)
+	if (!RUNES)
 	{
-		sprint(p, "*** Runes are turned off.\n");
-		return;
+		sprint(p, "*** Rune server is turned off.\n\n");
 	}
 
 	if (e == p) sprint(p, "You have");
@@ -183,7 +182,7 @@ void () rune_touch =
 	if (other.rune_flag & self.spawnflags)
 		return;
 
-	if (self.delay < 0 || !deathmatch) sigil_touch(); // map rune, or sp
+	if (self.map == "pic_item" || !deathmatch) sigil_touch(); // map rune (should have pic_item set), or sp
 
 	centerprint3 (other,"You got the ",self.netname," Rune!");
 	sprint(other,"You have the power of ");
@@ -235,6 +234,8 @@ void () rune_touch =
 };
 
 // make runes for runeserver
+
+// NOTE: other code making runes should NEVER set .delay - this would allow this code to remove the rune if server is turned off live
 
 float rune_map; // runes on level
 
@@ -333,7 +334,7 @@ void() rune_maker =
 	}
 };
 
-// count chg - remove rune(s)
+// count chg - remove rune(s) - must NOT remove non server made runes!
 
 void(float r1, float p) remove_rune =
 {
@@ -348,7 +349,7 @@ void(float r1, float p) remove_rune =
 		f = f - 1;
 		if (f < 1)
 		{
-			if (e.delay > -1)
+			if (e.classname == "item_sigil")
 			{
 				if (p)
 				{
@@ -418,14 +419,14 @@ void() run_runes =
 
 	mk_rune_set(); // manual config
 
-	if (RUNES != cvar("sv_c_rune")) // changed, off or on
+	if (RUNES != cvar("sv_c_rune")) // changed, off or on - controls rune server
 	{
 		RUNES = cvar("sv_c_rune");
 
 		e = find(world,map,"rune"); // off or on, rid map of runes & makers
 		while (e)
 		{
-			if (e.delay > -1)
+			if (e.classname == "item_sigil")
 				remove(e);
 			e = find(e,map,"rune");
 		}
@@ -448,6 +449,8 @@ void() run_runes =
 			}
 			bprint("***   Runes of power will spawn on this map - keep an eye out\n");
 		}
+		else
+			bprint("***   Rune server - turned off an all spawned runes removed\n");
 	}
 
  	if (RUNE_CNT != cvar("sv_c_rune_cnt"))
@@ -476,7 +479,7 @@ void() run_runes =
 	{
 		bprint("\bRunes:\n\n");
 		if (RUNES) bprint("Runes will appear in random locations\n");
-		else bprint("Runes are deactivated\n");
+		else bprint("Rune server is deactivated\n"); // note: runes can still appear on map from func_dyn, rndize
 		bprint("total rune count : ");
 		bprint(ftos(RUNE_CNT));
 		bprint("\n");

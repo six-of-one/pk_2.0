@@ -29,7 +29,7 @@ void (vector org, entity death_owner) spawn_tdeath;
 float	modelindex_eyes, modelindex_player;
 
 
-float intermission_running;
+//float intermission_running; - moved to painkeep.qc - q100 rules
 float intermission_exittime;
 
 /*QUAKED info_intermission (1 0.5 0.5) (-16 -16 -16) (16 16 16)
@@ -989,13 +989,10 @@ PlayerPreThink
 Called every frame before physics are run
 ================
 */
-void () PlayerPreThink =
+void () q100_PlayerPreThink =
 {
 	local	float	mspeed, aspeed;
 	local float r;
-	if (FRIKBOT)
-	if (BotPreFrame ())
-		return ;
 
 	if (intermission_running)
 	{
@@ -1008,24 +1005,11 @@ void () PlayerPreThink =
 
 	makevectors (self.v_angle);		// is this still used
 
-	if (PK || custom_hub_loaded)
-	{
-		pk_pre_think();
-		return;
-	}
-
 	CheckRules ();
 	WaterMove ();
 
 	if (self.waterlevel == 2)
 		CheckWaterJump ();
-
-	if (self.waterlevel)
-	if (! self.flags & FL_WATERJUMP)
-	if (self.cam_x & CHSCAM_ON)
-	{
-		cam_waterjump();  // Cataboligne 8.22.9 purify - chase cam
-	}
 
 	if (self.deadflag >= DEAD_DEAD)
 	{
@@ -1226,32 +1210,11 @@ PlayerPostThink
 Called every frame after physics are run
 ================
 */
-void () PlayerPostThink =
+void () q100_PlayerPostThink =
 {
 	local	float	mspeed, aspeed;
 	local float r;
-	if (FRIKBOT)
-	if (BotPostFrame ())
-		return ;
 
-	if (find(world,classname,"pk*bot"))
-  {
-	if (!(self.view_ofs == '0 0 0') && !self.deadflag)
-	if (CheckDropPath ()) // *bot
-	{
-		DropBotPath ();
-	}
-
-	if (cvar("botlevel")) // hack so alias can load new map & keep pk*bots
-	{
-		bot_changelevel();
-		cvar_set("botlevel", "0");
-	}
-
-  }
-
-//	if (self.weapon || self.vwepent) 
-	viswep_post(); // Cataboligne - 9.26.9 - viswep code link - always have to run this for 1 player + pk*bots deal
 
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
@@ -1261,37 +1224,19 @@ void () PlayerPostThink =
 	if (pk_adminframe != framecount)
 	if (admin_postthink()) return;
 
-
-// runes
-	if (self.rune_flag & RUNE_FLG_RG) rune_regen();
-
-	if (PK || custom_hub_loaded)
-	{
-		pk_post_think();
-		return;
-	}
-
 	if (self.deadflag)
 		return;
 
 
-	if (chaos)
-		if (!(self.dest2_x & CHSCAM_ON))  // Cataboligne - 5.14.10 - cam purify - custom engine dont display vw_ for 1pv
-			{
-//			if (!(self.flags & FL_NDISMDL)) bprint("switching to not display vwep\n");
+		if (chaos)
+//		if (!(self.dest2_x & CHSCAM_ON))  // Cataboligne - 5.14.10 - cam purify - custom engine dont display vw_ for 1pv
+	//			if (!(self.flags & FL_NDISMDL)) bprint("switching to not display vwep\n");
 			self.flags = self.flags | FL_NDISMDL; // old self.flags method, replacing with:
-			}
-		else
-			{
-//			if (self.flags & FL_NDISMDL) bprint("switching to display vwep\n");
-			self.flags = self.flags - (self.flags & FL_NDISMDL);
-			}
 
 // do weapon stuff
 
 	W_WeaponFrame ();
 
-	if (self.classname != OBSERVER) // Cataboligne - 8.16.9 - dont need this for observers
 // check to see if player landed and play landing sound	
 	if ((self.jump_flag < -300) && (self.flags & FL_ONGROUND) && (self.health > 0))
 	{

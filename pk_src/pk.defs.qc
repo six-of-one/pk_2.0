@@ -31,6 +31,9 @@ float MAP_OBSTR;							// object errors -> warnings that remove map items should
 float MAP_REPAIR;							// if true map repairs will execute
 void() q_startmap;						// fix start map issue for q single player
 
+// q100 stuff
+void() q100_PlayerPreThink;
+void() q100_PlayerPostThink;
 
 float PK_HUB2					= 131072; // bit if TRUE, using custom hub - only used for level transtion from hub vote
 float PK_ADHUB					= 1;		// set to 0 PK_mapmode and admin menu will ignore new maps - item load can still set PK mode for any pk map
@@ -125,6 +128,7 @@ float DYN_FORCE_CNT; // max forced items to load
 float DYN_START_TIME			= 5;	// seconds till dynamic spawner starts its thing - precache must cutoff before this, leave a couple secs for map load
 string (float mc) item_by_mcode;
 void(string cls) item_call;
+string(entity e) item_ident;
 entity() dyn_rndloc;
 vector(vector v1, float d1, float r1) stdv_rndloc
 void() start_loopcyc;
@@ -148,6 +152,7 @@ string sid_code;							// list of all codes as string, access = (code - 100) * 4
 float RE_LOC					= -666; // relocate restore point if .delay = this - pk_item_position_init
 float RSP_TIME; // respawn time
 float POW_TIME; // power time
+float CFM_TIME					= 60; // check for move time out
 float PIC_TO					= 5; // place_item_control time out
 float pic_tsk;
 void() place_item_control_loop;

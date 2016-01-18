@@ -21,7 +21,7 @@ void () SUB_regen =
 	self.model = self.mdl;		// restore original model
 	self.solid = SOLID_TRIGGER;	// allow it to be touched again
 	sound (self, CHAN_VOICE, "items/itembk2.wav", 1, ATTN_NORM);	// play respawn sound
-	if (PK) pk_item_position();  // *pk - reposition moved items (horn & harp effects) on respawn
+	if (!Q_100) pk_item_position();  // *pk - reposition moved items (horn & harp effects) on respawn
 	else
 		setorigin (self, self.origin);
 };
@@ -1117,8 +1117,11 @@ void () item_sigil =
 		self.netname = "Elder magic"; // Cataboligne - 5.32.10 - for rune server
 	}
 
-	self.map = "rune"; // Cataboligne - 5.32.10 - for rune server
-	self.delay = -6; // dont let map runes relocate
+	if (time > PIC_TO)
+	if(self.map == "")
+		self.map = "rune"; // Cataboligne - 5.32.10 - for rune server
+
+//	self.delay = -6; // dont let map runes relocate
 	if (RUNES)
 		self.touch = rune_touch;
 	else
