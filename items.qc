@@ -16,17 +16,12 @@ BE .8 .3 .4 IN COLOR */
 
 void () W_SetCurrentAmmo;
 
-void () SUB_regen =
+void () q100_SUB_regen =
 {
 	self.model = self.mdl;		// restore original model
 	self.solid = SOLID_TRIGGER;	// allow it to be touched again
-	if (self.noise4 != "")
-		sound (self, CHAN_VOICE, self.noise4, 1, ATTN_NORM);	// play respawn sound - doom / other resp sounds
-	else
 	sound (self, CHAN_VOICE, "items/itembk2.wav", 1, ATTN_NORM);	// play respawn sound
-	if (!Q_100) pk_item_position();  // *pk - reposition moved items (horn & harp effects) on respawn
-	else
-		setorigin (self, self.origin);
+	setorigin (self, self.origin);
 };
 
 
@@ -51,13 +46,9 @@ PlaceItem
 plants the object on the floor
 ============
 */
-void () PlaceItem =
+void () q100_PlaceItem =
 {
 	local float oldz;
- 
-	self.mcode = pk_mcode("", self); // put map code on ent
-	self.sscode = sid_code[(int)(self.mcode - 100) * %4];
-	if (!self.scode) self.scode = self.mcode;
 
 	self.mdl = self.model;		// so it can be restored on respawn
 	self.flags = FL_ITEM;		// make extra wide
@@ -66,23 +57,14 @@ void () PlaceItem =
 	self.velocity = '0 0 0';
 	self.origin_z = self.origin_z + 6;
 	oldz = self.origin_z;
-	if (!droptofloor(0,0)) // Cataboligne 9.17.3 - fix compiler warning
+	if (!droptofloor(0,0)) // Cataboligne 9.17.3 - fixed this compiler warning
 	{
 		dprint ("Bonus item fell out of level at ");
 		dprint (vtos (self.origin));
 		dprint ("\n");
-		if (PK_100 || Q_100)
-		{
-			remove (self);
-			return ;
-		}
-		else
-			dtf_handle();
+		remove (self);
+		return ;
 	}
-	if (!Q_100) pk_placeitem(); // *pk - set item details
-	bot_item_linx(self); // *bot - item tie in
-
-	pic_test();
 };
 
 /*
@@ -124,7 +106,7 @@ float (entity e, float healamount, float ignore) T_Heal =
 	if (e.health > 250)
 		e.health = 250;
 
-	if (PK) pk_setDamageSkin(e); // *pk damage skins code
+	if (!Q_100) pk_setDamageSkin(e); // *pk damage skins code
 	return 1;
 };
 
@@ -526,7 +508,7 @@ void () weapon_touch =
 	self = other;
 
 // PK-NOTE: "old" variable above does nothing...what was iD's plan for it?
-	if (PK)
+	if (!Q_100)
 		PK_Deathmatch_Weapon (new, 0); // *pk - new wep switch rule for higher risk weps
 	else
 	if (!deathmatch)
@@ -1151,7 +1133,7 @@ void () powerup_touch =
 	sprint (other,self.netname);
 	sprint (other,"\n");
 
-	if (!PK || (PK && deathmatch != 4)) // *pk - my new rule, logical extrapolation
+	if (Q_100 || Q_99 || (deathmatch != 4)) // *pk - my new rule, logical extrapolation
 	if (deathmatch)
 	{
 		self.mdl = self.model;
@@ -1293,13 +1275,8 @@ PLAYER BACKPACKS
 ===============================================================================
 */
 
-void () BackpackTouch =
+void () q100_BackpackTouch =
 {
-	if (PK || custom_hub_loaded)
-	{
-		PK_BackpackTouch();
-		return;
-	}
 	local string s;
 	local	float	best, old, new;
 	local entity stemp;
@@ -1401,14 +1378,8 @@ void () BackpackTouch =
 DropBackpack
 ===============
 */
-void () DropBackpack =
+void () q100_DropBackpack =
 {
-	if (PK || custom_hub_loaded)
-	{
-		PK_DropBackpack();
-		bot_BackpackSetup(newmis); // *bot - includes PK
-		return;
-	}
 	local entity item;
 
 	if (!(self.ammo_shells + self.ammo_nails + self.ammo_rockets + self.ammo_cells))
@@ -1451,7 +1422,7 @@ void () DropBackpack =
 	item.movetype = MOVETYPE_TOSS;
 	setmodel (item,"progs/backpack.mdl");
 	setsize (item,'-16 -16 0','16 16 56');
-	item.touch = BackpackTouch;
+	item.touch = q100_BackpackTouch;
 
 	item.nextthink = time + 120;	// remove after 2 minutes
 	item.think = SUB_Remove;

@@ -759,6 +759,67 @@ void() dyn_item =
 	}
 };
 
+// implemented for cvar control on server
+
+void() item_control_menu =
+{
+	local float f, k;
+	local string m;
+	local entity e;
+
+	k = cvar("pk_tog_mcode") - 101;
+	if (k < 1 || k > 17) k = cvar("pk_tog_itemmenu");
+
+	if (k > 0)
+	{
+		if (k > 31)
+		{
+			m = build_itemmenu();
+			bprint(m);
+		}
+		else if (k ==  31)
+		{
+			e = spawn();
+			if (e)
+			{
+				e.think = item_loop;
+				e.nextthink = time + 0.1;
+			}
+		}
+		else if (k == 30)
+			Admin_itembits();
+		else if (k == 29)
+		{
+			pk_itemovr = 0;
+			admin_sv_cfg();
+		}
+		else if (k < 23)
+		{
+				f = AdminBitFlag(k - 1);
+				if (Q_99  && k == 6) f = 0;
+				if (pk_itemovr & f)
+					pk_itemovr = pk_itemovr - (pk_itemovr & f);
+				else
+					pk_itemovr = pk_itemovr | f;
+				if (pk_itemovr != pk_itemovr_ck)
+				{
+					if (pk_itemovr & f)
+						m = "\nBit toggled on for selected item: ";
+					else
+						m = "\nBit toggled off for selected item: ";
+					bprint (m);
+					bprint(ftos(f));
+					bprint("\n");
+				}
+				admin_sv_cfg();
+		}
+	}
+
+	cvar_set("pk_tog_mcode", "0");
+	cvar_set("pk_tog_itemmenu", "0");
+};
+
+
 // fn(func_dynitem) - map load dynamic item ent maker
 
 // wait - time between spawns in secs
@@ -770,6 +831,8 @@ void() dyn_item =
 // dest2 - item bit codes to select from
 
 // pk_dyn_func_stop - stop func_dynitem processing
+
+// TDO: no pk for q_99
 
 void() func_dynitem =
 {

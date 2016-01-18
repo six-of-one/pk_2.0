@@ -58,6 +58,7 @@ void() doom_precache =
 	precache_model ("progs/d_spheres.mdl");
 	precache_model ("progs/d_radsuit.mdl");
 	precache_model ("progs/d_skullkey.mdl");
+	precache_model ("progs/d_cardkey.mdl");
 	precache_model ("progs/d_armor.mdl");
 // ammo
 	precache_model ("progs/d_4shell.mdl");
@@ -653,6 +654,41 @@ void() d_key_yellowskull =
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
+void() d_key_redcard =
+{
+	item_key1();
+
+	self.noise = "doom/dsitemup.wav";
+	setmodel (self, "progs/d_cardkey.mdl");
+//	self.skin = 0;
+	self.netname = "Red card key";
+	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	if (self.class_select == "") self.class_select = "doom_item";
+};
+
+void() d_key_bluecard =
+{
+	item_key2();
+
+	self.noise = "doom/dsitemup.wav";
+	setmodel (self, "progs/d_cardkey.mdl");
+	self.skin = 1;
+	self.netname = "Blue card key";
+	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	if (self.class_select == "") self.class_select = "doom_item";
+};
+
+void() d_key_yellowcard =
+{
+	item_key2();
+
+	self.noise = "doom/dsitemup.wav";
+	setmodel (self, "progs/d_cardkey.mdl");
+	self.skin = 2;
+	self.netname = "Yellow card key";
+	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	if (self.class_select == "") self.class_select = "doom_item";
+};
 
 /*
 		+---------------------------------------+

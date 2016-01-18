@@ -110,11 +110,11 @@ void() player_run;
 
 void()	player_stand1 =[	$axstnd1,	player_stand1	]
 {
-	if (PK || custom_hub_loaded) pk_harpoon_frames();
+	if (!Q_100 && !Q_99) pk_harpoon_frames();
 	else
 	self.weaponframe=0;
 
-	if (PK || custom_hub_loaded) pk_stand_frames();
+	if (!Q_100) pk_stand_frames();
 	else
 	if (self.weapon == IT_AXE)
 	{
@@ -140,11 +140,11 @@ void()	player_stand1 =[	$axstnd1,	player_stand1	]
 
 void()	player_run =[	$rockrun1,	player_run	]
 {
-	if (PK || custom_hub_loaded) pk_harpoon_frames();
+	if (!Q_100 && !Q_99) pk_harpoon_frames();
 	else
 	self.weaponframe=0;
 
-	if (PK || custom_hub_loaded) pk_run_frames();
+	if (!Q_100) pk_run_frames();
 	else
 	if (self.weapon == IT_AXE)
 	{
@@ -376,7 +376,7 @@ void() player_pain =
 	if (self.invisible_finished > time)
 		return;		// eyes don't have pain frames
 
-	if (PK || custom_hub_loaded)
+	if (!Q_100)
 	{
 		if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
 			player_axpain1 (); // *pk - run pk axe frames
@@ -483,7 +483,7 @@ vector(float dm) VelocityForDamage =
 {
 	local vector v;
 
-	if (PK && damage_inflictor) // *pk - used by the player gib functions to calculate the direction of the gib to go in.
+	if (!Q_100 && damage_inflictor) // *pk - used by the player gib functions to calculate the direction of the gib to go in.
 	{
 		makevectors(damage_inflictor.angles);
 		v = (300 * v_forward * random()) + (100 * v_right * crandom()) + (v_up * 300 * random());
@@ -583,7 +583,7 @@ void() GibPlayer =
 
 void() PlayerDie =
 {
-	if (PK || custom_hub_loaded)
+	if (!Q_100)
 	{
 		PK_PlayerDie();
 		return;

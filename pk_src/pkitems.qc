@@ -30,6 +30,64 @@
  */
 
 
+void () SUB_regen =
+{
+	if (Q_100)
+	{
+		q100_SUB_regen();
+		return;
+	}
+
+	self.model = self.mdl;		// restore original model
+	self.solid = SOLID_TRIGGER;	// allow it to be touched again
+	if (self.noise4 != "")
+		sound (self, CHAN_VOICE, self.noise4, 1, ATTN_NORM);	// play respawn sound - doom / other resp sounds
+	else
+		sound (self, CHAN_VOICE, "items/itembk2.wav", 1, ATTN_NORM);	// play respawn sound
+	pk_item_position();  // *pk - reposition moved items (horn & harp effects) on respawn
+};
+
+void () PlaceItem =
+{
+//	local float oldz;
+	bot_item_linx(self); // *bot - item tie in
+ 
+	if (Q_100)
+	{
+		q100_PlaceItem(); // always encoding now
+		return;
+	}
+
+	self.mcode = pk_mcode("", self); // put map code on ent
+	self.sscode = sid_code[(int)(self.mcode - 100) * %4];
+	if (!self.scode) self.scode = self.mcode;
+
+	self.mdl = self.model;		// so it can be restored on respawn
+	self.flags = FL_ITEM;		// make extra wide
+	self.solid = SOLID_TRIGGER;
+	self.movetype = MOVETYPE_TOSS;
+	self.velocity = '0 0 0';
+	self.origin_z = self.origin_z + 6;
+//	oldz = self.origin_z;
+	if (!droptofloor(0,0)) // Cataboligne 9.17.3 - fix compiler warning
+	{
+		dprint ("Bonus item fell out of level at ");
+		dprint (vtos (self.origin));
+		dprint ("\n");
+		if (PK_100)
+		{
+			remove (self);
+			return ;
+		}
+		else
+			dtf_handle();
+	}
+	pk_placeitem(); // *pk - set item details
+
+	pic_test();
+};
+
+
 // New weapons
 
 void () painkeep_weapon_touch =
@@ -605,7 +663,6 @@ void () light_painkeep_candle =
 	setmodel (self,"progs/candle.mdl");
 	FireAmbient ();
 	makestatic (self);
-	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 
@@ -724,12 +781,18 @@ void(float new, float new2) PK_Deathmatch_Weapon =
 
 // refered from below
 
-void() PK_BackpackTouch =
+void() BackpackTouch =
 {
 	local string	bs;
 	local	float	best, new;
 	local		entity	st1;
 	local	float	acount;
+
+	if (Q_100)
+	{
+		q100_BackpackTouch();
+		return;
+	}
 
 	if (other.classname != "player") // pk - this is where the grap can grab stuff
 	{
@@ -925,8 +988,14 @@ void() PK_BackpackTouch =
 
 // called from DropBackpack
 
-void() PK_DropBackpack =
+void() DropBackpack =
 {
+	if (Q_100)
+	{
+		q100_DropBackpack();
+		return;
+	}
+
 	newmis = world;
 	if (!(self.ammo_shells + self.ammo_nails + self.ammo_rockets + self.ammo_cells + self.pk_explode_ammo))
 		return;	// nothing in it
@@ -1012,6 +1081,8 @@ void() PK_DropBackpack =
 	newmis.nextthink = time + 120;	// remove after 2 minutes
 	newmis.think = SUB_Remove;
 	AddToSplash(newmis); // *pk - splash tossed items
+
+	bot_BackpackSetup(newmis); // *bot
 };
 
 

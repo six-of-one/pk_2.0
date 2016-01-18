@@ -226,8 +226,10 @@ float CON_RUN					= 3014656; //4063232; // any control bit CON_* entries above -
 float CYC_TIME					= 60; // TEST - 240; // seconds for cycle base - 4 mins +|- 2 mins
 
 void() item_loop;
+void() item_control_menu;
 float ammo_frame;
 float(float cn, entity e, string op) ammo_con;
+void () PlaceItem;
 
 // map translations
 
@@ -574,6 +576,9 @@ float PK_TP_USERMAPON		= 512;
 void() grap_releaseHarpoon;
 void() SUB_regen;
 void(entity e) AddToSplashBig;
+float(entity e) frag_plus;
+float(entity e) frag_minus;
+
 // pk_prethink
 void() WaterMove;
 void() CheckRules;
@@ -610,8 +615,7 @@ void() pk_item_position;
 void() pk_item_position_init;
 float(float w, float w2) PK_RankForWeapon;
 void(float new, float new2) PK_Deathmatch_Weapon;
-void() PK_DropBackpack;
-void() PK_BackpackTouch;
+void() DropBackpack;
 //void(entity e) PK_BackpackSetup;
 
 // player code
@@ -671,6 +675,23 @@ void() pk_placeitem;
 .string event;
 .float duration;
 
+
+// Cataboligne 9.11.3 purify - chase cam
+void() chase_cam_precache;
+void(float sel) cam_parms;
+void() Chase_cam_level_start;
+void() cam_waterjump;
+
+// message protocol defines
+float SVC_SETVIEWPORT	= 5;
+float SVC_SETVIEWANGLES	= 10;
+
+// free player entity variable
+// '.float speed'  bit-flag defines:
+//float CHSCAM_MONSTER  = ;
+float CHSCAM_ON			= 1;
+float LASERTARG_ON		= 4;
+float LASERTARG_LIT		= 32;
 
 .vector cam; // all chase cam data
 void() cam_punch;						// return punchangle if passed parm - otherwise set self. var

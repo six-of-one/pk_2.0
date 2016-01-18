@@ -72,7 +72,7 @@ local string	stemp;
 local entity	etemp;
 
 	self.origin_z = self.origin_z + 1;	// raise off floor a bit
-	droptofloor(0,0); // Cataboligne 9.17.3 - fix compiler warning
+	droptofloor(0,0); // Cataboligne 9.17.3 - fixed this compiler warning
 
 	if (!walkmove(0,0))
 	{
@@ -126,7 +126,7 @@ void() walkmonster_start =
 	self.nextthink = self.nextthink + random()*0.5;
 	self.think = walkmonster_start_go;
 	total_monsters = total_monsters + 1;
-	if (PK) AddToSplashBig(self); // *pk - Make this entity splash
+	if (!Q_100) AddToSplashBig(self); // *pk - Make this entity splash
 };
 
 
@@ -180,7 +180,7 @@ void() flymonster_start =
 	self.nextthink = self.nextthink + random()*0.5;
 	self.think = flymonster_start_go;
 	total_monsters = total_monsters + 1;
-	if (PK) AddToSplashBig(self); // *pk - Make this entity splash
+	if (!Q_100) AddToSplashBig(self); // *pk - Make this entity splash
 };
 
 

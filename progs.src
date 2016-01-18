@@ -28,6 +28,7 @@ frikbot/bot_move.qc
 frikbot/bot_ed.qc
 
 pk_src/painkeep.qc
+pk_src/pk_client.qc
 pk_src/splash.qc
 
 subs.qc

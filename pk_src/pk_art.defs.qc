@@ -16,7 +16,6 @@ void() pk_art_precache;
 void() pkplus_item_control_loop;
 void(float pkimp) pk_art_specialimpulse;
 void() pk_art_prinv;
-float() pk_art_checkpwr;
 float(entity ck, string prv) pk_art_movshot_ck;
 float(entity ck) pk_art_actor_ck;
 float(string mapNamed) pk_art_hubmapmsg;

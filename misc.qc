@@ -197,7 +197,7 @@ void () misc_fireball =
 	self.nextthink = time + (random() * 5);
 	self.think = fire_fly;
 	if (!self.speed)
-		self.speed = 1000; // Cataboligne 9.17.3 - fix compiler warning
+		self.speed = 1000; // Cataboligne 9.17.3 - fixed this compiler warning
 };
 
 void () fire_fly =
@@ -232,154 +232,7 @@ void () fire_touch =
 
 //============================================================================
 
-void(entity e, string md, float dm, float hl, float mt) misc_explodbox_set;
-
-
-// fn(barrel_regen) - heh heh, respawn exploding boxes
-
-void() barrel_regen =
-{
-	SUB_regen();
-	if (self.model == "progs/barrel.mdl")
-		d_barrel();
-	else
-		misc_explodbox_set(self, self.mdl, self.currentammo, self.armorvalue, self.movetype);
-};
-
-
-void() barrel_explode =
-{
-	local entity boombox, e;
-	local vector flg;
-	local float bdmg;
-	local string bsnd;
-
-	self.mdl = self.model;
-	self.solid = SOLID_NOT;
-//	if (self.classname == "chaos_item" && random() > CI_EXPLBOX_RES)
-//		self.think = SUB_Remove;
-//	else
-	if (EXPLBOX_RESP)
-	{
-		self.nextthink = time + RSP_TIME;
-		self.think = barrel_regen;
-	}
-	else
-		SUB_Remove();
-
-	boombox = spawn();
-	boombox.origin = self.origin;
-	
-	self.model = string_null;
-	bdmg = self.currentammo;
-	bsnd = self.noise;
-	self.takedamage = DAMAGE_NO;
-
-	self = boombox;
-	e = world;
-	if (self.classname == "chaos_item") e = self.owner;
-
-	self.takedamage = DAMAGE_NO;
-	self.classname = "explo_box";
-	// did say self.owner
-/*
-//	T_RadiusDamage (self, self, bdmg, e);
-	sound (self, CHAN_VOICE, bsnd, 1, ATTN_NORM);
-	particle (self.origin, '0 0 0', 75, 255);
-
-	self.origin_z = self.origin_z + 32;
-
-//	BecomeExplosion ();
-*/
-	sound (self, CHAN_VOICE, bsnd, 1, ATTN_NORM);
-	particle (self.origin, '0 0 0', 75, 255);
-	self.origin_z = self.origin_z + 32;
-//	Explode(0, bdmg, e, 0, 0, BecomeExplosion);
-	T_RadiusDamage (self,self,bdmg,world);
-	BecomeExplosion ();
-};
-
-
-
-// Chaos code
-// fn(misc_explobox_set) - set data for explode box...dang, can we get a doom barrel? - enhanced for chaos items as noted below
-// e - entity to set, create if null
-// md - string for model 					def: "maps/b_exbox2.bsp" (yes this could be _anything_)
-// dm - damage for explosion				def: 100
-// hl - health of box						def: 20
-// mt - move type
-
-void(entity e, string md, float dm, float hl, float mt) misc_explodbox_set =
-{
-	local float	oldz;
-
-//	map_precache();
-	precache_model ("maps/b_explob.bsp");
-	precache_model ("maps/b_exbox2.bsp");
-	precache_sound ("weapons/r_exp3.wav");
-
-//	if (e == world) e = spawn();
-	if (e == world) return;
-
-//	e.class_select = "class_explosive";
-	e.solid = SOLID_BBOX;
-	e.movetype = mt; // FIX - this would be why an explodbox cant be picked up
-
-	if (md != "")
-	{
-		setmodel (e, md);
-		e.mdl = md;
-	}
-	else
-	{
-		setmodel (e, "maps/b_exbox2.bsp");
-		e.mdl = "maps/b_exbox2.bsp";
-	}
-
-	if (hl > 0)
-		e.health = hl;
-	else
-		e.health = 20;
-	e.armorvalue = e.health; // for respawns
-
-	if (dm > 0)
-		e.currentammo = dm;
-	else
-		e.currentammo = 100;
-
-	e.th_die = barrel_explode;
-	e.takedamage = DAMAGE_AIM;
-	e.noise = "weapons/r_exp3.wav";
-
-//	if (map_load_flg | FL_MAPITEM) // loading on map
-//	{
-	e.origin_z = e.origin_z + 2;
-	oldz = e.origin_z;
-	droptofloor(0,0); // Cataboligne 9.17.3 - fixed this compiler warning
-	if (oldz - e.origin_z > 250)
-		{
-		dprint ("Barrel fell out of level at ");
-		dprint (vtos (self.origin));
-		dprint ("\n");
-		if (PK_100 || Q_100)
-		{
-			remove (self);
-			return ;
-		}
-		else
-			dtf_handle();
-		}
-//	map_load_flg = map_load_flg - (map_load_flg | FL_MAPITEM);
-//	}
-	pic_test();
-
-	if (!PK_100 && !Q_100)
-	if (self.wad == "q1")
-		doom_item_control(self, 0);
-};
-
-
-void () barrel_explode_q100 =
+void () q100_barrel_explode =
 {
 	self.takedamage = DAMAGE_NO;
 	self.classname = "explo_box";
@@ -393,19 +246,14 @@ void () barrel_explode_q100 =
 };
 
 
+
 /*QUAKED misc_explobox (0 .5 .8) (0 0 0) (32 32 64)
 TESTING THING
 */
 
-void () misc_explobox =
+void () q100_misc_explobox =
 {
 	local float oldz;
-
-	if (!Q_100)
-	{
-		misc_explodbox_set(self, "maps/b_explob.bsp", 160, 20, MOVETYPE_NONE);
-		return;
-	}
 
 	self.solid = SOLID_BBOX;
 	self.movetype = MOVETYPE_NONE;
@@ -413,12 +261,12 @@ void () misc_explobox =
 	setmodel (self,"maps/b_explob.bsp");
 	precache_sound ("weapons/r_exp3.wav");
 	self.health = 20;
-	self.th_die = barrel_explode_q100;
+	self.th_die = q100_barrel_explode;
 	self.takedamage = DAMAGE_AIM;
 
 	self.origin_z = self.origin_z + 2;
 	oldz = self.origin_z;
-	droptofloor(0,0); // Cataboligne 9.17.3 - fix compiler warning
+	droptofloor(0,0); // Cataboligne 9.17.3 - fixed this compiler warning
 	if (oldz - self.origin_z > 250)
 	{
 		dprint ("item fell out of level at ");
@@ -435,15 +283,9 @@ void () misc_explobox =
 Smaller exploding box, REGISTERED ONLY
 */
 
-void () misc_explobox2 =
+void () q100_misc_explobox2 =
 {
 	local float oldz;
-
-	if (!Q_100)
-	{
-		misc_explodbox_set(self, "maps/b_exbox2.bsp", 160, 20, MOVETYPE_NONE);
-		return;
-	}
 
 	self.solid = SOLID_BBOX;
 	self.movetype = MOVETYPE_NONE;
@@ -451,12 +293,12 @@ void () misc_explobox2 =
 	setmodel (self,"maps/b_exbox2.bsp");
 	precache_sound ("weapons/r_exp3.wav");
 	self.health = 20;
-	self.th_die = barrel_explode_q100;
+	self.th_die = q100_barrel_explode;
 	self.takedamage = DAMAGE_AIM;
 
 	self.origin_z = self.origin_z + 2;
 	oldz = self.origin_z;
-	droptofloor(0,0); // Cataboligne 9.17.3 - fix compiler warning
+	droptofloor(0,0); // Cataboligne 9.17.3 - fixed this compiler warning
 	if (oldz - self.origin_z > 250)
 	{
 		dprint ("item fell out of level at ");
@@ -723,7 +565,7 @@ void () func_illusionary =
 	self.movetype = MOVETYPE_NONE;
 	self.solid = SOLID_NOT;
 	setmodel (self,self.model);
-	makestatic (self); // Cataboligne 9.17.3 - fix compiler warning
+	makestatic (self); // Cataboligne 9.17.3 - fixed this compiler warning
 };
 
 /*QUAKED func_episodegate (0 .5 .8) ? E1 E2 E3 E4

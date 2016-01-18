@@ -410,14 +410,13 @@ ClientKill
 Player entered the suicide command
 ============
 */
-void () ClientKill =
+void () q100_ClientKill =
 {
 	bprint (self.netname);
 	bprint (" suicides\n");
 	set_suicide_frame ();
 	self.modelindex = modelindex_player;
-	if (!NOCIDE)
-	self.frags = self.frags - 2 * frag_minus(self);	// extra penalty
+	self.frags = self.frags - 2;	// extra penalty
 	respawn ();
 };
 
@@ -997,17 +996,8 @@ CheckPowerups
 Check for turning off powerups
 ================
 */
-void () CheckPowerups =
+void () q100_CheckPowerups =
 {
-	if (self.classname == OBSERVER) // Cataboligne 8.9.9 purify - chase cam (dead) & observer - clear all effects
-	{
-		self.super_damage_finished = self.invisible_finished = self.invincible_finished = self.radsuit_finished = 0;
-		self.super_time = self.invisible_time = self.invincible_time = self.rad_time = 0;
-		self.items = self.items - (self.items & (IT_QUAD | IT_SUIT | IT_INVISIBILITY | IT_INVULNERABILITY));
-		self.effects = 0;
-		return;
-	}						// NOTE: great place for some interesting chaos effects
-
 	if (self.health <= 0)
 		return;
 
