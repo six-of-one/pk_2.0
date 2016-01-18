@@ -189,6 +189,31 @@ void () rune_1_expire =
 	remove(self);
 };
 
+// because map runes still need to serverflag and random can change spawnflags
+
+void () rune_sigil_touch =
+{
+	if (other.classname != "player")
+			return;
+	if (other.health <= 0)
+		return ;
+
+	centerprint (other,"You got the rune!");
+
+	sound (other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
+	stuffcmd (other,"bf\n");
+	self.solid = SOLID_NOT;
+	self.model = string_null;
+	if (self.duration) // random runes - map run val goes here
+		serverflags = serverflags | (self.duration & 15);
+	else
+	serverflags = serverflags | (self.spawnflags & 15);
+	self.classname = "";		// so rune doors won't find it		Cat: ??? - huh?
+
+	activator = other;
+	SUB_UseTargets();				// fire all targets / killtargets
+};
+
 // TDO: rule 1 sfx here, 3 runes - 10+ secs, 4 runes - 1+ min or till death
 
 void () rune_touch =
@@ -200,16 +225,23 @@ void () rune_touch =
 			return;
 	if (other.health <= 0)
 		return ;
+
+	if (self.map == "pic_item")
+	if (!deathmatch) rune_sigil_touch(); // map rune in sp must allow touch even if rules prevent getting rune
+
 	if (RUNES == 1)
 	if (!RUNE_AR1M)
 	if (other.rune_flag)
 		return;
 
 	if (RUNES == 1)
-	if (other.rune_flag & self.spawnflags)
+	if (other.rune_flag & self.spawnflags) // already got one
 		return;
 
-	if (self.map == "pic_item" || !deathmatch) sigil_touch(); // map rune (should have pic_item set), or sp
+	if (self.map == "pic_item") rune_sigil_touch(); // map rune (should have pic_item set), do a touch for qstart map serverflags floor op
+
+	if (! (self.spawnflags & RUNE_MASK)) // rune not allowed - prob map rune
+		return;
 
 	centerprint3 (other,"You got the ",self.netname," Rune!");
 	sprint(other,"You have the power of ");
@@ -218,7 +250,7 @@ void () rune_touch =
 	sound (other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
 	stuffcmd (other,"bf\n");
 
-	other.rune_flag = other.rune_flag | self.spawnflags;
+	other.rune_flag = other.rune_flag | (self.spawnflags & RUNE_MASK_ALL);
 
 	if (RUNES == 1)
 	{
@@ -227,7 +259,7 @@ void () rune_touch =
 		{
 			e.classname = "rune_1_expiry";
 			e.netname = self.netname;
-			e.rune_flag = self.spawnflags;
+			e.rune_flag = self.spawnflags & RUNE_MASK_ALL;
 			e.think = rune_1_expire;
 			e.nextthink = time + POW_TIME;
 			e.owner = other;
@@ -424,7 +456,7 @@ void() run_runes =
 			R_HELL = 0;
 			R_ELDER = 0;
 			sf = 100;
-			f = RUNE_MASK_ALL;
+			f = RUNE_MASK; //RUNE_MASK_ALL; - try this out see how it does
 			while (f != 0 && sf > 0) // try to make a nice one of each deal
 			{
 				k = rnd_bit_mask(f);
@@ -436,10 +468,10 @@ void() run_runes =
 				f = f - (f & k);
 				sf = sf - 1;
 			}
-			if (!R_EARTH) R_EARTH = k; // any fail get assigned random powers
-			else if (!R_BLACK) R_BLACK = k;
-			else if (!R_HELL) R_HELL = k;
-			else if (!R_ELDER) R_ELDER = k;
+			if (!R_EARTH) R_EARTH = rnd_bit_mask(RUNE_MASK); // any fail get assigned random powers
+			if (!R_BLACK) R_BLACK = rnd_bit_mask(RUNE_MASK);
+			if (!R_HELL) R_HELL = rnd_bit_mask(RUNE_MASK);
+			if (!R_ELDER) R_ELDER = rnd_bit_mask(RUNE_MASK);
 			bprint("***   Runes randomly selected from pool of available rune powers\n");
 		}
 	}
@@ -501,7 +533,6 @@ void() run_runes =
 		}
 	}
 
-	if (!PK_100)
 	if (cvar("pk_runemap")) // display rune info on console (network - all players see this)
 	{
 		bprint("\bRunes:\n\n");
@@ -562,7 +593,7 @@ void() rune_regen =
 	{
 		self.health = self.health + 5;
 		if (self.health>100)
-			self.health=100;
+			self.health=100; // NOTE: violates T_Heal rule (implied from t_dmg rule) of only fn to add health - relates to morphs & needs morph tweak here
 		RegenerationSound();
 	}
 	if (self.items&(IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3))
@@ -602,4 +633,118 @@ float(float atf) rune_haste =
 	self.attack_finished = time + atf;
 	HasteSound();
 	return(FALSE);
+};
+
+/*QUAKED item_sigil (0 .5 .8) (-16 -16 -24) (16 16 32) E1 E2 E3 E4
+End of level sigil, pick up to end episode and return to jrstart.
+*/
+
+// NOTE - q100 code never used because q100 can run a rune server - think on this
+
+
+void () rune_spe =
+{
+bprint("RUNES = ");
+bprint(ftos(self.dmg));
+bprint(", rune = ");
+bprint(ftos(self.dodmg));
+bprint(", cvar = ");
+bprint(ftos(self.cnt));
+bprint(".\n");
+};
+
+void () item_sigil =
+{
+	local float f, rune;
+
+	if (time < 2) // delay till we can read cvar - HUH?  dont freaking get why this is necc!
+	{
+		self.nextthink = time + 1;
+		self.think = item_sigil;
+		return;
+	}
+
+	if (!self.spawnflags)
+//		objerror ("no spawnflags");
+	{
+		if (Q_100 && Q_100_OBJERR) objerror("no spawnflags");
+		else
+		{
+			if (WARNING)
+			{
+				if (Q_100 || PK_100)
+					bprint("\n*** warning:\nsigil with no spawnflags - removed.\n");
+				else
+					bprint("\n*** warning:\nsigil with no spawnflags - randomizing.\n");
+			}
+			if (Q_100 || PK_100)
+			{
+				remove(self);
+				return;
+			}
+			else
+			self.spawnflags = rnd_bit_mask(15);
+		}
+	}
+
+	precache_sound ("misc/runekey.wav");
+	self.noise = "misc/runekey.wav";
+
+	self.duration = 0;
+	if (self.class_select != "q3_item")
+	if (time < PIC_TO) // make sure map runes load the correct appearance even if powers change
+	{
+		self.duration = self.spawnflags & RUNE_MASK_ALL;
+		if (self.spawnflags & 1) f = rune_bit_code(MC_SIGIL1, 0);
+		else if (self.spawnflags & 2) f = rune_bit_code(MC_SIGIL2, 0);
+		else if (self.spawnflags & 4) f = rune_bit_code(MC_SIGIL4, 0);
+		else if (self.spawnflags & 8) f = rune_bit_code(MC_SIGIL8, 0);
+		else f = rnd_bit_mask(15); // fail! no spawnflag - just pick one at random
+		self.spawnflags = f;
+	}
+
+	if (self.spawnflags & R_EARTH)
+	{
+		precache_model ("progs/end1.mdl");
+		setmodel (self,"progs/end1.mdl");
+		self.netname = "Earth magic"; // Cataboligne - 5.32.10 - for rune server
+	}
+	if (self.spawnflags & R_BLACK)
+	{
+		precache_model2 ("progs/end2.mdl");
+		setmodel (self,"progs/end2.mdl");
+		self.netname = "Black magic"; // Cataboligne - 5.32.10 - for rune server
+	}
+	if (self.spawnflags & R_HELL)
+	{
+		precache_model2 ("progs/end3.mdl");
+		setmodel (self,"progs/end3.mdl");
+		self.netname = "Hell magic"; // Cataboligne - 5.32.10 - for rune server
+	}
+	if (self.spawnflags & R_ELDER)
+	{
+		precache_model2 ("progs/end4.mdl");
+		setmodel (self,"progs/end4.mdl");
+		self.netname = "Elder magic"; // Cataboligne - 5.32.10 - for rune server
+	}
+
+	if (time > PIC_TO)
+	if(self.map == "")
+		self.map = "rune"; // Cataboligne - 5.32.10 - for rune server
+
+	rune = FALSE;
+	if (RUNES != cvar("sv_c_rune")) rune = cvar("sv_c_rune"); // map load issue - 1st map loaded has no RUNES val here for map load runes
+
+local entity e;
+e = chaos_spawn(0, 0, 0, 0,  v0, v0, v0, v0, v0, "", "", SUB_Null, 1,rune_spe, SUB_Null, self, world);
+e.dmg = RUNES;
+e.dodmg = rune;
+e.cnt = cvar("sv_c_rune");
+
+	if (RUNES || rune)
+		self.touch = rune_touch;
+	else
+	self.touch = sigil_touch;
+	setsize (self, '-16 -16 -24', '16 16 32');
+	StartItem ();
 };

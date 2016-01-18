@@ -1099,7 +1099,7 @@ void () sigil_touch =
 End of level sigil, pick up to end episode and return to jrstart.
 */
 
-void () item_sigil =
+void () q100_item_sigil =
 {
 	if (!self.spawnflags)
 		objerror ("no spawnflags");
@@ -1107,39 +1107,27 @@ void () item_sigil =
 	precache_sound ("misc/runekey.wav");
 	self.noise = "misc/runekey.wav";
 
-	if (self.spawnflags & R_EARTH)
+	if (self.spawnflags & 1)
 	{
 		precache_model ("progs/end1.mdl");
 		setmodel (self,"progs/end1.mdl");
-		self.netname = "Earth magic"; // Cataboligne - 5.32.10 - for rune server
 	}
-	if (self.spawnflags & R_BLACK)
+	if (self.spawnflags & 2)
 	{
 		precache_model2 ("progs/end2.mdl");
 		setmodel (self,"progs/end2.mdl");
-		self.netname = "Black magic"; // Cataboligne - 5.32.10 - for rune server
 	}
-	if (self.spawnflags & R_HELL)
+	if (self.spawnflags & 4)
 	{
 		precache_model2 ("progs/end3.mdl");
 		setmodel (self,"progs/end3.mdl");
-		self.netname = "Hell magic"; // Cataboligne - 5.32.10 - for rune server
 	}
-	if (self.spawnflags & R_ELDER)
+	if (self.spawnflags & 8)
 	{
 		precache_model2 ("progs/end4.mdl");
 		setmodel (self,"progs/end4.mdl");
-		self.netname = "Elder magic"; // Cataboligne - 5.32.10 - for rune server
 	}
 
-	if (time > PIC_TO)
-	if(self.map == "")
-		self.map = "rune"; // Cataboligne - 5.32.10 - for rune server
-
-//	self.delay = -6; // dont let map runes relocate
-	if (RUNES)
-		self.touch = rune_touch;
-	else
 	self.touch = sigil_touch;
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();

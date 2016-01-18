@@ -1397,3 +1397,108 @@ void() dtf_handle =
 	setorigin(self, v1);
 };
 
+
+/// items tags
+
+/*
+vars used by items
+
+standard:
+
+.model = string descriptor of model for item appearance
+.modelindex = numeric index into set of models indicated by model string
+.mdl = model string for regen hide
+.size = bounding box / model sizing + following 4 vars
+.absmin
+.absmax
+.mins
+.maxs
+.origin = location in map
+.skin = for multi skinned items (armor)
+
+.netname = descriptive string for grab announce
+.classname = map spawn func name, sometimes used in item ops
+.solid = SOLID_TRIGGER
+.movetype = MOVETYPE_TOSS
+.flags  = FL_ITEM, FL_ONGROUND
+.velocity = used for eject sometimes
+
+.touch = fn for grab
+.nextthink = ip move timeout - 60 secs
+.think = ip_checkForMovement (mostly under pk)
+.items = regular item inventory value
+
+ops values:
+
+.armorvalue = amount of armor prot
+.healtype = what health box does (mod affects this)
+.aflag = ammo box adds this ammo (not used by xweaps)
+,spawnflags = map load control (ammo) rune server flag
+
+pk stuff:
+
+.ip_orgOrigin = return location for moved items
+.pk_items = pk item inventory value
+.splash_func = fn call to "splash" an item in liquid
+.water_notify = if "yes" (for search) check against splash in liq and call fn above
+
+bot stuff:
+
+--- so pk bots understand items
+.th_weight
+.th_cache
+.th_update
+.state = status set by bot route handling?
+
+extended mod codes
+
+.pk_touch = holds actual touch call for wrap code
+.*code = map codes [s] = original [m, ss] = current, search string
+.class_select = genre tag
+.wad = map loaded items can have q1 here mode - dual items 
+.wad = dynamic items store (new) classname here
+.map = pic_item or rune for server runes
+.wait = respawn time
+.dmgtime = artifact run time
+
+.lip = ammo type for weps / boxes
+,currentammo = ammo to add
+.volume = max value code for health, armor, ammo
+,spawnflags = rune power indicator
+
+.noise = pickup sound
+.noise4 = respawn sound
+
+xweps:
+
+.weaponmodel = v_* model for fpv
+.vwepmdl = viswep model
+.noise2 = ominous hum played while wep is not holstered
+.noise3 = wep fired sound
+.target = projectile strike sound
+
+.items = inv slot for this wep
+.attack_finished = time an attack takes before wep can fire again
+.dmg = damage one attack / projectile / pellet does
+.dodmg = splash damage for explosions / plasmas
+.dmg_save = ammo used per shot
+.dmg_take = amount shot (pellets usually)
+.duration = indicates melee weap or sound override or ignore inventory bit
+
+_fr_attack = attack frame code to call on fire
+_attack = attack code to call on fire
+--- it either attack is SUB_Null the other fn does all attack ops - usually for fire by frames
+
+RUNES
+--- these 3 run random relocation code
+.count = count val till rune gets moved due to non grab
+.cnt = counter measured against .cnt
+.delay = counter measured against RUNE_MOVE master move - all runes move even if well sought
+.duration = original server flag for map runes
+
+NOT DONE YET:
+
+xweps -
+.distance = ranking
+
+*/

@@ -1293,7 +1293,7 @@ void() pk_srvcmd_set =
 			localcmd("_server.cfg\n");
 		}
 
-	pk_srvcmd_load ();
+	pk_srvcmd_load();
 };
 
 // called from many places - handles pk_mode 0 where map sets whether or not we use PK stuff
