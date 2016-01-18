@@ -82,6 +82,15 @@ void() PK_init =
 	pk_flags = pk_flags_ck = cvar("savedgamecfg");
 	pk_map = PK_mapmode(world.model);
 
+// genre for init stuff
+
+	if (pk_map) MAP_MODE = "PK";
+	else if (world.wad == "wolftex.wad") MAP_MODE = "W";
+	else if (world.wad == "doomtex.wad") MAP_MODE = "D";
+	else if (world.wad == "q2.wad") MAP_MODE = "Q2";
+	else if (world.wad == "" && !pk_map) MAP_MODE = "Q3";
+	else  MAP_MODE = "Q";
+
 // single player hack - if hub flag is set and we forced dynamic items level exit returns to hub
 	if (!deathmatch && (pk_flags & PK_SF_HUB)) pk_flags = pk_flags - PK_SF_HUB;
  
@@ -220,13 +229,13 @@ string (string s) precache_model =
 	{
 		if (s == "progs/g_airgun.mdl" || s == "progs/g_airgun2.mdl" || s == "progs/g_clight.mdl" || s == "progs/g_harp.mdl" || s == "progs/tpower.mdl" || s == "progs/beans.mdl" || s == "progs/bearpick.mdl" || s == "maps/b_eshel0.bsp" )
 		{
-			if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+			if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 			pk_ditems = pk_ditems + 1;
 		}
 
 		if (s == "progs/ego.mdl" || s == "progs/tomb.mdl" || s == "progs/actor.mdl" || s == "progs/phone.mdl") // pkpitems.qc
 		{
-			if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+			if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 			pk_ditems = pk_ditems + 1;
 		}
 
@@ -804,13 +813,16 @@ void() pk_liveupd =
 			}
 			f = f + 1;
 		}
+		bprint("map mode = ");
+		bprint(MAP_MODE);
+		bprint("\n");
 		cvar_set("pk_mapcode", "0");
 	}
 
 	if (cvar("pk_make")) // create item at random location if map code valid
 	{
 		fn_make(cvar("pk_make"), v0);
-//		cvar_set("saved1", ftos(cvar("saved1") + 1));
+//		cvar_set("saved1", ftos(cvar("saved1") + 1)); // TEST
 		cvar_set("pk_make", "0");
 	}
 

@@ -447,7 +447,7 @@ float DEF_ATYPE = 0.3; // default armor is always lowest protection ?
 float DEF_ITEMS; // q1 standard bit flags
 float DEF_PK_ITEMS; // pk bit flags
 float DEF_WEAPON; // bit for wep slot - per genre char default action
-float DEF_REMWEP				= 256; // bit set in def_weap - if normal defaults are set - remove them
+float DEF_REMWEP				= 256; // bit set in def_weap - if normal defaults are set - remove them NOTE: axe doesnt remove because of pk item code!
 float DEF_REMAMMO				= 512; // bit set in def_weap - if normal ammo set - remove it
 
 
@@ -465,6 +465,9 @@ float DEF_AMMO_GAS;
 float DEF_AMMO_BASE = 25; // if no ammo given for a default wep, this is it
 
 // X (extra) weapon stuff
+
+string MAP_MODE; // genre of loaded map (if detected) Q quake (default), Q2 quake 2, Q3 quake 3, D doom, W wolf, PK painkeep
+//.string CHR_MODE; // genre of player - to be based on morph code
 
 float DEF_X_ITEMS; // x bit flags
 
@@ -484,8 +487,8 @@ float FL_INIT_CGEN_MC		= 2; // genre by char - 1 map code per genre
 float FL_INIT_MGEN_BIT		= 4; // genre by map - bits per genre
 float FL_INIT_MGEN_MC		= 8; // genre by map - 1 map code per genre
 float FL_INIT_ARB_MC			= 16; // arbitrary map codes - 8 total, everyone gets this set
-float FL_INIT_ADD				= 32; // add to initial weaps
-float FL_INIT_REP				= 64; // replaces initial weaps
+//float FL_INIT_ADD				= 32; // add to initial weaps -- deprecated, happens when DEF_REMWEP is false
+//float FL_INIT_REP				= 64; // replaces initial weaps -- handled by DEF_REMWEP now
 
 .float ammo_bullet;
 .float ammo_slug;

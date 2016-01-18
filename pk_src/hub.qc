@@ -210,7 +210,8 @@ void() hub_custom =
 	hub_teleport(); // init hub portal
 
 //	if (!(pk_flags & PK_MAP) && !PK) 
-		pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+//		pk_map =  // deprecated - now indicates a true (recognized) pk map
+		PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 
 // set appearance - model has different frames & skins for variety
 // IDEA: set facing in cphub? - not for now, all portals should be "directionless"
@@ -709,7 +710,8 @@ void() hub_control =
 	}
 	theHub = self;
 
-	pk_map = PK = TRUE; // *pk - in case its not an official pk hub
+//	pk_map =  // deprecated - now indicates a true (recognized) pk map
+	PK = TRUE; // *pk - in case its not an official pk hub
 
 // either triggered to by time
 	if (self.targetname)

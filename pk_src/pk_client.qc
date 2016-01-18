@@ -415,6 +415,7 @@ void() pk_plcfg =
 		if (DARKPLACES)
 		{
 			stuffcmd(self, Q3_BOBHOFF);
+			if (!pk_map) // not a pk map (some hubX maps have no .wad!)
 			if (world.wad == "") // q3 map? - then set bob
 				q3_bob_height();
 		}
@@ -1263,7 +1264,7 @@ float(entity e) frag_plus =
 	return(1); // chaos mod vector!
 };
 
-// fn(frag_minus) - return frag to subtract
+// fn(frag_minus) - return frag to *** subtract ***
 
 // test entity e
 
@@ -1587,6 +1588,15 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 				bprint (attacker.netname);
 				bprint (deathstring2);
 			}
+			return;
+		}
+		else if (attacker.classname == "CDM") // Cataboligne - 2.20.11 - customized death messages
+		{
+			if (attacker.deadflag & 1) bprint(targ.netname); // use targ name
+			if (attacker.netname) bprint(attacker.netname); // main message
+			if (attacker.noise) bprint(targ.noise); // other strings
+			bprint("\n");
+			if (attacker.frags) targ.frags = targ.frags - (attacker.frags * frag_minus(targ)); 
 			return;
 		}
 // TURRET_START

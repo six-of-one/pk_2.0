@@ -232,6 +232,8 @@ void(float ox) W_FirePulseSpikes =
 	newmis.theowner = self;
 	setmodel (newmis, "progs/pnail.mdl");
 	newmis.angles = vectoangles(dir);
+	newmis.weapon = IT_NAILGUN; // Cataboligne - 2.19.11 - correct obit in pk_clientobit
+
 	setsize (newmis, ' 0 0 0', ' 0 0 0');
 	self.punchangle_x = -2;
 	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view

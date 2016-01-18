@@ -99,6 +99,7 @@ float(entity e) inWater =
 void() CheckWaterLevels =
 {
 	local entity e;
+	local float mv;
 
 	cc_frame = framecount; // call only once per frame
 
@@ -156,10 +157,11 @@ void() CheckWaterLevels =
 // fall from grace - stuff out of level checks
 
 // suspect shot stuff is from bots fallen out & not returned yet
+		mv = 0 - cvar("sv_maxvelocity");
 
-		if (pcc == CONTENT_SOLID || ceil(e.velocity_z) == -2011)
+ 		if (pcc == CONTENT_SOLID || (ceil(e.velocity_z) == -2011 || ceil(e.velocity_z) == mv))
 		{
-			if (ceil(e.velocity_z) == -2011)
+			if (ceil(e.velocity_z) == -2011 || ceil(e.velocity_z) == mv)
 			{
 				if (e.flags & FL_ITEM)
 				{
@@ -189,7 +191,16 @@ void() CheckWaterLevels =
 					}
 				}
 				else if (e.flags & FL_MONSTER && e.solid != SOLID_NOT) e.th_die(); // note: swim monsters dont set splash
-				else if (IROBOT(e)) T_Damage(e, e, e, 10000); // TDO: obit for this - nocide
+				else if (IROBOT(e) ) //|| e.classname == "player")
+				{
+					f = spawn();
+					f.classname = "CDM"; // Cataboligne - 2.20.11 - customized death messages
+					f.netname = " fell from grace.";
+					f.deadflag = 1; // use name
+					f.frags = 0;
+					T_Damage(e, e, f, 10000);
+					remove(f);
+				}
 				else if (e.classname != "player")
 				{
 					if (WARNING)
