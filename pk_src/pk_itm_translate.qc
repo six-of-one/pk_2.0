@@ -725,7 +725,10 @@ void(entity e, float mc) doom_alpha_tran =
 		{
 // 0.4, 0.5
 		setmodel (e, "progs/d_bottle.mdl");
-		e.frame = 3;
+		if (mc)
+			e.frame = 3; // map load needs diff position
+		else
+		e.frame = 4;
 		e.skin = 2;
 		}
 		else if (DOOM_ALPHA == 0.6)
@@ -752,7 +755,10 @@ void(entity e, float mc) doom_alpha_tran =
 		if (DOOM_ALPHA == 0.4 || DOOM_ALPHA == 0.5) // 0.4, 0.5
 		{
 		setmodel (e, "progs/d_bottle.mdl");
-		e.frame = 3;
+		if (mc)
+			e.frame = 3; // map load needs diff position
+		else
+		e.frame = 4;
 		e.skin = 3;
 		}
 		else if (DOOM_ALPHA == 0.6) // pre-beta
@@ -779,7 +785,7 @@ void(entity e, float mc) doom_alpha_tran =
 		}
 		else
 		{
-		setmodel(self, "progs/d_berzerk.mdl");
+		setmodel(e, "progs/d_berzerk.mdl");
 		e.frame = 0;
 		e.skin = 0;
 		}
@@ -790,14 +796,17 @@ void(entity e, float mc) doom_alpha_tran =
 		if (DOOM_ALPHA == 0.4 || DOOM_ALPHA == 0.5) // 0.4, 0.5
 		{
 		setmodel (e, "progs/d_bottle.mdl");
-		e.frame = 3;
+		if (mc)
+			e.frame = 3; // map load needs diff position
+		else
+		e.frame = 4;
 		e.skin = 7;
 		}
 		else
 		{
-		setmodel(self, "progs/d_spheres.mdl");
-		self.frame = 0;
-		self.skin = 0;
+		setmodel(e, "progs/d_spheres.mdl");
+		e.frame = 0;
+		e.skin = 0;
 		}
 		return;
 	}
@@ -806,14 +815,17 @@ void(entity e, float mc) doom_alpha_tran =
 		if (DOOM_ALPHA == 0.4 || DOOM_ALPHA == 0.5) // 0.4, 0.5
 		{
 		setmodel (e, "progs/d_bottle.mdl");
-		e.frame = 3;
+		if (mc)
+			e.frame = 3; // map load needs diff position
+		else
+		e.frame = 4;
 		e.skin = 8;
 		}
 		else
 		{
-		setmodel(self, "progs/d_spheres.mdl");
-		self.frame = 0;
-		self.skin = 1;
+		setmodel(e, "progs/d_spheres.mdl");
+		e.frame = 0;
+		e.skin = 1;
 		}
 		return;
 	}
