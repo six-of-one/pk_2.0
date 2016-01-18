@@ -335,11 +335,6 @@ float ammo_frame;
 float(float cn, entity e, string op) ammo_con;
 void () PlaceItem;
 
-// common item controls
-
-void() q2_weapon_rocketlauncher;
-void() q3_weapon_rocketlauncher;
-
 // map translations
 
 void() check_translate;
@@ -430,6 +425,8 @@ float MLT_LAVA					= 2048;	// melt in lava
 float PF_LAVA					= 1048576;
 */
 
+float DROP_ALLOW; // inv bits player is allowed to drop
+
 float IGN_INV 					= 66600;
 float FL_MELEE_WEP			= 66601;
 float SND_OVER					= 66602; // play eweapon sound over after fire call
@@ -478,6 +475,9 @@ void() wchg2_weapon_touch;
 // doom
 
 string DOOM_DET				= "doom/dsitembk.wav"; // against	self.noise4 
+float D_POWER_WAIT; // seconds major doom powers need to respawn - norm 30
+float D_POWER_TIME; // seconds of power supply
+
 void() doom_precache;
 
 float d_reps_base				= 57005000; // heh heh - DEAD+
@@ -490,6 +490,8 @@ void() player_bfg1;
 // q2
 
 string Q2_DET					= "q2_snd/respawn1.wav"; // against	self.noise4 
+float Q2_POWER_WAIT; // norm = 30
+float Q2_POWER_TIME; // norm = 30
 
 void() q2_precache;
 void() q2_weapon_shotgun;
@@ -500,6 +502,8 @@ void() X_FireBlaster;
 // q3
 
 string Q3_DET					= "q3_snd/respawn1.wav"; // against	self.noise4 
+float Q3_POWER_WAIT; // norm = 120
+float Q3_POWER_TIME; // norm = 30
 
 void() q3_precache;
 void() q3_suspend;
@@ -507,6 +511,7 @@ void() q3_weapon_shotgun;
 void() q3_item_health;
 void(entity e, float v) q3_ha_rot;
 
+void() inventory;
 
 // so we can make new sv_ console vars
 //DP_REGISTERCVAR - adds a new console cvar to the server console (in singleplayer this is the player's console), the cvar exists until the mod is unloaded or the game quits.
@@ -758,6 +763,8 @@ float pk_attack;		// bit 1 = can make a pk attack on any map, bit 2 = pk_artifac
 void() use_pkitem; // bots using pk items
 void(entity e, vector v1) item_eject;
 
+
+float PK_INV = 1; // if true show pk items in inventory list
 
 // Items used in impulse 1
 float PK_IT_AXE				= 1;

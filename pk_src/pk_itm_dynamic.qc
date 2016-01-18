@@ -127,6 +127,12 @@ void(string cls) item_call =
 			self = f;
 			self.classname = cls;
 		}
+// TDO: undo or dont do for failed call - i.e. not a valid classname
+// clears for xwep features
+		self.style = 0; // so we dont get range weps using melee frames
+		self.dodmg = 0; // might give some things extra blast dmg
+		self.wait = 0; // RSP_TIME; // damn q3 respawn time rules - hope this doesnt fxk rndize
+		self.dmgtime = POW_TIME;
 	}
 
 	scls = cls;

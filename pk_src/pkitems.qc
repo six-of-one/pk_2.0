@@ -199,6 +199,9 @@ void () painkeep_weapon_touch =
 	self.solid = SOLID_NOT;
 	if (deathmatch == 1)
 	{
+		if (self.wait)
+			self.nextthink = time + self.wait;
+		else
 		self.nextthink = time + RSP_TIME;
 		self.think = SUB_regen;
 	}
@@ -450,8 +453,13 @@ void() pk_ammo_touch =
 	self.model = string_null;
 	self.solid = SOLID_NOT;
 	if (deathmatch == 1)
+	{
+		if (self.wait)
+			self.nextthink = time + self.wait;
+		else
 	  self.nextthink = time + RSP_TIME;
-	self.think = SUB_regen;
+		self.think = SUB_regen;
+	}
 
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
@@ -523,10 +531,13 @@ void() painkeep_touch =
 		if (self.solid == SOLID_NOT)
 		if (deathmatch == 3) // *pk - new dm mode settings
 		{
+			if (self.wait)
+				self.nextthink = time + self.wait;
+			else
 			if (self.pk_touch == ammo_touch)
-				self.nextthink = time + 15;
-			if (self.pk_touch == armor_touch)
-				self.nextthink = time + 20;
+				self.nextthink = time + RSP_TIME * 0.5; //15;
+			else if (self.pk_touch == armor_touch)
+				self.nextthink = time + RSP_TIME * 0.666; //20;
 		}
 
 		if (e)
@@ -605,12 +616,15 @@ void() painkeep_touch =
 	self.model = string_null;
 	if (deathmatch != 2)
 	{
+		if (self.wait)
+			self.nextthink = time + self.wait;
+		else
 		if (self.pk_items == PK_IT_GRAVITYWELL)
 			self.nextthink = time + RSP_TIME * 4;
 		else
 			self.nextthink = time + RSP_TIME * 2;
+		self.think = SUB_regen;
 	}
-	self.think = SUB_regen;
 
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets

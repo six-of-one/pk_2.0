@@ -651,7 +651,17 @@ void() pk_liveupd =
 	check_translate();
 
 // respawn times
+	D_POWER_WAIT = 
+	Q2_POWER_WAIT = 
+
 	RSP_TIME = cvar("sv_c_rsp_time");
+	Q3_POWER_WAIT = 4 * RSP_TIME;
+
+// art power supply times
+	D_POWER_TIME = 
+	Q2_POWER_TIME = 
+	Q3_POWER_TIME = 
+
 	POW_TIME = cvar("sv_c_pow_time");
 
 	EXPLBOX_RESP = cvar("pk_explbox_resp");
