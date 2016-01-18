@@ -914,6 +914,14 @@ void () dead_cam_set =
 
 	if (Q_100 || PK_100) return; // || NO_CAM) return; // Cataboligne - 8.16.9 - quake compatability mode
 
+// limit on frags from fire & forget implementation
+
+	if (self.flags & FL_CLIENT || IROBOT(self))
+	if (FFW_LIMIT > 0)
+	{
+		self.search_time = time + FFW_LIMIT;
+	}
+
 	if (IROBOT(self))  // no deadcam for bots
 	{
 /*
@@ -937,13 +945,13 @@ void () dead_cam_set =
 		return;
 	}
 
-	if (self.aiment)
-	if (self.aiment.classname == "deadcam") return; // dont make more than one - just in case
-
 // NOTE: wraith option still needs checked once we have chaos mod morph deal
 	
 	if (self.flags & FL_CLIENT)
 	{
+		if (self.aiment)
+		if (self.aiment.classname == "deadcam") return; // dont make more than one - just in case
+
 		if (! self.cam_x & CHSCAM_ON)
 			cam_startdeathview();
 	}

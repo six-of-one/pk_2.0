@@ -7,9 +7,14 @@ float PK_TUR_TIME; // time to live, after which explode, 0 = no timeout
 float PK_TUR_HEAL; // health we get - base = 2/3 this, < 0 = no limit
 float PK_TUR_TARGOWN; // time after which turret shoots owner, 0 = dont target owner
 float PK_TUR_RELOAD; // chance turret will reload when low on ammo
+float PK_TUR_DEATHRAD;
+float PK_TUR_CRITICALMASS; // too many in rad blows them all up
+float PK_TUR_CRITICALMASS_DIST;
+float CRIT_BLOW = 2;
 float PK_TUR_VARIETY; // a variety of turrets - 
 //															bits:		1 - orange kryptonite nails,	2 - lasers,	4 - pulse nails,	8 - lightning,	16 - rockets,	not done yet - 	32 - railgun,		64 - chaos
 //								fixed percentages:		60%													20%				10%						5%						4%														1%							0.5%
+float PK_TUR_QUADCON;
 float PK_TUR_LIMIT; // max turrets on a given server - used if inf detected
 float PK_TUR_SET; // set non 0 when vars loaded
 
@@ -42,12 +47,12 @@ void() turret_dropTurret =
 	local	entity turret;
 	local vector dir;
 
-	if (self.pk_turretammo <= 0)
+	if (self.pk_turretammo <= 0) // NEED: handle chaos item fire, rain of chaos - FL_CLIENT?
 	{
 		return;
 	}
 
-	if (!self.button0)
+	if (!self.button0) // same here
 	{
 		player_run ();
 	  return;
@@ -63,6 +68,10 @@ void() turret_dropTurret =
 		PK_TUR_TARGOWN = 3;
 		PK_TUR_RELOAD = 0.15; // not much chance
 		PK_TUR_VARIETY = 1; // regular orange nails
+		PK_TUR_QUADCON =  0; // if true, quad player takes ownership of turrets in deathrad
+		PK_TUR_DEATHRAD = 300; // this close to active pent destroys
+		PK_TUR_CRITICALMASS = 10; // more than this many
+		PK_TUR_CRITICALMASS_DIST = 100; // critical mass distance
 
 		if (!PK_100)
 		if (DARKPLACES || chaos)
@@ -73,7 +82,8 @@ void() turret_dropTurret =
 			PK_TUR_HEAL = cvar("pk_tur_health");
 			PK_TUR_TARGOWN = cvar("pk_tur_targetown");
 			PK_TUR_VARIETY = cvar("pk_tur_variety");
-			if (!PK_TUR_VARIETY) PK_TUR_VARIETY = 1;
+			if (PK_TUR_VARIETY < 1) PK_TUR_VARIETY = 1;
+			PK_TUR_QUADCON = cvar("pk_tur_quadcon");
 		}
 	}
 
@@ -239,11 +249,12 @@ void() turret_searchForEnemy =
 
 void() turret_findTarget =
 {
-	local float dist, tempDist;
+	local float dist, tempDist, e;
 	local entity head, selected;
 
 	// find the closest target within the current view of the turret.
 
+	e = 0;
 	// max distance that the turret can "see"
 	dist = 10000;
 	selected = world;
@@ -276,6 +287,44 @@ void() turret_findTarget =
 		    dist = tempDist;
 	    }
 	  }
+
+		if (time & 3)
+		if (self.delay) // infinite turret check
+		{
+			if (head.classname == "turret")
+			{
+				if (vlen(self.origin - head.origin) < PK_TUR_CRITICALMASS_DIST) e = e + 1;
+				if (e > PK_TUR_CRITICALMASS)
+				{
+					self.delay = CRIT_BLOW;
+					turret_deathAnim();
+					return;
+				}
+			}
+			if (head.classname == "player")
+			{
+
+			if (head.invincible_finished > time)
+			if (head.pkplus_actortype != PKPLUS_ACTORPENT)
+			if (vlen(self.origin - head.origin) < PK_TUR_DEATHRAD)
+			{
+				turret_deathAnim();
+				return;
+			}
+
+			if (PK_TUR_QUADCON)
+			if (self.owner != head)
+			if (head.super_damage_finished > time)
+			if (head.pkplus_actortype != PKPLUS_ACTORQUAD)
+			if (vlen(self.origin - head.origin) < PK_TUR_DEATHRAD)
+			{
+				self.owner = head;
+bprint("*** *** turret: quad con new ownership\n");
+				return;
+			}
+
+			}
+		}
 
 	  head = head.chain;
 	}
@@ -439,6 +488,51 @@ void() turret_attackEnemy =
 		self.v_angle = self.angles;
 	}
 
+// check infinte turret stuff
+	local entity head;
+	local float e;
+	head = findradius(self.origin, PK_TUR_DEATHRAD);
+	e = 0;
+
+	if (self.delay) // infinite turret check
+	if (time & 3) // every 3 secs?
+	while(head)
+	{
+			if (head.classname == "turret")
+			{
+				if (vlen(self.origin - head.origin) < PK_TUR_CRITICALMASS_DIST) e = e + 1;
+				if (e > PK_TUR_CRITICALMASS)
+				{
+					self.delay = CRIT_BLOW;
+					turret_deathAnim();
+					return;
+				}
+			}
+			if (head.classname == "player")
+			{
+
+			if (head.invincible_finished > time)
+			if (head.pkplus_actortype != PKPLUS_ACTORPENT)
+			{
+				turret_deathAnim();
+				return;
+			}
+
+			if (PK_TUR_QUADCON)
+			if (self.owner != head)
+			if (head.super_damage_finished > time)
+			if (head.pkplus_actortype != PKPLUS_ACTORQUAD)
+			if (vlen(self.origin - head.origin) < PK_TUR_DEATHRAD)
+			{
+				self.owner = head;
+bprint("*** *** turret: quad con new ownership\n");
+				return;
+			}
+
+			}
+	  head = head.chain;
+	}
+
 	self.nextthink = time + 0.1;
 };
 
@@ -447,6 +541,24 @@ void() turret_deathAnim =
 {
 	local float numOfGibs;
 
+	if (self.delay == CRIT_BLOW) // critical mass check
+	{
+		local entity head;
+		head = findradius(self.origin, PK_TUR_CRITICALMASS_DIST);
+
+		while(head)
+		{
+			if (head.classname == "turret")
+			if (head.delay != CRIT_BLOW)
+			{
+					head.delay = CRIT_BLOW;
+					head.think = turret_deathAnim;
+					head.nextthink = 1 + random() * 5; // spread out
+bprint("*** *** turret: crit blow caught one\n");
+			}
+			head = head.chain;
+		}
+	}
 	// ThrowGib is a function in player.qc
 	turret_throwGib("progs/turgib1.mdl", -50);
 	turret_throwGib("progs/turgib2.mdl", -50);

@@ -680,18 +680,27 @@ void() pk_srvcmd_load =
 	PK_ART_DEF  = cvar("sv_pk_art");
 	PK_100_OBJERR = cvar("sv_pk100_objerr");
 
-// item ammo levels
-	PK_GRAVITYWELLAMMO_MAX = cvar("pk_max_gravitywellammo");
-	PK_TURRETAMMO_MAX = cvar("pk_max_turretammo");
-	PK_CANPABAMMO_MAX = cvar("pk_max_canpabammo");
-	PK_BEARTRAPAMMO_MAX = cvar("pk_max_beartrapammo");
+// respawn times
+	RSP_TIME = cvar("pk_rsp_time");
 
-	PK_EXPLODEAMMO_MAX = cvar("pk_max_explodeammo");
+// q1 ammo
+	Q1_SHELLAMMO_MAX				= cvar("q1_shellammo_max");
+	Q1_NAILAMMO_MAX					= cvar("q1_nailammo_max");
+	Q1_ROCKETAMMO_MAX				= cvar("q1_rocketammo_max");
+	Q1_CELLAMMO_MAX					= cvar("q1_cellammo_max");
+
+// item ammo levels
+	PK_GRAVITYWELLAMMO_MAX	= cvar("pk_max_gravitywellammo");
+	PK_TURRETAMMO_MAX				= cvar("pk_max_turretammo");
+	PK_CANPABAMMO_MAX			= cvar("pk_max_canpabammo");
+	PK_BEARTRAPAMMO_MAX		= cvar("pk_max_beartrapammo");
+
+	PK_EXPLODEAMMO_MAX			= cvar("pk_max_explodeammo");
 // plus items
-	PKPLUS_EGOAMMO_MAX = cvar("pk_max_egoammo");
-	PKPLUS_TOMBAMMO_MAX = cvar("pk_max_tombammo");
-	PKPLUS_ACTORAMMO_MAX = cvar("pk_max_actorammo");
-	PKPLUS_PHONEAMMO_MAX = cvar("pk_max_phoneammo");
+	PKPLUS_EGOAMMO_MAX			= cvar("pk_max_egoammo");
+	PKPLUS_TOMBAMMO_MAX		= cvar("pk_max_tombammo");
+	PKPLUS_ACTORAMMO_MAX	= cvar("pk_max_actorammo");
+	PKPLUS_PHONEAMMO_MAX	= cvar("pk_max_phoneammo");
 
 	PK_MAX_LIVENT = cvar("pk_max_livent");
 
@@ -708,6 +717,10 @@ void() pk_srvcmd_load =
 // cam stuff
 	DCAMTO = cvar("sv_cam_timeout");
 	DCAMTOACT = cvar("sv_cam_to_action");
+	FFW_LIMIT = cvar("sv_pl_ffwlimit");
+
+	NOCIDE = 	cvar("sv_pl_nocide");
+	NOENVCIDE = cvar("sv_pl_nolavacide");
 
 // check for botmatch changes
 	if (deathmatch || coop)
@@ -734,6 +747,10 @@ void() pk_srvcmd_set =
 // cam controls
 	DCAMTO = 0; // FIX - final release should have 2 mins & respawn
 	DCAMTOACT = 0;
+	FFW_LIMIT = 0;
+
+	NOCIDE = 0;
+	NOENVCIDE = 0;
 
 // vw controls
 	VW_ARMOR = FALSE; /// has issues - can be turned on with sv_vw_armor 1 // TRUE; // should only ever be 1 or 0 - used in conditionals
@@ -745,6 +762,16 @@ void() pk_srvcmd_set =
 	DYN_FORCE = FALSE;
 	DYN_ARTFR = FALSE;
 	DYN_FORCE_CNT = 6;
+	PK_DYNTO = 120;
+
+// respawn times
+	RSP_TIME = 60;
+
+// q1 ammo
+	Q1_SHELLAMMO_MAX				= 100;
+	Q1_NAILAMMO_MAX					= 200;
+	Q1_ROCKETAMMO_MAX				= 100;
+	Q1_CELLAMMO_MAX					= 200; // pk amount
 
 // item ammo levels
 	PK_GRAVITYWELLAMMO_MAX	= 1;
@@ -758,8 +785,6 @@ void() pk_srvcmd_set =
 	PKPLUS_TOMBAMMO_MAX		= 3;
 	PKPLUS_ACTORAMMO_MAX	= 1;
 	PKPLUS_PHONEAMMO_MAX	= 1;
-
-	PKPLUS_TOMB_TIME = 90;  // MOVE to tomb.qc
 
 	PK_MAX_LIVENT = 256; // guessed - need research into where slowdown starts
 
@@ -793,33 +818,74 @@ void() pk_srvcmd_set =
 		registercvar("sv_cam_to_action", "0"); // set to 1 - disconnect, 0 - respawn
 
 		registercvar("sv_botmatch", "0"); // load bots without admin
+		registercvar("sv_pl_ffwlimit", "0"); // limits how long a dead player can collect frags for fire & forget weapons
+		registercvar("sv_pl_nocide", "0"); // dont count suicides as -1 frag
+		registercvar("sv_pl_nolavacide", "0"); // dont count lava /env suicides as -1 frag
+
 // dynamic item controls
 		registercvar("pk_dyn_ovr", "0"); // if set over-ride bit in control flag - gets set by menu command
 		registercvar("pk_dyn_art", "1"); // add artifacts to dyn items
 		registercvar("pk_dyn_force", "0"); // force dynamic items on any map - must set PK true, has no effect if dyn already on
 		registercvar("pk_dyn_art_force", "0"); // force artifacts on map if no dynamic spawner, if spawner exists this is the same as pk_dyn_art
 		registercvar("pk_dyn_force_cnt", "6"); // max force cnt - because forcing can exceed load max for dyn items
+		registercvar("pk_dyn_func_stop", "0"); // stop func_dynitem operation
 // pk items
+		registercvar("pk_rsp_time", "60");
 		registercvar("pk_bt_time", "90"); // time for beartraps to live
+		registercvar("pk_bt_follow", "15"); // time for beartraps to hold on & bite
+		registercvar("pk_bt_dmg", "2"); // beartrap damage per bite
+
+		registercvar("pk_grv_time", "3.2"); // time for gravity to pull
 
 		registercvar("pk_tur_ammo","40");
 		registercvar("pk_tur_time","20");
 		registercvar("pk_tur_health","300");
 		registercvar("pk_tur_targetown","3");
 		registercvar("pk_tur_variety","1"); // 1 - orange kryptonite nails, 2 - lasers, 4 - pulse nails, 8 - lightning, 16 - rockets, 32 - railgun
+		registercvar("pk_tur_quadcon", "0"); // if true allows quad player to take ownership of turrets in death rad
+// q1 ammos
+		registercvar("q1_shellammo_max", "100"); // caution - level transiton limits in parm{*} for all of these
+		registercvar("q1_nailammo_max", "200");
+		registercvar("q1_rocketammo_max", "100");
+		registercvar("q1_cellammo_max", "200");
+
 // item ammo levels
 		registercvar("pk_max_gravitywellammo", "1");
 		registercvar("pk_max_turretammo", "3");
 		registercvar("pk_max_canpabammo", "1");
 		registercvar("pk_max_beartrapammo", "3");
 		registercvar("pk_max_explodeammo", "10");
-//  items
+//  plus items
 		registercvar("pk_max_egoammo", "2");
 		registercvar("pk_max_tombammo", "3");
 		registercvar("pk_max_actorammo", "1");
 		registercvar("pk_max_phoneammo", "1");
 
+		registercvar("pk_tomb_time", "90"); // time for beartraps to live
+
+// total live ents per server
 		registercvar("pk_max_livent", "256");
+
+// map item upgrade loops
+// rl loop
+		registercvar("pk_rl_t", "-60"); // time for loop
+		registercvar("pk_rl_0", "0");
+		registercvar("pk_rl_1", "0");
+		registercvar("pk_rl_2", "0");
+		registercvar("pk_rl_3", "0");
+		registercvar("pk_rl_4", "0");
+		registercvar("pk_rl_5", "0");
+		registercvar("pk_rl_6", "0");
+// tl loop
+		registercvar("pk_gl_t", "-60"); // time for loop
+		registercvar("pk_gl_0", "0");
+		registercvar("pk_gl_1", "0");
+		registercvar("pk_gl_2", "0");
+		registercvar("pk_gl_3", "0");
+		registercvar("pk_gl_4", "0");
+		registercvar("pk_gl_5", "0");
+		registercvar("pk_gl_6", "0");
+
 // q1
 		registercvar("sv_q99", "0");
 		registercvar("sv_q100", "0");
@@ -1610,6 +1676,45 @@ void() pk_clientdisconnect =
 	admin_sv_cfg();
 };
 
+// fn(frag_plus) - return frag to add if frags should be counted after death & ffw limit set
+
+// test entity e
+
+float(entity e) frag_plus =
+{
+	if (FFW_LIMIT > 0)
+	if (e.deadflag)
+	if (e.search_time < time)
+		return(0);
+
+	return(1); // chaos mod vector!
+};
+
+// fn(frag_minus) - return frag to subtract
+
+// test entity e
+
+float(entity e) frag_minus =
+{
+	return(1); // chaos mod vector!
+};
+
+// fn(no*cide) - dont count some suicide frags
+
+// frag already removed - so we add it back in - chaos mod vectors
+
+// no suicide frags at all
+void(entity e) nocide =
+{
+	if (NOCIDE) e.frags = e.frags + 1;
+};
+
+// no environment suicide frags
+void(entity e) noenvcide =
+{
+	if (!NOCIDE && NOENVCIDE) e.frags = e.frags + 1;
+};
+
 // called from killed - updated client obit for pk items
 
 void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
@@ -1627,7 +1732,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			bprint (attacker.owner.netname);
 			bprint ("\n");
 
-			attacker.owner.frags = attacker.owner.frags + 1;
+			attacker.owner.frags = attacker.owner.frags + frag_plus(attacker.owner);
 			return;
 		}
 
@@ -1637,7 +1742,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			bprint (targ.netname);
 			bprint ("'s telefrag\n");
 
-			targ.frags = targ.frags - 1;
+			targ.frags = targ.frags - frag_minus(targ);
 			return;
 		}
 
@@ -1648,7 +1753,8 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			if (targ == attacker)
 			{
 				// killed self
-				attacker.frags = attacker.frags - 1;
+				attacker.frags = attacker.frags - frag_minus(attacker);
+				nocide(targ);
 				bprint (targ.netname);
 
 				if ((inflictor.weapon == IT_LIGHTNING) || ((inflictor.weapon == IT_AXE) && (targ.pk_currentitem == PK_IT_CLIGHT)) && attacker.waterlevel > 1)
@@ -1687,12 +1793,12 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 					deathstring = " loses another friend\n";
 				bprint (attacker.netname);
 				bprint (deathstring);
-				attacker.frags = attacker.frags - 1;
+				attacker.frags = attacker.frags - frag_minus(attacker);
 				return;
 			}
 			else
 			{
-				attacker.frags = attacker.frags + 1;
+				attacker.frags = attacker.frags + frag_plus(attacker);
 
 				// For the correct death messages
 				//rnum = attacker.weapon;
@@ -1855,22 +1961,25 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 	 	// check if killed the droper of the turret.
 		if (attacker.owner == targ) {
 				// killed self
-				targ.frags = targ.frags - 1;
+				targ.frags = targ.frags - frag_minus(targ);
 				bprint(" forgot to hide from his own AutoSentry!\n");
 			return;
 		}
 
 		// increase frags & print message.
-		attacker.owner.frags = attacker.owner.frags + 1;
-			bprint(" was ventilated by ");
+		attacker.owner.frags = attacker.owner.frags + frag_plus(attacker.owner);
+
+		bprint(" was ventilated by ");
 		bprint(attacker.owner.netname);
-			bprint("'s AutoSentry\n");
+		bprint("'s AutoSentry\n");
 		return;
 	 }
 // TURRET_END
 		else
 		{
-			targ.frags = targ.frags - 1;
+			targ.frags = targ.frags - frag_minus(targ);
+			nocide(targ);
+
 			bprint (targ.netname);
 
 			// killed by a montser?
@@ -1921,6 +2030,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			if (attacker.solid == SOLID_BSP && attacker != world)
 			{
 				bprint (" was squished\n");
+				noenvcide(targ);
 				return;
 			}
 			if (attacker.classname == "trap_shooter" || attacker.classname == "trap_spikeshooter")
@@ -1931,6 +2041,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			if (attacker.classname == "fireball")
 			{
 				bprint (" ate a lavaball\n");
+				noenvcide(targ);
 				return;
 			}
 			if (attacker.classname == "trigger_changelevel")
@@ -1947,6 +2058,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 					bprint (" sleeps with the fishes\n");
 				else
 					bprint (" sucks it down\n");
+				noenvcide(targ);
 				return;
 			}
 			else if (rnum == -4)
@@ -1955,10 +2067,12 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 					bprint (" gulped a load of slime\n");
 				else
 					bprint (" can't exist on slime alone\n");
+				noenvcide(targ);
 				return;
 			}
 			else if (rnum == -5)
 			{
+				noenvcide(targ);
 				if (targ.health < -15)
 				{
 					bprint (" burst into flames\n");
@@ -1976,6 +2090,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			{
 				targ.deathtype = "";
 				bprint (" fell to his death\n");
+				noenvcide(targ);
 				return;
 			}
 

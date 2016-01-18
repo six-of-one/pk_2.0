@@ -1,0 +1,243 @@
+/* ::-::
+ *
+ * Cataboligne
+ *
+ * file: mcode.qc
+ *
+ * date: 5/27/10
+ *
+ * qc - map codes for wep cycling - chaos mod code
+ *
+ */
+
+float MIN_ITEM					= 100;
+//float MAX_INVITEM			= 255;
+//float MAX_OLDQ				= 300;
+float MAX_ITEM					= 9999;
+
+// master code list
+
+// q1 wep ids
+float MC_AXE					= 100;
+float MC_SHOTGUN				= 101;
+float MC_SUPER_SHOTGUN		= 102;
+float MC_NAILGUN				= 103;
+float MC_SUPER_NAILGUN		= 104;
+float MC_GRENADEL	 			= 105;
+float MC_ROCKETL				= 106;
+float MC_THUNDER				= 107;
+// pk wep ids
+float MC_EXPSHOTGUN			= 108;
+float MC_PULSE_NAILGUN		= 109;
+float MC_CHTHUNDR				= 110;
+float MC_GRAP					= 111;
+float MC_AIRGUN				= 112;
+
+// device ids - carryable stuff? (doesnt use ammo like a range wep)
+float MC_CARRYABLE			= 200;
+// pk weps;
+float MC_BEARTRAP				= 200;
+float MC_GRAVITY				= 201;
+float MC_SENTRY				= 202;
+float MC_CANOBEANS			= 203;
+// pk plus
+float MC_TOMB					= 204;
+float MC_EGO					= 205;
+float MC_PHONE					= 206;
+float MC_MASK					= 207;
+
+
+
+// ammo ids
+float MIN_AMMO					= 400;
+float MAX_AMMO					= 500;
+
+float MC_ASHELLS				= 400;
+float MC_ASHELLS_LG			= 401;
+float MC_ANAILS				= 402;
+float MC_ANAILS_LG			= 403;
+float MC_AROCKETS				= 404;
+float MC_AROCKETS_LG			= 405;
+float MC_ACELLS				= 406;
+float MC_ACELLS_LG			= 407;
+
+float MC_AEXPLSH				= 410;
+
+// armor ids
+float MC_ARMOR1				= 300;
+float MC_ARMOR2				= 301;
+float MC_ARMOR3				= 302;
+
+// NOTE: all items below are NOT inventory saveable
+
+// key ids
+float MC_KEY1					= 303;
+float MC_KEY2					= 304;
+
+// special ids
+float MC_QUAD					= 306;
+float MC_PENT					= 307;
+float MC_RING					= 308;
+float MC_SUIT					= 309;
+
+float MC_BACKPACK				= 310;
+
+float MC_HEALTHROT			= 311;
+float MC_HEALTH				= 312;
+float MC_HEALTHMEGA			= 313;
+
+// sigil id
+float MC_SIGIL					= 314;
+float MC_SIGIL1				= 315;
+float MC_SIGIL2				= 316;
+float MC_SIGIL4				= 317;
+float MC_SIGIL8				= 318;
+
+
+// fn(pk_mcode) - map code for items
+
+// e - ent being tested
+// sc - classname to test
+// returns map code value
+
+float(string sc, entity e) pk_mcode =
+{
+	local float mc;
+	local string tsc;
+
+	tsc = sc;
+	if (sc == "" && e) tsc = e.classname;
+
+	if (tsc == "dyn_item")												mc = 0;
+// q1
+	else if (tsc == "weapon_supershotgun")							mc = MC_SUPER_SHOTGUN;
+	else if (tsc == "weapon_nailgun")								mc = MC_NAILGUN;
+	else if (tsc == "weapon_supernailgun")							mc = MC_SUPER_NAILGUN;
+	else if (tsc == "weapon_grenadelauncher")						mc = MC_GRENADEL;
+	else if (tsc == "weapon_rocketlauncher")						mc = MC_ROCKETL;
+	else if (tsc == "weapon_lightning")								mc = MC_THUNDER;
+// pk
+	else if (tsc == "weapon_airfist")								mc = MC_AIRGUN;
+	else if (tsc == "weapon_chainlg")								mc = MC_CHTHUNDR;
+	else if (tsc == "weapon_grapgun")								mc = MC_GRAP;
+	else if (tsc == "item_painkeep_gwell")							mc = MC_GRAVITY;
+	else if (tsc == "item_painkeep_turret")						mc = MC_SENTRY;
+	else if (tsc == "item_painkeep_beartrap")						mc = MC_BEARTRAP;
+	else if (tsc == "item_painkeep_expshells")					mc = MC_AEXPLSH;
+	else if (tsc == "item_painkeep_can")							mc = MC_CANOBEANS;
+	else if (tsc == "item_pkplus_ego")								mc = MC_EGO;
+	else if (tsc == "item_pkplus_tomb")								mc = MC_TOMB;
+	else if (tsc == "item_pkplus_actor")							mc = MC_MASK;
+	else if (tsc == "item_pkplus_phone")							mc = MC_PHONE;
+// ammo
+	else if (tsc == "item_shells")									mc = MC_ASHELLS;
+	else if (tsc == "item_spikes")									mc = MC_ANAILS;
+	else if (tsc == "item_rockets")									mc = MC_AROCKETS;
+	else if (tsc == "item_cells")										mc = MC_ACELLS;
+
+	else if (tsc == "item_artifact_invulnerability")			mc = MC_PENT;
+	else if (tsc == "item_artifact_super_damage")				mc = MC_QUAD;
+	else if (tsc == "item_artifact_invisibility")				mc = MC_RING;
+	else if (tsc == "item_artifact_envirosuit")					mc = MC_SUIT;
+
+	else if (tsc == "item_health")									mc = MC_HEALTH;
+	else if (tsc == "item_armor1")									mc = MC_ARMOR1;
+	else if (tsc == "item_armor2")									mc = MC_ARMOR2;
+	else if (tsc == "item_armorInv")									mc = MC_ARMOR3;
+	else if (tsc == "item_key1")										mc = MC_KEY1;
+	else if (tsc == "item_key2")										mc = MC_KEY2;
+	else if (tsc == "item_sigil")										mc = MC_SIGIL;
+// q3 - translates classname for now
+//	else if (tsc == "")								mc = MC_;
+
+	if (e) // qualify ent
+	{
+	if ((tsc == "item_shells") && (e.spawnflags & 1))			mc = MC_ASHELLS_LG;
+	else if ((tsc == "item_spikes") && (e.spawnflags & 1))	mc = MC_ANAILS_LG;
+	else if ((tsc == "item_rockets") && (e.spawnflags & 1))	mc = MC_AROCKETS_LG;
+	else if ((tsc == "item_cells") && (e.spawnflags & 1))		mc = MC_ACELLS_LG;
+	else if ((tsc == "item_health") && (e.spawnflags & 1))	mc = MC_HEALTHROT;
+	else if ((tsc == "item_health") && (e.spawnflags & 2))	mc = MC_HEALTHMEGA;
+
+	else if ((tsc == "item_sigil") && (e.spawnflags & 1))		mc = MC_SIGIL1;
+	else if ((tsc == "item_sigil") && (e.spawnflags & 2))		mc = MC_SIGIL2;
+	else if ((tsc == "item_sigil") && (e.spawnflags & 4))		mc = MC_SIGIL4;
+	else if ((tsc == "item_sigil") && (e.spawnflags & 8))		mc = MC_SIGIL8;
+	}
+
+	if (tsc != "dyn_item" && mc == 0)
+	{
+		bprint("\b *** item with no map code translation:\n");
+		bprint(" -------------->  ");
+		bprint(tsc);
+		bprint("\n");
+	}
+
+	return(mc); 
+
+};
+
+// fn(item_by_mcode) - given map code mc, return call string
+
+string (float mc) item_by_mcode =
+{
+	if (mc == MC_SUPER_SHOTGUN)										return("weapon_supershotgun");
+	if (mc == MC_NAILGUN)												return("weapon_nailgun");
+	if (mc == MC_SUPER_NAILGUN)										return("weapon_supernailgun");
+	if (mc == MC_GRENADEL)												return("weapon_grenadelauncher");
+	if (mc == MC_ROCKETL)												return("weapon_rocketlauncher");
+	if (mc == MC_THUNDER)												return("weapon_lightning");
+
+	if (mc == MC_PENT)													return("item_artifact_invulnerability");
+	if (mc == MC_SUIT)													return("item_artifact_envirosuit");
+	if (mc == MC_RING)													return("item_artifact_invisibility");
+	if (mc == MC_QUAD)													return("item_artifact_super_damage");
+
+	if (mc == MC_ARMOR1)													return("item_armor1");
+	if (mc == MC_ARMOR2)													return("item_armor2");
+	if (mc == MC_ARMOR3)													return("item_armorInv");
+
+	if (mc == MC_HEALTHROT)												return("item_health_15");
+	if (mc == MC_HEALTH)													return("item_health");
+	if (mc == MC_HEALTHMEGA)											return("item_health_mega");
+
+	if (mc == MC_KEY1)													return("item_key1");
+	if (mc == MC_KEY2)													return("item_key2");
+	if (mc == MC_SIGIL1)													return("item_sigil1");
+	if (mc == MC_SIGIL2)													return("item_sigil2");
+	if (mc == MC_SIGIL4)													return("item_sigil4");
+	if (mc == MC_SIGIL8)													return("item_sigil8");
+
+//	if (mc == MC_) return("item_");
+
+// wep ammo by bit
+	if (mc == MC_ASHELLS)												return("item_shells");
+	if (mc == MC_ANAILS)													return("item_spikes");
+	if (mc == MC_AROCKETS)												return("item_rockets");
+	if (mc == MC_ACELLS)													return("item_cells");
+
+	if (mc == MC_ASHELLS_LG)											return("item_shells_lg");
+	if (mc == MC_ANAILS_LG)												return("item_spikes_lg");
+	if (mc == MC_AROCKETS_LG)											return("item_rockets_lg");
+	if (mc == MC_ACELLS_LG)												return("item_cells_lg");
+
+//	if (Q_100 | Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+//		return("");
+	
+// pk item subs by special bits
+	if (mc == MC_GRAVITY)												return("item_painkeep_gwell");
+	if (mc == MC_SENTRY)													return("item_painkeep_turret");
+	if (mc == MC_BEARTRAP)												return("item_painkeep_beartrap");
+	if (mc == MC_AEXPLSH)												return("item_painkeep_expshells");
+	if (mc == MC_CHTHUNDR)												return("weapon_chainlg");
+	if (mc == MC_GRAP)													return("weapon_grapgun");
+	if (mc == MC_AIRGUN)													return("weapon_airfist");
+	if (mc == MC_CANOBEANS)												return("item_painkeep_can");
+//	if (PK_ART) return(pk_art_ammo_by_bit(bt)); // Cataboligne 8.12.9 purify - pk artifacts
+	if (mc == MC_EGO)														return("item_pkplus_ego");
+	if (mc == MC_TOMB)													return("item_pkplus_tomb");
+	if (mc == MC_MASK)													return("item_pkplus_actor");
+	if (mc == MC_PHONE)													return("item_pkplus_phone");
+
+	return("");
+};

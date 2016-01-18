@@ -1,7 +1,7 @@
 /* beartrap */
 
 float PK_BT_TIMETOFOLLOW;
-float PK_BT_DMG = 2;
+float PK_BT_DMG;
 float PK_BT_TIME;
 float PK_BT_SET;
 
@@ -173,11 +173,14 @@ void() beartrap_dropBearTrap =
 
 		PK_BT_TIME = 90; // def
 		PK_BT_TIMETOFOLLOW = 15;
+		PK_BT_DMG = 2;
 
 		if (!PK_100)
 		if (DARKPLACES || chaos)
 		{
 			PK_BT_TIME = cvar("pk_bt_time");
+			PK_BT_TIMETOFOLLOW = cvar("pk_bt_follow");
+			PK_BT_DMG = cvar("pk_bt_dmg");
 		}
 	}
 

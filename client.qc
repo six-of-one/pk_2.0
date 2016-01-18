@@ -455,7 +455,8 @@ void () ClientKill =
 	bprint (" suicides\n");
 	set_suicide_frame ();
 	self.modelindex = modelindex_player;
-	self.frags = self.frags - 2;	// extra penalty
+	if (!NOCIDE)
+	self.frags = self.frags - 2 * frag_minus(self);	// extra penalty
 	respawn ();
 };
 
@@ -1377,7 +1378,7 @@ void(entity targ, entity attacker) ClientObituary =
 			bprint (attacker.owner.netname);
 			bprint ("\n");
 
-			attacker.owner.frags = attacker.owner.frags + 1;
+			attacker.owner.frags = attacker.owner.frags + frag_plus(attacker.owner);
 			return;
 		}
 
@@ -1387,7 +1388,7 @@ void(entity targ, entity attacker) ClientObituary =
 			bprint (targ.netname);
 			bprint ("'s telefrag\n");
 
-			targ.frags = targ.frags - 1;
+			targ.frags = targ.frags - frag_minus(targ);
 			return;
 		}
 
@@ -1396,9 +1397,10 @@ void(entity targ, entity attacker) ClientObituary =
 			if (targ == attacker)
 			{
 				// killed self
-				attacker.frags = attacker.frags - 1;
+				attacker.frags = attacker.frags - frag_minus(attacker);
+				nocide(targ);
 				bprint (targ.netname);
-				
+
 				if (targ.weapon == 64 && targ.waterlevel > 1)
 				{
 					bprint (" discharges into the water.\n");
@@ -1422,12 +1424,12 @@ void(entity targ, entity attacker) ClientObituary =
 					deathstring = " loses another friend\n";
 				bprint (attacker.netname);
 				bprint (deathstring);
-				attacker.frags = attacker.frags - 1;
+				attacker.frags = attacker.frags - frag_minus(attacker);
 				return;
 			}
 			else
 			{
-				attacker.frags = attacker.frags + 1;
+				attacker.frags = attacker.frags + frag_plus(attacker);
 
 				rnum = attacker.weapon;
 				if (rnum == IT_AXE)
@@ -1492,7 +1494,8 @@ void(entity targ, entity attacker) ClientObituary =
 		}
 		else
 		{
-			targ.frags = targ.frags - 1;
+			targ.frags = targ.frags - frag_minus(targ);
+			nocide(targ);
 			bprint (targ.netname);
 
 			// killed by a montser?
@@ -1543,6 +1546,7 @@ void(entity targ, entity attacker) ClientObituary =
 			if (attacker.solid == SOLID_BSP && attacker != world)
 			{	
 				bprint (" was squished\n");
+				noenvcide(targ);
 				return;
 			}
 			if (attacker.classname == "trap_shooter" || attacker.classname == "trap_spikeshooter")
@@ -1553,6 +1557,7 @@ void(entity targ, entity attacker) ClientObituary =
 			if (attacker.classname == "fireball")
 			{
 				bprint (" ate a lavaball\n");
+				noenvcide(targ);
 				return;
 			}
 			if (attacker.classname == "trigger_changelevel")
@@ -1569,6 +1574,7 @@ void(entity targ, entity attacker) ClientObituary =
 					bprint (" sleeps with the fishes\n");
 				else
 					bprint (" sucks it down\n");
+				noenvcide(targ);
 				return;
 			}
 			else if (rnum == -4)
@@ -1577,10 +1583,12 @@ void(entity targ, entity attacker) ClientObituary =
 					bprint (" gulped a load of slime\n");
 				else
 					bprint (" can't exist on slime alone\n");
+				noenvcide(targ);
 				return;
 			}
 			else if (rnum == -5)
 			{
+				noenvcide(targ);
 				if (targ.health < -15)
 				{
 					bprint (" burst into flames\n");
@@ -1598,6 +1606,7 @@ void(entity targ, entity attacker) ClientObituary =
 			{
 				targ.deathtype = "";
 				bprint (" fell to his death\n");
+				noenvcide(targ);
 				return;
 			}
 

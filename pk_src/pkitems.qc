@@ -244,11 +244,10 @@ void() pk_ammo_touch =
 	bestpk = W_BestPKWeapon(); // *pk - best pk wep
 	self = sv;
 
-
 // shotgun
 	if (self.weapon == 1)
 	{
-		if (other.ammo_shells >= 100)
+		if (other.ammo_shells >= Q1_SHELLAMMO_MAX)
 			return;
 		other.ammo_shells = other.ammo_shells + self.aflag;
 	}
@@ -256,7 +255,7 @@ void() pk_ammo_touch =
 // spikes
 	if (self.weapon == 2)
 	{
-		if (other.ammo_nails >= 200)
+		if (other.ammo_nails >= Q1_NAILAMMO_MAX)
 			return;
 		other.ammo_nails = other.ammo_nails + self.aflag;
 	}
@@ -264,7 +263,7 @@ void() pk_ammo_touch =
 //	rockets
 	if (self.weapon == 3)
 	{
-		if (other.ammo_rockets >= 100)
+		if (other.ammo_rockets >= Q1_ROCKETAMMO_MAX)
 			return;
 		other.ammo_rockets = other.ammo_rockets + self.aflag;
 	}
@@ -272,7 +271,7 @@ void() pk_ammo_touch =
 //	cells
 	if (self.weapon == 4)
 	{
-		if (other.ammo_cells >= 200)
+		if (other.ammo_cells >= Q1_CELLAMMO_MAX)
 			return;
 		other.ammo_cells = other.ammo_cells + self.aflag;
 	}
@@ -456,9 +455,9 @@ void() painkeep_touch =
 	if (deathmatch != 2)
 	{
 		if (self.pk_items == PK_IT_GRAVITYWELL)
-			self.nextthink = time + 60*2;
+			self.nextthink = time + RSP_TIME * 2;
 		else
-			self.nextthink = time + 60;
+			self.nextthink = time + RSP_TIME;
 	}
 	self.think = SUB_regen;
 
@@ -672,8 +671,8 @@ void() pk_item_position_init =
 
 void() pk_bound_ammo =
 {
-	if (other.ammo_cells > 200)
-		other.ammo_cells = 200;
+	if (other.ammo_cells > Q1_CELLAMMO_MAX)
+		other.ammo_cells = Q1_CELLAMMO_MAX;
 
 	if (other.pk_gravitywellammo > PK_GRAVITYWELLAMMO_MAX)
 		other.pk_gravitywellammo = PK_GRAVITYWELLAMMO_MAX;
@@ -975,6 +974,7 @@ void() PK_DropBackpack =
 	AddToSplash(newmis); // *pk - splash tossed items
 };
 
+
 // called from PlaceItem - sorts many things now - happens 0.2 secs after map load
 
 void() pk_placeitem =
@@ -989,6 +989,8 @@ void() pk_placeitem =
 		self.velocity_x = -170 + (random() * 340);
 		self.velocity_y = -170 + (random() * 340);
 	}
+
+	self.mcode = pk_mcode("", self); // put map code on ent
 
 // handle extra item stuff
 	if (self.pk_touch == (void()) 0) // dont swamp pointers
@@ -1071,20 +1073,34 @@ string (float bt) ammo_by_bit =
 
 void(string cls) item_call =
 {
+	local string scls;
+	local float rd;
+
+	rd = random();
+	if (self.classname != "dyn_item") rd = 1;
+	
+	scls = cls;
 	if (cls == "weapon_supershotgun") weapon_supershotgun();
 	else if (cls == "weapon_nailgun") weapon_nailgun();
 	else if (cls == "weapon_supernailgun") weapon_supernailgun();
 	else if (cls == "weapon_grenadelauncher") weapon_grenadelauncher();
 	else if (cls == "weapon_rocketlauncher") weapon_rocketlauncher();
-	else if (cls == "weapon_lightning")
+	else if (self.classname == "dyn_item" && cls == "weapon_lightning")
 	{
 		if (PK) weapon_chainlg();
 		else weapon_lightning();
 	}
-	else if (cls == "item_shells") { if (random() < 0.5) self.spawnflags = WEAPON_BIG2; item_shells(); }
-	else if (cls == "item_spikes") { if (random() < 0.4) self.spawnflags = WEAPON_BIG2; item_spikes(); }
-	else if (cls == "item_rockets") { if (random() < 0.2) self.spawnflags = WEAPON_BIG2; item_rockets(); }
-	else if (cls == "item_cells") { if (random() < 0.8) self.spawnflags = WEAPON_BIG2; item_cells(); }
+	else if (cls == "weapon_lightning") weapon_lightning();
+	else if (cls == "item_shells") { if (rd < 0.5) self.spawnflags = WEAPON_BIG2; item_shells(); }
+	else if (cls == "item_spikes") { if (rd < 0.4) self.spawnflags = WEAPON_BIG2; item_spikes(); }
+	else if (cls == "item_rockets") { if (rd < 0.2) self.spawnflags = WEAPON_BIG2; item_rockets(); }
+	else if (cls == "item_cells") { if (rd < 0.8) self.spawnflags = WEAPON_BIG2; item_cells(); }
+
+	else if (cls == "item_shells_lg") { self.spawnflags = WEAPON_BIG2; item_shells(); scls = "item_shells"; }
+	else if (cls == "item_spikes_lg") { self.spawnflags = WEAPON_BIG2; item_spikes(); scls = "item_spikes"; }
+	else if (cls == "item_rockets_lg") { self.spawnflags = WEAPON_BIG2; item_rockets(); scls = "item_rockets"; }
+	else if (cls == "item_cells_lg") { self.spawnflags = WEAPON_BIG2; item_cells(); scls = "item_cells"; }
+
 	else if (cls == "item_artifact_invulnerability") item_artifact_invulnerability();
 	else if (cls == "item_artifact_super_damage") item_artifact_super_damage();
 	else if (cls == "item_artifact_envirosuit") item_artifact_envirosuit();
@@ -1092,13 +1108,25 @@ void(string cls) item_call =
 	else if (cls == "item_armor1") item_armor1();
 	else if (cls == "item_armor2") item_armor2();
 	else if (cls == "item_armorInv") item_armorInv();
-	else if (cls == "item_health_15") { self.spawnflags = H_ROTTEN; item_health(); }
+	else if (cls == "item_health_15") { self.spawnflags = H_ROTTEN; item_health(); scls = "item_health";}
 	else if (cls == "item_health") item_health();
-	else if (cls == "item_health_mega") { self.spawnflags = H_MEGA; item_health(); }
+	else if (cls == "item_health_mega") { self.spawnflags = H_MEGA; item_health(); scls = "item_health"; }
+
+	else if (cls == "item_key1") item_key1();
+	else if (cls == "item_key2") item_key2();
+
+	else if (cls == "item_sigil1") { self.spawnflags = 1; item_sigil(); scls = "item_sigil"; }
+	else if (cls == "item_sigil2") { self.spawnflags = 2; item_sigil(); scls = "item_sigil"; }
+	else if (cls == "item_sigil4") { self.spawnflags = 4; item_sigil(); scls = "item_sigil"; }
+	else if (cls == "item_sigil8") { self.spawnflags = 8; item_sigil(); scls = "item_sigil"; }
+
+//	else if (cls == "item_") item_();
+
 	else if (cls == "item_painkeep_gwell") item_painkeep_gwell();
 	else if (cls == "item_painkeep_turret") item_painkeep_turret();
 	else if (cls == "item_painkeep_beartrap") item_painkeep_beartrap();
 	else if (cls == "item_painkeep_expshells") item_painkeep_expshells();
+	else if (cls == "weapon_chainlg") weapon_chainlg();
 	else if (cls == "weapon_grapgun") weapon_grapgun();
 	else if (cls == "weapon_airfist") weapon_airfist();
 	else if (cls == "item_painkeep_can") item_painkeep_can();
@@ -1107,7 +1135,7 @@ void(string cls) item_call =
 	self.mdl = self.model;
 	if (self.classname != "dyn_item") // dont do these for dyn items
 	{
-		self.classname = cls;
+		self.classname = scls;
 		if (PK) pk_placeitem();
 		self.think = SUB_regen; // dont go thru place_item - use regen method
 		self.nextthink = time + 1 + 3 * random(); // spread em out
@@ -1550,7 +1578,7 @@ float(float fb, float rb) bit_cnt =
 // dest1 - weapon bit codes to select from
 // dest2 - item bit codes to select from
 
-// sv_kill_func_dynitem - stop func_dynitem processing
+// pk_dyn_func_stop - stop func_dynitem processing
 
 void() func_dynitem =
 {
@@ -1575,6 +1603,9 @@ void() func_dynitem =
 
 	self.think = func_dynitem;
 	self.nextthink = time + self.wait + rv;
+
+// stop item spawn when set true - leaves func_ ents on map
+	if (cvar("pk_dyn_func_stop")) return;
 
 // spawn an item
 	e = spawn();

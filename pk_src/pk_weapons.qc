@@ -889,6 +889,39 @@ float() PK_CheckNoAmmo =
 	return FALSE;
 };
 
+void() pk_cycleObjects;
+
+// fn(PK_CheckLivEnt) - check live ents for throwing fire & forget
+
+// return false if we cant fire
+
+float(float rot) PK_CheckLivEnt =
+{
+	if (self.weapon != IT_AXE || PK_100) return(TRUE);
+
+	pk_livent = cnt_ent(world, "classname", "turret") + cnt_ent(world, "classname", "beartrap") + cnt_ent(world, "classname", "gravity") + cnt_ent(world, "classname", "tomb");
+	
+	if (self.pk_currentitem == PK_IT_GRAVITYWELL ||
+		  self.pk_currentitem == PK_IT_TURRET ||
+		  self.pk_currentitem == PK_IT_BEARTRAP ||
+		  self.pk_currentitem == PKPLUS_IT_TOMB)
+	{
+		if (pk_livent < PK_MAX_LIVENT) return(TRUE);
+	}
+	else return(TRUE);
+
+	bprint(" *** warning: too many live ents to fire selected weapon = ");
+	bprint(ftos(pk_livent));
+	bprint(".\n");
+
+	if (rot) // rotate weapons if we cant fire
+	if (self.weapon == IT_AXE)
+	{
+		pk_cycleObjects();
+	}
+	return(FALSE);
+};
+
 // called from below
 
 void() PK_Attack =
@@ -897,6 +930,9 @@ void() PK_Attack =
 
 	if (!W_CheckNoAmmo ())
 		return;
+
+	if (!PK_CheckLivEnt (TRUE))
+	return;
 
 	makevectors	(self.v_angle);			// calculate forward angle for velocity
 	self.show_hostile = time + 1;	// wake monsters up
@@ -1508,8 +1544,34 @@ void() PK_ImpulseCommands =
 	}
 
 	else if (self.impulse == 255)
-		QuadCheat ();
+//		QuadCheat ();
+	{
+		local entity e;
+		local string sc;
 
+		sc = item_by_mcode(cvar("saved1"));
+		if (sc != "")
+		{
+		sv = self;
+		self = spawn();
+		self.wad = sc;
+		setorigin(self, sv.origin);
+		item_call(sc);
+		self.velocity_z = 300 + 100 * random();
+		self.velocity_x = -170 + (random() * 340);
+		self.velocity_y = -170 + (random() * 340);
+		self = sv;
+		}
+		else
+		{
+		bprint("\b *** map code with no item translation:\n");
+		bprint(" -------------->  ");
+		bprint(ftos(cvar("saved1")));
+		bprint("\n");
+		}
+		cvar_set("saved1", ftos(cvar("saved1") + 1));
+		
+	}
 	self.impulse = 0;
 };
 

@@ -8,6 +8,9 @@ $frame cubelf01 cubelf02 cubelf03 cubelf04 cubelf05 cubelf06 cubelf07 cubelf08
 $frame cubelf09 cubelf10 cubelf11 cubelf12 cubelf13 cubelf14 cubelf15 cubelf16
 $frame cubelf17 cubelf18 cubelf19 cubelf20
 
+float PK_GRV_TIME;
+float PK_GRV_SET;
+
 void() gravity_touch =
 {
 	// try to gib whatever touched the gravity centre
@@ -16,6 +19,13 @@ void() gravity_touch =
 		// sound
 
 		T_Damage(other, self, self.owner, 5000);
+	}
+
+	if (other.classname == "turret")
+	if (other.delay == TRUE)
+	{
+		other.think = turret_deathAnim;
+		other.nextthink = 1 + random() * 5; // spread out
 	}
 };
 
@@ -58,6 +68,7 @@ void() gravity_pull =
 		if (e.classname != "beartrap")
 		if (pk_art_movshot_ck(e, "grav")) // Cataboligne 8.12.9 purify - pk artifacts
 		//if (e != self.owner)
+		if ((e.classname == OBSERVER && random() < 0.01666) || e.classname != OBSERVER)
 		if (e.movetype != MOVETYPE_NONE) // anything that can move
 		if (e.movetype != MOVETYPE_PUSH)
 		if (e.movetype != MOVETYPE_NOCLIP)
@@ -107,7 +118,7 @@ void() gravity_explode =
 		// TODO something funky in the water?
 
 		setmodel(self, "progs/cubel.mdl");
-		self.attack_finished = time + 3.2;	// duration of gravity well
+		self.attack_finished = time + PK_GRV_TIME;	// duration of gravity well
 		self.touch = gravity_touch;
 		self.effects = self.effects | EF_BRIGHTLIGHT;
 	  self.pk_currentitem = PK_IT_GRAVITYWELL;
@@ -123,6 +134,19 @@ void() gravity_explode =
 void() drop_gravity =
 {
 	local entity gravity;
+
+	if (!PK_GRV_SET)
+	{
+		PK_GRV_SET = TRUE;
+
+		PK_GRV_TIME = 3.2; // def
+
+		if (!PK_100)
+		if (DARKPLACES || chaos)
+		{
+			PK_GRV_TIME = cvar("pk_grv_time");
+		}
+	}
 
 	// create a gravity object
 	gravity = spawn();

@@ -450,6 +450,13 @@ void() grap_touch =
 		return;
 	}
 
+	if (other.classname == "turret")
+	if (other.delay == TRUE)
+	{
+		other.think = turret_deathAnim;
+		other.nextthink = 1 + random() * 5; // spread out
+	}
+
 	self.touch = SUB_Null;
 
 	grapOwner = self.grap_owner;

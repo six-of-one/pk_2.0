@@ -556,7 +556,8 @@ float(entity trg, entity infl, entity atkr) pk_art_obit =
 			bprint (trg.netname);
 			if (infl.owner == trg)
 			{
-				trg.frags = (trg.frags - 1);
+				trg.frags = (trg.frags - frag_minus(trg));
+				nocide(trg);
 				if (rnum < 0.250)
 					bprint (" had a mental breakdown!\n");
 				else if (rnum < 0.5)
@@ -567,7 +568,7 @@ float(entity trg, entity infl, entity atkr) pk_art_obit =
 					bprint ("'s EGO sometimes has a mind of its own!\n");
 				return TRUE;
 			}
-			atkr.frags = (atkr.frags + 1);
+			atkr.frags = (atkr.frags + frag_plus(atkr));
 			if (rnum < 0.250)
 				bprint (" was impressed by the power of ");
 			else if (rnum < 0.5)
@@ -586,7 +587,8 @@ float(entity trg, entity infl, entity atkr) pk_art_obit =
 			bprint (trg.netname);
 			if (infl.owner == trg)
 			{
-				trg.frags = (trg.frags - 1);
+				trg.frags = (trg.frags - frag_minus(trg));
+				nocide(trg);
 				if (rnum < 0.250)
 					bprint (" was caught robbing the family grave!\n");
 				else if (rnum < 0.5)
@@ -597,7 +599,7 @@ float(entity trg, entity infl, entity atkr) pk_art_obit =
 					bprint (" was brought down by an old friend\n");
 				return TRUE;
 			}
-			atkr.frags = (atkr.frags + 1);
+			atkr.frags = (atkr.frags + frag_plus(atkr));
 			if (rnum < 0.250)
 				bprint (" was dragged down by an old friend in ");
 			else if (rnum < 0.5)

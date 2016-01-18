@@ -71,6 +71,7 @@ chasecam.qc  //Cataboligne MOD 9.11.3
 pk_src/viswep.qc
 
 // painkeep code
+pk_src/mcode.qc
 pk_src/pkitems.qc
 pk_src/pk_weapons.qc
 pk_src/pk_player.qc

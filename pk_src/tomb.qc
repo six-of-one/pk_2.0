@@ -10,6 +10,7 @@
  *
  */
 
+float PK_TOMB_SET;
 
 void () corpsefollow;
 void () corpse_drag1 =  [ 56, corpse_drag2  ] { 	corpsefollow (); };
@@ -221,6 +222,22 @@ void () tomb_launch =
 		player_run ();
 		return ;
 	}
+
+	if (!PK_TOMB_SET)
+	{
+		PK_TOMB_SET = TRUE;
+// defs
+		PKPLUS_TOMB_TIME = 90;  // MOVE to tomb.qc
+
+		if (!PK_100)
+		if (DARKPLACES || chaos)
+		{
+			PKPLUS_TOMB_TIME = cvar("pk_tomb_time");
+			if (PKPLUS_TOMB_TIME < 0) PKPLUS_TOMB_TIME = 90;
+		}
+	}
+		
+
 	tomb = spawn ();
 	tomb.owner = self;
 	tomb.movetype = MOVETYPE_TOSS;
