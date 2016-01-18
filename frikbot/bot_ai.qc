@@ -617,6 +617,25 @@ float(entity thing) priority_for_thing =
 		// ugly hack
                 if (thing._last != self)
                         thisp = 20;
+
+
+// painkeep hub support - Cataboligne - 9.29.9
+
+		if (thing.classname == "hub_teleport" && ! Q_100 && !Q_99)
+			thisp = 75;
+		else if (thing.classname == "hub_custom" && ! Q_100 && !Q_99)
+			thisp = 75;
+
+// painkeep weapon support - Cataboligne - 9.29.9
+		else if (thing.classname == "weapon_chainlg")
+				thisp = 55;
+		else if (thing.classname == "item_painkeep_gwell")
+				thisp = 50;
+
+		else
+// end painkeep * support
+
+
 		if (thing.classname == "item_artifact_super_damage")
 			thisp = 65;
 		else if (thing.classname == "item_artifact_invulnerability")
@@ -967,8 +986,18 @@ void() BotAI =
 	if (self.enemy)
 		bot_fight_style();
 	else if (random() < 0.2)
+	{
 		if (random() < 0.2)
 			bot_weapon_switch(-1);
+	}
+
+
+// try some pk items randomly - Cataboligne - 9.29.9
+	else if (random() < 0.1)
+		use_pkitem();
+// end pk item,s
+
+
 	bot_dodge_stuff();
 
 	// checks to see if bot needs to start going up for air

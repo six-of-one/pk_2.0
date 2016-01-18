@@ -314,6 +314,7 @@ void() pk_ammo_touch =
 	if (pk_flags & PK_DYNAMIC) pk_dyn_touch();
 };
 
+
 // The touch func for our new items
 
 void() painkeep_touch =
@@ -332,27 +333,27 @@ void() painkeep_touch =
 		if (self.state == BOT_TOUCHED || self.state == BOT_TOUCHED_CACHE_ROUTE_TOUCH) // *bot code - patch in bot_toucheditem for bots - routes here because this is PK master touch fn()
 		{
 			bot_toucheditem ();
-if (0) {
+if (cvar("saved1") == 898) {
 bprint("hi, code base here, ran PK bot_toucheditem for item ( ");
 bprint(self.classname);
 bprint(" , ");
 bprint(self.netname);
 bprint(" )\n");}
 		}
-		if (self.pk_touch != painkeep_touch) // bots dont get pktouch stuff yet...
-		{
+//		if (self.pk_touch != painkeep_touch) // bots dont get pktouch stuff yet...
+//		{
 			e = other;
 			e.classname = "player";
-		}
+//		}
 	}
 
 	if (other.classname == "player") // *bot
-	if (self.pk_touch != painkeep_touch)
+//	if (self.pk_touch != painkeep_touch)
 	if (self.state == CACHE_ROUTE_TOUCH || self.state == BOT_TOUCHED_CACHE_ROUTE_TOUCH) // *bot code - patch in cacheRoute for bot code - routes here because this is PK master touch fn()
 	{
 		if (other.movetarget.movetarget){
 			cacheRoute (other.movetarget,other.movetarget.movetarget,0,self);
-if (0) {
+if (cvar("saved1") == 898) {
 bprint("hi, code base here, ran PK cacheRoute for item ( ");
 bprint(self.classname);
 bprint(" , ");
@@ -386,7 +387,7 @@ bprint(" )\n");}
 			e.classname = "pk*bot";
 			if (e.think == player_run) e.think = e.th_run;
 			if (e.think == player_stand1) e.think = e.th_stand;
-if (1) {
+if (cvar("saved1") == 899) {
 bprint("hi, code base here, in PK - bot ( ");
 bprint(e.netname);
 bprint(" )	touched item ( ");
@@ -399,6 +400,8 @@ else bprint(" )\n");}
 		if (pk_flags & PK_DYNAMIC) pk_dyn_touch();
 		return;
 	}
+
+	if (e) e.classname = "pk*bot";
 
 	// check if it can be picked up
 	if (self.pk_items == PK_IT_BEARTRAP)
@@ -473,6 +476,20 @@ else bprint(" )\n");}
 
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
+
+if (e)
+//if (cvar("saved1") == 899)
+{
+bprint("hi, code base here, in PK  (item) - bot ( ");
+bprint(e.netname);
+bprint(" )	touched item ( ");
+bprint(self.classname);
+bprint(" , ");
+bprint(self.netname);
+if (self.solid == SOLID_NOT) bprint(") and collected it.\n");
+else bprint(" )\n");}
+
+	
 	if (pk_flags & PK_DYNAMIC) pk_dyn_touch();
 };
 

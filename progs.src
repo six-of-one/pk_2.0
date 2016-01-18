@@ -122,6 +122,6 @@ botnoise.qc
 botvis.qc
 botgoal.qc
 bot_ai.qc
-dmbot.qc
+pkbot.qc
 botroute.qc
 botimp.qc

@@ -280,6 +280,7 @@ void () cam_deathmove =
 	}
 	stuffcmd( self.owner, "fov 130\n" ); // I see short dead dudes - enforce crow vision
 	self.owner.weaponmodel = "";
+	self.owner.weapon = 0;
 	self.owner.flags = self.owner.flags | FL_ONGROUND;
 };
 

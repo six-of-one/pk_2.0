@@ -257,7 +257,7 @@ void () bot_stand1;
 void () bot_walk;
 void () bot_run;
 void () bot_start;
-void () dmbot_melee;
+void () pkbot_melee;
 entity () botmovetarget;
 
 void () PutBotInServer =
@@ -298,7 +298,7 @@ void () PutBotInServer =
 	self.th_stand = bot_stand1;
 	self.th_walk = bot_walk;
 	self.th_run = bot_run;
-	self.th_melee = dmbot_melee;
+	self.th_melee = pkbot_melee;
 	self.th_cache = cacheenemy;
 	self.touch = fix_thud;
 	self.think = bot_start;

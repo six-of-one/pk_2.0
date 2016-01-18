@@ -121,7 +121,7 @@ void () observer =
 	self.aiment.oldorigin = self.origin;
 	self.aiment.think = cam_deathmove; // straight to death move, do not collect $200
 	self.classname = OBSERVER;
-	self.owner.frags = 0; // woo - lose score?
+	self.frags = 0; // woo - lose score?
 	self.solid = SOLID_NOT;
 	self.takedamage = DAMAGE_NO;
 	centerprint (self,"Observer mode activated\nPress \bFIRE\b to exit and respawn\n");

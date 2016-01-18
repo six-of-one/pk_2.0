@@ -447,11 +447,17 @@ void () W_FireRocket =
 	setsize (missile, '0 0 0', '0 0 0');
 	if (self.classname == "pk*bot")
 	{
-		setorigin (missile,((self.origin + (bfwd * 8)) + '0 0 16'));
+		if (PK_100 || Q_100)
+			setorigin (missile,((self.origin + (bfwd * 8)) + '0 0 16'));
+		else
+			setorigin (missile,self.origin + bfwd * VWX_ROCKETL + v_right * VWY_ROCKETL + v_up * VWZ_ROCKETL); // Cataboligne - 9.30.9 - true position fire point
 	}
 	else
 	{
-		setorigin (missile, self.origin + v_forward*8 + '0 0 16');
+		if (PK_100 || Q_100)
+			setorigin (missile, self.origin + v_forward*8 + '0 0 16');
+		else
+			setorigin (missile,self.origin + v_forward * VWX_ROCKETL + v_right * VWY_ROCKETL + v_up * VWZ_ROCKETL); // Cataboligne - 9.30.9 - true position fire point
 	}
 	if (PK) pk_missile_splash(missile); // *pk - splash & message setup
 };
@@ -565,7 +571,10 @@ void () W_FireLightning =
 
 	self.currentammo = self.ammo_cells = self.ammo_cells - 1;
 
-	org = self.origin + '0 0 16';
+	if (PK_100 || Q_100)
+		org = self.origin + '0 0 16';
+	else
+		org = self.origin + v_right * VWY_THUNDER + v_forward * VWX_THUNDER + v_up * VWZ_THUNDER;
 
 	if (self.classname == "pk*bot")
 	{
@@ -676,7 +685,10 @@ void () W_FireGrenade =
 
 	setmodel (missile,"progs/grenade.mdl");
 	setsize (missile, '0 0 0', '0 0 0');
-	setorigin (missile,self.origin);
+	if (PK_100 || Q_100)
+		setorigin (missile,self.origin);
+	else
+		setorigin (missile, self.origin + v_forward * VWX_GRENADEL + v_right * VWY_GRENADEL + v_up * VWZ_GRENADEL); // Cataboligne - 9.30.9 - true position fire point
 	if (PK) pk_missile_splash(missile); // *pk - splash & message setup
 };
 
@@ -726,7 +738,11 @@ void () W_FireSuperSpikes =
 		dir = botaim ();
 	else
 	dir = aim (self,1000);
-	launch_spike (self.origin + '0 0 16', dir);
+	
+	if (PK_100 || Q_100)
+		launch_spike (self.origin + '0 0 16', dir);
+	else
+		launch_spike (self.origin + v_up * VWZ_SNAILG + v_right * VWY_SNAILG + v_forward * VWX_SNAILG, dir);
 	newmis.touch = superspike_touch;
 	setmodel (newmis,"progs/s_spike.mdl");
 	setsize (newmis,VEC_ORIGIN,VEC_ORIGIN);
@@ -760,7 +776,7 @@ void(float ox) W_FireSpikes =
 
 	if (PK)
 	{
-	W_FirePulseSpikes (ox);
+		W_FirePulseSpikes (ox);
 		return;
 	}
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
@@ -770,7 +786,11 @@ void(float ox) W_FireSpikes =
 		dir = botaim ();
 	else
 	dir = aim (self, 1000);
-	launch_spike (self.origin + '0 0 16' + v_right*ox, dir);
+
+	if (PK_100 || Q_100)
+		launch_spike (self.origin + '0 0 16' + v_right*ox, dir);
+	else
+		launch_spike (self.origin + v_up * VWZ_NAILG + v_right * ox + v_right * VWY_NAILG + v_forward * VWX_NAILG, dir);
 
 	self.punchangle_x = -2;
 };

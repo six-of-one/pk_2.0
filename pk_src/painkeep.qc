@@ -171,6 +171,13 @@ void() PK_precache =
 	pkweps = PK_IT_AXE | PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT	| PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB
 							 | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // pk plus weps
 
+	VW_ARMOR = TRUE; // should only ever be 1 or 0 - used in conditionals
+
+// testing
+
+//	Q_99 = TRUE;
+//	Q_100 = TRUE;
+//	PK_99 = TRUE;
 
 // PK_100 - fix - needs to be admin toggle
 

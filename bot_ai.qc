@@ -10,6 +10,58 @@
  *
  */
 
+// * bots can collect & use painkeep stuff - YAY (no gir, thats bad...aww. I wanted to explode.)
+
+void() use_pkitem =
+{
+	local float drp;
+
+	drp = 0;
+
+	if (self.health < 30) drp = 1;		// hurt - always use item
+
+	else if (self.health < 66)
+	{
+		if (self.health < 40) drp = 1;
+		else drp = random();
+		if (drp < 0.3) drp = 0.9;
+		else if (drp < 0.6) drp = 0.8;
+	}
+	else if (random() < 0.3)
+	{
+		drp = random();
+		if (drp < 0.1) drp = 0.9;
+		else if (drp < 0.3) drp = 0.8;
+	}
+
+	if (drp)
+	{
+		if (self.pk_canpabammo > 0 && drp > 0.9)
+		{
+			self.weapon = IT_AXE;
+			self.pk_currentitem = PK_IT_CANPAB;
+			PK_Attack();
+		}
+		else if (self.pk_gravitywellammo > 0 && drp > 0.8)
+		{
+			self.weapon = IT_AXE;
+			self.pk_currentitem = PK_IT_GRAVITYWELL;
+			PK_Attack();
+		}
+		else if (self.pk_turretammo > 0 && drp > 0.7)
+		{
+			self.weapon = IT_AXE;
+			self.pk_currentitem = PK_IT_TURRET;
+			PK_Attack();
+		}
+		else if (self.pk_beartrapammo > 0)
+		{
+			self.weapon = IT_AXE;
+			self.pk_currentitem = PK_IT_BEARTRAP;
+			PK_Attack();
+		}
+	}
+};
 
 void () endEnemy =
 {
@@ -114,7 +166,7 @@ float () RunAway =
 		}
 		return (1);
 	}
-	if (self.enemy.health < WANT)
+	if (self.enemy.health < WANT) // 35
 	{
 		return (0);
 	}
@@ -144,10 +196,12 @@ float () RunAway =
 			bprint (self.netname);
 			bprint (": Run Away!\n");
 		}
+		use_pkitem();
 		return (1);
 	}
 	if (self.health < 45)
 	{
+		use_pkitem();
 		return (1);
 	}
 	if (weap & ((IT_SHOTGUN + IT_AXE) + IT_NAILGUN))
@@ -163,10 +217,12 @@ float () RunAway =
 				bprint (self.enemy.netname);
 				bprint (" has Quad Damage!\n");
 			}
+			use_pkitem();
 			return (1);
 		}
 		if (self.enemy.weapon & ((IT_ROCKET_LAUNCHER + IT_LIGHTNING) + IT_SUPER_NAILGUN))
 		{
+			use_pkitem();
 			return (1);
 		}
 	}
@@ -180,6 +236,7 @@ float () RunAway =
 				bprint (self.netname);
 				bprint (": I'm being assraped by convicts!");
 			}
+			use_pkitem();
 			return (1);
 		}
 	}

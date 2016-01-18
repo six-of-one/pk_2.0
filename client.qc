@@ -336,8 +336,8 @@ void () execute_changelevel =
 		other.modelindex = 0;
 		other.voteIntermission = 0; // *pk - hub ops
 		setorigin (other,pos.origin);
-		other = find (other,classname,"player");
 		if (other.ishuman) test_parms(other, 16); // *pk TESTING
+		other = find (other,classname,"player");
 	}
 
 	WriteByte (MSG_ALL,SVC_INTERMISSION);
@@ -1240,6 +1240,9 @@ void () PlayerPostThink =
 		DropBotPath ();
 	}
 
+//	if (self.weapon || self.vwepent) 
+	viswep_post(); // Cataboligne - 9.26.9 - viswep code link - always have to run this for 1 player + pk*bots deal
+
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
 
@@ -1251,8 +1254,6 @@ void () PlayerPostThink =
 	if (pk_itemovr & CON_INF)
 	if (ammo_frame < framecount)
 		infinite_ammo();
-
-	if (self.weapon || self.vwepent) viswep_post(); // Cataboligne - 9.26.9 - viswep code link
 
 	if (PK || custom_hub_loaded)
 	{

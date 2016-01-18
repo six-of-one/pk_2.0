@@ -37,6 +37,9 @@ void() viswep_pre =
 //	precache_model ("progs/vw_.mdl");
 //	precache_model ("progs/vw_.mdl");
 //	precache_model ("progs/vw_.mdl");
+// armor
+	precache_model ("progs/vw_armor.mdl");
+
 };
 
 // fn(FL_MELEE) - detect melee weps
@@ -153,12 +156,13 @@ entity(entity e, float fl) vload =
 	else if (fl == IT_GRENADE_LAUNCHER) md = "progs/vw_gren.mdl";
 	else if (fl == IT_ROCKET_LAUNCHER) md = "progs/vw_rock.mdl";
 	else if (fl == IT_LIGHTNING) md = "progs/vw_light.mdl";
+	else if (fl == IT_ARMOR1) md = "progs/vw_armor.mdl";
 	if (md == "") md = VW_DEFGUN;
 	tr.vwepent.mdl = md;
 	setmodel(tr.vwepent, md);
 
 // devmsg
-if (cvar("saved1") == 999)
+if (cvar("saved1") == 991)
 {
 dprint("\nvw add: ");
 dprint(ftos(tr.vwepent.weapon) );
@@ -202,7 +206,7 @@ void(entity e, float fl) pkvload =
 
 // devmsg
 
-if (cvar("saved1") == 999)
+if (cvar("saved1") == 991)
 {
 dprint("\npkvw add: ");
 dprint(ftos(fl) );
@@ -225,11 +229,11 @@ dprint("\n");
 void(entity vh, float cd) viswep_ld =
 {
 	local entity tr, pr;
-	local float bts, pkts, f;
+	local float bts, pkts, f, at;
 
 	tr = vh;
 	pr = self;
-	pkts = bts = 0;
+	at = pkts = bts = 0;
 
 // NOTE: fix - need unload (-1) here
 	if (cd < 0)
@@ -246,6 +250,22 @@ void(entity vh, float cd) viswep_ld =
 // have items & check for inventory
 	while (tr)
 	{
+		if (tr.armortype)
+		{
+			at = self.armortype;
+			if (!at)
+			{
+				tr.think = SUB_Remove;
+				tr.nextthink = time + 0.01;
+				tr.model = "";
+				pr.vwepent = tr.vwepent;
+			}
+			if (self.armortype == 0.3) tr.skin = 0;
+			else if (self.armortype == 0.6) tr.skin = 1;
+			else if (self.armortype == 0.8) tr.skin = 2;
+			tr.armortype = at;
+		}
+		else
 		if (tr.weapon != IT_AXE || !pkbits)
 		{
 			if (! tr.weapon & self.items)
@@ -274,6 +294,15 @@ void(entity vh, float cd) viswep_ld =
 		tr = tr.vwepent;
 	}
 
+	if (VW_ARMOR)
+	if (self.armortype && !at)
+	{
+		tr = vload(self, IT_ARMOR1);
+		if (self.armortype == 0.3) tr.skin = 0;
+		else if (self.armortype == 0.6) tr.skin = 1;
+		else if (self.armortype == 0.8) tr.skin = 2;
+		tr.armortype = at = self.armortype;
+	}
 //	if (!pkbits)
 //	if ((self.items & IT_AXE) && !(bts & IT_AXE))
 //		vload(self, IT_AXE);
@@ -281,7 +310,7 @@ void(entity vh, float cd) viswep_ld =
 	f = 1;
 	while ( f & qweps && f < 8388609 ) // NOTE: this will not load an axe
 	{
-if (cvar("saved1") == 999)
+if (cvar("saved1") == 992)
 {
 dprint("q load test: ");
 dprint(ftos(f) );
@@ -297,7 +326,7 @@ dprint("\n");
 	f = 1;
 	while ( f & pkweps && f < 8388609 )
 	{
-if (cvar("saved1") == 999)
+if (cvar("saved1") == 992)
 {
 dprint("pk load test: ");
 dprint(ftos(f) );
@@ -313,7 +342,7 @@ dprint("\n");
 	}
 
 tr =self.vwepent;
-if (cvar("saved1") == 999)
+if (cvar("saved1") == 993)
 while (tr)
 {
 dprint("vw: ");
@@ -329,9 +358,45 @@ tr = tr.vwepent;
 
 };
 
+// fn(viswep_pkbot) - load / unload pkbots
+
+float vw_bot_frame; // handle pk*bots
+
+void() viswep_pkbot =
+{
+	local entity sv;
+
+	vw_bot_frame = framecount;
+
+	sv = self;
+	self = find(world,classname,"pk*bot");
+	while (self)
+	{
+		viswep_post();
+// bot post think checks - NOTE: need to go elsewhere
+		if (self.copb_timeout)
+		{
+			if (self.copb_timeout >= time)
+			{
+				copb_checkFart();
+			}
+			else
+			{
+				self.copb_timeout = 0;
+			}
+		}
+
+		self = find(self,classname,"pk*bot");
+	}
+
+	self = sv;
+};
+
 // fn(viswep_post) - postthink viswep run code
 
 // self - player ent
+
+float vw_frame; // once per frame
 
 float tmpt; // dev msg - viswep frame tracking
 
@@ -340,9 +405,12 @@ void() viswep_post =
 	local entity vhead;
 	local float qld; 
 
-	if (!self.flags & FL_CLIENT) return;
+//	if (!self.flags & FL_CLIENT) return;
 
-	if (self.deadflag || self.classname == OBSERVER || self.view_ofs == '0 0 0') //intermission_running)
+	if (vw_bot_frame != framecount)
+	if (self.classname != "pk*bot" && self.ishuman) viswep_pkbot();
+
+	if (self.deadflag || self.classname == OBSERVER || self.view_ofs == '0 0 0' || (self.admin && self.admin != USER_MENU)) //intermission_running)
 	{
 		if (self.vwepent) viswep_ld(self.vwepent, -2); // unload all weps - for now just removes ent, later deadthrow what's not put in pack if died
 		return;
@@ -382,7 +450,7 @@ void() viswep_post =
 	if (!vhead)
 		viswep_ld(vhead, 1);
 	else
-	if (self.items & qweps != vhead.items) qld = TRUE;
+	if (self.items & qweps != vhead.items || vhead.armorvalue != self.armortype * VW_ARMOR) qld = TRUE;
 
 	pkbits = mk_pkbits(self);
 	if (vhead.pk_items != pkbits || qld) viswep_ld(vhead, 1);
@@ -395,6 +463,7 @@ void() viswep_post =
 	vhead = self.vwepent;
 	vhead.items = self.items & qweps;
 	vhead.pk_items = pkbits;
+	vhead.armorvalue = self.armortype;
 
 // run viswep frame match
 
@@ -456,8 +525,8 @@ void() viswep_post =
 					} else if (FL_RANGE(vhead.weapon, vhead.pk_currentitem) || (vhead.mdl == VW_DEFGUN)) {
 					if ( (vhead.owner.frame - gremlin_frame_adjust) < range_frames) vadd = viswaddf;
 				 }
-if (1)
-//if (cvar("saved1") == 999.999)
+
+if (cvar("saved1") == 999)
 if (tmpt != vhead.owner.frame)  // test
 {
 tmpt = vhead.owner.frame;

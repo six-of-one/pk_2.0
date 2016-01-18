@@ -224,7 +224,10 @@ void(float ox) W_FirePulseSpikes =
 		dir = botaim ();
 	else
 	dir = aim (self, 1000);
-	launch_spike (self.origin + ' 0 0 16' + v_right*ox, dir);
+	if (PK_100 || Q_100)
+		launch_spike (self.origin + ' 0 0 16' + v_right*ox, dir);
+	else
+		launch_spike (self.origin + v_up * VWZ_PNAILG + v_right * (ox / 2.5) + v_right * VWY_PNAILG + v_forward * VWX_PNAILG, dir);
 	newmis.touch = pulse_touch;
 	newmis.theowner = self;
 	setmodel (newmis, "progs/pnail.mdl");
@@ -245,6 +248,7 @@ void() PK_SetCurrentAmmo =
 
 	wchanged = FALSE;
 
+	if (self.classname == "player") // *bot - dont set run frames
 	player_run ();		// get out of any weapon firing states
 
 	self.items = self.items - (self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS));
@@ -443,7 +447,7 @@ void() PK_SetCurrentAmmo =
 
 // Cataboligne 8.8.9 purify - chase cam
 	// disable model in chase view
-		if ( (self.dest2_x & CHSCAM_ON) )
+		if ( (self.dest2_x & CHSCAM_ON) || self.classname == OBSERVER)
 		{
 			self.weaponmodel = "";
 		}
