@@ -236,7 +236,7 @@ void() player_light1   =[$lightfatt1, player_light2  ]
 	if (!self.button0)
 		{player_run ();return;}
 	self.weaponframe = self.weaponframe + 1;
-	if (self.weaponframe == 5)
+	if (self.weaponframe >= 5)
 		self.weaponframe = 1;
 	SuperDamageSound();
 	W_FireLightning();
@@ -249,7 +249,7 @@ void() player_light2   =[$lightfatt2, player_light1  ]
 	if (!self.button0)
 		{player_run ();return;}
 	self.weaponframe = self.weaponframe + 1;
-	if (self.weaponframe == 5)
+	if (self.weaponframe >= 5)
 		self.weaponframe = 1;
 	SuperDamageSound();
 	W_FireLightning();

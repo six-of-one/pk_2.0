@@ -134,7 +134,12 @@ void() q2_precache =
 // weps
 	precache_sound ("q2_snd/grnf_mx.wav");
 	precache_sound ("q2_snd/rktf_mx.wav");
+	precache_sound ("q2_snd/rocklx1a.wav");
+	precache_sound ("q2_snd/railf_mx.wav");
+	precache_sound ("q2_snd/shtf_mx.wav");
+	precache_sound ("q2_snd/sshotf1b.wav");
 
+	rail_precache();
 };
 
 
@@ -243,7 +248,7 @@ void() q2_ammo_grenades =
 
 void () q2_weapon_bfg =
 {
-	weapon_lightning();
+	q100_weapon_lightning();
 
 	setmodel (self, "progs/q2_bfg.mdl");
 	self.weaponmodel = "progs/v_q2_bfg.mdl";
@@ -257,21 +262,36 @@ void () q2_weapon_bfg =
 
 void () q2_weapon_railgun =
 {
-	weapon_lightning();
+	q100_weapon_lightning();
+	self.netname = "Rail Gun";
+
+	self.touch = d_weapon_touch;
+	self._attack = player_rocket1;
+	self._fr_attack = X_FireRailgun;
+
+	self.currentammo = Q2_DEF_SLUGS;
+	self.items = IT_LIGHTNING;
+	self.lip = AMMO_SLUGS;
+	self.attack_finished = 1.5;
+	self.dmg = 100;
+	self.dmg_save = 1;
+	self.dmg_take = 1; // shot cnt
 
 	setmodel (self, "progs/q2_rail.mdl");
 	self.weaponmodel = "progs/v_q2_rail.mdl";
 	self.vwepmdl = "progs/vw_q2_rail.mdl";
 	self.noise = "q2_snd/w_pkup.wav";
 	self.noise4 = "q2_snd/respawn1.wav";
-//	self.noise3 = "q2_snd/dsrlaunc.wav";
+	self.noise3 = "q2_snd/railf_mx.wav";
+	self.noise2 = "q3_snd/rg_hum.wav"; // gun hum - TDO: q2 snd
+	self.chaosweptime = 1.16;
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
 
 void () weapon_hyperblaster =
 {
-	weapon_lightning();
+	q100_weapon_lightning();
 
 	setmodel (self, "progs/q2_hyperb.mdl");
 	self.weaponmodel = "progs/v_q2_hbl.mdl";
@@ -306,6 +326,7 @@ void() q2_weapon_rocketlauncher =
 	self.noise = "q2_snd/w_pkup.wav";
 	self.noise4 = "q2_snd/respawn1.wav";
 	self.noise3 = "q2_snd/rktf_mx.wav";
+	self.target = "q2_snd/rocklx1a.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
@@ -367,35 +388,63 @@ void () q2_weapon_machinegun =
 
 void () q2_weapon_supershotgun =
 {
-	weapon_supershotgun();
+	q100_weapon_supershotgun();
+	self.netname = "Super Shotgun";
+
+	self.touch = d_weapon_touch;
+	self._attack = X_FireHitscan;
+	self._fr_attack = player_shot1;
+
+	self.currentammo = Q2_DEF_SHOTG	;
+	self.items = IT_SUPER_SHOTGUN;
+	self.lip = AMMO_SHELLS;
+	self.attack_finished = 1;
+	self.dmg = 6;
+	self.dmg_save = 2;
+	self.dmg_take = 20; // shot cnt
+	self.punchangle = ' 0.14 0.08 0'; // bullet spread out -- TDO: get q2 value, this is q1
 
 	setmodel (self, "progs/q2_dblshot.mdl");
 	self.weaponmodel = "progs/v_q2_shot2.mdl";
 	self.vwepmdl = "progs/vw_q2_dblshot.mdl";
 	self.noise = "q2_snd/w_pkup.wav";
 	self.noise4 = "q2_snd/respawn1.wav";
-//	self.noise3 = "q2_snd/dsrlaunc.wav";
+	self.noise3 = "q2_snd/sshotf1b.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
 
 void () q2_weapon_shotgun =
 {
-	weapon_shotgun();
+	q100_weapon_shotgun();
+	self.netname = "Shotgun";
+
+	self.touch = d_weapon_touch;
+	self._attack = X_FireHitscan;
+	self._fr_attack = player_shot1;
+
+	self.currentammo = Q2_DEF_SHOTG	;
+	self.items = IT_SHOTGUN;
+	self.lip = AMMO_SHELLS;
+	self.attack_finished = 1;
+	self.dmg = 4;
+	self.dmg_save = 1;
+	self.dmg_take = 12; // shot cnt
+	self.punchangle = ' 0.04 0.04 0'; // bullet spread out -- TDO: get q2 value, this is q1
 
 	setmodel (self, "progs/q2_shotgun.mdl");
 	self.weaponmodel = "progs/v_q2_shot.mdl";
 	self.vwepmdl = "progs/vw_q2_shot.mdl";
 	self.noise = "q2_snd/w_pkup.wav";
 	self.noise4 = "q2_snd/respawn1.wav";
-//	self.noise3 = "q2_snd/dsrlaunc.wav";
+	self.noise3 = "q2_snd/shtf_mx.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
 
 void () q2_weapon_blaster =
 {
-	weapon_shotgun();
+	q100_weapon_shotgun();
 
 	setmodel (self, "progs/q2_blaster.mdl");
 	self.weaponmodel = "progs/v_q2_blst.mdl";
@@ -556,7 +605,7 @@ void() item_power_screen =
 
 void() item_silencer =
 {
-	weapon_shotgun();
+	q100_weapon_shotgun();
 	setmodel (self, "progs/q2_silencer.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "q2_snd/respawn1.wav";

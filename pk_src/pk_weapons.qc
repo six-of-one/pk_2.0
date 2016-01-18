@@ -274,6 +274,7 @@ void() PK_SetCurrentAmmo =
 		self.forcewchange = FALSE;
 
 		wchanged = TRUE;
+		ominous_hum("misc/null.wav", 0);
 	}
 
 	wchanged = wchanged & ((self.items & IT_INVISIBILITY) || (self.cam_x & CHSCAM_ON));
@@ -542,10 +543,22 @@ void() PK_SetCurrentAmmo =
 	{
 		if (self.eweapon.lip)
 		{
-			if (self.eweapon.lip == AMMO_SHELLS)
-				self.currentammo = self.ammo_shells;
-			else if (self.eweapon.lip == AMMO_BULLETS)
+			if (self.eweapon.lip == AMMO_BULLETS)
 				self.currentammo = self.ammo_bullet;
+			else if (self.eweapon.lip == AMMO_SHELLS)
+				self.currentammo = self.ammo_shells;
+			else if (self.eweapon.lip == AMMO_CELLS)
+				self.currentammo = self.ammo_cells;
+			else if (self.eweapon.lip == AMMO_NAILS)
+				self.currentammo = self.ammo_nails;
+			else if (self.eweapon.lip == AMMO_ROCKETS)
+				self.currentammo = self.ammo_rockets;
+			else if (self.eweapon.lip == AMMO_GRENADES)
+				self.currentammo = self.ammo_rockets;
+			else if (self.eweapon.lip == AMMO_SLUGS)
+				self.currentammo = self.ammo_slug;
+			else if (self.eweapon.lip == AMMO_NONE)
+				self.currentammo = 1;
 		}
 		self.weaponframe = 0;
 		self.weaponmodel = self.eweapon.weaponmodel;

@@ -9,9 +9,6 @@ pk_src/pk.defs.qc
 bot.defs.qc
 bot_tally.qc
 
-// chaos code
-chaos.qc
-
 frikbot/map_dm1.qc
 frikbot/map_dm2.qc
 frikbot/map_dm3.qc
@@ -26,6 +23,9 @@ frikbot/bot_misc.qc
 frikbot/bot_phys.qc
 frikbot/bot_move.qc
 frikbot/bot_ed.qc
+
+// chaos code
+chaos.qc
 
 pk_src/painkeep.qc
 pk_src/pk_client.qc
@@ -73,11 +73,23 @@ pk_src/viswep.qc
 
 pk_src/mcode.qc
 
+// hipnotic
+
+hipnotic/hiprubbl.qc
+
+// support for rotating brushes - Ariochs Heaven map
+hipnotic/rotate.qc
+
 // runes
 runes.qc
 
-// support for doom maps 
+// support for doom maps ! 
 pk_src/dooments.qc
+
+// extra weapons
+
+xwep/railgun.qc
+xwep/x_firecode.qc
 
 // painkeep code
 pk_src/2dtrain.qc
@@ -122,8 +134,6 @@ pk_src/q2ents.qc
 // support for q3 maps in darkplaces
 pk_src/q3ents.qc
 
-// support for rotating brushes - Ariochs Heaven map
-rotate.qc
 
 bot.qc
 bot_func.qc

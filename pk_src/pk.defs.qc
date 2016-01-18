@@ -36,6 +36,7 @@ void() q_startmap;						// fix start map issue for q single player
 // q100 stuff
 void() q100_PlayerPreThink;
 void() q100_PlayerPostThink;
+float intermission_running;
 
 float PK_HUB2					= 131072; // bit if TRUE, using custom hub - only used for level transtion from hub vote
 float PK_ADHUB					= 1;		// set to 0 PK_mapmode and admin menu will ignore new maps - item load can still set PK mode for any pk map
@@ -83,6 +84,88 @@ float pk_mapcfg;
 float pk_srvcfg;
 
 void() pk_srvcmd_set;
+
+// env
+
+/// *** DUMMY SECTION - move later - FIX
+
+//float FL_NOPART		= 8192; //no particles when melting
+
+float RMIN_SKY					= -60;	// removed from values returned
+float RMIN_LAVA				= -50;
+float RMIN_SLIME				= -40;
+float RMIN_WATER				= -30;
+
+float RM_SKY					= 1; // dummy(s) - just so we dont have to recode later
+//float RM_SKY					= 1;		// remove imm. if CONTENT_SKY
+float RM_WATER 				= 2;		// remove imm. if CONTENT_WATER
+float RM_SLIME 				= 4;		// remove imm. if CONTENT_SLIME
+float RM_LAVA					= 8;		// remove imm. if CONTENT_LAVA
+float CKO						= 16; 	// only check content, take no action - should not be used in cycle - negates timer
+float FLT_WATER				= 32; 	// float when in water
+float FLT_SLIME				= 64; 	// float in slime
+float FLT_LAVA					= 128;	// float in lava
+//float FLT_BOB					= 256;	// bob cycle while floating
+float FLT_IMM					= 512;	// no lift, just blink it there
+float MLT_SLIME				= 1024;	// melt in slime, ** time prior to melt in .wait
+float MLT_LAVA					= 2048;	// melt in lava
+//float MLT_WATER				= 4096;	// melt in water (what the hey, made of sugar?)
+//float MLT_IMM				= 8192;	// melt with no wait time - *** ISSUE: FL_NOPART code borks this, but its not implemented yet
+//float MLT_BLOW				= 16384;	// try to blow up explosives, dmg based on currentammo and mode_x - subflare spot
+//float FLT_SINK				= 32768;	// eventually sink the floaty, ** time in .delay
+
+/* deprecated - not used, ever
+float FRC_RESP					= 65536;	// force a respawn after .pausetime, if MLT_IMM, this will be instant
+float CLR_TOUCH				= 131072;// clear touch fn when first event occurs
+*/
+
+float CK_EARTHQUAKE			= 131072;// check if ent in earthquake range
+
+float PF_WATER					= 262144;// call .th_stand() every time in content
+float PF_SLIME					= 524288;
+float PF_LAVA					= 1048576;
+float PF_EMPTY					= 2097152;
+float SF_CHK					= 4194304;// call .th_walk() on sched above also
+float PF_SOLID		 			= 8388608;// solid check, for stopping things?
+
+float CTI_LAVA					= 1050776;// Lava flag indicated - RM_LAVA | CKO | FLT_LAVA | MLT_LAVA | PF_LAVA
+float CTI_WATER				= 262194;// Water flag indicated
+float CTI_SLIME				= 525396;// Slime flag indicated
+
+.float content_flag;
+
+.string quakeset // string search link all quakeable ents
+string EARTHQUAKE				= "earthquake"; // select things we want to shake up
+
+float QUAKE_RUBBLE			= 0.17; // chance of rubble when skaking loose debris
+float QUAKE_RUBBLE_PER		= 0.04; // chance of rubble percent per richter
+float RUBBLE_DMGDEF			= 10; // default damage from hot rubble
+float RUBBLE_TIME				= 15; // TEST 45; // time for rubble to hang around
+float RUBBLE_TDEV				= 15; // dev time on rubble
+float RUBBLE_BLASTRAD		= 48; // distance from explosion to look for rubble to blast
+float EXPLODE_RUBBLE			= 0.6; // chance of rubble from explosion
+float RUBBLE_SHOT				= 0.07; // % chance a bullet hitting solid will release a mini rubble
+
+void(vector rorg, vector vel, float vibe, float rskn) rubble_debris;
+
+
+// wrap - fix fte broke ass shit
+
+float(entity e, float s) getsurfacenumpoints_wrap = #434;
+vector(entity e, float s, float n) getsurfacepoint_wrap = #435;
+vector(entity e, float s) getsurfacenormal_wrap = #436;
+string(entity e, float s) getsurfacetexture_wrap = #437;
+float(entity e, vector p) getsurfacenearpoint_wrap = #438;
+vector(entity e, float s, vector p) getsurfaceclippedpoint_wrap = #439;
+
+
+float(entity e, float s) getsurfacenumpoints;
+vector(entity e, float s, float n) getsurfacepoint;
+vector(entity e, float s) getsurfacenormal;
+string(entity e, float s) getsurfacetexture;
+float(entity e, vector p) getsurfacenearpoint;
+vector(entity e, float s, vector p) getsurfaceclippedpoint;
+
 
 // runes
 .float rune_flag;
@@ -294,6 +377,46 @@ float NO_PI;					// dont let item_call call place_item
 float PK_BULLETAMMO_MAX;
 float PK_SLUGAMMO_MAX;
 
+// X fire
+
+void(entity e, float trv) master_item_control;
+void(string tri, float trv) master_item_control_loop;
+void(float velmul, float mvt, float flg, float ct, vector fmorg, vector vdr, string cname, string md, string sd, void() tch, float tht, void() thk, void() thd) fire_missile;
+void() player_plasma1;
+void() X_FireHitscan;
+void() X_FireRailgun;
+void() player_mgchg1;
+
+float PLASMA_VEL;
+float ROCKET_FUSE;
+float WEPHUM; // weapons hum
+
+
+
+// missile code flags
+float FL_PUNCH					= 2;				// use punchangle for weapon fire
+float FL_2PUNCH				= 4;				// double punch
+float FL_MPUNCH				= 6;				// mega punch?
+float FL_MSL					= 8;				// set missile velocity
+float FL_GRN					= 16;				// set grenade type velocitys
+float FL_USEAMMO				= 32;				// for generic fire fns
+float FL_CTHONF				= 64;				// cthon fire balls
+float FL_SNDMIS				= 128				// sound on missile wep channel
+float FL_RUNEHST				= 256				// missile gets runehaste check
+float FL_AIM1K					= 131072;		// aim fn, val 1000
+float FL_AIM10K				= 262144;		// aim fn, val 10000
+float FL_AIM100K				= 524288;		// aim fn, val 100000
+float FL_MORPHSHOT			= 2097152;			// builtin weapon damage
+/*
+be aware...also used as missile code flags
+
+float RM_SKY					= 1;		// remove imm. if CONTENT_SKY
+float FLT_LAVA					= 128;	// float in lava
+float FLT_IMM					= 512;	// no lift, just blink it there
+float MLT_LAVA					= 2048;	// melt in lava
+float PF_LAVA					= 1048576;
+*/
+
 // wolf
 
 void() wchg2_weapon_touch;
@@ -301,14 +424,11 @@ void() wchg2_weapon_touch;
 // doom
 
 void() doom_precache;
-void(entity e, float trv) master_item_control;
-void(string tri, float trv) master_item_control_loop;
 
 float d_reps_base				= 57005000; // heh heh - DEAD+
 void() d_rep_set;
 float() mega_touch;
 void() d_weapon_touch;
-void() X_FireHitscan;
 
 // q2
 
@@ -408,6 +528,10 @@ float VWX_THUNDER				= 12;
 float VWY_THUNDER				= 8;
 float VWZ_THUNDER				= 16;
 
+float VWX_PLASMA				= 32;
+float VWY_PLASMA				= 8;
+float VWZ_PLASMA				= 16;
+
 // pk weps
 // cell guns
 float VWX_CHTHUNDER			= 20;	// 18
@@ -421,6 +545,12 @@ float VWZ_HARP_IDLE			= -6;
 float VWX_HARP_RETR			= 8;	// harpoon being retracted
 float VWY_HARP_RETR			= 8;
 float VWZ_HARP_RETR			= 0;
+
+// slug weps
+
+float VWX_RAILGUN				= 16;
+float VWY_RAILGUN				= 14;
+float VWZ_RAILGUN				= 15;
 
 
 

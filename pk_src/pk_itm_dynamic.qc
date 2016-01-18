@@ -131,8 +131,8 @@ void(string cls) item_call =
 
 	scls = cls;
 	if (cls == "weapon_axe") weapon_axe();
-	else if (cls == "weapon_shotgun") weapon_shotgun();
-	else if (cls == "weapon_supershotgun") weapon_supershotgun();
+	else if (cls == "weapon_shotgun") q100_weapon_shotgun();
+	else if (cls == "weapon_supershotgun") q100_weapon_supershotgun();
 	else if (cls == "weapon_nailgun") weapon_nailgun();
 	else if (cls == "weapon_supernailgun") weapon_supernailgun();
 	else if (cls == "weapon_grenadelauncher") q100_weapon_grenadelauncher();
@@ -140,9 +140,9 @@ void(string cls) item_call =
 	else if (self.classname == "dyn_item" && cls == "weapon_lightning")
 	{
 		if (PK) weapon_chainlg();
-		else weapon_lightning();
+		else q100_weapon_lightning();
 	}
-	else if (cls == "weapon_lightning") weapon_lightning();
+	else if (cls == "weapon_lightning") q100_weapon_lightning();
 	else if (cls == "item_shells") { if (rd < 0.5) self.spawnflags = WEAPON_BIG2; item_shells(); }
 	else if (cls == "item_spikes") { if (rd < 0.4) self.spawnflags = WEAPON_BIG2; item_spikes(); }
 	else if (cls == "item_rockets") { if (rd < 0.2) self.spawnflags = WEAPON_BIG2; item_rockets(); }

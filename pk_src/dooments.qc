@@ -59,6 +59,7 @@ void() doom_precache =
 	precache_model ("progs/heal_stimpak.mdl");
 	precache_model ("progs/spiritarmor.mdl");
 	precache_model ("progs/d_spheres.mdl");
+	precache_model ("progs/d_berzerk.mdl");
 	precache_model ("progs/d_radsuit.mdl");
 	precache_model ("progs/d_skullkey.mdl");
 	precache_model ("progs/d_cardkey.mdl");
@@ -72,8 +73,9 @@ void() doom_precache =
 	precache_model ("progs/d_shellbox.mdl");
 	precache_model ("progs/d_cellbox.mdl");
 	precache_model ("progs/d_cellpack.mdl");
+	precache_model ("progs/d_pack.mdl");
 // doom weps
-	precache_model ("progs/d_chainsaw.mdl");
+	precache_model ("progs/d_saw.mdl");
 	precache_model ("progs/d_pistol.mdl");
 	precache_model ("progs/d_bfg.mdl");
 	precache_model ("progs/d_rock.mdl");
@@ -81,6 +83,9 @@ void() doom_precache =
 	precache_model ("progs/d_chaingun.mdl");
 	precache_model ("progs/d_shotgun.mdl");
 	precache_model ("progs/d_dblshot.mdl");
+// shots
+	precache_model ("progs/d_plasma_sht.mdl");
+
 // view models
 	precache_model ("progs/v_d_pistol.mdl");
 	precache_model ("progs/v_d_shot.mdl");
@@ -398,7 +403,7 @@ void() d_barrel =
 
 void() d_weapon_bfg =
 {
-	weapon_lightning();
+	q100_weapon_lightning();
 	self.netname = "BFG 9000";
 
 	setmodel (self, "progs/d_bfg.mdl");
@@ -504,7 +509,7 @@ void() d_weapon_saw =
 	weapon_nailgun();
 	self.netname = "Chainsaw";
 
-	setmodel (self, "progs/d_chainsaw.mdl");
+	setmodel (self, "progs/d_saw.mdl");
 	self.weaponmodel = "progs/v_d_saw.mdl";
 	self.vwepmdl = "progs/vw_d_saw.mdl";
 //	self.noise3 = "doom/dssaw.wav";
@@ -520,7 +525,7 @@ void() d_weapon_saw =
 void() d_weapon_shotgun =
 {
 	d_rep_set();
-	weapon_shotgun();
+	q100_weapon_shotgun();
 
 	self.touch = d_weapon_touch;
 	self._attack = X_FireHitscan;
@@ -547,7 +552,7 @@ void() d_weapon_shotgun =
 
 void() d_weapon_supershotgun =
 {
-	weapon_supershotgun();
+	q100_weapon_supershotgun();
 	self.netname = "Super shotgun";
 
 	self.touch = d_weapon_touch;
@@ -576,8 +581,20 @@ void() d_weapon_supershotgun =
 
 void() d_weapon_plasma =
 {
-	weapon_lightning();
+	q100_weapon_lightning();
 	self.netname = "Plasma Gun";
+
+	self.touch = d_weapon_touch;
+	self._attack = SUB_Null;
+	self._fr_attack = player_plasma1;
+
+	self.currentammo = D_DEF_PLASMAG;
+	self.items = IT_LIGHTNING;
+	self.lip = AMMO_CELLS;
+	self.attack_finished = 0.083;
+	self.dmg = DOOM_SHOT_DMG;
+	self.dmg_save = 1;
+	self.dmg_take = 1; // shot cnt
 
 	setmodel (self, "progs/d_plasma.mdl");
 	self.weaponmodel = "progs/v_d_plasma.mdl";
@@ -585,19 +602,32 @@ void() d_weapon_plasma =
 	self.noise = "doom/dswpnup.wav";
 	self.noise3 = "doom/dsplasma.wav";
 	self.noise4 = "doom/dsitembk.wav";
+	self.target = "doom/dsfirxpl.wav";
 
-	self.attack_finished = 0.083;
-//	self._attack = player_dplasma1;
-//	self._hk_major = SUB_Null;
-//	self.pull = W_gPull;
-//	self.th_walk = SUB_Null;
-//	self.dmg_save = 1;
-//	self.deathtype = " was melted by ";
-//	self.deathtype2 = "'s plasma\n";
-//	self.upgrade_mc = MC_BOMB;
-//	self.mode_x = IV_POSITRON;
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "doom_item";
+};
 
-	self.currentammo = D_DEF_PLASMAG;
+void() d_item_pack =
+{
+	item_shells();
+	setmodel(self, "progs/d_pack.mdl");
+	self.noise = "doom/dsitemup.wav";
+	self.noise4 = "doom/dsitembk.wav";
+	self.netname = "Ammo Pack";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "doom_item";
+};
+
+void() d_art_berserker =
+{
+	item_health();
+	setmodel(self, "progs/d_berzerk.mdl");
+	self.noise = "doom/dsitemup.wav";
+	self.noise4 = "doom/dsitembk.wav";
+	self.netname = "Berserker";
+	self.healamount = 100;
+//	self.healtype = HEAL_NORM;
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
@@ -940,7 +970,7 @@ void() w_ammo_clip =
 	setmodel (self, "progs/w_clip.mdl");
 	self.noise = "wolf/pickup_am.wav";
 	self.noise4 = "doom/dsitembk.wav";
-	self.netname = "A clip";
+	self.netname = "Clip";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "wolf_item";
 };
@@ -1107,12 +1137,16 @@ void() d_weapon_touch =
 
 	if (self.classname == "q2_weapon_rocketlauncher" || self.classname == "q3_weapon_rocketlauncher" ||
 		self.classname == "q3_weapon_grenadelauncher" || self.classname == "q2_weapon_grenadelauncher" ||
+		self.classname == "weapon_grenadelauncher" || self.classname == "weapon_rocketlauncher" ||
 		self.classname == "d_weapon_rocketlauncher" || self.classname == "w_weapon_mortar")
 	{
 	other.ammo_rockets = other.ammo_rockets + self.currentammo; // TDO: ammo type fn
 	camc = other.ammo_rockets;
 	}
-	else if (self.classname == "d_weapon_shotgun" || self.classname == "d_weapon_supershotgun" || self.classname == "q3_weapon_shotgun")
+	else if (self.classname == "d_weapon_shotgun" || self.classname == "d_weapon_supershotgun" ||
+		self.classname == "q2_weapon_shotgun" || self.classname == "q2_weapon_supershotgun" ||
+		self.classname == "weapon_shotgun" || self.classname == "weapon_supershotgun" ||
+		self.classname == "q3_weapon_shotgun")
 	{
 	other.ammo_shells = other.ammo_shells + self.currentammo;
 	camc = other.ammo_shells;
@@ -1125,6 +1159,21 @@ void() d_weapon_touch =
 	{
 	other.ammo_bullet = other.ammo_bullet + self.currentammo;
 	camc = other.ammo_bullet;
+	}
+	else if (self.classname == "d_weapon_plasma" ||
+		self.classname == "q3_weapon_lightning" || self.classname == "weapon_lightning" ||
+		self.classname == "q3_weapon_bfg" ||
+		self.classname == "weapon_plasmagun")
+	{
+	other.ammo_cells = other.ammo_cells + self.currentammo;
+	camc = other.ammo_cells;
+	}
+	else if (self.classname == "q2_weapon_railgun" ||
+		self.classname == "q3_weapon_railgun" ||
+		self.classname == "weapon_railgun")
+	{
+	other.ammo_slug = other.ammo_slug + self.currentammo;
+	camc = other.ammo_slug;
 	}
 	else
 	{
@@ -1166,9 +1215,12 @@ void() d_weapon_touch =
 		setmodel (e, self.vwepmdl);
 		e.mdl = e.model;
 		e.weaponmodel = self.weaponmodel;
-		e.noise3 = self.noise3;
+		e.chaosweptime = self.chaosweptime;
 		e.noise = self.noise;
+		e.noise2 = self.noise2;
+		e.noise3 = self.noise3;
 		e.noise4 = self.noise4;
+		e.target = self.target;
 	}
 
 	sprint (other,"You got the ");
@@ -1219,10 +1271,12 @@ void() wchg2_weapon_touch =
 {
 	local entity e;
 
-	e = vchk(weaponnum, 0, self.vwepent);
+	e = vchk(self.items, 0, other.vwepent);
+	if (e)
 	if (e.eweapon)
 	{
-		if (e.eweapon.mdl == "progs/vw_w_chaing.mdl")
+		if (! (other.items & IT_LIGHTNING))
+		if (e.eweapon.mdl == "progs/vw_w_chaing.mdl") // IDEA: do for other akimbos
 		{
 			self.items = IT_LIGHTNING;
 			self.dmg_save = 2;
@@ -1244,189 +1298,3 @@ void() wchg2_weapon_touch =
 	d_weapon_touch();
 };
 
-
-void () X_MissileTouch =
-{
-	if (other == self.owner)
-		return;		// don't explode on owner
-
-	if (pointcontents(self.origin) == CONTENT_SKY)
-	{
-		remove (self);
-		return ;
-	}
-if (self.eweapon) {
-bprint(" *** eweap ");
-bprint(self.eweapon.netname);
-}
-else
-bprint(" *** missile (?) ");
-
-	if (!self.dmg) self.dmg = 100 + random() * 20;
-	else if (self.dmg == DOOM_ROCK_DMG) self.dmg = 20 * ceil(random() * 8);
-	if (!self.dodmg) self.dodmg = 120;
-
-bprint(", hit dmg = ");
-bprint(ftos(self.dmg));
-bprint(", splash dmg = ");
-bprint(ftos(self.dodmg));
-
-	if (other.health)
-	{
-		if (other.classname == "monster_shambler")
-			self.dmg = self.dmg * 0.5;	// mostly immune
-		T_Damage (other,self,self.owner,self.dmg);
-	}
-
-	// don't do radius damage to the other, because all the damage
-	// was done in the impact
-	T_RadiusDamage (self,self.owner,self.dodmg,other);
-
-bprint(", tot dmg = ");
-bprint(ftos(self.dmg+self.dodmg));
-bprint(".\n");
-
-//	sound (self, CHAN_WEAPON, "weapons/r_exp3.wav", 1, ATTN_NORM);
-	self.origin = self.origin - 8*normalize(self.velocity);
-
-	WriteByte (MSG_BROADCAST,SVC_TEMPENTITY);
-	WriteByte (MSG_BROADCAST,TE_EXPLOSION);
-	WriteCoord (MSG_BROADCAST,self.origin_x);
-	WriteCoord (MSG_BROADCAST,self.origin_y);
-	WriteCoord (MSG_BROADCAST,self.origin_z);
-
-	BecomeExplosion ();
-};
-
-// handle eweapon hitscan bullet shooters
-float tdmg;
-
-void (float shotcount, float pdmg, vector dir, vector spread) X_FireBullets =
-{
-	local vector direction;
-	local vector src;
-	local float ddmg
-
-	makevectors (self.v_angle);
-
-	ddmg = pdmg;
-
-	src = self.origin + v_forward*10;
-	src_z = self.absmin_z + self.size_z * 0.7;
-
-	ClearMultiDamage ();
-	while (shotcount > 0)
-	{
-		if (pdmg == DOOM_SHOT_DMG) {ddmg = 5 * ceil(random() * 3);
-
-bprint(", bdmg = ");
-bprint(ftos(ddmg));
-
-}
-tdmg = tdmg + ddmg;
-
-		direction = dir + crandom()*spread_x*v_right + crandom()*spread_y*v_up;
-
-		traceline (src, src + direction*2048, FALSE, self);
-		if (trace_fraction != 1.0)
-			TraceAttack (ddmg, direction);
-
-		shotcount = shotcount - 1;
-	}
-	ApplyMultiDamage ();
-};
-
-/*
-================
-X_FireHitscan - fire eweapon hit scan weps
-================
-*/
-void () X_FireHitscan =
-{
-	local vector dir;
-	local float f, d, t;
-
-
-bprint(" *** eweap ");
-bprint(EWEAP.netname);
-tdmg = 0;
-
-	self.punchangle_x = -2 * EWEAP.dmg_save;
-	cam_punch(); // Cataboligne - 6.26.10 - because of fire from frames call
-
-	if (EWEAP.lip == AMMO_SHELLS)
-		f = self.ammo_shells;
-	else if (EWEAP.lip == AMMO_BULLETS)
-		f = self.ammo_bullet;
-	d = EWEAP.dmg_save; // ammo to fire
-	t = EWEAP.dmg_take; // shots to fire
-
-	f = f - ammo_con(d, self, ""); // use ammo
-	if (f < 0)
-	{
-		d = d + f; // only can fire this many
-		f = 0;
-		t = EWEAP.dmg_take * (d / EWEAP.dmg_save); // pellets or bullets we get to shoot due to reduced ammo
-	}
-
-	if (!ammo_con(EWEAP.weapon, self, "wpck"))
-	if (d < 1) // NOTE: can this ever happen?
-	{
-		self.weapon = W_BestWeapon ();
-		if (!Q_100 && !Q_99) self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
-		W_SetCurrentAmmo ();
-		if (self.classname == "pk*bot")
-			self.think = self.th_run;
-		return ;
-	}
-
-	if (EWEAP.lip == AMMO_SHELLS)
-		self.currentammo = self.ammo_shells = f;
-	else if (EWEAP.lip == AMMO_BULLETS)
-		self.currentammo = self.ammo_bullet = f;
-
-	if (self.classname == "pk*bot")
-		dir = botaim ();
-	else
-		dir = aim (self,100000);
-
-	X_FireBullets (t, EWEAP.dmg, dir, EWEAP.punchangle);
-
-bprint(", tot dmg = ");
-bprint(ftos(tdmg));
-bprint(".\n");
-
-};
-
-
-// fire any eweapon
-
-void() e_weap_Attack =
-{
-	local entity e;
-
-	EWEAP = e = self.eweapon;
-
-	if (rune_haste(e.attack_finished / 2))
-		self.attack_finished = time + e.attack_finished;
-
-	if (e._attack != SUB_Null) e._attack();
-	if (e._fr_attack != SUB_Null) e._fr_attack();
-	if (e.noise3 != "")
-		sound (self, CHAN_WEAPON, e.noise3, 1, ATTN_NORM);
-//	e.aflag = self.currentammo;
-
-// rocket wep specials
-	if (e._attack == W_FireRocket)
-	if (newmis.classname == "missile")
-	{
-		newmis.touch = X_MissileTouch;
-		newmis.dmg = e.dmg;
-		newmis.dodmg = e.dodmg;
-		newmis.eweapon = e;
-	}
-
-	EWEAP = world;
-
-	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
-};

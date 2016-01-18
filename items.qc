@@ -538,7 +538,7 @@ void () weapon_touch =
 /*QUAKED weapon_supershotgun (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void () weapon_supershotgun =
+void () q100_weapon_supershotgun =
 {
 	precache_model ("progs/g_shot.mdl");
 	setmodel (self,"progs/g_shot.mdl");
@@ -609,7 +609,7 @@ void () q100_weapon_rocketlauncher =
 /*QUAKED weapon_lightning (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void () weapon_lightning =
+void () q100_weapon_lightning =
 {
 	precache_model ("progs/g_light.mdl");
 	setmodel (self,"progs/g_light.mdl");

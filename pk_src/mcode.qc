@@ -656,19 +656,8 @@ void () weapon_axe =
 /*QUAKED weapon_shotgun (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void () weapon_shotgun =
+void () q100_weapon_shotgun =
 {
-	if (world.wad == "q2.wad")
-	{
-		q2_weapon_shotgun();
-		return;
-	}
-	else if (world.wad == "")
-	{
-		q3_weapon_shotgun(); 
-		return;
-	}
-
 	self.touch = weapon_touch;
 	self._attack = W_FireShotgun;
 	self._fr_attack = player_shot1;
@@ -691,6 +680,22 @@ void () weapon_shotgun =
 
 	setsize (self,'-16 -16 0','16 16 56');
 	StartItem ();
+};
+
+void () weapon_shotgun =
+{
+	if (world.wad == "q2.wad")
+	{
+		q2_weapon_shotgun();
+		return;
+	}
+	else if (world.wad == "")
+	{
+		q3_weapon_shotgun(); 
+		return;
+	}
+
+	q100_weapon_shotgun();
 };
 
 // all quake 1 key load outs

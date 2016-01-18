@@ -803,7 +803,7 @@ void() pk_liveupd =
 	if (Q_100)
 	{
 		Q1_CELLAMMO_MAX = 100;
-		XENV = FALSE;
+		XENV = TRUE;
 		return;
 	}
 
@@ -831,7 +831,7 @@ void() pk_liveupd =
 
 	if (PK_100)
 	{
-		XENV = FALSE;
+		XENV = TRUE;
 		PK_ART = FALSE;
 		return;
 	}
@@ -1153,6 +1153,12 @@ void() pk_srvcmd_set =
 	PKPLUS_PHONEAMMO_MAX	= 1;
 
 	PK_MAX_LIVENT = 256; // guessed - need research into where slowdown starts
+
+// weps
+
+	PLASMA_VEL = 600;
+	ROCKET_FUSE = 5.0;
+	WEPHUM = 1;
 
 // pk artifacts
 	PK_ART = TRUE; // Cataboligne - 8.12.9 - pk artifacts support

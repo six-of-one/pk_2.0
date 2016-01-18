@@ -28,7 +28,7 @@ float q3_grenade_amsk		= 5;
 float q3_shot_amsk			= 6;
 float q3_mach_amsk			= 7;
 
-float Q3_BFG_AMMO				= 15;
+float Q3_BFG_AMMO				= 150;
 float Q3_SLUG_AMMO			= 10;
 float Q3_CELL_AMMO			= 30;
 float Q3_ELEX_AMMO			= 60;
@@ -93,12 +93,13 @@ void() q3_precache =
 	precache_model ("progs/v_q3_shot.mdl");
 	precache_model ("progs/v_q3_bfg.mdl");
 	precache_model ("progs/v_q3_gl.mdl");
-	precache_model ("progs/v_q3_hawk.mdl");
+//	precache_model ("progs/v_q3_hawk.mdl");
 	precache_model ("progs/v_q3_mgun.mdl");
-	precache_model ("progs/v_q3_mini.mdl");
+//	precache_model ("progs/v_q3_mini.mdl");
 	precache_model ("progs/v_q3_plg.mdl");
 	precache_model ("progs/v_q3_rail.mdl");
 	precache_model ("progs/v_q3_rl.mdl");
+	precache_model ("progs/v_q3_lg.mdl");
 // carry
 	precache_model ("progs/vw_q3_ssg.mdl");
 	precache_model ("progs/vw_q3_bfg.mdl");
@@ -115,8 +116,18 @@ void() q3_precache =
 	precache_sound ("q3_snd/w_pkup.wav");
 	precache_sound ("q3_snd/respawn1.wav");
 // fire
+	precache_sound ("q3_snd/rocklf1a.wav");
+	precache_sound ("q3_snd/rocklx1a.wav");
+	precache_sound ("q3_snd/grenlf1a.wav");
 	precache_sound ("q3_snd/sshotf1b.wav");
 	precache_sound ("q3_snd/machgf1b.wav");
+	precache_sound ("q3_snd/hyprbf1a.wav");
+	precache_sound ("q3_snd/railgf1a.wav");
+	precache_sound ("q3_snd/rg_hum.wav");
+	precache_sound ("q3_snd/lg_fire.wav");
+	precache_sound ("q3_snd/lg_hum.wav");
+	precache_sound ("q3_snd/bfg_fire.wav");
+	precache_sound ("q3_snd/bfg_hum.wav");
 };
 
 // bob em - needs called from client capable of stuff cmd
@@ -162,28 +173,78 @@ void() q3_suspend =
 /*QUAKED weapon_bfg (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void () weapon_bfg =
+void () q3_weapon_bfg =
 {
-	self.classname = "weapon_chainlg";
+	d_weapon_bfg();
+	self.netname = "BFG";
 
-	precache_model ("progs/g_clight.mdl");
-	setmodel (self,"progs/g_clight.mdl");
-	self.pk_currentitem = PK_IT_CLIGHT;
-	self.netname = "Chain Thunderbolt";
-	self.touch = painkeep_weapon_touch;
-	setsize (self,'-16 -16 0','16 16 56');
-	StartItem ();
+	self.touch = d_weapon_touch;
+	self._attack = X_Fire3BFG;
+	self._fr_attack = player_shot1;
 
+	self.items = IT_LIGHTNING;
+	self.currentammo = 200;
+	self.lip = AMMO_CELLS;
+	self.attack_finished = 0.2;
+	self.dmg = 100;
+	self.dodmg = 120;
+	self.dmg_save = 10;
+	self.dmg_take = 1;
+
+	setmodel (self, "progs/q3_bfg.mdl");
+	self.weaponmodel = "progs/v_q3_bfg.mdl";
+	self.vwepmdl = "progs/vw_q3_bfg.mdl";
+	self.noise = "q3_snd/w_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.noise3 = "q3_snd/bfg_fire.wav";
+	self.noise2 = "q3_snd/bfg_hum.wav";
+	self.target = "q3_snd/plasmx1a.wav"; // TDO: get right snd
+	self.chaosweptime = 0.93;
+
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 };
+
+void() weapon_bfg =
+{
+	if (world.wad == "")
+		q3_weapon_bfg();
+	else // if (world.wad == "q2.wad")
+		q2_weapon_bfg();
+}
 
 /*QUAKED weapon_plasmagun (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
 void() weapon_plasmagun =
 {
-	weapon_bfg();
+	d_weapon_plasma();
+	self.netname = "Plasma Gun";
 
+	self.touch = d_weapon_touch;
+	self._attack = SUB_Null;
+	self._fr_attack = player_plasma1;
+
+	self.items = IT_NAILGUN;
+	self.currentammo = 50;
+	self.lip = AMMO_CELLS;
+	self.attack_finished = 0.1; // 10 per
+	self.dmg = 20;
+	self.dodmg = 15;
+	self.dmg_save = 1;
+	self.dmg_take = 1;
+
+	setmodel (self, "progs/q3_plg.mdl");
+	self.weaponmodel = "progs/v_q3_plg.mdl";
+	self.vwepmdl = "progs/vw_q3_plg.mdl";
+	self.noise = "q3_snd/w_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.noise3 = "q3_snd/hyprbf1a.wav";
+	self.target = "q3_snd/plasmx1a.wav";
+
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 };
 
@@ -225,6 +286,7 @@ void() q3_weapon_machinegun =
 
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q3_item";
+	if (self.spawnflags & SUSPENDED) q3_suspend();
 };
 
 void() weapon_machinegun =
@@ -240,7 +302,7 @@ void() weapon_machinegun =
 
 void() q3_weapon_shotgun =
 {
-	weapon_supershotgun();
+	q100_weapon_supershotgun();
 	self.netname = "Shotgun";
 
 	self.touch = d_weapon_touch;
@@ -264,6 +326,18 @@ void() q3_weapon_shotgun =
 	self.noise3 = "q3_snd/sshotf1b.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q3_item";
+	if (self.spawnflags & SUSPENDED) q3_suspend();
+};
+
+void () weapon_supershotgun =
+{
+	if (world.wad == "q2.wad")
+	{
+		q2_weapon_supershotgun();
+		return;
+	}
+
+	q100_weapon_supershotgun();
 };
 
 void() q3_weapon_rocketlauncher =
@@ -290,8 +364,10 @@ void() q3_weapon_rocketlauncher =
 	self.noise = "q3_snd/w_pkup.wav";
 	self.noise4 = "q3_snd/respawn1.wav";
 	self.noise3 = "q3_snd/rocklf1a.wav";
+	self.target = "q3_snd/rocklx1a.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q3_item";
+	if (self.spawnflags & SUSPENDED) q3_suspend();
 };
 
 void () weapon_rocketlauncher =
@@ -336,6 +412,7 @@ void () q3_weapon_grenadelauncher =
 	self.noise3 = "q3_snd/grenlf1a.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q3_item";
+	if (self.spawnflags & SUSPENDED) q3_suspend();
 };
 
 void () weapon_grenadelauncher =
@@ -379,6 +456,7 @@ void () weapon_gauntlet =
 //	self.noise3 = "q3_snd/sshotf1b.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q3_item";
+	if (self.spawnflags & SUSPENDED) q3_suspend();
 };
 
 
@@ -410,34 +488,96 @@ void () weapon_grapplinghook =
 //	self.noise3 = "q3_snd/sshotf1b.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q3_item";
+	if (self.spawnflags & SUSPENDED) q3_suspend();
+};
+
+void () q3_weapon_lightning =
+{
+	q100_weapon_lightning();
+	self.netname = "Lightning Gun";
+
+	self.touch = d_weapon_touch;
+	self._attack = SUB_Null;
+	self._fr_attack = player_light1;
+
+	self.currentammo = 100;
+	self.items = IT_LIGHTNING;
+	self.lip = AMMO_CELLS;
+	self.attack_finished = 0.1; // TDO: separate from q1 lg fire
+	self.dmg = 8;
+	self.dmg_save = 1;
+	self.dmg_take = 1; // shot cnt
+
+	setmodel (self, "progs/q3_lg.mdl");
+	self.weaponmodel = "progs/v_q3_lg.mdl";
+	self.vwepmdl = "progs/vw_q3_lg.mdl";
+	self.noise = "q3_snd/w_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.noise3 = "q3_snd/lg_fire.wav";
+//	self.noise2 = "q3_snd/lg_hum.wav"; // ? - could have been 1 lg used to use
+	self.chaosweptime = 0.964;
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
+	if (self.spawnflags & SUSPENDED) q3_suspend();
 };
 
 //weapon_lightning - already exists
+
+void() weapon_lightning =
+{
+	if (world.wad == "")
+	{
+		q3_weapon_lightning();
+		return;
+	}
+
+	q100_weapon_lightning(); 
+};
+
+void () q3_weapon_railgun =
+{
+	q100_weapon_lightning();
+	self.netname = "Rail Gun";
+
+	self.touch = d_weapon_touch;
+	self._attack = player_rocket1;
+	self._fr_attack = X_FireRailgun;
+
+	self.currentammo = Q3_SLUG_AMMO;
+	self.items = IT_LIGHTNING;
+	self.lip = AMMO_SLUGS;
+	self.attack_finished = 1.5;
+	self.dmg = 100;
+	self.dmg_save = 1;
+	self.dmg_take = 1; // shot cnt
+
+	setmodel (self, "progs/q3_rail.mdl");
+	self.weaponmodel = "progs/v_q3_rail.mdl";
+	self.vwepmdl = "progs/vw_q3_rail.mdl";
+	self.noise = "q3_snd/w_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.noise3 = "q3_snd/railgf1a.wav"; // TDO: impact site snd
+	self.noise2 = "q3_snd/rg_hum.wav"; // gun hum
+	self.chaosweptime = 1.16;
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
+	if (self.spawnflags & SUSPENDED) q3_suspend();
+};
 
 //weapon_railgun
 
 void() weapon_railgun =
 {
-//weapon_airfist();
-//weapon_grapgun();
-	if (random() < 0.66)
+	if (world.wad == "q2.wad")
 	{
-		self.classname = "item_painkeep_gwell";
-		item_painkeep_gwell();
+		q2_weapon_railgun();
+		return;
 	}
-	else 
-//	if (random() < 0.5)
+	else //if (world.wad == "")
 	{
-		self.classname = "item_painkeep_turret";
-		item_painkeep_turret();
+		q3_weapon_railgun(); 
+		return;
 	}
-//	else
-//	{
-//		self.classname = "item_painkeep_beartrap";
-//		item_painkeep_beartrap();
-//	}
-
-	if (self.spawnflags & SUSPENDED) q3_suspend();
 };
 
 void() q3_ammo_bullets =

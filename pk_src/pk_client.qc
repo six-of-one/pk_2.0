@@ -28,7 +28,6 @@ void (vector org, entity death_owner) spawn_tdeath;
 void () q100_ClientConnect;
 void () q100_ClientDisconnect;
 void () ExitIntermission;
-float intermission_running;
 void () IntermissionThink;
 void () q100_CheckPowerups;
 
@@ -910,7 +909,11 @@ float vw_bot_frame; // handle pk*bots
 //void() pk_post_think =
 void () PlayerPostThink =
 {
-	if (vw_bot_frame != framecount) viswep_pkbot();
+	if (vw_bot_frame != framecount)  // run these things once this frame
+	{
+		viswep_pkbot();
+		if (find(world, classname, LOOPSOUND)) loop_play(); // play on looped sounds
+	}
 
 	if (FRIKBOT)
 	if (BotPostFrame ())
@@ -979,6 +982,17 @@ void () PlayerPostThink =
 
 
 // do weapon stuff
+
+//	if (WEPHUM)
+	if (!XENV)
+	if (self.eweapon)
+		if (self.chaosweptime < time)
+//		if (self.chaosattnoise != HUMLOCAL) 
+//		if (self.eweapon.weapon != MC_AIRGUN)
+			ominous_hum(self.eweapon.noise2, self.eweapon.chaosweptime);
+
+	if (time < self.attack_finished)
+		return;
 
 	if (self.attack_finished < time) W_WeaponFrame ();
 
