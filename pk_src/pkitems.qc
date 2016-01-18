@@ -614,6 +614,7 @@ void() painkeep_touch =
 	// remove object until it is time to respawn
 	self.solid = SOLID_NOT;
 	self.model = string_null;
+	if (deathmatch)
 	if (deathmatch != 2)
 	{
 		if (self.wait)

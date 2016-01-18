@@ -308,7 +308,7 @@ void() turret_findTarget =
 	    }
 	  }
 
-		if (time & 3)
+		if ((time & 3) == 3)
 		if (self.delay) // infinite turret check
 		{
 			if (head.classname == "turret")
@@ -522,7 +522,7 @@ void() turret_attackEnemy =
 	e = 0;
 
 	if (self.delay) // infinite turret check
-	if (time & 3) // every 3 secs?
+	if ((time & 3) == 3) // every 3 secs?
 	while(head)
 	{
 			if (head.classname == "turret")

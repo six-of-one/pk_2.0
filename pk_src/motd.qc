@@ -123,7 +123,7 @@ if (self.classname != "pk*bot" && (!FRIKBOT ||self.ishuman))
 	  centerprint7(self, "Welcome to ÐainËeep!\n", "\nTeam Evolve\n", Line3,"\b_-=*\b Cataboligne\n",Line5,"painkeep-source-update",Line7);
 }
 
-	if (time & 3 == 3) self.msgcount = self.msgcount + 1;
+	if ((time & 3) == 3) self.msgcount = self.msgcount + 1;
 };
 
 
@@ -151,10 +151,10 @@ void() updateStatusDisplay =
 // web site promo
 		Line3 = "\n\n[\\/\b2\b.\b0\b] \b_-=\b* \bC\bataboligne\n\nhttp://www.moddb.com/mods/\bpainkeep-source-update\n\n";
 // heh heh - scroll wheel of pain!
-		if (time & 3 == 0) Line5 = "|";
-		else if (time & 3 == 1) Line5 = "\\";
-		else if (time & 3 == 2) Line5 = "-";
-		else if (time & 3 == 3) Line5 = "/";
+		if ((time & 3) == 0) Line5 = "|";
+		else if ((time & 3) == 1) Line5 = "\\";
+		else if ((time & 3) == 2) Line5 = "-";
+		else if ((time & 3) == 3) Line5 = "/";
 
 		if (self.revotemsg)
 			centerprint(self, "Vote Cancelled.\n\nYou must recast your vote");

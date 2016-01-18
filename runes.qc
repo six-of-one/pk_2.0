@@ -456,7 +456,7 @@ void() run_runes =
 			R_HELL = 0;
 			R_ELDER = 0;
 			sf = 100;
-			f = RUNE_MASK; //RUNE_MASK_ALL; - try this out see how it does
+			f = RUNE_MASK_ALL;
 			while (f != 0 && sf > 0) // try to make a nice one of each deal
 			{
 				k = rnd_bit_mask(f);
@@ -641,27 +641,36 @@ End of level sigil, pick up to end episode and return to jrstart.
 
 // NOTE - q100 code never used because q100 can run a rune server - think on this
 
+// fix initial server map load runes where random is on
 
-void () rune_spe =
+void () item_sigil_set =
 {
-bprint("RUNES = ");
-bprint(ftos(self.dmg));
-bprint(", rune = ");
-bprint(ftos(self.dodmg));
-bprint(", cvar = ");
-bprint(ftos(self.cnt));
-bprint(".\n");
+	if (RUNE_RANDOM)
+	{
+		if (self.owner.duration & 1) self.owner.spawnflags = rune_bit_code(MC_SIGIL1, 0);
+		else if (self.owner.duration & 2) self.owner.spawnflags = rune_bit_code(MC_SIGIL2, 0);
+		else if (self.owner.duration & 4) self.owner.spawnflags = rune_bit_code(MC_SIGIL4, 0);
+		else if (self.owner.duration & 8) self.owner.spawnflags = rune_bit_code(MC_SIGIL8, 0);
+	}
+	remove(self);
 };
 
 void () item_sigil =
 {
 	local float f, rune;
 
-	if (time < 2) // delay till we can read cvar - HUH?  dont freaking get why this is necc!
+	if (!RUNES)
+	if (time < PIC_TO)
 	{
-		self.nextthink = time + 1;
-		self.think = item_sigil;
-		return;
+		if (time < 2) // delay till we can read cvar - HUH?  dont freaking get why this is necc!  if this isnt done for an initial server start map load rune has sigil_touch set and things fail
+		{
+			self.nextthink = time + 1;
+			self.think = item_sigil;
+			return;
+		}
+		rune = FALSE;
+		if (RUNES != cvar("sv_c_rune")) rune = cvar("sv_c_rune"); // map load issue - 1st map loaded has no RUNES val here for map load runes
+		chaos_spawn(0, 0, 0, 0,  v0, v0, v0, v0, v0, "", "", SUB_Null, PIC_TO, item_sigil_set, SUB_Null, self, world); // random rune spawnflags fix
 	}
 
 	if (!self.spawnflags)
@@ -691,7 +700,7 @@ void () item_sigil =
 	self.noise = "misc/runekey.wav";
 
 	self.duration = 0;
-	if (self.class_select != "q3_item")
+	if (self.class_select != "q3_item") // TDO: remove once q3 art are done
 	if (time < PIC_TO) // make sure map runes load the correct appearance even if powers change
 	{
 		self.duration = self.spawnflags & RUNE_MASK_ALL;
@@ -731,15 +740,6 @@ void () item_sigil =
 	if (time > PIC_TO)
 	if(self.map == "")
 		self.map = "rune"; // Cataboligne - 5.32.10 - for rune server
-
-	rune = FALSE;
-	if (RUNES != cvar("sv_c_rune")) rune = cvar("sv_c_rune"); // map load issue - 1st map loaded has no RUNES val here for map load runes
-
-local entity e;
-e = chaos_spawn(0, 0, 0, 0,  v0, v0, v0, v0, v0, "", "", SUB_Null, 1,rune_spe, SUB_Null, self, world);
-e.dmg = RUNES;
-e.dodmg = rune;
-e.cnt = cvar("sv_c_rune");
 
 	if (RUNES || rune)
 		self.touch = rune_touch;

@@ -376,10 +376,11 @@ float PK_BULLETAMMO_MAX;
 float PK_SLUGAMMO_MAX;
 float PK_GASAMMO_MAX;
 
-// X fire
+// X stuff
 
 void(entity e, float trv) master_item_control;
 void(string tri, float trv) master_item_control_loop;
+void() x_pwr_touch;
 void(float velmul, float mvt, float flg, float ct, vector fmorg, vector vdr, string cname, string md, string sd, void() tch, float tht, void() thk, void() thd) fire_missile;
 void() melee_hit;
 void() player_plasma1;
@@ -482,10 +483,12 @@ void() doom_precache;
 
 float d_reps_base				= 57005000; // heh heh - DEAD+
 void() d_rep_set;
-float() mega_touch;
 void() d_weapon_touch;
 void() player_saw1;
 void() player_bfg1;
+
+float DOOM_BFG 				= 66603;
+float DOOM_BFG_TRACE			= 1024; // IDEA: adjust by doom to quake dist adjust for maps ?
 
 // q2
 
@@ -498,6 +501,9 @@ void() q2_weapon_shotgun;
 void() q2_item_health;
 void() X_FireHandGrenade;
 void() X_FireBlaster;
+
+float Q2_BFG 					= 66604;
+float Q2_BFG_TRACE			= 2048; // TDO: find real q2 trace limit
 
 // q3
 

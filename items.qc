@@ -322,7 +322,10 @@ void () armor_touch =
 		self.nextthink = time + 20;
 	self.think = SUB_regen;
 
+	if (self.netname != "Mega Sphere")
+	{
 	sprint(other, "You got armor\n");
+	}
 // armor touch sound
 	sound(other, CHAN_ITEM, snd, 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
