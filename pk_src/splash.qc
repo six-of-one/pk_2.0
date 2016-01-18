@@ -203,8 +203,6 @@ void() CheckWaterLevels =
 				}
 			}
 		}
-		else
-			e.endtime = 0;
 
 		e = find(e, water_notify, "yes");
 	}
