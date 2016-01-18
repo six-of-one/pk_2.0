@@ -53,6 +53,7 @@ void() doom_precache =
 
 // items
 	precache_model ("progs/barrel.mdl");
+	precache_model ("progs/barrel2.mdl");
 	precache_model ("progs/heal_bottle.mdl");
 	precache_model ("progs/heal_medkit.mdl");
 	precache_model ("progs/heal_stimpak.mdl");
@@ -183,7 +184,7 @@ void() d_item_healthbottle =
 	self.netname = "Health potion";
 	self.healamount = D_DEF_HBOTTLE;
 	self.healtype = HEAL_BOT;
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	self.alpha = 0.8;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
@@ -197,7 +198,7 @@ void() d_item_healthmedkit =
 	self.netname = "Health Medikit";
 	self.healamount = D_DEF_HMEDKIT;
 //	self.healtype = HEAL_NORM;
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -210,7 +211,7 @@ void() d_item_healthstimpak =
 	self.netname = "Health Stimpak";
 	self.healamount = D_DEF_HSTIMPAK;
 //	self.healtype = HEAL_NORM;
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -224,7 +225,7 @@ void() d_item_spiritarmor =
 //	self.skin = 0;
 	self.state = D_ARM_TBLU;
 	self.currentammo = ARM_SPIRIT;
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -238,7 +239,7 @@ void() d_item_armorgreen =
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Security armor";
 	self.state = D_ARM_TGRN;
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -252,7 +253,7 @@ void() d_item_armorblue =
 	self.netname = "Combat armor";
 	self.state = D_ARM_TBLU;
 	self.currentammo = D_ARM_BLUE; // 200 units
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -268,7 +269,7 @@ void() d_ammo_ammobox =
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Box of bullets";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -284,7 +285,7 @@ void() d_ammo_clip =
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "A clip";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -300,7 +301,7 @@ void() d_ammo_1rocket =
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Rocket";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -316,7 +317,7 @@ void() d_ammo_rockbox =
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Box of Rockets";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -332,7 +333,7 @@ void() d_ammo_4shell =
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "4 shells";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -348,7 +349,7 @@ void() d_ammo_shellbox =
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Box of Shells";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -364,7 +365,7 @@ void() d_ammo_cellbox =
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Box of cells";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -380,7 +381,7 @@ void() d_ammo_cellpack =
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Cells";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -391,7 +392,7 @@ void() d_barrel =
 	self.health = 20 + random() * 16; // heh heh
 	self.noise = "doom/dsbarexp.wav";
 	self.noise4 = "doom/dsitembk.wav";
-//	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+//	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -411,7 +412,7 @@ void() d_weapon_bfg =
 
 void() d_weapon_rocketlauncher =
 {
-	weapon_rocketlauncher();
+	q100_weapon_rocketlauncher();
 
 // fn
 	self.touch = d_weapon_touch;
@@ -614,7 +615,7 @@ void() d_art_soulsphere =
 	self.healamount = D_DEF_SOULSPH;
 	self.healtype = HEAL_SOUL;
 	self.wait = D_POWER_WAIT;
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -632,7 +633,7 @@ void() d_art_megasphere =
 	self.healamount = D_DEF_SOULSPH;
 	self.healtype = HEAL_SOUL;
 	self.wait = D_POWER_WAIT;
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -645,7 +646,7 @@ void() d_art_invulnerable =
 	self.skin = 2;
 	self.netname = "Invulnerability";
 	self.wait = D_POWER_WAIT;
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -659,6 +660,7 @@ void() d_art_invisible =
 	self.netname = "Invisibilty";
 	self.wait = D_POWER_WAIT;
 	self.delay = POW_TIME; // usage time
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -670,7 +672,7 @@ void() d_art_radsuit =
 	self.delay = POW_TIME;
 	self.netname = "Radiation Suit";
 	self.wait = D_POWER_WAIT;
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -683,7 +685,7 @@ void() d_key_redskull =
 	setmodel (self, "progs/d_skullkey.mdl");
 	self.skin = 0;
 	self.netname = "Red Skull key";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -695,7 +697,7 @@ void() d_key_blueskull =
 	setmodel (self, "progs/d_skullkey.mdl");
 	self.skin = 1;
 	self.netname = "Blue Skull key";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -707,7 +709,7 @@ void() d_key_yellowskull =
 	setmodel (self, "progs/d_skullkey.mdl");
 	self.skin = 2;
 	self.netname = "Yellow Skull key";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -719,7 +721,7 @@ void() d_key_redcard =
 	setmodel (self, "progs/d_cardkey.mdl");
 	self.skin = 0;
 	self.netname = "Red card key";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -731,7 +733,7 @@ void() d_key_bluecard =
 	setmodel (self, "progs/d_cardkey.mdl");
 	self.skin = 1;
 	self.netname = "Blue card key";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -743,7 +745,7 @@ void() d_key_yellowcard =
 	setmodel (self, "progs/d_cardkey.mdl");
 	self.skin = 2;
 	self.netname = "Yellow card key";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "doom_item";
 };
 
@@ -835,7 +837,7 @@ void() w_fire_motar =
 
 void() w_weapon_mortar =
 {
-	weapon_rocketlauncher();
+	q100_weapon_rocketlauncher();
 
 // fn
 	self.touch = d_weapon_touch;
@@ -864,7 +866,7 @@ void() w_weapon_mortar =
 
 void() w_weapon_flamer =
 {
-	weapon_grenadelauncher();
+	q100_weapon_grenadelauncher();
 
 	self.netname = "Flame Thrower";
 	setmodel (self, "progs/w_flamer.mdl");
@@ -939,7 +941,22 @@ void() w_ammo_clip =
 	self.noise = "wolf/pickup_am.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "A clip";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "wolf_item";
+};
+
+void() w_art_facesphere =
+{
+	item_health();
+	setmodel(self, "progs/d_spheres.mdl");
+	self.skin = 4;
+	self.noise = "wolf/pickup_gdy.wav";
+	self.noise4 = "doom/dsitembk.wav";
+	self.netname = "Face Sphere";
+	self.healamount = 100;
+	self.healtype = HEAL_SOUL;
+	self.wait = D_POWER_WAIT;
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "wolf_item";
 };
 
@@ -955,7 +972,7 @@ void() w_key =
 
 	self.netname = "Blue key";
 	if (self.spawnflags & 1) self.netname = "Gold key";
-	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "wolf_item";
 };
 
@@ -971,6 +988,32 @@ void() w_key_b =
 	self.spawnflags = 2;
 	self.skin = 2;
 	w_key();
+};
+
+void() w_barl_solid =
+{
+	self.owner.solid = SOLID_BBOX;
+	self.owner.pk_touch = SUB_Null;
+	remove(self);
+};
+
+void() w_barrel =
+{
+	local entity e;
+	e = spawn();
+	if (e)
+	{
+		e.owner = self;
+		e.think = w_barl_solid;
+		e.nextthink = time  + 1;
+	}
+	self.netname = "Barrel";
+	setmodel (self, "progs/barrel2.mdl");
+	self.frame = 1;
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "wolf_item";
+//	setsize (self, '-16 -16 -24', '16 16 32');
+	StartItem ();
 };
 
 // code to run doom ents
@@ -1062,17 +1105,20 @@ void() d_weapon_touch =
 	if (leave && (other.items & self.items))	return ;
 	new = self.items;
 
-	if (self.classname == "q2_weapon_rocketlauncher" || self.classname == "d_weapon_rocketlauncher" || self.classname == "w_weapon_mortar")
+	if (self.classname == "q2_weapon_rocketlauncher" || self.classname == "q3_weapon_rocketlauncher" ||
+		self.classname == "q3_weapon_grenadelauncher" || self.classname == "q2_weapon_grenadelauncher" ||
+		self.classname == "d_weapon_rocketlauncher" || self.classname == "w_weapon_mortar")
 	{
 	other.ammo_rockets = other.ammo_rockets + self.currentammo; // TDO: ammo type fn
 	camc = other.ammo_rockets;
 	}
-	else if (self.classname == "d_weapon_shotgun" || self.classname == "d_weapon_supershotgun")
+	else if (self.classname == "d_weapon_shotgun" || self.classname == "d_weapon_supershotgun" || self.classname == "q3_weapon_shotgun")
 	{
 	other.ammo_shells = other.ammo_shells + self.currentammo;
 	camc = other.ammo_shells;
 	}
 	else if (self.classname == "d_weapon_pistol" || self.classname == "d_weapon_chaingun"
+					|| self.classname == "q3_weapon_machinegun"
 					|| self.classname == "w_weapon_machinegun"
 					|| self.classname == "w_weapon_chaingun"
 					|| self.classname == "w_weapon_pistol")
@@ -1171,26 +1217,31 @@ void() d_weapon_touch =
 
 void() wchg2_weapon_touch =
 {
-	if (!vchk(self.items, 0, other.vwepent))
+	local entity e;
+
+	e = vchk(weaponnum, 0, self.vwepent);
+	if (e.eweapon)
 	{
-		d_weapon_touch();
-		return;
+		if (e.eweapon.mdl == "progs/vw_w_chaing.mdl")
+		{
+			self.items = IT_LIGHTNING;
+			self.dmg_save = 2;
+			self.dmg_take = 4;
+			self.punchangle = ' 0.07 0.07 0';
+
+			self.netname = "Dual Chain Gun";
+
+			self.weaponmodel = "progs/v_w_2chg.mdl";
+			self.vwepmdl = "progs/vw_w_2chaing.mdl";
+
+			d_weapon_touch();
+			w_chg_base();
+			self.model = string_null;
+			return;
+		}
 	}
-	if (!vchk(IT_LIGHTNING, 0, other.vwepent))
-	{
-		self.items = IT_LIGHTNING;
-		self.dmg_save = 2;
-		self.dmg_take = 4;
-		self.punchangle = ' 0.07 0.07 0';
 
-		self.netname = "Dual Chain Gun";
-
-		self.weaponmodel = "progs/v_w_2chg.mdl";
-		self.vwepmdl = "progs/vw_w_2chaing.mdl";
-
-		d_weapon_touch();
-		w_chg_base();
-	}
+	d_weapon_touch();
 };
 
 

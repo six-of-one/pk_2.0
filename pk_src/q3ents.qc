@@ -11,47 +11,132 @@
  */
 
 
+// q3 values
+
+float Q3_DEFW					= 123;
+float Q3_DEFA					= 100;
+
+float Q3_MAX					= 200;
+
+// ammo skins in mdl
+float q3_bfg_amsk				= 0;
+float q3_rail_amsk			= 1;
+float q3_plasma_amsk			= 2;
+float q3_lightn_amsk			= 3;
+float q3_rocket_amsk			= 4;
+float q3_grenade_amsk		= 5;
+float q3_shot_amsk			= 6;
+float q3_mach_amsk			= 7;
+
+float Q3_BFG_AMMO				= 15;
+float Q3_SLUG_AMMO			= 10;
+float Q3_CELL_AMMO			= 30;
+float Q3_ELEX_AMMO			= 60;
+float Q3_ROCK_AMMO			= 5;
+float Q3_GREN_AMMO			= 5;
+float Q3_SHOT_AMMO			= 10;
+float Q3_BULLET_AMMO			= 50;
+
+float Q3_ARM_RED				= 100;
+float Q3_ARM_YEL				= 50;
+float Q3_ARM_SHARD			= 5;
+float Q3_ARM_MAX				= 200;
+
+float Q3_WEP_WAIT				= 5;
+float Q3_AMMO_WAIT			= 40;
+float Q3_POWER_WAIT			= 120;
+float Q3_HEAL_WAIT			= 35;
+float Q3_ARM_WAIT				= 25;
+
 /*
+float Q3_HEALLG				= 0; // skin ? - not needed for now
+float Q3_HEALMD				= 1;
+float Q3_HEAL5					= 2;
+float Q3_HEALM					= 3;
+*/
+
+float Q3_HEALLG_A				= 50;
+float Q3_HEALMD_A				= 25;
+float Q3_HEAL5_A				= 5;
+float Q3_HEALM_A				= 100;
+
+vector Q3_LIFT					= ' 0 0 20'; // q3 models sit too "low" - lift them by this on spawn
+
+string Q3_BOBHOFF				= "cl_itembobheight 0\n"; // q3 item bob height off setting
+string Q3_BOBH					= "cl_itembobheight 8\n"; // q3 item bob height default - compile as 0 to disable (server cfg parm?)
+string Q3_BOBHALIAS			= "q3bobheight\n"; // q3 item bob height alias to run
+
+float q3_bob_on; // server cfg this to 1 for total disable
+// for q3 maps
+// = 0, q3 bob is off
+// = 1, q3 bob is activated
+// = -1 q3 bob is waiting activation by player stuff - items cant stuff
+
+void() q3_precache =
+{
+//	precache_model ("");
+//	precache_sound ("");
+
+// all ammo
+	precache_model ("progs/q3_ammobox.mdl");
+// weps
+	precache_model ("progs/q3_shot.mdl");
+	precache_model ("progs/q3_rl.mdl");
+	precache_model ("progs/q3_rail.mdl");
+	precache_model ("progs/q3_bfg.mdl");
+	precache_model ("progs/q3_gl.mdl");
+	precache_model ("progs/q3_lg.mdl");
+	precache_model ("progs/q3_mgun.mdl");
+	precache_model ("progs/q3_gauntlet.mdl");
+
+// 1pv
+	precache_model ("progs/v_q3_shot.mdl");
+	precache_model ("progs/v_q3_bfg.mdl");
+	precache_model ("progs/v_q3_gl.mdl");
+	precache_model ("progs/v_q3_hawk.mdl");
+	precache_model ("progs/v_q3_mgun.mdl");
+	precache_model ("progs/v_q3_mini.mdl");
+	precache_model ("progs/v_q3_plg.mdl");
+	precache_model ("progs/v_q3_rail.mdl");
+	precache_model ("progs/v_q3_rl.mdl");
+// carry
+	precache_model ("progs/vw_q3_ssg.mdl");
+	precache_model ("progs/vw_q3_bfg.mdl");
+	precache_model ("progs/vw_q3_gl.mdl");
+	precache_model ("progs/vw_q3_lg.mdl");
+	precache_model ("progs/vw_q3_mg.mdl");
+	precache_model ("progs/vw_q3_plg.mdl");
+	precache_model ("progs/vw_q3_rail.mdl");
+	precache_model ("progs/vw_q3_rl.mdl");
+
+
+// hear it
+	precache_sound ("q3_snd/am_pkup.wav");
+	precache_sound ("q3_snd/w_pkup.wav");
+	precache_sound ("q3_snd/respawn1.wav");
+// fire
+	precache_sound ("q3_snd/sshotf1b.wav");
+	precache_sound ("q3_snd/machgf1b.wav");
+};
+
+// bob em - needs called from client capable of stuff cmd
+void() q3_bob_height =
+{
+	if (q3_bob_on > 0) return;
+	if (q3_bob_on == 0) q3_bob_on = -1;
+	if (!self.flags & FL_CLIENT) return;
+
+	q3_bob_on = 1;
+	stuffcmd(self, Q3_BOBH); // bob q3 items, heh heh
+	stuffcmd(self, Q3_BOBHALIAS); // alias override
+};
+
+/*
+deprecating for full support - need this in translate
 
 q3 support via translation
 
-q3 wep					pk wep
-------------------------------------------
-bfg						chain_lg
-plasma					chain_lg
-machinegun				supernailgun / nailgun
-shotgun					supershotgun
-grapplinghook			harpoon
-railgun					gravity well / turret
-lighting					lighting
-------------------------------------------
-slugs						explodeshells
-grenades					rockets
-lightning				cells
-bfg						cells
-------------------------------------------
-armor shard				beartrap
-item_armor_combat		item_armor2
-item_armor_body		item_armorInv
-------------------------------------------
-item health sm			candle
-item_health_large		item_health
-item_health_mega		item_health
-------------------------------------------
-item_quad				item_artifact_super_damage
-item_regen				item_artifact_invulnerability
-item_invis				item_artifact_invisibility
-item_enviro				item_artifact_envirosuit
-------------------------------------------
-holdable_medkit		item_painkeep_can
-holdable_teleporter	item_pkplus_phone
-
-FIX FIX FIX
-
 - precache needed !
-
-SV_ModelIndex("progs/v_reggun.mdl"): not precached (fix your code), precaching anyway
-SV_ModelIndex("progs/v_q3_mgun.mdl"): not precached (fix your code), precaching anyway
 
 SV_SoundIndex("sound/misc/w_pkup.wav"): not precached (fix your code), precaching anyway
 SV_SoundIndex("sound/misc/am_pkup.wav"): not precached (fix your code), precaching anyway
@@ -59,7 +144,6 @@ SV_SoundIndex("sound/items/respawn1.wav"): not precached (fix your code), precac
 SV_SoundIndex("reggun/fire4.wav"): not precached (fix your code), precaching anyway
 SV_SoundIndex("sound/weapons/machinegun/machgf1b.wav"): not precached (fix your code), precaching anyway
 SV_SoundIndex("sound/weapons/rocket/rocklf1a.wav"): not precached (fix your code), precaching anyway
-
 
 */
 
@@ -105,51 +189,227 @@ void() weapon_plasmagun =
 
 /*QUAKED weapon_machinegun (0 .5 .8) (-16 -16 0) (16 16 32)
 */
+
+// doing the same way even tho q3 doesnt offer a dbl yet
+void() q3_mg_base =
+{
+// stats
+	self.items = IT_SUPER_NAILGUN;
+	self.currentammo = 100;
+	self.lip = AMMO_BULLETS;
+	self.attack_finished = 0.1; // 10 per
+	self.dmg = 7;
+	self.dmg_save = 1;
+	self.dmg_take = 1;
+	self.punchangle = ' 0.025 0.025 0';
+
+	self.netname = "Machine Gun";
+
+	setmodel (self, "progs/q3_mgun.mdl");
+	self.weaponmodel = "progs/v_q3_mgun.mdl";
+	self.vwepmdl = "progs/vw_q3_mg.mdl";
+};
+
+void() q3_weapon_machinegun =
+{
+	weapon_nailgun();
+
+	q3_mg_base();
+	self.touch = d_weapon_touch;//wchg2_weapon_touch;
+	self._attack = SUB_Null;
+	self._fr_attack = player_mgchg1;
+
+	self.noise = "q3_snd/w_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.noise3 = "q3_snd/machgf1b.wav";
+
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
+};
+
 void() weapon_machinegun =
 {
-	if (random() < 0.6)
-	{
-		self.classname = "weapon_supernailgun";
-		weapon_supernailgun();
-	}
-	else
-	{
-		self.classname = "weapon_nailgun";
-		weapon_nailgun();
-	}
-
-	if (self.spawnflags & SUSPENDED) q3_suspend();
-};
+	if (world.wad == "")
+		q3_weapon_machinegun();
+	else // if (world.wad == "q2.wad")
+		q2_weapon_machinegun();
+}
 
 /*QUAKED weapon_shotgun (0 .5 .8) (-16 -16 0) (16 16 32)
-
-// moved to mcode for upgrades
-
-void() weapon_shotgun =
-{
-	self.classname = "weapon_supershotgun";
-	weapon_supershotgun();
-
-	if (self.spawnflags & SUSPENDED) q3_suspend();
-};
 */
+
+void() q3_weapon_shotgun =
+{
+	weapon_supershotgun();
+	self.netname = "Shotgun";
+
+	self.touch = d_weapon_touch;
+	self._attack = X_FireHitscan;
+	self._fr_attack = player_shot1;
+
+	self.currentammo = Q3_SHOT_AMMO;
+	self.items = IT_SUPER_SHOTGUN;
+	self.lip = AMMO_SHELLS;
+	self.attack_finished = 1;
+	self.dmg = 10;
+	self.dmg_save = 2;
+	self.dmg_take = 11; // shot cnt
+	self.punchangle = ' 0.14 0.08 0'; // bullet spread out -- TDO: get doom value, this is q1
+
+	setmodel (self, "progs/q3_shot.mdl");
+	self.weaponmodel = "progs/v_q3_shot.mdl";
+	self.vwepmdl = "progs/vw_q3_ssg.mdl";
+	self.noise = "q3_snd/w_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.noise3 = "q3_snd/sshotf1b.wav";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
+};
+
+void() q3_weapon_rocketlauncher =
+{
+	q100_weapon_rocketlauncher();
+
+// fn
+	self.touch = d_weapon_touch;
+	self._attack = W_FireRocket;
+	self._fr_attack = player_rocket1;
+// stats
+	self.currentammo = 10;
+	self.items = IT_ROCKET_LAUNCHER;
+	self.lip = AMMO_ROCKETS;
+	self.attack_finished = 0.8;
+	self.dmg = 100;
+	self.dodmg = 120; // splash
+	self.dmg_save = 1;
+
+// appearances
+	setmodel (self, "progs/q3_rl.mdl");
+	self.weaponmodel = "progs/v_q3_rl.mdl";
+	self.vwepmdl = "progs/vw_q3_rl.mdl";
+	self.noise = "q3_snd/w_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.noise3 = "q3_snd/rocklf1a.wav";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
+};
+
+void () weapon_rocketlauncher =
+{
+	if (world.wad == "q2.wad")
+	{
+		q2_weapon_rocketlauncher();
+		return;
+	}
+	else if (world.wad == "")
+	{
+		q3_weapon_rocketlauncher(); 
+		return;
+	}
+
+	q100_weapon_rocketlauncher();
+};
+
+void () q3_weapon_grenadelauncher =
+{
+	q100_weapon_grenadelauncher();
+
+// fn
+	self.touch = d_weapon_touch;
+	self._attack = W_FireGrenade;
+	self._fr_attack = player_rocket1;
+// stats
+	self.currentammo = 10;
+	self.items = IT_GRENADE_LAUNCHER;
+	self.lip = AMMO_ROCKETS;
+	self.attack_finished = 0.8;
+	self.dmg = 100;
+	self.dodmg = 150; // splash
+	self.dmg_save = 1;
+
+// appearances
+	setmodel (self, "progs/q3_gl.mdl");
+	self.weaponmodel = "progs/v_q3_gl.mdl";
+	self.vwepmdl = "progs/vw_q3_gl.mdl";
+	self.noise = "q3_snd/w_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.noise3 = "q3_snd/grenlf1a.wav";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
+};
+
+void () weapon_grenadelauncher =
+{
+	if (world.wad == "q2.wad")
+	{
+		q2_weapon_grenadelauncher();
+		return;
+	}
+	else if (world.wad == "")
+	{
+		q3_weapon_grenadelauncher(); 
+		return;
+	}
+
+	q100_weapon_grenadelauncher();
+};
+
+void () weapon_gauntlet =
+{
+	weapon_axe();
+	self.netname = "Gauntlet";
+
+	self.touch = d_weapon_touch;
+//	self._attack = X_FireHitscan;
+//	self._fr_attack = player_shot1;
+
+	self.currentammo = 0;
+	self.items = IT_NAILGUN; // IT_AXE; // test
+	self.lip = 0;
+	self.attack_finished = 0.4;
+	self.dmg = 50;
+	self.dmg_save = 0;
+	self.dmg_take = 1; // shot cnt
+
+	setmodel (self, "progs/q3_gauntlet.mdl");
+//	self.weaponmodel = "progs/v_q3_.mdl";
+//	self.vwepmdl = "progs/vw_q3_.mdl";
+	self.noise = "q3_snd/w_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+//	self.noise3 = "q3_snd/sshotf1b.wav";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
+};
+
 
 /*QUAKED weapon_grapplinghook (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
 void () weapon_grapplinghook =
 {
-	self.classname = "weapon_grapgun";
-	self.touch = painkeep_weapon_touch;
+	weapon_axe();
+	self.netname = "Grappling hook";
 
-	precache_model ("progs/g_harp.mdl");
-	setmodel (self,"progs/g_harp.mdl");
-	self.pk_currentitem = PK_IT_GRAPGUN;
-	self.netname = "Harpoon Gun";
-	setsize (self,'-16 -16 0','16 16 56');
-	StartItem ();
+	self.touch = d_weapon_touch;
+//	self._attack = X_FireHitscan;
+//	self._fr_attack = player_shot1;
 
-	if (self.spawnflags & SUSPENDED) q3_suspend();
+	self.currentammo = 0;
+	self.items = IT_NAILGUN; // IT_AXE; // test
+	self.lip = 0;
+	self.attack_finished = 0.5;
+	self.dmg = 5;
+	self.dmg_save = 0;
+	self.dmg_take = 1; // shot cnt
+
+	setmodel (self, "progs/q3_grapple.mdl");
+//	self.weaponmodel = "progs/v_q3_.mdl";
+//	self.vwepmdl = "progs/vw_q3_.mdl";
+	self.noise = "q3_snd/w_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+//	self.noise3 = "q3_snd/sshotf1b.wav";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
 };
 
 //weapon_lightning - already exists
@@ -180,51 +440,100 @@ void() weapon_railgun =
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 };
 
-void() ammo_bullets =
+void() q3_ammo_bullets =
 {
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 
-	self.spawnflags = self.spawnflags | 1;
-//	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_spikes";
 	item_spikes();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_BULLETS;
+	self.currentammo = Q3_BULLET_AMMO;
+
+	self.classname = "ammo_bullets";
+	setmodel (self, "progs/q3_ammobox.mdl");
+	self.skin = q3_mach_amsk;
+	self.noise = "q3_snd/am_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.netname = "Bullets";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
+}
+
+void() ammo_bullets =
+{
+	if (world.wad == "")
+		q3_ammo_bullets();
+	else // if (world.wad == "q2.wad")
+		q2_ammo_bullets();
+};
+
+void() q3_ammo_grenades =
+{
+	if (self.spawnflags & SUSPENDED) q3_suspend();
+
+	item_spikes();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_ROCKETS;
+	self.currentammo = Q3_GREN_AMMO;
+
+	self.classname = "ammo_grenades";
+	setmodel (self, "progs/q3_ammobox.mdl");
+	self.skin = q3_grenade_amsk;
+	self.noise = "q3_snd/am_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.netname = "Grenades";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
 }
 
 void() ammo_grenades =
 {
-	if (self.spawnflags & SUSPENDED) q3_suspend();
-
-	self.spawnflags = self.spawnflags | 1; // big
-//	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_rockets";
-	item_rockets();
+	if (world.wad == "")
+		q3_ammo_grenades();
+	else // if (world.wad == "q2.wad")
+		q2_ammo_grenades();
 }
 
 void() ammo_lightning =
 {
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 
-	local entity e;
-	self.spawnflags = self.spawnflags | 1;
-//	setorigin(self, self.origin + ' 0 0 16');
-	item_cells();
-	e = spawn();
-	setorigin(e, self.origin);
-	e.spawnflags = self.spawnflags;
-	self = e;
-//	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_cells";
-	item_cells();
+	item_shells();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_CELLS;
+	self.currentammo = Q3_ELEX_AMMO;
+
+	self.classname = "ammo_lightning";
+	setmodel (self, "progs/q3_ammobox.mdl");
+	self.skin = q3_lightn_amsk;
+	self.noise = "q3_snd/am_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.netname = "Cells";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
 }
 
 void() ammo_bfg =
 {
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 
-	self.spawnflags = self.spawnflags | 1;
-//	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_cells";
-	item_cells();
+	item_shells();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_CELLS; // FIX
+	self.currentammo = Q3_BFG_AMMO;
+
+	self.classname = "ammo_bfg";
+	setmodel (self, "progs/q3_ammobox.mdl");
+	self.skin = q3_bfg_amsk;
+	self.noise = "q3_snd/am_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.netname = "Cells";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
 }
 
 // spawnfunc_ - because quake already has variables ammo_* and the function names cannot be used
@@ -234,45 +543,119 @@ void() ammo_bfg =
 //ammo_rockets
 //ammo_cells
 
+void() q3_ammo_shells =
+{
+	if (self.spawnflags & SUSPENDED) q3_suspend();
+
+	item_shells();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_SHELLS;
+	self.currentammo = Q3_SHOT_AMMO;
+
+	self.classname = "ammo_shells";
+	setmodel (self, "progs/q3_ammobox.mdl");
+	self.skin = q3_shot_amsk;
+	self.noise = "q3_snd/am_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.netname = "Shells";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
+}
+
 void() spawnfunc_ammo_shells =
 {
-//	self.spawnflags = self.spawnflags | 1;
-//	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_shells";
-	item_shells();
-
-	if (self.spawnflags & SUSPENDED) q3_suspend();
+	if (world.wad == "")
+		q3_ammo_shells();
+	else // if (world.wad == "q2.wad")
+		q2_ammo_shells();
 };
+
+void() q3_ammo_rockets =
+{
+	if (self.spawnflags & SUSPENDED) q3_suspend();
+
+	item_shells();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_ROCKETS;
+	self.currentammo = Q3_ROCK_AMMO;
+
+	self.classname = "ammo_rockets";
+	setmodel (self, "progs/q3_ammobox.mdl");
+	self.skin = q3_rocket_amsk;
+	self.noise = "q3_snd/am_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.netname = "Rockets";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
+}
 
 void() spawnfunc_ammo_rockets =
 {
-	if (self.spawnflags & SUSPENDED) q3_suspend();
-
-	self.spawnflags = self.spawnflags | 1; // q3 rockets are 10 pk
-//	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_rockets";
-	item_rockets();
+	if (world.wad == "")
+		q3_ammo_rockets();
+	else // if (world.wad == "q2.wad")
+		q2_ammo_rockets();
 };
 
-void() spawnfunc_ammo_cells =
+void() q3_ammo_cells =
 {
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 
-	self.spawnflags = self.spawnflags | 1; // big - note conflicts with suspend
-//	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_cells";
-	item_cells();
+	item_shells();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_CELLS;
+	self.currentammo = Q3_CELL_AMMO;
+
+	self.classname = "ammo_cells";
+	setmodel (self, "progs/q3_ammobox.mdl");
+	self.skin = q3_plasma_amsk;
+	self.noise = "q3_snd/am_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.netname = "Cells";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
+}
+
+void() spawnfunc_ammo_cells =
+{
+	if (world.wad == "")
+		q3_ammo_cells();
+	else // if (world.wad == "q2.wad")
+		q2_ammo_cells();
 };
 
 //ammo_slugs
 
+void() q3_ammo_slugs =
+{
+	if (self.spawnflags & SUSPENDED) q3_suspend();
+
+	item_shells();
+	self.touch = pk_ammo_touch;
+
+	self.lip = AMMO_SLUGS;
+	self.currentammo = Q3_SLUG_AMMO;
+
+	self.classname = "ammo_slugs";
+	setmodel (self, "progs/q3_ammobox.mdl");
+	self.skin = q3_rail_amsk;
+	self.noise = "q3_snd/am_pkup.wav";
+	self.noise4 = "q3_snd/respawn1.wav";
+	self.netname = "Slugs";
+	self.effects = self.effects | EF_FULLBRIGHT;
+	if (self.class_select == "") self.class_select = "q3_item";
+}
+
+
 void() ammo_slugs =
 {
-	self.classname = "item_painkeep_expshells";
-//	setorigin(self, self.origin + ' 0 0 16');
-	item_painkeep_expshells();
-
-	if (self.spawnflags & SUSPENDED) q3_suspend();
+	if (world.wad == "")
+		q3_ammo_slugs();
+	else // if (world.wad == "q2.wad")
+		q2_ammo_slugs();
 };
 
 

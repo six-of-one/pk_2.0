@@ -135,8 +135,8 @@ void(string cls) item_call =
 	else if (cls == "weapon_supershotgun") weapon_supershotgun();
 	else if (cls == "weapon_nailgun") weapon_nailgun();
 	else if (cls == "weapon_supernailgun") weapon_supernailgun();
-	else if (cls == "weapon_grenadelauncher") weapon_grenadelauncher();
-	else if (cls == "weapon_rocketlauncher") weapon_rocketlauncher();
+	else if (cls == "weapon_grenadelauncher") q100_weapon_grenadelauncher();
+	else if (cls == "weapon_rocketlauncher") q100_weapon_rocketlauncher();
 	else if (self.classname == "dyn_item" && cls == "weapon_lightning")
 	{
 		if (PK) weapon_chainlg();
@@ -266,6 +266,7 @@ void(string cls) item_call =
 	else if (cls == "w_ammo_clip") w_ammo_clip();
 	else if (cls == "w_key_g") w_key_g();
 	else if (cls == "w_key_b") w_key_b();
+	else if (cls == "w_barrel") w_barrel();
 
 	else return;
 	self.mdl = self.model;

@@ -879,9 +879,35 @@ void() check_translate =
 
 };
 
-// common item temp code - does nothing for now
-
-void() q3_weapon_rocketlauncher =
-{
-	SUB_Nop();
-};
+/*
+q3 wep					pk wep
+------------------------------------------
+bfg						chain_lg
+plasma					chain_lg
+machinegun				supernailgun / nailgun
+shotgun					supershotgun
+grapplinghook			harpoon
+railgun					gravity well / turret
+lighting					lighting
+------------------------------------------
+slugs						explodeshells
+grenades					rockets
+lightning				cells
+bfg						cells
+------------------------------------------
+armor shard				beartrap
+item_armor_combat		item_armor2
+item_armor_body		item_armorInv
+------------------------------------------
+item health sm			candle
+item_health_large		item_health
+item_health_mega		item_health
+------------------------------------------
+item_quad				item_artifact_super_damage
+item_regen				item_artifact_invulnerability
+item_invis				item_artifact_invisibility
+item_enviro				item_artifact_envirosuit
+------------------------------------------
+holdable_medkit		item_painkeep_can
+holdable_teleporter	item_pkplus_phone
+*/

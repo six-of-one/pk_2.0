@@ -749,12 +749,22 @@ void() PK_SetCurrentAmmoOnly =
 	{
 		if (self.eweapon.lip)
 		{
-			if (self.eweapon.lip == AMMO_SHELLS)
-				self.currentammo = self.ammo_shells;
-			else if (self.eweapon.lip == AMMO_BULLETS)
+			if (self.eweapon.lip == AMMO_BULLETS)
 				self.currentammo = self.ammo_bullet;
+			else if (self.eweapon.lip == AMMO_SHELLS)
+				self.currentammo = self.ammo_shells;
+			else if (self.eweapon.lip == AMMO_CELLS)
+				self.currentammo = self.ammo_cells;
+			else if (self.eweapon.lip == AMMO_NAILS)
+				self.currentammo = self.ammo_nails;
 			else if (self.eweapon.lip == AMMO_ROCKETS)
 				self.currentammo = self.ammo_rockets;
+			else if (self.eweapon.lip == AMMO_GRENADES)
+				self.currentammo = self.ammo_rockets;
+			else if (self.eweapon.lip == AMMO_SLUGS)
+				self.currentammo = self.ammo_slug;
+			else if (self.eweapon.lip == AMMO_NONE)
+				self.currentammo = 1;
 		}
 		self.weaponframe = 0;
 	}
@@ -764,6 +774,7 @@ void() PK_SetCurrentAmmoOnly =
 		{
 			self.weaponmodel = "";
 		}
+
 };
 
 // called from many places
@@ -792,6 +803,8 @@ New for PainKeep, makes things a whole lot simplier
 
 float(float weaponnum, float pknum) HasAmmo =
 {
+	local entity e;
+
 	if (weaponnum == IT_AXE)
 	{
 		if (pknum == PK_IT_CLIGHT)
@@ -845,40 +858,102 @@ float(float weaponnum, float pknum) HasAmmo =
 // end pk_art
 	}
 	else	if (!ammo_con(weaponnum, self, "wpck"))
-	if (weaponnum == IT_SHOTGUN)
 	{
-		if (self.ammo_shells < 1 && self.pk_explode_ammo < 1)
-			return FALSE;
-	}
-	else if (weaponnum == IT_SUPER_SHOTGUN)
-	{
-		if (self.ammo_shells < 2 && self.pk_explode_ammo < 2)
-			return FALSE;
-	}
-	else if (weaponnum == IT_NAILGUN)
-	{
-		if (self.ammo_nails < 1)
-			return FALSE;
-	}
-	else if (weaponnum == IT_SUPER_NAILGUN)
-	{
-		if (self.ammo_nails < 2)
-			return FALSE;
-	}
-	else if (weaponnum == IT_GRENADE_LAUNCHER)
-	{
-		if (self.ammo_rockets < 1)
-			return FALSE;
-	}
-	else if (weaponnum == IT_ROCKET_LAUNCHER)
-	{
-		if (self.ammo_rockets < 1)
-			return FALSE;
-	}
-	else if (weaponnum == IT_LIGHTNING)
-	{
-		if (self.ammo_cells < 1)
-			return FALSE;
+		e = vchk(weaponnum, 0, self.vwepent);
+		if (e.eweapon) // the selection has eweap code
+		{
+			if (e.eweapon.lip == AMMO_NONE)
+				return TRUE;
+			else if (e.eweapon.lip == AMMO_SHELLS)
+			{
+				if (self.ammo_shells >= e.eweapon.dmg_save)
+					return TRUE;
+				else
+					return FALSE;
+			}
+			else if (e.eweapon.lip == AMMO_NAILS)
+			{
+				if (self.ammo_nails >= e.eweapon.dmg_save)
+					return TRUE;
+				else
+					return FALSE;
+			}
+			else if (e.eweapon.lip == AMMO_BULLETS)
+			{
+				if (self.ammo_bullet >= e.eweapon.dmg_save)
+					return TRUE;
+				else
+					return FALSE;
+			}
+			else if (e.eweapon.lip == AMMO_SLUGS)
+			{
+				if (self.ammo_slug >= e.eweapon.dmg_save)
+					return TRUE;
+				else
+					return FALSE;
+			}
+			else if (e.eweapon.lip == AMMO_CELLS)
+			{
+				if (self.ammo_cells >= e.eweapon.dmg_save)
+					return TRUE;
+				else
+					return FALSE;
+			}
+			else if (e.eweapon.lip == AMMO_ROCKETS)
+			{
+				if (self.ammo_rockets >= e.eweapon.dmg_save)
+					return TRUE;
+				else
+					return FALSE;
+			}
+			else if (e.eweapon.lip == AMMO_GRENADES)
+			{
+				if (self.ammo_rockets >= e.eweapon.dmg_save)
+					return TRUE;
+				else
+					return FALSE;
+			}
+			else if (e.eweapon.lip)
+			{
+				if (WARNING) bprint(" *** Warning: eweapon ammo type not recognized.\n");
+				return FALSE;
+			}
+		}
+		if (weaponnum == IT_SHOTGUN)
+		{
+			if (self.ammo_shells < 1 && self.pk_explode_ammo < 1)
+				return FALSE;
+		}
+		else if (weaponnum == IT_SUPER_SHOTGUN)
+		{
+			if (self.ammo_shells < 2 && self.pk_explode_ammo < 2)
+				return FALSE;
+		}
+		else if (weaponnum == IT_NAILGUN)
+		{
+			if (self.ammo_nails < 1)
+				return FALSE;
+		}
+		else if (weaponnum == IT_SUPER_NAILGUN)
+		{
+			if (self.ammo_nails < 2)
+				return FALSE;
+		}
+		else if (weaponnum == IT_GRENADE_LAUNCHER)
+		{
+			if (self.ammo_rockets < 1)
+				return FALSE;
+		}
+		else if (weaponnum == IT_ROCKET_LAUNCHER)
+		{
+			if (self.ammo_rockets < 1)
+				return FALSE;
+		}
+		else if (weaponnum == IT_LIGHTNING)
+		{
+			if (self.ammo_cells < 1)
+				return FALSE;
+		}
 	}
 
 	return TRUE;
@@ -1630,6 +1705,7 @@ void() PK_ChangeWeapon =
 //
 // set weapon, set ammo
 //
+
 	self.weapon = fl;
 // PAINKEEP_START
 	self.pk_currentitem = fl2;

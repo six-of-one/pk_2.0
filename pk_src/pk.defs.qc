@@ -151,6 +151,26 @@ string sid_code;							// list of all codes as string, access = (code - 100) * 4
 
 float EF_FULLBRIGHT			= 512;
 
+
+//DP_SV_MODELFLAGS_AS_EFFECTS
+//this extension allows model flags to be specified on entities so you can add a rocket trail and glow to any entity, etc.
+//setting any of these will override the flags the model already has, to disable the model's flags without supplying any of your own you must use EF_NOMODELFLAGS.
+//idea: LordHavoc, Dresk - darkplaces implementation: LordHavoc
+
+// not used yet - chaos will want this
+
+.float modelflags;
+
+float EF_NOMODELFLAGS		= 8388608; // ignore any effects in a model file and substitute your own
+float MF_ROCKET  				= 1; // leave a trail
+float MF_GRENADE 				= 2; // leave a trail
+float MF_GIB     				= 4; // leave a trail
+float MF_ROTATE  				= 8; // rotate (bonus items)
+float MF_TRACER  				= 16; // green split trail
+float MF_ZOMGIB  				= 32; // small blood trail
+float MF_TRACER2 				= 64; // orange split trail
+float MF_TRACER3 				= 128; // purple trail
+
 // respawn times
 //float RSP_AMMO; // these are dm 3 rules
 //float RSP_ARMOR;
@@ -288,15 +308,18 @@ float d_reps_base				= 57005000; // heh heh - DEAD+
 void() d_rep_set;
 float() mega_touch;
 void() d_weapon_touch;
-void () X_FireHitscan;
+void() X_FireHitscan;
 
 // q2
 
 void() q2_precache;
+void() q2_weapon_shotgun;
 
 // q3
 
+void() q3_precache;
 void() q3_suspend;
+void() q3_weapon_shotgun;
 
 
 // so we can make new sv_ console vars
@@ -317,8 +340,8 @@ float AMMO_NAILS				= 103;
 float AMMO_ROCKETS			= 105;
 float AMMO_CELLS				= 107;
 float AMMO_BULLETS			= 109;
-float AMMO_SLUGS			= 111;
-float AMMO_GRENADES		= 113;
+float AMMO_SLUGS				= 111;
+float AMMO_GRENADES			= 113;
 
 // **************************************
 // viswep

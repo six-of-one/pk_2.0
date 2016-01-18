@@ -880,7 +880,8 @@ void () PlayerPreThink =
 
 // PAINKEEP_START
 	if (time > self.attack_finished)
-	if (self.currentammo == 0)
+//	if (self.currentammo == 0)
+	if (!HasAmmo(self.weapon, self.pk_currentitem))
 	if (!ammo_con(self.weapon, self, "wpck"))
 	if (self.weapon != IT_AXE || self.pk_currentitem != PK_IT_AXE)
 	{

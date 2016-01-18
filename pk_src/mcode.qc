@@ -174,8 +174,9 @@ float MC_W_FLAMER				= 204;
 float MC_W_CLIP				= 205;
 float MC_W_KEY_G				= 206;
 float MC_W_KEY_B				= 207;
+float MC_W_BARREL				= 208;
 
-float MC_W_RNDITM				= 8;		// # of total items
+float MC_W_RNDITM				= 9;		// # of total items
 
 // fn(bit_mcode) - item bit assoc with given mcode
 
@@ -289,6 +290,7 @@ float(float mcv, entity e) bit_mcode =
 
 	if (mc == MC_W_KEY_G)												return(IT_KEY1);
 	if (mc == MC_W_KEY_B)												return(IT_KEY2);
+	if (mc == MC_W_BARREL)												return(0);
 
 	return(0);
 };
@@ -435,6 +437,7 @@ float(string sc, entity e) pk_mcode =
 	if (tsc == "w_ammo_clip")											return(MC_W_CLIP);
 	if (tsc == "w_key_g")												return(MC_W_KEY_G);
 	if (tsc == "w_key_b")												return(MC_W_KEY_B);
+	if (tsc == "w_barrel")												return(MC_W_BARREL);
 
 
 // q3 - translates classname for now
@@ -576,6 +579,8 @@ string (float mc) item_by_mcode =
 	if (mc == MC_W_CLIP)													return("w_ammo_clip");
 	if (mc == MC_W_KEY_G)												return("w_key_g");
 	if (mc == MC_W_KEY_B)												return("w_key_b");
+	if (mc == MC_W_BARREL)												return("w_barrel");
+
 
 //	if (mc == MC_) return("item_");
 
@@ -653,17 +658,14 @@ void () weapon_axe =
 
 void () weapon_shotgun =
 {
-// CIC example - wont do anything for a bit
 	if (world.wad == "q2.wad")
 	{
-//		q2_weapon_shotgun();
+		q2_weapon_shotgun();
 		return;
 	}
-	else if (world.wad == "") // TDO: q3_weapon_shotgun
+	else if (world.wad == "")
 	{
-		self.classname = "weapon_supershotgun";
-		weapon_supershotgun(); 
-		if (self.spawnflags & 1) q3_suspend();
+		q3_weapon_shotgun(); 
 		return;
 	}
 

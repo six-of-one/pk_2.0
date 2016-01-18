@@ -259,6 +259,7 @@ void() PK_precache =
 
 	doom_precache();
 	q2_precache();
+	q3_precache();
 
 	viswep_pre();
 

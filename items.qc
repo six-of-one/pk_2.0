@@ -580,7 +580,7 @@ void () weapon_supernailgun =
 /*QUAKED weapon_grenadelauncher (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void () weapon_grenadelauncher =
+void () q100_weapon_grenadelauncher =
 {
 	precache_model ("progs/g_rock.mdl");
 	setmodel (self,"progs/g_rock.mdl");
@@ -594,7 +594,7 @@ void () weapon_grenadelauncher =
 /*QUAKED weapon_rocketlauncher (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void () weapon_rocketlauncher =
+void () q100_weapon_rocketlauncher =
 {
 	precache_model ("progs/g_rock2.mdl");
 	setmodel (self,"progs/g_rock2.mdl");

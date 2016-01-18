@@ -126,9 +126,14 @@ void() q2_precache =
 	precache_model ("progs/q2_barrel.mdl");
 
 // sounds
+	precache_sound ("q2_snd/w_pkup.wav");
+	precache_sound ("q2_snd/am_pkup.wav");
+	precache_sound ("q2_snd/respawn1.wav");
+
 //	precache_sound ("q2/.wav");
 // weps
-//	precache_sound ("q2/.wav");
+	precache_sound ("q2_snd/grnf_mx.wav");
+	precache_sound ("q2_snd/rktf_mx.wav");
 
 };
 
@@ -141,9 +146,10 @@ void() q2_ammo_bullets =
 	self.lip = AMMO_BULLETS;
 	self.currentammo = Q2_DEF_BULLETS_BOX;
 
+	self.classname = "ammo_bullets";
 	setmodel (self, "progs/q2_bullets.mdl");
-	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise = "q2_snd/am_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Box of bullets";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -158,8 +164,8 @@ void() q2_ammo_rockets =
 	self.currentammo = Q2_DEF_ROCKETS_LG;
 
 	setmodel (self, "progs/q2_rockets.mdl");
-	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise = "q2_snd/am_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Box of Rockets";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -175,8 +181,8 @@ void() q2_ammo_shells =
 	self.currentammo = Q2_DEF_SHELLS;
 
 	setmodel (self, "progs/q2_shells.mdl");
-	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise = "q2_snd/am_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Box of Shells";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -191,8 +197,8 @@ void() q2_ammo_cells =
 	self.currentammo = Q2_DEF_CELLPAK;
 
 	setmodel (self, "progs/q2_cellbox.mdl");
-	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise = "q2_snd/am_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Box of cells";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -207,8 +213,8 @@ void() q2_ammo_slugs =
 	self.currentammo = Q2_DEF_SLUGS;
 
 	setmodel (self, "progs/q2_slugs.mdl");
-	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise = "q2_snd/am_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Box of slugs";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -223,8 +229,8 @@ void() q2_ammo_grenades =
 	self.currentammo = Q2_DEF_HGRN;
 
 	setmodel (self, "progs/q2_grenades.mdl");
-	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise = "q2_snd/am_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Grenades";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -242,9 +248,9 @@ void () q2_weapon_bfg =
 	setmodel (self, "progs/q2_bfg.mdl");
 	self.weaponmodel = "progs/v_q2_bfg.mdl";
 	self.vwepmdl = "progs/vw_q2_bfg.mdl";
-//	self.noise = "q2_snd/dswpnup.wav";
+	self.noise = "q2_snd/w_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 //	self.noise3 = "q2_snd/dsrlaunc.wav";
-//	self.noise4 = "q2_snd/dsitembk.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
@@ -256,9 +262,9 @@ void () q2_weapon_railgun =
 	setmodel (self, "progs/q2_rail.mdl");
 	self.weaponmodel = "progs/v_q2_rail.mdl";
 	self.vwepmdl = "progs/vw_q2_rail.mdl";
-//	self.noise = "q2_snd/dswpnup.wav";
+	self.noise = "q2_snd/w_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 //	self.noise3 = "q2_snd/dsrlaunc.wav";
-//	self.noise4 = "q2_snd/dsitembk.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
@@ -270,15 +276,15 @@ void () weapon_hyperblaster =
 	setmodel (self, "progs/q2_hyperb.mdl");
 	self.weaponmodel = "progs/v_q2_hbl.mdl";
 	self.vwepmdl = "progs/vw_q2_hbl.mdl";
-//	self.noise = "q2_snd/dswpnup.wav";
+	self.noise = "q2_snd/w_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 //	self.noise3 = "q2_snd/dsrlaunc.wav";
-//	self.noise4 = "q2_snd/dsitembk.wav";
 	if (self.class_select == "") self.class_select = "q2_item";
 };
 
 void() q2_weapon_rocketlauncher =
 {
-	weapon_rocketlauncher();
+	q100_weapon_rocketlauncher();
 
 // fn
 	self.touch = d_weapon_touch;
@@ -297,23 +303,37 @@ void() q2_weapon_rocketlauncher =
 	setmodel (self, "progs/q2_rocketl.mdl");
 	self.weaponmodel = "progs/v_q2_rl.mdl";
 	self.vwepmdl = "progs/vw_q2_rock.mdl";
-//	self.noise = "q2_snd/dswpnup.wav";
-//	self.noise3 = "q2_snd/dsrlaunc.wav";
-//	self.noise4 = "q2_snd/dsitembk.wav";
+	self.noise = "q2_snd/w_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
+	self.noise3 = "q2_snd/rktf_mx.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
 
 void () q2_weapon_grenadelauncher =
 {
-	weapon_grenadelauncher();
+	q100_weapon_grenadelauncher();
 
+// fn
+	self.touch = d_weapon_touch;
+	self._attack = W_FireGrenade;
+	self._fr_attack = player_rocket1;
+// stats
+	self.currentammo = Q2_DEF_BLAST;
+	self.items = IT_GRENADE_LAUNCHER;
+	self.lip = AMMO_ROCKETS;
+	self.attack_finished = 0.9;
+	self.dmg = 120;
+	self.dodmg = 160; // splash
+	self.dmg_save = 1;
+
+// appearances
 	setmodel (self, "progs/q2_gl.mdl");
 	self.weaponmodel = "progs/v_q2_gl.mdl";
 	self.vwepmdl = "progs/vw_q2_gl.mdl";
-//	self.noise = "q2_snd/dswpnup.wav";
-//	self.noise3 = "q2_snd/dsrlaunc.wav";
-//	self.noise4 = "q2_snd/dsitembk.wav";
+	self.noise = "q2_snd/w_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
+	self.noise3 = "q2_snd/grnf_mx.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
@@ -325,9 +345,9 @@ void () weapon_chaingun =
 	setmodel (self, "progs/q2_chain.mdl");
 	self.weaponmodel = "progs/v_q2_chg.mdl";
 	self.vwepmdl = "progs/vw_q2_chg.mdl";
-//	self.noise = "q2_snd/dswpnup.wav";
+	self.noise = "q2_snd/w_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 //	self.noise3 = "q2_snd/dsrlaunc.wav";
-//	self.noise4 = "q2_snd/dsitembk.wav";
 	if (self.class_select == "") self.class_select = "q2_item";
 };
 
@@ -338,9 +358,9 @@ void () q2_weapon_machinegun =
 	setmodel (self, "progs/q2_mgun.mdl");
 	self.weaponmodel = "progs/v_q2_mg.mdl";
 	self.vwepmdl = "progs/vw_q2_mg.mdl";
-//	self.noise = "q2_snd/dswpnup.wav";
+	self.noise = "q2_snd/w_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 //	self.noise3 = "q2_snd/dsrlaunc.wav";
-//	self.noise4 = "q2_snd/dsitembk.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
@@ -352,9 +372,9 @@ void () q2_weapon_supershotgun =
 	setmodel (self, "progs/q2_dblshot.mdl");
 	self.weaponmodel = "progs/v_q2_shot2.mdl";
 	self.vwepmdl = "progs/vw_q2_dblshot.mdl";
-//	self.noise = "q2_snd/dswpnup.wav";
+	self.noise = "q2_snd/w_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 //	self.noise3 = "q2_snd/dsrlaunc.wav";
-//	self.noise4 = "q2_snd/dsitembk.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
@@ -366,9 +386,9 @@ void () q2_weapon_shotgun =
 	setmodel (self, "progs/q2_shotgun.mdl");
 	self.weaponmodel = "progs/v_q2_shot.mdl";
 	self.vwepmdl = "progs/vw_q2_shot.mdl";
-//	self.noise = "q2_snd/dswpnup.wav";
+	self.noise = "q2_snd/w_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 //	self.noise3 = "q2_snd/dsrlaunc.wav";
-//	self.noise4 = "q2_snd/dsitembk.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
@@ -380,9 +400,9 @@ void () q2_weapon_blaster =
 	setmodel (self, "progs/q2_blaster.mdl");
 	self.weaponmodel = "progs/v_q2_blst.mdl";
 //	self.vwepmdl = "progs/vw_q2_blst.mdl";
-//	self.noise = "q2_snd/dswpnup.wav";
+	self.noise = "q2_snd/w_pkup.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 //	self.noise3 = "q2_snd/dsrlaunc.wav";
-//	self.noise4 = "q2_snd/dsitembk.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
@@ -393,7 +413,7 @@ void() q2_item_health_small =
 	item_health();
 	setmodel(self, "progs/q2_heal_stimpak.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav"; // doom respawn sound
+	self.noise4 = "q2_snd/respawn1.wav"; // doom respawn sound
 	self.netname = "Stimpack";
 	self.healamount = Q2_DEF_HBOTTLE;
 	self.healtype = HEAL_BOT;
@@ -406,7 +426,7 @@ void() q2_item_health =
 	item_health();
 	setmodel(self, "progs/q2_heal_medium.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "First Aid";
 	self.healamount = Q2_DEF_HFIRSTAID;
 //	self.healtype = HEAL_NORM;
@@ -419,7 +439,7 @@ void() q2_item_health_large =
 	item_health();
 	setmodel(self, "progs/q2_heal_large.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Medkit";
 	self.healamount = Q2_DEF_HMEDKIT;
 //	self.healtype = HEAL_NORM;
@@ -432,7 +452,7 @@ void() q2_item_health_mega =
 	item_health();
 	setmodel(self, "progs/q2_heal_mega.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Medkit";
 	self.healamount = Q2_DEF_HMEGATUBE;
 //	self.healtype = HEAL_NORM;
@@ -445,7 +465,7 @@ void() q2_misc_explobox =
 	self.netname = "Barrel";
 	misc_explodbox_set(self, "progs/q2_barrel.mdl", Q2_BARREL_BLAST, 80, MOVETYPE_NONE);
 //	self.noise = "doom/dsbarexp.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 //	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
 };
@@ -455,7 +475,7 @@ void() q2_item_armor_body =
 	item_armorInv();
 	setmodel (self, "progs/q2_armorbody.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Body armor";
 	self.volume = 200; // max add
 	self.state = Q2_ARM_TBDY;
@@ -469,7 +489,7 @@ void() q2_item_armor_combat =
 	item_armor2();
 	setmodel (self, "progs/q2_armorcombat.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Combat armor";
 	self.volume = 100; // max add
 	self.state = Q2_ARM_TCMB;
@@ -483,7 +503,7 @@ void() item_armor_jacket =
 	item_armor1();
 	setmodel (self, "progs/q2_armorjacket.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Jacket armor";
 	self.volume = 50; // max add
 	self.state = Q2_ARM_TFLK;
@@ -497,7 +517,7 @@ void() q2_item_armor_shard =
 	item_armor1();
 	setmodel (self, "progs/q2_armorshard.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Armor shard";
 	self.volume = -1; // max add
 	self.state = Q2_ARM_TFLK;
@@ -511,7 +531,7 @@ void() item_power_shield =
 	item_armor1();
 	setmodel (self, "progs/q2_armorpower.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Power shield";
 	self.volume = -1;
 	self.state = 0;
@@ -525,7 +545,7 @@ void() item_power_screen =
 	item_armor1();
 	setmodel (self, "progs/q2_armorscreen.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Power screen";
 	self.volume = -1;
 	self.state = 0;
@@ -539,7 +559,7 @@ void() item_silencer =
 	weapon_shotgun();
 	setmodel (self, "progs/q2_silencer.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Silencer";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -550,7 +570,7 @@ void() item_invulnerability =
 {
 	item_artifact_invulnerability();
 	self.noise = "doom/dsgetpow.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	setmodel (self, "progs/q2_inv.mdl");
 	self.netname = "Invulnerability";
 	self.wait = Q2_POWER_WAIT;
@@ -587,7 +607,7 @@ void() item_adrenaline =
 	item_health();
 	setmodel(self, "progs/q2_adrenaline.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Adrenaline";
 	self.healamount = Q2_DEF_HMEGATUBE;
 //	self.healtype = HEAL_NORM;
@@ -600,7 +620,7 @@ void() item_bandolier =
 	item_spikes();
 	setmodel(self, "progs/q2_bando.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Bandolier";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -611,7 +631,7 @@ void() item_pack =
 	item_spikes();
 	setmodel(self, "progs/q2_pack.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Ammo Pack";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -622,7 +642,7 @@ void() item_breather =
 	item_spikes();
 	setmodel(self, "progs/q2_breather.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Re-breather";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -633,7 +653,7 @@ void() key_pyramid =
 	item_key1();
 	setmodel(self, "progs/q2_keypyramid.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Pyramid Key";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -644,7 +664,7 @@ void() key_power_cube =
 	item_key1();
 	setmodel(self, "progs/q2_keypower.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Power Cube";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -655,7 +675,7 @@ void() key_pass =
 	item_key1();
 	setmodel(self, "progs/q2_keypass.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Pass Key";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -666,7 +686,7 @@ void() key_data_cd =
 	item_key1();
 	setmodel(self, "progs/q2_keycd.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Data CD";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -677,7 +697,7 @@ void() key_data_spinner =
 	item_key1();
 	setmodel(self, "progs/q2_keyspinner.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Data Spinner";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -688,7 +708,7 @@ void() key_airstrike_target =
 	item_key1();
 	setmodel(self, "progs/q2_keytarget.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Airstrike Target";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -700,7 +720,7 @@ void() key_blue_key =
 	setmodel(self, "progs/q2_keyrb.mdl");
 	self.skin = 1;
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Blue Key";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -712,7 +732,7 @@ void() key_red_key =
 	setmodel(self, "progs/q2_keyrb.mdl");
 	self.skin = 0;
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Red Key";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";
@@ -723,7 +743,7 @@ void() key_commander_head =
 	item_key1();
 	setmodel(self, "progs/q2_key_cmd_head.mdl");
 	self.noise = "doom/dsitemup.wav";
-	self.noise4 = "doom/dsitembk.wav";
+	self.noise4 = "q2_snd/respawn1.wav";
 	self.netname = "Commanders Head";
 	self.effects = self.effects | EF_FULLBRIGHT;
 	if (self.class_select == "") self.class_select = "q2_item";

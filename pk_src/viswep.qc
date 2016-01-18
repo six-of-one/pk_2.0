@@ -267,7 +267,7 @@ entity(float qw, float pkw, entity vh) vchk =
 	f = vh;
 	while (f)
 	{
-		if (f.weapon == qw && f.pk_currentitem == pkw) return (f);
+		if (f.weapon == qw && (f.pk_currentitem == pkw || pkw == 0)) return (f);
 		f = f.vwepent;
 	}
 	return(world);
@@ -603,6 +603,7 @@ void() viswep_post =
 		}
 
 		if (vhead.owner.items & IT_INVISIBILITY) vhead.model = ""; // heh heh, player invisible
+		else if (vhead.owner.eweapon.model == "progs/vw_w_2chaing.mdl" && vhead.mdl == "progs/vw_w_chaing.mdl") vhead.model = "";
 		else
 		if (vhead.model == "" || (vhead.origin + vofs) != vhead.owner.origin || vhead.angles != vhead.owner.angles || vhead.weaponframe != vhead.owner.frame) // update track
 			{

@@ -90,3 +90,30 @@ void() SUB_Nop =
 {
 	return;
 };
+
+void() func_model_frames =
+{
+	self.frame = self.frame + 1;
+	if (self.frame > self.state) self.frame = self.count;
+	self.nextthink = time + self.delay;
+};
+
+// testing
+
+void() func_model =
+{
+	self.mdl = self.model;
+	precache_model (self.mdl);
+	setmodel (self,self.mdl);
+
+	if (self.count)
+	{
+		self.frame = self.count;
+		if (self.state)
+		{
+		if (self.delay <= 0) self.delay = 0.1;
+		self.think = func_model_frames;
+		self.nextthink = time + self.delay;
+		}
+	}
+};
