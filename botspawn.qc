@@ -358,21 +358,6 @@ void () PutBotInServer =
 		dprint ("Seems like sv_aim isn't 0.93\n");
 	}
 	if (!Q_100 && !Q_99) PK_CIS(); // *pk - set client pk elements
-
-
-// TEST
-if (0)  {
-bprint("##		bot renewed: ");
-bprint(self.netname);
-bprint(" -- ");
-bprint(ftos(self.items));
-bprint(" -- pk = ");
-bprint(ftos(mk_pkbits(self)));
-bprint("\n");
-}
-
-
-
 };
 
 void () SpawnNewBot =

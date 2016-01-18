@@ -393,7 +393,7 @@ void() bot_fight_style =
 		if (vlen(trace_endpos - (self.origin + self.view_ofs)) >= v_y)
 		{
 			// try to avoid shooting teammates
-			if (trace_ent.classname == "player")
+			if (trace_ent.classname == "player")			// Cataboligne - 4.27.10 - pk*bot mods, frik hunts pk - dont need to change this one, looking for frik bots, tho this could change in the chaos mod gen /morph section
 				if ((trace_ent.team == self.team && teamplay) || (coop))
 					return;
 			bot_shoot();

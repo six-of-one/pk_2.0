@@ -613,43 +613,88 @@ float() MapDM =
 		}
 		else if (self.lefty == 61) // hub links
 		{
-			local entity e, f, b, c;
-			local float dx;
+			local entity e, f, b;
+			local vector v1, v2;
+			local float dx, mm;
 			bprint("---------------------\nHub map set\n---------------------\n\n");
 			e = find(world, classname, "hub_teleport");
 			while (e)
 			{
-				bprint(e.map);
-				bprint(", trg: ");
+				if (e.model == "progs/hub_port.mdl" || e.model == "progs/null.mdl")
+				{
+					if (v1 != ' 0 0 0' && mm < 2)
+					{
+						bprint("\nmixed mode --- custom hub + regular hub!\n\n");
+						mm = 2;
+					}
+					else
+						if (mm < 2) mm = -1;
+					bprint(e.map);
+					bprint(", trg: ");
+					b = e.enemy; // we know trigger messages for custom hubs
+					if (!b) bprint("NO TRIGGER!");
+					else { bprint(b.message); if (fabs(b.origin_z - e.origin_z) > 25) { bprint(" : Z > 25");} }
+					bprint("\n");
+					e = find(e, classname, "hub_teleport");
+				}
+				else
+			 {
+					if (!v1) bprint("hub_control maps:\n\n");
+					if (mm < 0)
+					{
+						bprint("\nmixed mode --- custom hub + regular hub!\n\n");
+						mm = 2;
+					}
+					bprint(e.map);
+
+// possible target message - list all after this
 				dx = 8001;
-				e.origin = (e.absmin + e.absmax) * 0.5;
-				f = findradius(e.origin, 8000);
-//bprint("\n");
-				b = e;
-			 if (b.model != "progs/hub_port.mdl")
-			  {
+				v1 = (e.absmin + e.absmax) * 0.5;
+				f = findradius(v1, 8000);
 				b = world;
 				while (f)
 				{
 					if (f.classname == "trigger_multiple")
-					if (f.message != "")
+					if (f.message != "" && f.message != "\n" && f.message != " ")
 					{
-						f.origin = (f.mins + f.maxs) * 0.5;
-						if (vlen(e.origin - f.origin) < dx)
+						v2 = (f.mins + f.maxs) * 0.5;
+						if (vlen(v1 - v2) < dx)
 						{
-							c = b;
 							b = f;
-							dx = vlen(e.origin - f.origin);
+							dx = vlen(v1 - v2);
 						}
 					}
 				f = f.chain;
 				}
-			  }
-				if (!b) bprint("NO TRIGGER!");
-				else { bprint(b.message); if (fabs(b.origin_z - e.origin_z) > 25) { bprint(" : Z > 25");} }// bprint(c.message); }
-				bprint("\n");
-				e = find(e, classname, "hub_teleport");
-			}
+				if (b)
+				{
+					bprint(", possible trg: ");
+					bprint(b.message);
+					if (fabs(b.origin_z - e.origin_z) > 25) bprint(" : Z > 25");
+				}
+
+
+					bprint("\n");
+					e = find(e, classname, "hub_teleport");
+				if (!e)
+				{
+				bprint("\npossible map messages:\n\n");
+				f = findradius(world.origin, 32000);
+				while (f)
+				{
+					if (f.classname == "trigger_multiple")
+					if (f.message != "" && f.message != "\n" && f.message != " ")
+					{
+						bprint(f.message);
+						bprint("\n");
+					}
+				f = f.chain;
+				}
+					
+				}
+			 }
+		  }
+
 			bprint("\n---------------------\n");
 		}
 

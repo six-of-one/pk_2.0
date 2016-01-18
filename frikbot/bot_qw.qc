@@ -341,6 +341,11 @@ void(entity e, float chan, string samp, float vol, float atten) sound =
 		e.b_sound = time + 1;
 	else if (other.classname == "player")
 		other.b_sound = time + 1;
+
+	else if (e.classname == "pk*bot")			// Cataboligne - 4.27.10 - pk*bot mods, frik hunts pk
+		e.b_sound = time + 1;
+	else if (other.classname == "pk*bot")			// Cataboligne - 4.27.10 - pk*bot mods, frik hunts pk
+		other.b_sound = time + 1;
 };
 void(float to, float f) WriteByte =
 {

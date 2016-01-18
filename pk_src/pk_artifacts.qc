@@ -54,6 +54,8 @@ void() pk_art_attack  =
 			self.weapon = W_BestWeapon ();
 			self.pk_currentitem = W_BestPKWeapon ();
 			W_SetCurrentAmmo ();
+
+			vwep_firecary(self, PKPLUS_IT_EGO); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
 		}
 	}
 	else	if (self.pk_currentitem == PKPLUS_IT_TOMB)
@@ -67,6 +69,8 @@ void() pk_art_attack  =
 			self.weapon = W_BestWeapon ();
 			self.pk_currentitem = W_BestPKWeapon ();
 			W_SetCurrentAmmo ();
+
+			vwep_firecary(self, PKPLUS_IT_TOMB); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
 		}
 	}
 	else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
@@ -87,6 +91,8 @@ void() pk_art_attack  =
 			self.weapon = W_BestWeapon ();
 			self.pk_currentitem = W_BestPKWeapon ();
 			W_SetCurrentAmmo ();
+
+			vwep_firecary(self, PKPLUS_IT_ACTOR); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
 		}
 	}
 	else if (self.pk_currentitem == PKPLUS_IT_PHONE)
@@ -100,6 +106,8 @@ void() pk_art_attack  =
 			self.weapon = W_BestWeapon ();
 			self.pk_currentitem = W_BestPKWeapon ();
 			W_SetCurrentAmmo ();
+
+			vwep_firecary(self, PKPLUS_IT_PHONE); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
 		}
 	}
 };
@@ -855,6 +863,7 @@ void() pk_art_precache =
 	precache_sound ("ego/ego.wav");
 	precache_model ("progs/ego.mdl");
 	precache_model ("progs/v_ego.mdl");
+
 	precache_model ("progs/tomb.mdl");
 	precache_model ("progs/tomb2.mdl");
 	precache_model ("progs/v_tomb.mdl");
@@ -862,9 +871,13 @@ void() pk_art_precache =
 	precache_sound ("tomb/tombdrop.wav");
 	precache_sound ("tomb/tombdie.wav");
 	precache_sound ("tomb/tombopen.wav");
+	precache_sound ("zombie/z_gib.wav");
+	precache_model ("progs/h_zombie.mdl");
+
 	precache_model ("progs/actor.mdl");
 	precache_model ("progs/v_actorb.mdl");
 	precache_model ("progs/v_actorr.mdl");
+
 	precache_model ("progs/phone.mdl");
 	precache_model ("progs/v_phone.mdl");
 	precache_sound ("phone/phone.wav");

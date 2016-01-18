@@ -930,6 +930,8 @@ void() PK_Attack =
 				self.weapon = W_BestWeapon();
 				self.pk_currentitem = W_BestPKWeapon();
 				W_SetCurrentAmmo();
+
+				vwep_firecary(self, PK_IT_GRAVITYWELL); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
 			}
 		}
 		else if (self.pk_currentitem == PK_IT_TURRET)
@@ -945,6 +947,8 @@ void() PK_Attack =
 				self.weapon = W_BestWeapon();
 				self.pk_currentitem = W_BestPKWeapon();
 				W_SetCurrentAmmo();
+
+				vwep_firecary(self, PK_IT_TURRET); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
 			}
 		}
 		else if (self.pk_currentitem == PK_IT_CANPAB)
@@ -964,6 +968,8 @@ void() PK_Attack =
 				self.weapon = W_BestWeapon();
 				self.pk_currentitem = W_BestPKWeapon();
 				W_SetCurrentAmmo();
+
+				vwep_firecary(self, PK_IT_CANPAB); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
 			}
 		}
 		else if (self.pk_currentitem == PK_IT_GRAPGUN)
@@ -986,6 +992,8 @@ void() PK_Attack =
 				self.weapon = W_BestWeapon();
 				self.pk_currentitem = W_BestPKWeapon();
 				W_SetCurrentAmmo();
+
+				vwep_firecary(self, PK_IT_BEARTRAP); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
 			}
 		}
 		else if (self.pk_currentitem == PK_IT_AIRGUN)

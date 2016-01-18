@@ -210,6 +210,7 @@ void() hub_custom =
 	self = spawn();
 	if (self != e)
 	{
+		e.enemy = self; // hub points to trigger - no more searching in admin
 		self.classname = "trigger_multiple";
 // bounds bigger than portal to give message
 		setorigin(self, e.origin);
@@ -413,6 +414,11 @@ void() hub_control_use =
 	// error
 	if (highest == world)
 	{
+		if (PK_100)
+		{
+			remove(self);
+			return;
+		}
 		bprint("hub_control_use: highest vote not found\n");
 		return;
 	}

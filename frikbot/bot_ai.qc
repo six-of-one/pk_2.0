@@ -179,7 +179,7 @@ void(entity targ, float success) bot_lost =
         }
 
 
-	if (targ.classname != "player")
+	if (targ.classname != "player" && targ.classname != "pk*bot")			// Cataboligne - 4.27.10 - pk*bot mods, frik hunts pk
 		targ.search_time = time + 5;
 };
 
@@ -233,13 +233,13 @@ void(entity targ) bot_check_lost =
 		if (vlen(targ.origin - self.origin) < 32)
 			bot_lost(targ, TRUE);
 	}
-	else if (targ.classname == "player")
+	else if (targ.classname == "player" || targ.classname == "pk*bot")			// Cataboligne - 4.27.10 - pk*bot mods, frik hunts pk
 	{
 		if (targ.health <= 0)
 			bot_lost(targ, TRUE);
 		else if ((coop) || (teamplay && targ.team == self.team))
 		{
-			if (targ.target1_.classname == "player")
+			if (targ.target1_.classname == "player" || targ.target1_.classname == "pk*bot")			// Cataboligne - 4.27.10 - pk*bot mods, frik hunts pk
 			{
 				if (!targ.target1_.ishuman)
 					bot_lost(targ, TRUE);
@@ -522,7 +522,7 @@ void() bot_path =
 		if (self.target1_.current_way != self.last_way)
 		{
 			if (self.target1_.classname != "temp_waypoint")
-				if (self.target1_.classname != "player")
+				if (self.target1_.classname != "player" && self.target1_.classname != "pk*bot")			// Cataboligne - 4.27.10 - pk*bot mods, frik hunts pk
 					bot_lost(self.target1_, FALSE);
 		}
 
@@ -690,7 +690,7 @@ float(entity thing) priority_for_thing =
 	}
 	else if ((thing.flags & FL_MONSTER) && thing.health > 0)
 		thisp = 45;
-	else if (thing.classname == "player")
+	else if (thing.classname == "player" || thing.classname == "pk*bot")			// Cataboligne - 4.27.10 - pk*bot mods, frik hunts pk
 	{ 
 		if (thing.health > 0)
 		{
@@ -703,14 +703,14 @@ float(entity thing) priority_for_thing =
 				else if (coop)
 				{
 					thisp = 100;
-					if (thing.target1_.classname == "player")
+					if (thing.target1_.classname == "player" || thing.target1_.classname == "pk*bot")			// Cataboligne - 4.27.10 - pk*bot mods, frik hunts pk
 						if (!thing.target1_.ishuman)
 							return 0;
 				}
 				else if (teamplay && thing.team == self.team)
 				{
 					thisp = 100;
-					if (thing.target1_.classname == "player")
+					if (thing.target1_.classname == "player" || thing.target1_.classname == "pk*bot")			// Cataboligne - 4.27.10 - pk*bot mods, frik hunts pk
 						return 0;
 				}
 				else thisp = 30;
@@ -855,7 +855,7 @@ void() bot_angle_set =
 			self.v_angle_x = self.v_angle_x - 360;
 
 	}
-	else if ((self.enemy == world || self.enemy.movetype == MOVETYPE_PUSH) && self.target1_.classname != "player")
+	else if ((self.enemy == world || self.enemy.movetype == MOVETYPE_PUSH) && self.target1_.classname != "player") //  && self.target1_.classname != "pk*bot") 			/// Cataboligne - 4.27.10 - pk*bot mods, frik hunts pk - left out for turning
 	{
 		self.keys = self.keys & 63;
 		self.v_angle = self.b_angle;

@@ -17,7 +17,7 @@ chasecam file
 string CAM_MODEL = "progs/null.mdl";
 float CAM_DIST		= 100.0;
 float CAM_Z			= 22.0;
-float CAM_DEF		= 1; // set to 1 for default chase cam
+float CAM_DEF; 					// set to 1 for default chase cam
 
 float CHSCAM_NO_WATER = FALSE; // if true, cam will deactivate in water
 
@@ -234,16 +234,6 @@ void() bot_renew =
 		{
 			self.owner.think = respawn;
 			self.owner.nextthink = time + 0.5;
-
-
-// TEST
-if (0)  {
-bprint("##		bot renewed: ");
-bprint(self.owner.netname);
-bprint("\n");
-}
-
-
 		}
 }
 
@@ -273,16 +263,6 @@ void () cam_deathmove =
 		{
 			self.owner.think = respawn;
 			self.owner.nextthink = time + 0.5;
-
-
-// TEST
-if (0)  {
-bprint("##		player renewed: ");
-bprint(self.owner.netname);
-bprint("\n");
-}
-
-
 		}
 		return;
 	}
@@ -867,6 +847,8 @@ void(float sel) cam_parms =
 		}
 	else
 		{
+			CAM_DEF = 1;
+			if (DARKPLACES) CAM_DEF = cvar("cl_pk_cam"); // dp var disables default cam - FIX - doesnt work, death cam doesnt go back to 1pv always
 	// only reset if zeroed  (so DM/COOP respawns don't reset)
 		if (self.deadflag == DEAD_RESPAWNABLE)
 			parm14 = self.dest2_x + (self.dest2_y & 255) * 256 + ((self.dest2_z * 100) & 255) * 65536; // bit flags, cam distance, cam height
