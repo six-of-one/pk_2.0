@@ -165,6 +165,13 @@ void() PK_precache =
 
 // visible weapon support - bit masks for inventory
 
+	precache_model ("progs/v2_nail.mdl");
+	precache_model ("progs/v2_nail2.mdl");
+	precache_model ("progs/v2_rock.mdl");
+	precache_model ("progs/v2_rock2.mdl");
+	precache_model ("progs/v2_pulsenail.mdl");
+	precache_model ("progs/v2_harp.mdl");
+
 	viswep_pre();
 
 	qweps = IT_AXE | IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN | IT_SUPER_NAILGUN | IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER | IT_LIGHTNING;

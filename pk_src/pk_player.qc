@@ -134,15 +134,20 @@ void() pk_harpoon_frames =
 			{
 				self.weaponframe = self.weaponframe + 1;
 			}
+			if (!PK_100) stuffcmd( self, "cl_bob 0\n" ); // dont bob while pulling in
 		}
 		else
 		{
 			self.weaponframe = 8;
+			if (!PK_100)
+			if ( !(self.dest2_x & CHSCAM_ON) ) stuffcmd( self, CL_BOBAMT );
 		}
 	}
 	else
 	{
 		self.weaponframe=0;
+		if (!PK_100)
+		if ( !(self.dest2_x & CHSCAM_ON) ) stuffcmd( self, CL_BOBAMT );
 	}
 
 };

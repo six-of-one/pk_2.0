@@ -219,12 +219,28 @@ dprint("\n");
 
 };
 
+// fn (vchk) - check for a given item & return ent pointer if found
+
+entity(float qw, float pkw, entity vh) vchk =
+{
+	local entity f;
+
+	f = vh;
+	while (f)
+	{
+		if (f.weapon == qw && f.pk_currentitem == pkw) return (f);
+		f = f.vwepent;
+	}
+	return(world);
+};
+
 // fn (viswep_ld) - load or unload viswep models
 
 // vh - head ent
 // self - player ent
 // cd - 1 = load em up, -1 = unload em
 //			future expansion: -1 dead throw em, -2 unload em
+//			-3 - init, unload then countdown set
 
 void(entity vh, float cd) viswep_ld =
 {
@@ -245,6 +261,12 @@ void(entity vh, float cd) viswep_ld =
 			remove(pr);
 		}
 		self.vwepent = world;
+
+//		if (cd == -3)
+//		{
+//			self.vwepent = spawn();
+//			self.vwepent.delay = time + 1;
+//		}
 		return;
 	}
 // have items & check for inventory
@@ -260,9 +282,9 @@ void(entity vh, float cd) viswep_ld =
 				tr.model = "";
 				pr.vwepent = tr.vwepent;
 			}
-			if (self.armortype == 0.3) tr.skin = 0;
-			else if (self.armortype == 0.6) tr.skin = 1;
-			else if (self.armortype == 0.8) tr.skin = 2;
+			if (at == 0.3) tr.skin = 0;
+			else if (at == 0.6) tr.skin = 1;
+			else if (at == 0.8) tr.skin = 2;
 			tr.armortype = at;
 		}
 		else
@@ -418,7 +440,7 @@ void() viswep_post =
 
 	vhead = self.vwepent;
 
-	qld = FALSE;
+//	qld = FALSE;
 
 	if (PK_100 || Q_100)
 	{
@@ -609,4 +631,25 @@ void() player_bolt4	 =[$lightfatt4, player_bolt1  ]
 	SuperDamageSound();
 	bolt_fire();
 	self.attack_finished = time + 0.2;
+};
+
+// fn(grap_vw_adj) - adjust start position for viswep location
+
+vector(entity hent) grap_vw_adj =
+{
+	local vector vwa;
+
+	vwa = v0;
+	if (!hent) return (vwa);
+//	if (hent.flags & FL_CLIENT)
+	makevectors(hent.v_angle);
+	if (hent.frame > 10) // retr | shoot frames
+	{
+		vwa = VWX_HARP_RETR * v_forward + VWY_HARP_RETR * v_right + VWZ_HARP_RETR * v_up;
+	}
+	else
+	{
+		vwa = VWX_HARP_IDLE * v_forward + VWY_HARP_IDLE * v_right + VWZ_HARP_IDLE * v_up;
+	}
+	return(vwa);
 };

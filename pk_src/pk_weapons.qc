@@ -308,7 +308,10 @@ void() PK_SetCurrentAmmo =
 		{
 // GRAPPLING_START
 			self.currentammo = 1;
-			self.weaponmodel = "progs/v_harp.mdl";
+			if (PK_100 || Q_100)
+				self.weaponmodel = "progs/v_harp.mdl";
+			else
+				self.weaponmodel = "progs/v2_harp.mdl";
 
 			if (self.grap_cornerchainNext != world)
 			{
@@ -393,8 +396,20 @@ void() PK_SetCurrentAmmo =
 	{
 		self.currentammo = self.ammo_nails;
 // PULSE_GUN_START
-		if (PK) self.weaponmodel = "progs/v_fnail.mdl";
-		else self.weaponmodel = "progs/v_nail.mdl";
+		if (PK)
+		{			
+			if (PK_100 || Q_100)
+				self.weaponmodel = "progs/v_fnail.mdl";
+			else
+				self.weaponmodel = "progs/v2_pulsenail.mdl";
+		}
+		else
+		{
+			if (PK_100 || Q_100)
+				self.weaponmodel = "progs/v_nail.mdl";
+			else
+				self.weaponmodel = "progs/v2_nail.mdl";
+		}
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
 		if (wchanged)
@@ -403,7 +418,10 @@ void() PK_SetCurrentAmmo =
 	else if (self.weapon == IT_SUPER_NAILGUN)
 	{
 		self.currentammo = self.ammo_nails;
-		self.weaponmodel = "progs/v_nail2.mdl";
+		if (PK_100 || Q_100)
+			self.weaponmodel = "progs/v_nail2.mdl";
+		else
+			self.weaponmodel = "progs/v2_nail2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
 		if (wchanged)
@@ -412,7 +430,10 @@ void() PK_SetCurrentAmmo =
 	else if (self.weapon == IT_GRENADE_LAUNCHER)
 	{
 		self.currentammo = self.ammo_rockets;
-		self.weaponmodel = "progs/v_rock.mdl";
+		if (PK_100 || Q_100)
+			self.weaponmodel = "progs/v_rock.mdl";
+		else
+			self.weaponmodel = "progs/v2_rock.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
 		if (wchanged)
@@ -421,7 +442,10 @@ void() PK_SetCurrentAmmo =
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
 		self.currentammo = self.ammo_rockets;
-		self.weaponmodel = "progs/v_rock2.mdl";
+		if (PK_100 || Q_100)
+			self.weaponmodel = "progs/v_rock2.mdl";
+		else
+			self.weaponmodel = "progs/v2_rock2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
 		if (wchanged)

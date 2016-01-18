@@ -508,24 +508,24 @@ float VWY_VEL_SHOTGUN		= 48;
 float VWZ_VEL_SHOTGUN		= 16;
 
 // nails
-float VWX_NAILG				= 15;	// 12		v_forward *
+float VWX_NAILG				= 16;	// 12		v_forward *
 float VWY_NAILG				= 9;	//			v_right *
 float VWZ_NAILG				= 15;	// 16		v_up *
 
-float VWX_SNAILG				= 21;	// 14
-float VWY_SNAILG				= 8;
+float VWX_SNAILG				= 22;	// 14
+float VWY_SNAILG				= 9;
 float VWZ_SNAILG				= 15;	// 16
 
-float VWX_PNAILG				= 27;	// 15
+float VWX_PNAILG				= 31;	// 15
 float VWY_PNAILG				= 9.5;// 8
 float VWZ_PNAILG				= 14;	// 15
 
 // rockets
-float VWX_ROCKETL				= 16;
+float VWX_ROCKETL				= 20;
 float VWY_ROCKETL				= 11;
 float VWZ_ROCKETL				= 16;
 
-float VWX_GRENADEL			= 10;
+float VWX_GRENADEL			= 18;	// 10
 float VWY_GRENADEL			= 11;
 float VWZ_GRENADEL			= 16;
 
@@ -536,13 +536,13 @@ float VWZ_THUNDER				= 16;
 
 // pk weps
 // cell guns
-float VWX_CHTHUNDER			= 19;	// 18
+float VWX_CHTHUNDER			= 20;	// 18
 float VWY_CHTHUNDER			= 8;
 float VWZ_CHTHUNDER			= 16;
 
 float VWX_HARP_IDLE			= 4;	// harpoon is fired, player standing idle
 float VWY_HARP_IDLE			= -10;
-float VWZ_HARP_IDLE			= 0;
+float VWZ_HARP_IDLE			= -4;
 
 float VWX_HARP_RETR			= 8;	// harpoon being retracted
 float VWY_HARP_RETR			= 8;

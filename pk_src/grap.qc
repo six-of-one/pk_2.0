@@ -174,7 +174,7 @@ float() grap_maintainRope =
 {
 	local entity corner;
 	local vector cornerOrigin;
-	local float totalLength;
+	local float totalLength,sf;
 
 	totalLength = 0;
 	// play rope sounds needed...
@@ -204,8 +204,13 @@ float() grap_maintainRope =
 	corner = self;
 	cornerOrigin = corner.origin + '0 0 16';
 
-	while(corner.grap_cornerchainNext)
+	sf = 300;
+	while(corner.grap_cornerchainNext && sf > 0)
 	{
+		sf = sf - 1;
+
+		if (!PK_100)
+		if (corner.flags & FL_CLIENT) cornerOrigin = cornerOrigin + grap_vw_adj(corner);
 
 		totalLength = totalLength + vlen(corner.grap_cornerchainNext.origin - cornerOrigin);
 
@@ -222,7 +227,8 @@ float() grap_maintainRope =
 void(entity corner, vector cornerOrigin) grep_createCornerRope =
 {
 	local entity rope, ropeOwner;
-	local vector startPoint, dir, vangle;
+	local vector startPoint, dir, vangle, vwa;
+	local float sf;
 
 	// Calculate viewing angle
 	vangle = normalize(corner.grap_cornerchainNext.origin - cornerOrigin);
@@ -232,10 +238,14 @@ void(entity corner, vector cornerOrigin) grep_createCornerRope =
 
 	ropeOwner.angles = vangle;
 
+	vwa = v0;
+	if (!PK_100)
+	if (ropeOwner.flags & FL_CLIENT) vwa = grap_vw_adj(corner);
+
 	// if going out, create coil's
 	if (self.grap_state == GRAP_OUT)
 	{
-	  if (vlen(cornerOrigin - ropeOwner.origin) < 86)
+		if(vlen(cornerOrigin - ropeOwner.origin + vwa) < 86)
 	  {
 	    // if there is rope, then delete
 	    if (ropeOwner.grap_ropechainPrev)
@@ -246,10 +256,10 @@ void(entity corner, vector cornerOrigin) grep_createCornerRope =
 	  }
 
 	  // Calculate direction to owner.
-	  dir = normalize(cornerOrigin - ropeOwner.origin);
+		dir = normalize(cornerOrigin - ropeOwner.origin + vwa);
 
 	  // Calculate start point of the coil
-	  startPoint = ropeOwner.origin + (dir * 68);
+		startPoint = ropeOwner.origin + vwa + (dir * 68);
 
 	  if (ropeOwner.grap_ropechainPrev)
 	  {
@@ -269,8 +279,11 @@ void(entity corner, vector cornerOrigin) grep_createCornerRope =
 
 
 
-	  while(1)
-	  {
+		sf = 300;
+		while(sf > 0)
+		{
+			sf = sf - 1;
+
 	    // create a coil entity if there is room
 	    if (vlen(cornerOrigin - ropeOwner.origin) < 32)
 	    {
@@ -348,8 +361,11 @@ void(entity corner, vector cornerOrigin) grep_createCornerRope =
 	  ropeOwner = rope;
 
 
-	  while(1)
-	  {
+		sf = 300;
+		while(sf > 0)
+		{
+			sf = sf - 1;
+
 	    // create a coil entity if there is room
 	    if (vlen(cornerOrigin - ropeOwner.origin) < 35)
 	    {
@@ -398,6 +414,7 @@ void() grap_touch =
 {
 	local entity grapOwner;
 	local vector temp;
+	local float sf;
 
 	if (other == self.grap_owner)
 		return;
@@ -412,8 +429,10 @@ void() grap_touch =
 	self.touch = SUB_Null;
 
 	grapOwner = self.grap_owner;
-	while(grapOwner.grap_state == GRAP_CORNER)
+	sf = 300;
+	while(grapOwner.grap_state == GRAP_CORNER && sf > 0)
 	{
+		sf = sf - 1;
 	  grapOwner = grapOwner.grap_owner;
 	}
 
@@ -427,8 +446,10 @@ void() grap_touch =
 
 		// set the corner touch functions.
 		grapOwner = self.grap_owner;
-		while(grapOwner.grap_state == GRAP_CORNER)
+		sf = 300;
+		while(grapOwner.grap_state == GRAP_CORNER && sf > 0)
 		{
+			sf = sf - 1;
 		  grapOwner.touch = grep_touchCorner;
 		  grapOwner = grapOwner.grap_owner;
 		}
@@ -491,6 +512,7 @@ void() grap_touch =
 void() grap_touchOwner =
 {
 	local entity grapOwner;
+	local float sf;
 
 	// if touch grap_pull, don't bother to remove self, not there yet.
 	if (self.grap_pull == other)
@@ -520,9 +542,11 @@ void() grap_touchOwner =
 
 	  // remove everything
 	  grapOwner = self.grap_owner;
-	  while(grapOwner.grap_state == GRAP_CORNER)
-	  {
-	  	grapOwner = grapOwner.grap_owner;
+		sf = 300;
+		while(grapOwner.grap_state == GRAP_CORNER && sf > 0)
+		{
+			sf = sf - 1;
+			grapOwner = grapOwner.grap_owner;
 	  }
 
 	  grap_remove(grapOwner);
@@ -537,7 +561,7 @@ void() grap_goToOwner =
 
 	if (self.grap_checkTimeout < time)
 	{
-		if (self.origin == self.oldorigin)
+		if (self.origin == self.oldorigin || (!PK_100 && vlen(self.origin - self.grap_owner.origin) < 50))
 	  { // stuck on wall or something
 	  	other = self.grap_owner;
 	    grap_touchOwner();
@@ -725,10 +749,13 @@ void() grap_maintainHarpoon =
 void(entity grapOwner) grap_remove =
 {
 	local entity e, f;
+	local float sf;
 	e = grapOwner.grap_cornerchainNext;
 
-	while(e)
+	sf = 300;
+	while(e && sf > 0)
 	{
+		sf = sf - 1;
 		f = e;
 	  e = e.grap_cornerchainNext;
 
@@ -760,10 +787,13 @@ void(entity grapOwner) grap_remove =
 void(entity grapOwner) grap_removeRope =
 {
 	local entity e, f;
+	local float sf;
 	e = grapOwner.grap_ropechainPrev;
 
-	while(e)
+	sf = 300;
+	while(e && sf > 0)
 	{
+		sf = sf - 1;
 		f = e;
 	  e = e.grap_ropechainPrev;
 
@@ -821,8 +851,12 @@ entity(entity ropeOwner) grap_createRope =
 // Find the harpoon entity.
 entity(entity start) grap_findHarpoon =
 {
-	while(start.grap_cornerchainNext)
+	local float sf;
+
+	sf = 300;
+	while(start.grap_cornerchainNext && sf > 0)
 	{
+		sf = sf - 1;
 		start = start.grap_cornerchainNext;
 
 	  if (start.grap_state != GRAP_CORNER)
@@ -873,12 +907,16 @@ float() grap_checkCornerLines =
 {
 	local entity corner, tryNext, del;
 	local vector cornerOrigin;
+	local float sf;
 
 	corner = self.grap_cornerchainNext;
 	cornerOrigin = self.origin + '0 0 16';
 
-	while(corner)
+	sf = 300;
+	while(corner && sf > 0)
 	{
+		sf = sf - 1;
+
 		// check if the line is broken
 	  traceline (cornerOrigin, corner.origin, TRUE, self.grap_pull);
 
@@ -904,12 +942,16 @@ float() grap_checkCornerLines =
 	  { // check if a corner can be deleted.
 	    tryNext = corner.grap_cornerchainNext;
 
-	    while(tryNext) {
+			sf = 500;
+			while(tryNext && sf > 0)
+				{
+				sf = sf - 1;
 	    	if (grap_checkIfCanBeRemoved(corner.grap_owner, cornerOrigin, tryNext.origin))
 	      { // Up to this corner can be deleted.
 
-	        while(corner != tryNext)
-	        {
+				while(corner != tryNext && sf > 0)
+				{
+						sf = sf - 1;
 						del = corner;
 	          corner = corner.grap_cornerchainNext;
 						grap_removeCorner(del);
@@ -1084,6 +1126,8 @@ float(entity ownerEntity, vector ownerOrigin, vector tryOrigin) grap_checkIfCanB
 
 void() grap_checkIfGrap =
 {
+	local float sf;
+
 	if (other.classname == "Harpoon")
 	{ // we have a harpoon from a grappling hook, drag back..
 		local entity temp;
@@ -1091,8 +1135,10 @@ void() grap_checkIfGrap =
 
 	  // and it's going out...
 	  grapOwner = other.grap_owner;
-	  while(grapOwner.grap_state == GRAP_CORNER)
-	  {
+		sf = 300;
+		while(grapOwner.grap_state == GRAP_CORNER && sf > 0)
+		{
+		sf = sf - 1;
 	    grapOwner = grapOwner.grap_owner;
 	  }
 

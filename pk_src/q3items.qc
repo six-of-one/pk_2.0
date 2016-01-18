@@ -386,6 +386,7 @@ notteam : when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.
 notsingle : when set to 1, entity will not spawn in Single Player mode (bot play mode).
 */
 
+
 void() misc_teleporter_dest =
 {
 // this does nothing, just serves as a target spot
@@ -402,6 +403,19 @@ void() misc_teleporter_dest =
 	
 };
 
+// altarbetas teleporter for some reason - works in q3
+
+void() target_teleporter =
+{
+	misc_teleporter_dest();
+};
+
+// some q3 triggers may be like this ??
+
+void() misc_teleporter =
+{
+	trigger_teleport();
+};
 
 // fn(q3_play_sound) - play a sound for target_speaker, repeating or by activator
 // fn(q3_sound_think) - periodic repeating sound for target speaker

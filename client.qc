@@ -607,7 +607,7 @@ void () PutClientInServer =
 
 	spawn_tdeath (self.origin,self);
 	if (!Q_100 && !Q_99) PK_CIS(); // *pk - set client pk elements
-	if (self.vwepent) viswep_ld(self.vwepent, -2);
+	viswep_ld(self.vwepent, -3);
 	self.admin = 0;
 	set_initBotLevel(); // *bot
 
