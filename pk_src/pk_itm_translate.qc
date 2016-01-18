@@ -701,21 +701,174 @@ void() set_translate =
 string(float tr) tran_str =
 {
 	if (tr == FL_TR_WOLF) return("Wolfenstien");
-	else if (tr == FL_TR_DOOM) return("DooM");
-	else if (tr == FL_TR_QUAKE) return("Quake");
-	else if (tr == FL_TR_Q2) return("Quake 2");
-	else if (tr == FL_TR_Q3) return("Quake 3");
-	else if (tr == FL_TR_RESTORE) return("Restoring");
-	else if (tr == FL_TR_RANDIN) return("Random genre");
-	else if (tr == FL_TR_RANDOM) return("any Random item");
-//	if (tr == FL_TR_REMOVE) 
-		return("null - removing");
+	if (tr == FL_TR_DOOM) return("DooM");
+	if (tr == FL_TR_QUAKE) return("Quake");
+	if (tr == FL_TR_Q2) return("Quake 2");
+	if (tr == FL_TR_Q3) return("Quake 3");
+	if (tr == FL_TR_RESTORE) return("Restoring");
+	if (tr == FL_TR_RANDIN) return("Random genre");
+	if (tr == FL_TR_RANDOM) return("any Random item");
+	if (tr == FL_TR_REMOVE) return("code = removing");
+	return("null - removing");
 };
 
-// map translations
+// doom alpha translates
+
+// mc is set by map spawn fn
+// final release is always default
+
+void(entity e, float mc) doom_alpha_tran =
+{
+	if (e.mcode == MC_D_INVUL || mc == MC_D_INVUL)
+	{
+		if (DOOM_ALPHA == 0.4 || DOOM_ALPHA == 0.5)
+		{
+// 0.4, 0.5
+		setmodel (e, "progs/d_bottle.mdl");
+		e.frame = 3;
+		e.skin = 2;
+		}
+		else if (DOOM_ALPHA == 0.6)
+		{
+// pre-beta
+		setmodel (e, "progs/d_bottle.mdl");
+		if (mc)
+			e.frame = 2; // map load needs diff position
+		else
+		e.frame = 1;
+		e.skin = 1;
+		}
+		else // if (!DOOM_ALPHA) // default here
+		{
+// release
+			setmodel (e, "progs/d_spheres.mdl");
+			e.frame = 0;
+			e.skin = 2;
+		}
+		return;
+	}
+	if (e.mcode == MC_D_INVIS || mc == MC_D_INVIS)
+	{
+		if (DOOM_ALPHA == 0.4 || DOOM_ALPHA == 0.5) // 0.4, 0.5
+		{
+		setmodel (e, "progs/d_bottle.mdl");
+		e.frame = 3;
+		e.skin = 3;
+		}
+		else if (DOOM_ALPHA == 0.6) // pre-beta
+		{
+		setmodel (e, "progs/d_spheres.mdl");
+		e.frame = 1;
+		e.skin = 5;
+		}
+		else
+		{
+		setmodel (e, "progs/d_spheres.mdl");
+		e.frame = 0;
+		e.skin = 3;
+		}
+		return;
+	}
+	if (e.mcode == MC_D_BERS || mc == MC_D_BERS)
+	{
+		if (DOOM_ALPHA == 0.4 || DOOM_ALPHA == 0.5) // 0.4, 0.5
+		{
+		setmodel (e, "progs/d_bottle.mdl");
+		e.frame = 3;
+		e.skin = 5;
+		}
+		else
+		{
+		setmodel(self, "progs/d_berzerk.mdl");
+		e.frame = 0;
+		e.skin = 0;
+		}
+		return;
+	}
+	if (e.mcode == MC_D_SOULSPH || mc == MC_D_SOULSPH)
+	{
+		if (DOOM_ALPHA == 0.4 || DOOM_ALPHA == 0.5) // 0.4, 0.5
+		{
+		setmodel (e, "progs/d_bottle.mdl");
+		e.frame = 3;
+		e.skin = 7;
+		}
+		else
+		{
+		setmodel(self, "progs/d_spheres.mdl");
+		self.frame = 0;
+		self.skin = 0;
+		}
+		return;
+	}
+	if (e.mcode == MC_D_MEGASPH || mc == MC_D_MEGASPH)
+	{
+		if (DOOM_ALPHA == 0.4 || DOOM_ALPHA == 0.5) // 0.4, 0.5
+		{
+		setmodel (e, "progs/d_bottle.mdl");
+		e.frame = 3;
+		e.skin = 8;
+		}
+		else
+		{
+		setmodel(self, "progs/d_spheres.mdl");
+		self.frame = 0;
+		self.skin = 1;
+		}
+		return;
+	}
+	if (e.mcode == MC_D_ASHELLS || mc == MC_D_ASHELLS)
+	{
+		if (DOOM_ALPHA == 0.6) // pre-beta
+		{
+		setmodel (e, "progs/d_shellbox.mdl");
+		e.frame = 2;
+		}
+		else // release
+		{
+		setmodel (e, "progs/d_4shell.mdl");
+		e.frame = 0;
+		}
+		return;
+	}
+	if (e.mcode == MC_D_ASHELLS_LG || mc == MC_D_ASHELLS_LG)
+	{
+		setmodel (e, "progs/d_shellbox.mdl");
+		if (DOOM_ALPHA == 0.6) // pre-beta
+		{
+		e.frame = 1;
+		}
+		else // release
+		{
+		e.frame = 0;
+		}
+		return;
+	}
+	
+};
+
+// run map translations
 
 void() check_translate =
 {
+		if (DOOM_ALPHA != cvar("pk_doom_alpha"))
+		{
+			local float f;
+			local entity e;
+			DOOM_ALPHA = cvar("pk_doom_alpha"); // set doom alpha level - intended to be loaded by server cfg
+			f = MC_D_SAW;
+			while (f < MC_DOOM)
+			{
+				e = find(world,sscode,ftos(f));
+				while (e)
+				{
+					doom_alpha_tran(e, 0);
+					e = find(e,sscode,ftos(f));
+				}
+				f = f + 1;
+			}
+		}
+
 	TR_NOT = cvar("pk_tr_not");
 
 	if (cvar("pk_place_item") != 1)

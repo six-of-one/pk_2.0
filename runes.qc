@@ -184,6 +184,9 @@ void () rune_1_expire =
 	self.owner.rune_flag = self.owner.rune_flag - (self.owner.rune_flag & self.rune_flag);
 	sprint(self.owner, "The power of the ");
 	sprint(self.owner, self.netname);
+	if (self.noise4 == "q3_snd/poweruprespawn.wav")
+		sprint(self.owner, " has expired.\n");
+	else
 	sprint(self.owner, " rune has expired.\n");
 	}
 	remove(self);
@@ -589,25 +592,26 @@ void() rune_regen =
 	if (self.rg_time > time)
 		return;
 
-	if (self.health<100)
+	if (self.health < 100)
 	{
-		self.health = self.health + 5;
-		if (self.health>100)
-			self.health=100; // NOTE: violates T_Heal rule (implied from t_dmg rule) of only fn to add health - relates to morphs & needs morph tweak here
+		self.health = self.health + 5; // NOTE: violates T_Heal rule (implied from t_dmg rule) of only fn to add health - relates to morphs & needs morph tweak here
+		if (self.health > 100)
+			self.health = 100;
 		RegenerationSound();
 	}
-	if (self.items&(IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3))
+	if (self.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3))
+	if (self.armorvalue < 200) // q2 allows values over 200
 	{
 		self.armorvalue = self.armorvalue + 5;
-		if ((self.items&IT_ARMOR3) && (self.armorvalue>200))
-		  self.armorvalue=200;
-		else if ((self.items&IT_ARMOR2) && (self.armorvalue>150))
-		  self.armorvalue=150;
-		else if ((self.items&IT_ARMOR1) && (self.armorvalue>100))
-			self.armorvalue=100;
+		if ((self.items & IT_ARMOR3) && (self.armorvalue > 200)) // NOTE: increments q2 armor beyond local max limit in some cases (q2 jacket)
+			self.armorvalue = 200;
+		else if ((self.items & IT_ARMOR2) && (self.armorvalue > 150))
+		  self.armorvalue = 150;
+		else if ((self.items & IT_ARMOR1) && (self.armorvalue > 100))
+			self.armorvalue = 100;
 		else
 			RegenerationSound();
-		if (self.armorvalue>250) self.armorvalue=200;
+//		if (self.armorvalue>250) self.armorvalue=200;
 	}
 
 	pk_setDamageSkin(self);

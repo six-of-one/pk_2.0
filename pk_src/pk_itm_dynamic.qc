@@ -955,9 +955,9 @@ bprint(ftos(MC_TOT));
 bprint("\n");
 bprint("\n");
 
-			bprint(" *** Use code (");
+			bprint(" *** Use map code (");
 			bprint(ftos(MC_SHOTGUN - 2));
-			bprint(") for 07 painkeep items\n");
+			bprint(") for 07 painkeep items with pk_tog_mcode\n\n");
 			m = build_itemmenu();
 			bprint(m);
 bprint("\n");

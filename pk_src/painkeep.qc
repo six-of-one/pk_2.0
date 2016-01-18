@@ -911,6 +911,8 @@ void() pk_srvcmd_set =
 
 	NO_PI = 0;
 
+	DOOM_ALPHA = 0;
+
 // respawn times
 	RSP_TIME = 30;
 	POW_TIME = 30;
@@ -1094,6 +1096,11 @@ void() pk_srvcmd_set =
 		registercvar("pk_tr_all", "0");
 		registercvar("pk_tr_not", "2"); // 0 - leave items with no translation, 1 - remove, 2 - best guess, 3 - randomize
 		registercvar("pk_translate", "0");
+
+		registercvar("pk_doom_alpha", "0"); // sort of a translate - use doom alpha / pre-beta models, for use with alpha maps
+														// 04 - doom alpha level 0.4
+														// 05 - doom alpha level 0.5
+														// 06 - doom alpha level pre-beta
 
 // pk items
 		registercvar("pk_bt_time", "90"); // time for beartraps to live

@@ -494,6 +494,9 @@ string DOOM_DET				= "doom/dsitembk.wav"; // against	self.noise4
 float D_POWER_WAIT; // seconds major doom powers need to respawn - norm 30
 float D_POWER_TIME; // seconds of power supply
 
+float DOOM_ALPHA;
+void(entity e, float mc) doom_alpha_tran;
+
 void() doom_precache;
 
 float d_reps_base				= 57005000; // heh heh - DEAD+
