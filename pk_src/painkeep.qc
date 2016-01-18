@@ -345,7 +345,7 @@ void() q_startmap =
 {
 	if (self.map == "start") // trying to load start.bsp - fix/hack
 	{
-		if (world.model == "maps/e1m7.bsp" && world.message == "The House of Chthon") // qualify these - some custom load could have renamed maps to q1 names
+		if (world.model == "maps/e1m7.bsp" && world.message == "The House of Chthon") // qualify these ? - some custom load might rename other maps to q1 names
 		{
 			self.map = "qstart";
 		}
@@ -604,7 +604,7 @@ void() pk_liveupd =
 
 	FFW_LIMIT = cvar("sv_pl_ffwlimit");
 
-// defaults
+// defaults - set on respawn or server entry
 	DEF_HEALTH = cvar("pk_def_health");
 	DEF_ARMOR = cvar("pk_def_armor");
 	DEF_ITEMS = cvar("pk_def_items");
@@ -641,7 +641,7 @@ void() pk_liveupd =
 	else 
 		Q1_CELLAMMO_MAX					= cvar("pk_cellammo_max");
 
-// item ammo levels - NOTE: limit to what can be carried tween levels is fixed! (at 3)
+// item ammo levels - NOTE: limit to what can be carried tween levels is fixed! (at 3) - CHECK: tween levels storage code - as 4 could be 0, 5 -> 1, etc - any over 3 should be 3
 	PK_GRAVITYWELLAMMO_MAX	= cvar("pk_max_gravitywellammo");
 	PK_TURRETAMMO_MAX				= cvar("pk_max_turretammo");
 	PK_CANPABAMMO_MAX			= cvar("pk_max_canpabammo");
@@ -655,6 +655,11 @@ void() pk_liveupd =
 	PKPLUS_PHONEAMMO_MAX	= cvar("pk_max_phoneammo");
 
 	SV_AMMO_MAX = cvar("sv_c_ammo_max");
+
+// x ammos
+	PK_BULLETAMMO_MAX				= cvar("pk_bulletammo_max");
+	PK_SLUGAMMO_MAX					= cvar("pk_slugammo_max");
+	PK_GASAMMO_MAX						= cvar("pk_gasammo_max");
 
 	PK_MAX_LIVENT = cvar("pk_max_livent");
 
@@ -812,7 +817,7 @@ void() pk_liveupd =
 	item_control_menu();
 }
 // fn(pk_monitor) - some sv_ commands are continuosly monitored
-// TDO: chaos mod - chaos effect can turn this off, so chaos can muss vars.
+// IDEA: chaos mod - chaos effect can turn this off, so chaos can muss vars.
 
 void() pk_monitor =
 {
@@ -992,9 +997,9 @@ POW_TIME = 30;
 	Q1_ROCKETAMMO_MAX				= 100;
 	Q1_CELLAMMO_MAX					= 200; // pk amount
 
-	PK_BULLETAMMO_MAX				= 200; // TDO: cvar
-	PK_SLUGAMMO_MAX					= 50; // TDO: cvar
-	PK_GASAMMO_MAX						= 400; // TDO: cvar
+	PK_BULLETAMMO_MAX				= 200;
+	PK_SLUGAMMO_MAX					= 50;
+	PK_GASAMMO_MAX						= 400;
 	
 // item ammo levels
 	PK_GRAVITYWELLAMMO_MAX	= 1;
@@ -1169,7 +1174,7 @@ POW_TIME = 30;
 														// 05 - doom alpha level 0.5
 														// 06 - doom alpha level pre-beta
 
-// defaults & inits
+// defaults & inits - set on respawn or server entry
 
 		registercvar("pk_def_health", "0");
 		registercvar("pk_def_armor", "0");
@@ -1235,6 +1240,11 @@ POW_TIME = 30;
 		registercvar("pk_max_phoneammo", "1");
 
 		registercvar("pk_tomb_time", "90"); // time for beartraps to live
+
+// x ammos
+		registercvar("pk_bulletammo_max", "200");
+		registercvar("pk_slugammo_max", "50");
+		registercvar("pk_gasammo_max", "400");
 
 // total live ents per server
 		registercvar("pk_max_livent", "256");
@@ -1433,7 +1443,7 @@ void(entity e, float chan, string samp, float vol, float atten) pk_sound =
 		if (samp == "misc/secret.wav") psamp = "alt_sounds/misc/secret.wav";
 	}
 
-// TDO: q2 silencer for wep channel stuff
+// q2 silencer for wep channel stuff
 	if (chan == CHAN_WEAPON)
 	if (e.silencer_finished)
 	{

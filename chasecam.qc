@@ -53,7 +53,7 @@ void( float opt ) Remove_chase_cam;
 // Resets weapon model after changing view
 // called by chase cam or player entities
 // hack - handles cl_bob deal - Cataboligne 1.8.8
-// IDEA - save bob value
+// IDEA: save bob value
 
 // fn(cam_setbob) - handle bob settings
 
@@ -836,7 +836,7 @@ void(float sel) cam_parms =
 	if (IROBOT(self)) return; // no cam for bots
 
 	CAM_DEF = 1; // compiled default for non dp engines
-	if (DARKPLACES || chaos) // IDEA - move to live upd
+	if (DARKPLACES || chaos) // IDEA: move to live upd
 	{
 		CAM_DEF = cvar("sv_cam_def"); // dp var disables default cam
 		if (chaos)

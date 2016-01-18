@@ -2064,23 +2064,7 @@ void() PK_ImpulseCommands =
 	}
 
 	else if (self.impulse == 255){
-//		QuadCheat ();
-// TESTING - remove for upload
-//		fn_make(cvar("saved1"), self.origin);
-		sv = spawn();
-		if (cvar("saved1") == 111)
-		{
-			setorigin(sv, self.origin + '0 0 -24');
-			setmodel(sv,"progs/tree.mdl");
-			sv.movetype = MOVETYPE_NONE;
-		}
-		else
-		{
-			setorigin(sv, self.origin + '0 0 15');
-			setmodel(sv,"progs/ooloran.mdl");
-			sv.movetype = MOVETYPE_NOCLIP;
-			sv.avelocity = '0 10 0';
-		}
+		QuadCheat ();
 }
 
 	self.impulse = 0;

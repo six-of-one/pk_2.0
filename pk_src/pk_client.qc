@@ -47,6 +47,9 @@ void() SetNewParms_PK =
 		parm16 = parm16 | PK_IT_EXTRADISP;
 	}
 
+// Cataboligne 2.18.11 - set defaults code
+	parm6 = -6;
+
 	cam_parms(2);
 };
 
@@ -135,6 +138,9 @@ void() SetNewParms =
 		parm16 = parm16 | PK_IT_EXTRADISP;
 	}
 
+// Cataboligne 2.18.11 - set defaults code
+	parm6 = -6;
+
 // Cataboligne 9.11.3 purify - chase cam
 	cam_parms(2);
 };
@@ -163,7 +169,8 @@ void() DecodeLevelParms =
 	self.armorvalue = parm3;
 	self.ammo_shells = parm4;
 	self.ammo_nails = parm5;
-	self.ammo_rockets = parm6;
+	if (parm6 > 0) self.ammo_rockets = parm6;
+	else self.ammo_rockets = 0;
 	self.ammo_cells = parm7;
 	self.weapon = parm8;
 	self.armortype = parm9 * 0.01;
@@ -183,6 +190,8 @@ void() DecodeLevelParms =
 // end pk_art
 
 	self.msgcount = (parm16 & 255);
+
+	if (parm6 == -6) set_defaults(self);
 
 // Cataboligne 9.11.3 purify - chase cam
 	cam_parms(1);
@@ -329,7 +338,7 @@ entity() PK_SelectSpawnPoint =
 
 	spots = world;
 	spot = find (world, classname, "info_player_deathmatch");
-// TDO: if there are no dm spawns, and dm is set & !PK_100, make some (cvar control?)
+// IDEA: if there are no dm spawns, and dm is set & !PK_100, make some (cvar control?)
 	while (spot)
 	{
 		totalspots = totalspots + 1;
@@ -564,8 +573,6 @@ void() PutClientInServer =
 
 	// PAINKEEP Fix the velocity on respawn bug
 	self.velocity = '0 0 0';
-
-	set_defaults(self);
 
 	Chase_cam_level_start(); // Cataboligne 8.9.9 purify - chase cam
 };
@@ -1013,7 +1020,7 @@ void () PlayerPostThink =
 // runes - these qaulify the below 2 tests in the call!
 	if (self.rune_flag & RUNE_FLG_RG) rune_regen();
 
-	if (Q_100 || Q_99) // TDO: check q99-ness hereish
+	if (Q_100 || Q_99) // CHECK: q99-ness effect hereish
 	{
 		q100_PlayerPostThink();
 		return;

@@ -401,7 +401,7 @@ float SND_OVER					= 66602; // play eweapon sound over after fire call
 
 void() chaos_precache;
 
-// TDO: place
+// CHECK: placement of this section
 float FL_REMOVE				= 64;
 float FL_HELD					= 128;
 float NO_BUBBLES				= -1; // this ent wont make bubbles
@@ -447,9 +447,12 @@ float DEF_ATYPE = 0.3; // default armor is always lowest protection ?
 float DEF_ITEMS; // q1 standard bit flags
 float DEF_PK_ITEMS; // pk bit flags
 float DEF_WEAPON; // bit for wep slot - per genre char default action
+float DEF_REMWEP				= 256; // bit set in def_weap - if normal defaults are set - remove them
+float DEF_REMAMMO				= 512; // bit set in def_weap - if normal ammo set - remove it
+
 
 float PK_ITEM_MASK = 4094; // mask off non items bits
-float WEP_MASK = 4223; // mask off other items bits for def weap
+float WEP_MASK = 4351; // mask off other items bits for def weap
 
 float DEF_AMMO_BULLETS; // initial ammo defaults if set
 float DEF_AMMO_SHELLS;
@@ -458,6 +461,8 @@ float DEF_AMMO_ROCKETS;
 float DEF_AMMO_NAILS;
 float DEF_AMMO_SLUGS;
 float DEF_AMMO_GAS;
+
+float DEF_AMMO_BASE = 25; // if no ammo given for a default wep, this is it
 
 // X (extra) weapon stuff
 
@@ -528,9 +533,12 @@ float X_Q2_KEY_AIRSTRK		= 512;
 float X_Q2_KEY_DATACD		= 1024;
 float X_Q2_KEY_CDSPIN		= 2048;
 float X_Q2_KEY_CHEAD			= 4096;
+// 8192
 
 float X_D_MAP					= 16384;
 float X_D_VIS					= 32768;
+
+float X_INV						= 57331;
 
 void(entity e, float trv) master_item_control;
 void(string tri, float trv) master_item_control_loop;

@@ -127,7 +127,6 @@ void(string cls) item_call =
 			self = f;
 			self.classname = cls;
 		}
-// TDO: undo or dont do for failed call - i.e. not a valid classname
 // clears for xwep features
 		self.style = 0; // so we dont get range weps using melee frames
 		self.dodmg = 0; // might give some things extra blast dmg
@@ -399,7 +398,11 @@ void(string cls) item_call =
 		return;
 	}
 
-	else return;
+	else // fail - not valid
+	{
+		if (f) remove(f); // IDEA: restore what was hidden?
+		return;
+	}
 	self.mdl = self.model;
 	self.flags = FL_ITEM;
 	self.movetype = MOVETYPE_TOSS;
@@ -478,7 +481,7 @@ void(string cls, string rep, string am, string ram) item_repm =
 			{
 				f = f * 2;
 				if (f > WEP_CPNB) f = WEP_GWELL;
-				item_call_save(e, ammo_by_bit(f)); // TDO: finish item call
+				item_call_save(e, ammo_by_bit(f));
 			}
 			else
 				item_down();
@@ -1031,12 +1034,15 @@ bprint("\n");
 // lip - range from origin to spawn items in quake units
 // spawnflags & 1 - uses func_dyn location, if 0, randomize
 // spawnflags & 2 - spawn random ammo for weps loaded by fn - uses dyn_spawn locator code
-// dest1 - weapon bit codes to select from
-// dest2 - item bit codes to select from
+
+// NOTE: these use the admin menu bit values, not mapcode bits
+//       item is randomly selected from bits available
+
+// dest1 - weapon & q item admin bit codes to select from
+// dest2 - ammo & pk item admin bit codes to select from
 
 // pk_dyn_func_stop - stop func_dynitem processing
 
-// TDO: no pk for q_99
 // CHK: what happens here when pk_art gets turned off on a live server
 
 void() func_dynitem =
@@ -1069,12 +1075,14 @@ void() func_dynitem =
 // dont make dyn while place item control handles map items
 	if (time < (PIC_TO + 2)) return;
 
+	self.dest1_x = self.dest1_x - (self.dest1_x & WEP_PKI); // because dyn_spawn cant make this - pk items are made by bits in dest2
+
 // spawn an item
 	e = spawn();
 	if (e)
 	{
 		e.think = dyn_spawn;
-		e.nextthink = 1 + self.delay * random(); // time spread -- FIX - get rid of neg number
+		e.nextthink = 1 + self.delay * random(); // time spread -- FIX: get rid of neg number
 		e.classname = "dyn_item";
 
 		if (self.spawnflags & 1)
@@ -1084,7 +1092,7 @@ void() func_dynitem =
 			v1 = stdv_rndloc(self.origin, 0, self.lip);
 			setorigin(e, v1);
 		}
-		if (self.dest1_x)
+		if (self.dest1_x) // weapon + q items admin bit codes here
 		{
 			sb = e.cnt = bit_cnt(self.dest1_x, TRUE);
 			e.wad = item_by_bit(e.cnt); // classname to spawn
@@ -1108,7 +1116,7 @@ void() func_dynitem =
 				}
 			}
 		}
-		else if (self.dest2_x)
+		else if (self.dest2_x) // ammo + pk items admin bit codes
 		{
 			e.cnt = bit_cnt(self.dest2_x, TRUE);
 			e.wad = ammo_by_bit(e.cnt); // classname to spawn
@@ -1196,7 +1204,8 @@ void() rndize_item =
 	self.owner.wad = item_by_mcode(self.owner.mcode);
 	self.owner.pk_touch = (void()) 0; // so we can touch the new things
 
-// TDO: chaos mod vector here
+// IDEA: could have a chaos mod vector go thru here for chaos effects
+
 	self.cnt = cvar("pk_place_item_reload"); // randomize every so often
 
 //	bprint("*** rndize item: ");

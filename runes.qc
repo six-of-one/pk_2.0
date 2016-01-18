@@ -673,7 +673,6 @@ void () item_sigil =
 
 	if (!RUNES)
 	if (time < PIC_TO)
-	if (self.class_select != "q3_item")
 	{
 		if (time < 2) // delay till we can read cvar - HUH?  dont freaking get why this is necc!  if this isnt done for an initial server start map load rune has sigil_touch set and things fail
 		{
@@ -713,7 +712,6 @@ void () item_sigil =
 	self.noise = "misc/runekey.wav";
 
 	self.duration = 0;
-	if (self.class_select != "q3_item") // TDO: remove once q3 art are done
 	if (time < PIC_TO) // make sure map runes load the correct appearance even if powers change
 	{
 		self.duration = self.spawnflags & RUNE_MASK_ALL;

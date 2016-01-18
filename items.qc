@@ -276,7 +276,8 @@ void () armor_touch =
 		value = 200;
 		bit = IT_ARMOR3;
 	}
-// TDO: move these - maintain q100 code
+// IDEA: move this somehow one day in the far future - maintain q100 code
+//       move issues - snd, ck, bit values used by later q100 code
 	local string snd;
 	local float ck;
 	ck = TRUE;

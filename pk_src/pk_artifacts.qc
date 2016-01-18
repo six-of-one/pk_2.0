@@ -79,7 +79,7 @@ float(entity ck, string prv) pk_art_movshot_ck =
 		ev = FALSE;
 	else if (ck.classname == "corpse" && prv != "horn")
 		ev = FALSE;
-	else if (ck.classname == "func_button" && prv == "turret") // CHECK - is this test needed??
+	else if (ck.classname == "func_button" && prv == "turret") // CHECK: is this test needed??
 		ev = FALSE;
 
 	return(ev);

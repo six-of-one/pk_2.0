@@ -119,6 +119,11 @@ float(entity hent, string match, string srch) cnt_ent =
 	return(rc);
 }
 
+/*
+		+---------------------------------------+
+		|  bit operations code                  | SEC-HEAD
+		+---------------------------------------+
+*/
 
 // fn(bit_cnt) - count available bits for random selection
 
@@ -155,6 +160,194 @@ float(float fb, float rb) bit_cnt =
 
 	return(f);
 };
+
+// fn(return_bit) - return a requested bit from a value and mask if available
+
+// bt - bit value
+// msk - mask value
+// op - operation
+// df - default return value
+
+float BIT_HIGH = 8388608;
+float BIT_LOW = 1;
+
+float (float bt, float msk, float op, float df) return_bit =
+{
+	local float f, v, sf;
+
+	f = op;
+	v = bt;
+	sf = 64;
+	if (msk != 0) v = bt & msk;
+	if (!v) return(df);
+
+	while (1)
+	{
+		if (v & f) return (f);
+		if (op == BIT_LOW) f = f * 2;
+		else //if (op == BIT_HIGH) - op doesnt have to be bit high
+			f = floor(f / 2);
+		sf = sf - 1;
+		if (sf < 0 || f < BIT_LOW || f > BIT_HIGH) return(df);
+	}
+	return(df); // never executes - for dumb compiler warning
+};
+
+// given a mask (max value of all 1s - does not mask bits to print), print a bit set as string of 1s & 0s
+
+void(float msk, float bt) bit_print =
+{
+	local float b, f, sf ;
+	local string b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11 , b12, b13, b14, b15, b16, b17, b18, b19, b20, b21, b22, b23, b24;  
+
+	if (msk < 1) return;
+	if (bt < 1) bt = 0;
+
+	b = fabs(bt);
+	f = fabs(msk);
+	sf = 24;
+
+	while (sf > 0 && f >= 1)
+	{
+/*
+bprint("mask: ");
+bprint(ftos(f));
+bprint(" bit: ");
+bprint(ftos(b&1));
+bprint(" sf: ");
+bprint(ftos(sf));
+bprint("\n");*/
+		if (sf == 24) b1 = ftos(b & 1);
+		else if (sf == 23) b2 = ftos(b & 1);
+		else if (sf == 22) b3 = ftos(b & 1);
+		else if (sf == 21) b4 = ftos(b & 1);
+		else if (sf == 20) b5 = ftos(b & 1);
+		else if (sf == 19) b6 = ftos(b & 1);
+		else if (sf == 18) b7 = ftos(b & 1);
+		else if (sf == 17) b8 = ftos(b & 1);
+		else if (sf == 16) b9 = ftos(b & 1);
+		else if (sf == 15) b10 = ftos(b & 1);
+		else if (sf == 14) b11 = ftos(b & 1);
+		else if (sf == 13) b12 = ftos(b & 1);
+		else if (sf == 12) b13 = ftos(b & 1);
+		else if (sf == 11) b14 = ftos(b & 1);
+		else if (sf == 10) b15 = ftos(b & 1);
+		else if (sf == 9) b16 = ftos(b & 1);
+		else if (sf == 8) b17 = ftos(b & 1);
+		else if (sf == 7) b18 = ftos(b & 1);
+		else if (sf == 6) b19 = ftos(b & 1);
+		else if (sf == 5) b20 = ftos(b & 1);
+		else if (sf == 4) b21 = ftos(b & 1);
+		else if (sf == 3) b22 = ftos(b & 1);
+		else if (sf == 2) b23 = ftos(b & 1);
+		else if (sf == 1) b24 = ftos(b & 1);
+		b = floor(b / 2);
+		f = floor(f / 2);
+		sf = sf - 1;
+	}
+	if (sf < 1)		bprint(b24);
+	if (sf < 2)		bprint(b23);
+	if (sf < 3)		bprint(b22);
+	if (sf < 4)		bprint(b21);
+	if (sf < 5)		bprint(b20);
+	if (sf < 6)		bprint(b19);
+	if (sf < 7)		bprint(b18);
+	if (sf < 8)		bprint(b17);
+	if (sf < 9)		bprint(b16);
+	if (sf < 10)	bprint(b15);
+	if (sf < 11)	bprint(b14);
+	if (sf < 12)	bprint(b13);
+	if (sf < 13)	bprint(b12);
+	if (sf < 14)	bprint(b11);
+	if (sf < 15)	bprint(b10);
+	if (sf < 16)	bprint(b9);
+	if (sf < 17)	bprint(b8);
+	if (sf < 18)	bprint(b7);
+	if (sf < 19)	bprint(b6);
+	if (sf < 20)	bprint(b5);
+	if (sf < 21)	bprint(b4);
+	if (sf < 22)	bprint(b3);
+	if (sf < 23)	bprint(b2);
+	if (sf <24)		bprint(b1);
+};
+
+// return 2^rl, bounded by 2^0 (lowest bit, 1) to 2^23 (highest bit, 8388608)
+
+/*  code table:
+1					0
+2					1
+4					2
+8					3
+16					4
+32					5
+64					6
+128				7
+256				8
+512				9
+1024				10
+2048				11
+4096				12
+8192				13
+16384				14
+32768				15
+65536				16
+131072			17
+262144			18
+524288			19
+1048576			20
+2097152			21
+4194304			22
+8388608			23
+*/
+
+float (float rl) AdminBitFlag =
+{
+	local float f, e;
+
+	f = floor(rl);
+	if (f < 0 || f > 23) return(0);
+	e = 1;
+	while (f > 0)
+	{
+		f = f - 1;
+		e = e * 2;
+	}
+	return(e);
+};
+
+// return a random bit from a mask
+
+float(float msk) rnd_bit_mask =
+{
+	float f, sf, mm, b;
+
+	if (msk < 1) return(0); // no other possibilities
+	if (msk == 1) return(1);
+
+	b = mm = 0;
+	f = 1;
+	if (f & msk) b = f;
+	while (msk > f && mm < 23) // max out rnd selector
+	{
+		mm = mm + 1;
+		f = AdminBitFlag(mm);
+		if (!b)
+		if (f & msk) b = f;
+	}
+
+	f = 0;
+	sf = 100;
+	while (f == 0 && sf > 0)
+	{
+		f = AdminBitFlag(random() * mm);
+		if (! (f & msk)) f = 0;
+		sf = sf - 1;
+	}
+	if (!f) // damn - didnt get one? - take first bit then
+		f = b;
+	return(f);
+};
+
 
 void() SUB_Nop =
 {
@@ -366,7 +559,7 @@ vector(entity e, float s, vector p) getsurfaceclippedpoint =
 
 // e - passed entity, if world, try self, if self == world return FALSE
 
-// IDEA - limit re-entry
+// IDEA: limit re-entry
 
 /* sky list - so far
 
@@ -425,7 +618,7 @@ void() sky_touch_pointer =
 //	if (self.content_flag & RM_SKY) // has a remove sky setting - wont work after content_clear
 //		SUB_Remove();
 
-// IDEA - rethink code here if called as a think fn, till timeout
+// IDEA: rethink code here if called as a think fn, till timeout
 };
 
 

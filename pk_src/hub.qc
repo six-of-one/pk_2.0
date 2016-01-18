@@ -213,7 +213,7 @@ void() hub_custom =
 		pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 
 // set appearance - model has different frames & skins for variety
-// IDEA - set facing in cphub? - not for now, all portals should be "directionless"
+// IDEA: set facing in cphub? - not for now, all portals should be "directionless"
 	if (self.delay < 0)
 		setmodel (self, "progs/null.mdl");
 	else
