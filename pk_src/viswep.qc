@@ -3,7 +3,6 @@
 visible weapon support
 
 Cataboligne 9.26.9
-
 */
 
 // TEST - check for errors in viswep chains
@@ -147,6 +146,38 @@ float(entity e) mk_pkbits =
 	return(nbits);
 };
 
+// fn(vw_chain) - chain up viswep for an ent, rebuild vwepent list(s)
+
+// e - ent we want viswep for
+
+entity(entity e) vw_chain =
+{
+	local entity f, c, ch;
+
+	c = world;
+	ch = e;
+	f = find(world,classname,"viswep");
+
+	while (f)
+	{
+		if (f.owner == e)
+		{
+			if (!c) c = f;
+//			else
+//			{
+//				ch.chain = f; // NOTE - use vwepent?
+//			}
+				// chain up any viswep with owner = world
+			if (ch) ch.vwepent = f; // this becomes a list rebuild
+			ch = f;
+			f.vwepent = world; // unlink old stuff
+		}
+
+		f = find(f,classname,"viswep");
+	}
+	return (c);
+};
+
 // fn([pk]vload) - load up vwepent for an ent
 
 // e - ent loading to
@@ -194,8 +225,9 @@ void() vwep_tst =
 		bprint(" -  at: ");
 		bprint(ftos(self.wait));
 		bprint("\n");
-	self.nextthink = time + 0.1;
-	self.think = SUB_Remove;
+//	self.nextthink = time + 0.1;
+//	self.think = SUB_Remove;
+	vw_chain(self.owner);
 };
 
 entity(entity e, float fl) vload =
@@ -238,7 +270,7 @@ local float tst;
 	setmodel(tr.vwepent, md);
 
 /*
-	if (DARKPLACES) // TEST - trying movement deal
+	if (DARKPLACES) // TEST - trying movement deal - movetype 12
 	{
 		tr.vwepent.movetype = MOVETYPE_FOLLOW; // make the tr.vwepent follow
 		tr.vwepent.solid = SOLID_NOT; // MOVETYPE_FOLLOW is always non-solid
@@ -322,6 +354,8 @@ return(tr);
 
 // fn (vchk) - check for a given item & return ent pointer if found
 
+// can be used for vw special
+
 entity(float qw, float pkw, entity vh) vchk =
 {
 	local entity f;
@@ -338,26 +372,26 @@ entity(float qw, float pkw, entity vh) vchk =
 // fn (viswep_ld) - load or unload viswep models
 
 // vh - head ent
-// self - player ent
+// e - player ent
 // cd - 1 = load em up, -1 = unload em
 //			future expansion: -1 dead throw em, -2 unload em
 //			-3 - init, unload then countdown set
 
-void(entity vh, float cd) viswep_ld =
+void(entity e, float cd) viswep_ld =
 {
 	local entity tr, pr;
 	local float pkbits, bts, pkts, f, at;
 
-	tr = vh;
-	pr = self;
+local entity vh; //TEST now
+	tr = vh = e.vwepent;
+	pr = e;
 	at = pkts = bts = 0;
 
-	pkbits = mk_pkbits(self);
+	pkbits = mk_pkbits(e);
 
 // TEST
 	local float nvw, fld;
 if (!tr) nvw = 1;// came in with null viswep set
-
 
 
 // NOTE: fix - need unload (-1) here
@@ -418,9 +452,9 @@ bprint(ftos(mk_pkbits(tr.owner)));
 }
 
 		}
-		if (self) // because we may come here with self = first viswep ent
-		if (self.classname != "viswep")
-			self.vwepent = world;
+		if (e) // because we may come here with self = first viswep ent
+		if (e.classname != "viswep")
+			e.vwepent = world;
 
 // TEST
 //bprint("\n");
@@ -440,16 +474,18 @@ float unlk;
 // have items & check for inventory
 	while (tr)
 	{
+		pr = world;
 		if (tr.armortype)
 		{
-			at = self.armortype;
+			at = e.armortype;
 			if (!at)
 			{
-				tr.mdl = "";
-				tr.think = SUB_Remove;
-				tr.nextthink = time + 0.01;
-				tr.model = "";
-				pr.vwepent = tr.vwepent;
+//				tr.mdl = "";
+//				tr.think = SUB_Remove;
+//				tr.nextthink = time + 0.01;
+//				tr.model = "";
+				pr = tr.vwepent;
+				remove(tr);
 			}
 			if (at > 0.6) tr.skin = 2;
 			else if (at <= 0.6) tr.skin = 1;
@@ -459,7 +495,7 @@ float unlk;
 		else
 		if (tr.weapon != IT_AXE || !pkbits)
 		{
-			if (! tr.weapon & self.items)
+			if (! tr.weapon & e.items)
 			{
 
 
@@ -483,11 +519,13 @@ bprint(ftos(mk_pkbits(tr.owner)));
 		unlk = 1;
 }
 
-				tr.mdl = "";
-				tr.think = SUB_Remove;
-				tr.nextthink = time + 0.01;
-				tr.model = "";
-				pr.vwepent = tr.vwepent;
+//				tr.mdl = "";
+//				tr.think = SUB_Remove;
+//				tr.nextthink = time + 0.01;
+//				tr.model = "";
+//				pr.vwepent = tr.vwepent;
+				pr = tr.vwepent;
+				remove(tr);
 				}
 			else
 				bts = bts | tr.weapon;
@@ -517,17 +555,20 @@ bprint(ftos(mk_pkbits(tr.owner)));
 		unlk = 1;
 }
 
-				tr.mdl = "";
-				tr.think = SUB_Remove;
-				tr.nextthink = time + 0.01;
-				tr.model = "";
-				pr.vwepent = tr.vwepent;
+//				tr.mdl = "";
+//				tr.think = SUB_Remove;
+//				tr.nextthink = time + 0.01;
+//				tr.model = "";
+//				pr.vwepent = tr.vwepent;
+				pr = tr.vwepent;
+				remove(tr);
 			}
 			else
 				pkts = pkts | tr.pk_currentitem;
 		}
-		pr = tr;
-		tr = tr.vwepent;
+//		pr = tr;
+		if (pr) tr = pr;
+		else if (tr) tr = tr.vwepent;
 
 
 // TEST
@@ -536,12 +577,12 @@ if (0) //unlk)
 		bprint("    --- Unlinked ");
 		if (tr) bprint("trace is: ");
 		if (tr) bprint(tr.model);
-		if (pr) if (pr.model != "") bprint(" -  prev is: ");
-		if (pr) if (pr.model != "") bprint(pr.model);
-		if (pr) if (pr.model == "") bprint(" -  prev is deleted ");
+//		if (pr) if (pr.model != "") bprint(" -  prev is: ");
+//		if (pr) if (pr.model != "") bprint(pr.model);
+//		if (pr) if (pr.model == "") bprint(" -  prev is deleted ");
 		if (tr.vwepent) bprint(" -  next trace is: ");
 		if (tr.vwepent) bprint(tr.vwepent.model);
-		if (!tr && !pr) bprint(" -  nothing left.");
+		if (!tr) bprint(" -  nothing left.");
 		bprint("\n");
 }
 unlk = 0;
@@ -550,9 +591,9 @@ unlk = 0;
 	}
 
 	if (VW_ARMOR)
-	if (self.armortype && !at)
+	if (e.armortype && !at)
 	{
-		tr = vload(self, IT_ARMOR1);
+		tr = vload(e, IT_ARMOR1);
 
 // TEST
 if (0) 
@@ -568,7 +609,7 @@ if (!fld) {
 }
 
 
-		tr.armortype = at = self.armortype;
+		tr.armortype = at = e.armortype;
 		if (tr.armortype > 0.6) tr.skin = 2;
 		else if (tr.armortype <= 0.6) tr.skin = 1;
 		else if (tr.armortype <= 0.3) tr.skin = 0;
@@ -580,10 +621,10 @@ if (!fld) {
 	f = 1;
 	while ( f & qweps && f < 8388609 ) // NOTE: this will not load an axe
 	{
-		if ((self.items & f) && !(bts & f)){
+		if ((e.items & f) && !(bts & f)){
 // TEST
 			tr = 
-			vload(self, f);
+			vload(e, f);
 
 // TEST
 if (0) 
@@ -610,7 +651,7 @@ if (!fld) {
 		if ((pkbits & f) && !(pkts & f)){
 // TEST
 			tr = 
-			pkvload(self, f);
+			pkvload(e, f);
 
 // TEST
 if (0) 
@@ -738,12 +779,13 @@ void() viswep_post =
 
 //	if (!self.flags & FL_CLIENT) return;
 
+	vw_chain(self);
 
 // TEST *** VW ERROR
 vw_error = "";
 
-	vhead = find(world,classname,"pk*bot");
-	while (vhead)
+vhead = find(world,classname,"pk*bot");
+while (vhead)
 	{
 		if (vhead.vwepent)
 			vw_errck(vhead.vwepent);
@@ -759,11 +801,11 @@ vw_error = "";
 
 		vhead = find(vhead,classname,"pk*bot");
 	}
-	vhead = find(world,classname,"player");
-	while (vhead)
+vhead = find(world,classname,"player");
+while (vhead)
 	{
-		if (vhead.vwepent)
-			vw_errck(vhead.vwepent);
+	if (vhead.vwepent)
+		vw_errck(vhead.vwepent);
 if (vw_error != "")
 	{
 		bprint("vw error - ");
@@ -790,14 +832,15 @@ if (vw_error != "")
 	if (vw_bot_frame != framecount)
 	if (self.classname != "pk*bot" && self.ishuman) viswep_pkbot();
 
-	if (self.deadflag || self.classname == OBSERVER || self.view_ofs == '0 0 0' || (self.admin && self.admin != USER_MENU)) //intermission_running)
+														// NOTE - check this vs. invisibility for norm & morphs
+	if (self.deadflag || self.classname == OBSERVER || self.view_ofs == '0 0 0' || self.model == "") //(self.admin && self.admin != USER_MENU)) //intermission_running)
 	{
 
 
 vw_errck(self.vwepent);
 
 
-		if (self.vwepent) viswep_ld(self.vwepent, -2); // unload all weps - for now just removes ent, later deadthrow what's not put in pack if died
+		if (self.vwepent) viswep_ld(self, -2); // unload all weps - for now just removes ent, later deadthrow what's not put in pack if died
 
 
 // TEST *** VW ERROR
@@ -862,7 +905,7 @@ if (vw_error != "")
 	{
 
 	if (!vhead){
-		viswep_ld(vhead, 1);
+		viswep_ld(self, 1);
 
 
 // TEST *** VW ERROR
@@ -882,7 +925,7 @@ if (vw_error != "")
 		if (self.items & qweps != vhead.items || vhead.armorvalue != self.armortype * VW_ARMOR) qld = TRUE;
 
 		pkbits = mk_pkbits(self);
-		if (vhead.pk_items != pkbits || qld) viswep_ld(vhead, 1);
+		if (vhead.pk_items != pkbits || qld) viswep_ld(self, 1);
 	}
 
 
@@ -896,8 +939,8 @@ if (vw_error != "")
 		bprint(self.netname);
 		bprint("\n");
 		
-		viswep_ld(vhead, -1);
-		viswep_ld(vhead, 1);
+//		viswep_ld(vhead, -1);
+//		viswep_ld(vhead, 1);
 	}
 
 
@@ -910,7 +953,7 @@ if (vw_error != "")
 	vhead = self.vwepent;
 	vhead.items = self.items & qweps;
 	vhead.pk_items = pkbits;
-	vhead.armorvalue = self.armortype;
+	vhead.armorvalue = self.armortype; // FIX - does not match above test - will always cause qld if armortype & VW_ARMOR = 0
 
 // run viswep frame match
 
@@ -976,7 +1019,7 @@ if (vw_error != "")
 
 				} // IDEA - viswframe weps on gremlins back for special frames
 			vhead.frame = vframe + vadd - gremlin_frame_adjust - grap_frame_adjust;
-//			if (!DARKPLACES) // TEST
+//			if (!DARKPLACES) // TEST --- movetype 12
 //				{
 				setorigin(vhead, vhead.owner.origin + vofs); // ... sync visible weapon model
 				vhead.angles = vhead.owner.angles;
