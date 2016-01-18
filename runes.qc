@@ -613,6 +613,7 @@ void() rune_regen =
 			self.health = 100;
 		RegenerationSound();
 	}
+	armorsave_rev(self);
 	if (self.target2 != "progs/q3_art.mdl") // apparently q3 doesnt regen armor
 	if (self.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3))
 	if (self.armorvalue < 200) // q2 allows values over 200

@@ -658,6 +658,9 @@ void() pk_liveupd =
 
 	NOCIDE = 	cvar("sv_pl_nocide");
 	NOENVCIDE = cvar("sv_pl_nolavacide");
+	NOPKCIDE = 	cvar("sv_pl_nopkcide");
+	if (NOCIDE && NOENVCIDE >= 0) NOENVCIDE = NOCIDE; // if noenvc < 0 can still have env suicide when nocide is true
+	if (NOCIDE && NOPKCIDE >= 0) NOPKCIDE = NOCIDE; // if nopkc < 0 can still have pk ffw suicide when nocide is true
 
 	FFW_LIMIT = cvar("sv_pl_ffwlimit");
 
@@ -954,7 +957,7 @@ void() pk_srvcmd_set =
 
 // q1 control
 	Q_99 = FALSE; // quake mode with all env effects / extra weps
-	Q_100 = FALSE; // if true run 100% true to quake v106 - i n theory, dev purposes only
+	Q_100 = FALSE; // if true run 100% true to quake v106 - in theory, really for dev purposes only
 	Q_100_OBJERR = FALSE;
 
 // runes
@@ -979,6 +982,7 @@ void() pk_srvcmd_set =
 
 	NOCIDE = 0;
 	NOENVCIDE = 0;
+	NOPKCIDE = 0;
 
 // vw controls
 	VW_ARMOR = FALSE; /// has issues - can be turned on with sv_vw_armor 1 // TRUE; // should only ever be 1 or 0 - used in conditionals
@@ -1210,6 +1214,7 @@ POW_TIME = 30;
 		registercvar("sv_pl_ffwlimit", "0"); // limits how long a dead player can collect frags for fire & forget weapons
 		registercvar("sv_pl_nocide", "0"); // dont count suicides as -1 frag
 		registercvar("sv_pl_nolavacide", "0"); // dont count lava /env suicides as -1 frag
+		registercvar("sv_pl_nopkcide", "0"); // dont count pk ffw suicides as -1 frag
 
 // dynamic item controls
 		registercvar("pk_dyn_ovr", "0"); // if set over-ride bit in control flag - gets set by menu command

@@ -507,6 +507,7 @@ void(entity e, float camct, float mcd, string spf) xwep_fakeload;
 float(entity e, entity f, float dm) power_armor;
 void() power_armor_impulse;
 .float armorsave; // save armor value for power armor flipping value
+void(entity e) armorsave_rev;
 
 float X_PWR_ARMOR				= 1;
 float X_PWR_SCREEN			= 2;
@@ -720,6 +721,9 @@ float VW; // viswep support - set to 0 to return to generic gun / axe
 float VW_ARMOR; // viswep armor support - eventually admin controlled & cvar
 float VW_HOLSTER; // viswep - show holstered weps when true
 
+// config new vw by code
+void() vw_config;
+
 // Cataboligne - projectile / cartridge fire(d) positioning - 9.30.9
 
 // really needed by viswep & chasecam which shows how bad original positioning looks
@@ -836,8 +840,10 @@ void() dead_cam_set;					// Cataboligne 9.11.3 purify proto - chase cam
 float DCAMTO;							// timeout for death cam 2 mins
 float DCAMTOACT;						// action after timeout 0 = respawn, 1 = disconnect
 float FFW_LIMIT;						// time limit on how long players get frags from fire & forget weaps after dead
-float NOCIDE;
+float NOCIDE;							// dont cound suicide frags for idiom of var
 float NOENVCIDE;
+float NOPKCIDE;
+float(entity e) frag_minus_cide;
 
 // cam vision field settings
 float DCAM_FOV					= 130; // dead cam crow vision

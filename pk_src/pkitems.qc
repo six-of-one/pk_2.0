@@ -569,6 +569,7 @@ void() painkeep_touch =
 	else
 	if (self.pk_touch != painkeep_touch) // all items route through here - handle special cases, other touch fns & return
 	{
+		armorsave_rev(other); // get armor if power on
 		if (self.pk_touch == ammo_touch) self.pk_touch = pk_ammo_touch; // new fn for ammo collections
 
 		self.pk_touch();

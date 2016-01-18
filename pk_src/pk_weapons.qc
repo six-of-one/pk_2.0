@@ -1928,6 +1928,16 @@ void() PK_ImpulseCommands =
 {
 	local entity sv;
 
+
+
+
+// DEV - TESTING
+	vw_config(); // call config check viswep
+
+
+
+
+
 	if (self.impulse >= 1 && self.impulse <= 8)
 		W_ChangeWeapon ();
 	else if (self.impulse == 9)
