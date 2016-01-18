@@ -897,9 +897,13 @@ PLAYER WEAPON USE
 
 void () W_SetCurrentAmmo =
 {
-	if (PK || custom_hub_loaded || (self.cam_x & CHSCAM_ON)) // Cataboligne 8.8.9 purify - cc thru pk code - chase cam
+//	if (PK || custom_hub_loaded || (self.cam_x & CHSCAM_ON)) // Cataboligne 8.8.9 purify - cc thru pk code - chase cam
+	if (!Q_100)
 	{
-		PK_SetCurrentAmmo(); // *pk - handle ammo for all pk items
+		if (PK_100 || !VW)
+			PK_SetCurrentAmmo(); // *pk - handle ammo for all pk items & cam
+		else
+			PK_SetCurrentAmmoOnly();
 		return;
 	}
 	if (self.classname == "player") // *bot

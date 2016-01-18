@@ -409,6 +409,10 @@ bprint("repm: restore on con_only\n");
 
 // fn(ammo_con) - handle admin infinite flag, runes, chaos, etc
 
+// cn - ammo count needing approval
+// e - gun carrier tested (player / bot)
+// op - for load check
+
 // NOTE: need to sw to inf ammo wep if ammo = 0
 
 float(float cn, entity e, string op) ammo_con =
@@ -423,23 +427,61 @@ float(float cn, entity e, string op) ammo_con =
 	{
 		if (pk_itemovr & CON_INF)
 		{
+if (WARNING)
+{
+bprint("*** ammo_con: wep:");
+bprint(ftos(e.weapon));
+bprint(" - ");
+}
+
 		if (e.weapon == IT_SUPER_SHOTGUN)
 		if (pk_itemovr & WEP_SSHOT) f = 0;
+if (WARNING)
+{
+bprint(" - ss:");
+bprint(ftos(pk_itemovr & WEP_SSHOT));
+}
 
 		if (e.weapon == IT_NAILGUN)
 		if (pk_itemovr & WEP_NAILGUN) f = 0;
+if (WARNING)
+{
+bprint(" - ng:");
+bprint(ftos(pk_itemovr & WEP_NAILGUN));
+}
 
 		if (e.weapon == IT_SUPER_NAILGUN)
 		if (pk_itemovr & WEP_PERF) f = 0;
+if (WARNING)
+{
+bprint(" - sng:");
+bprint(ftos(pk_itemovr & WEP_PERF));
+}
 
 		if (e.weapon == IT_GRENADE_LAUNCHER)
 		if (pk_itemovr & WEP_GREN) f = 0;
+if (WARNING)
+{
+bprint(" - gl:");
+bprint(ftos(pk_itemovr & WEP_GREN));
+}
 
 		if (e.weapon == IT_ROCKET_LAUNCHER)
 		if (pk_itemovr & WEP_ROCKET) f = 0;
+if (WARNING)
+{
+bprint(" - rl:");
+bprint(ftos(pk_itemovr & WEP_ROCKET));
+}
 
 		if (e.weapon == IT_LIGHTNING || e.pk_currentitem == PK_IT_CLIGHT)
 		if (pk_itemovr & WEP_THUNDER) f = 0;
+if (WARNING)
+{
+bprint(" - lt:");
+bprint(ftos(pk_itemovr & WEP_THUNDER));
+bprint("\n");
+}
 		}
 	}
 	else if (op == "ldck") // load check - allow sw to inf ammo wep

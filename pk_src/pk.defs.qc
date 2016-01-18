@@ -304,7 +304,7 @@ void() e_weap_Attack;
 void() viswep_post;
 void() viswep_pre;
 void(entity vh, float cd) viswep_ld;
-string(float dw, string wpm) ver_weaponmodel;
+float(string wpm) ver_weaponmodel;
 void() player_nail3;
 float VW; // viswep support - set to 0 to return to generic gun / axe
 float VW_ARMOR; // viswep armor support - eventually admin controlled & cvar
@@ -554,6 +554,7 @@ void() PlayerDeathThink;
 void() PlayerJump;
 float() W_BestWeapon;
 void() W_SetCurrentAmmo;
+void() PK_SetCurrentAmmoOnly;
 void() CheckWaterLevels;
 float cc_frame;
 // pk_postthink

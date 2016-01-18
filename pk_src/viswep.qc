@@ -437,6 +437,20 @@ void(entity e, float cd) viswep_ld =
 
 };
 
+
+// verify this for new weps that use eweapon
+
+float (string wpm) ver_weaponmodel =
+{
+	string wmr;
+
+	if (wpm == "progs/v_w_mortar.mdl") return(TRUE);
+	else if (wpm == "progs/v_d_rock.mdl") return(TRUE);
+//	else if (wpm == "") return(TRUE);
+
+	return(FALSE);
+};
+
 // fn(viswep_pkbot) - load / unload pkbots
 
 float vw_bot_frame; // handle pk*bots
@@ -562,7 +576,6 @@ void() viswep_post =
 
 	local float vadd, vframe, dwep, gremlin_frame_adjust, grap_frame_adjust, pkdwep;
 	local vector vofs, vang; // gremlin vwep offsets
-	local string wm;
 
 	if (vhead)
 		{
@@ -616,12 +629,14 @@ void() viswep_post =
 					{
 						if (vhead.owner.eweapon)
 						{
-							if (vhead.owner.eweapon.weaponmodel != vhead.owner.weaponmodel) wm = vhead.owner.weaponmodel = vhead.owner.eweapon.weaponmodel;
+							if (vhead.owner.eweapon.weaponmodel != vhead.owner.weaponmodel) PK_SetCurrentAmmo(); //vhead.owner.weaponmodel = vhead.owner.eweapon.weaponmodel;
 						}
 						else
 							if (ver_weaponmodel(vhead.owner.weaponmodel)) PK_SetCurrentAmmo();
 //							if (wm != vhead.owner.weaponmodel) vhead.owner.weaponmodel = wm;
+						if ((vhead.owner.prevweapon != vhead.owner.weapon) || (vhead.owner.pkprevweapon != vhead.owner.pk_currentitem) || (vhead.owner.forcewchange == 1)) PK_SetCurrentAmmo();
 					}
+					else	if ((vhead.owner.prevweapon != vhead.owner.weapon) || (vhead.owner.pkprevweapon != vhead.owner.pk_currentitem) || (vhead.owner.forcewchange == 1)) PK_SetCurrentAmmo();
 				}
 			}
 

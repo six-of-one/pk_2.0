@@ -272,6 +272,16 @@ void() PK_SetCurrentAmmo =
 	if (wchanged)
 		sprint(self, "You have selected the ");
 
+	if (self.eweapon) // display got first
+	{
+		if (wchanged)
+		{
+			sprint(self, self.eweapon.netname);
+			sprint(self, "\n");
+		}
+		wchanged = FALSE;
+	}
+
 	if (self.weapon == IT_AXE)
 	{
 		if (self.pk_currentitem == PK_IT_AXE)
@@ -512,14 +522,13 @@ void() PK_SetCurrentAmmo =
 			sprint(self, "An Unknown Weapon???\n");
 	}
 
-	if (self.eweapon)
+	if (self.eweapon) // set model / ammo
 	{
 //		self.currentammo = self.eweapon.aflag;
 		self.weaponframe = 0;
 		self.weaponmodel = self.eweapon.weaponmodel;
-		if (wchanged)
-			sprint(self, self.eweapon.netname);
 	}
+
 // Cataboligne 8.8.9 purify - chase cam
 	// disable model in chase view
 		if ( (self.cam_x & CHSCAM_ON) || self.classname == OBSERVER)
@@ -528,72 +537,180 @@ void() PK_SetCurrentAmmo =
 		}
 };
 
-// verify this for new weps that use eweapon
+// just to update ammo counts since viswep controls "you have selected" & weaponmodel changes now
 
-string(float dw, string wpm) ver_weaponmodel =
+void() PK_SetCurrentAmmoOnly =
 {
-	string wmr;
 
-	wmr = wpm;
-	if (dw == IT_AXE)
+	if (self.classname == "player") // *bot - dont set run frames
+	player_run ();		// get out of any weapon firing states
+
+	self.items = self.items - (self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS));
+
+	if (self.weapon == IT_AXE)
 	{
 		if (self.pk_currentitem == PK_IT_AXE)
-		if (wpm != "progs/v_axe.mdl")
-			wmr = "progs/v_axe.mdl";
+		{
+			self.currentammo = 0;
+			self.weaponframe = 0;
 		}
-	else if (dw == IT_SHOTGUN)
-	{
-		if (wpm != "progs/v_eshot.mdl" && wpm != "progs/v_shot.mdl")
-			wmr = "progs/v_shot.mdl";
-	}
-	else if (dw == IT_SUPER_SHOTGUN)
-	{
-		if (wpm != "progs/v_eshot2.mdl" && wpm != "progs/v_shot2.mdl")
-			wmr = "progs/v_shot2.mdl";
-	}
-	else if (dw == IT_NAILGUN)
-	{
-		if (wpm != "progs/v_nail.mdl" && wpm != "progs/v2_nail.mdl" && wpm != "progs/v_fnail.mdl" && wpm != "progs/v2_pulsenail.mdl")
-		if (PK_100)
-			wmr = "progs/v_fnail.mdl";
-		else if (Q_100)
-			wmr = "progs/v_nail.mdl";
-		else if (PK)
-			wmr = "progs/v2_pulsenail.mdl";
-		else
-			wmr = "progs/v2_nail.mdl";
-	}
-	else if (dw == IT_SUPER_NAILGUN)
-	{
-		if (wpm != "progs/v_nail2.mdl" && wpm != "progs/v2_nail2.mdl")
-		if (PK_100 || Q_100)
-			wmr = "progs/v_nail2.mdl";
-		else
-			wmr = "progs/v2_nail2.mdl";
-	}
-	else if (dw == IT_GRENADE_LAUNCHER)
-	{
-		if (wpm != "progs/v_rock.mdl" && wpm != "progs/v2_rock.mdl")
-		if (PK_100 || Q_100)
-			wmr = "progs/v_rock.mdl";
-		else
-			wmr = "progs/v2_rock.mdl";
-	}
-	else if (dw == IT_ROCKET_LAUNCHER)
-	{
-		if (wpm != "progs/v_rock2.mdl" && wpm != "progs/v2_rock2.mdl")
-		if (PK_100 || Q_100)
-			wmr = "progs/v_rock2.mdl";
-		else
-			wmr = "progs/v2_rock2.mdl";
-	}
-	else if (dw == IT_LIGHTNING)
-	{
-		if (wpm != "progs/v_light.mdl")
-			wmr = "progs/v_light.mdl";
-	}
+		else if (self.pk_currentitem == PK_IT_GRAVITYWELL)
+		{
+			self.currentammo = self.pk_gravitywellammo;
+			self.weaponframe = 0;
+		}
+		else if (self.pk_currentitem == PK_IT_TURRET)
+		{
+			self.currentammo = self.pk_turretammo;
+			self.weaponframe = 0;
+		}
+		else if (self.pk_currentitem == PK_IT_CANPAB)
+		{
+			self.currentammo = self.pk_canpabammo;
+			self.weaponframe = 0;
+		}
+		else if (self.pk_currentitem == PK_IT_GRAPGUN)
+		{
+// GRAPPLING_START
+			self.currentammo = 1;
 
-	return(wmr);
+			if (self.grap_cornerchainNext != world)
+			{
+				self.weaponframe = 8;
+			}
+			else
+			{
+				self.weaponframe = 0;
+			}
+		}
+		else if (self.pk_currentitem == PK_IT_BEARTRAP)
+		{
+			self.currentammo = self.pk_beartrapammo;
+			self.weaponframe = 0;
+		}
+		else if (self.pk_currentitem == PK_IT_AIRGUN)
+		{
+			self.currentammo = 1;
+			self.weaponframe = 0;
+		}
+// BOLT_START
+		else if (self.pk_currentitem == PK_IT_CLIGHT)
+		{
+			self.currentammo = self.ammo_cells;
+			self.weaponframe = 0;
+			if (self.bolt_changeModelTimeout < time)
+			{
+				self.weaponmodel = "progs/v_cl_off.mdl";
+			}
+			else
+			{
+				self.weaponmodel = "progs/v_cl_on.mdl";
+			}
+			self.items = self.items | IT_CELLS;
+		}
+
+// Cataboligne 8.12.9 purify - pk artifacts
+		if (self.pk_currentitem == PKPLUS_IT_EGO)
+		{
+			self.currentammo = self.pkplus_egoammo;
+			self.weaponframe = 0;
+		}
+		else if (self.pk_currentitem == PKPLUS_IT_TOMB)
+		{
+			self.currentammo = self.pkplus_tombammo;
+			self.weaponframe = 0;
+		}
+		else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
+		{
+			if (self.pkplus_actorskin == PKPLUS_ACTORQUAD)
+			{
+				self.weaponmodel = "progs/v_actorb.mdl";
+			}
+			else
+//		if (self.pkplus_actorskin == PKPLUS_ACTORPENT)
+			{	
+				self.weaponmodel = "progs/v_actorr.mdl";
+			}
+			self.currentammo = self.pkplus_actorammo;
+			self.weaponframe = 0;
+			}
+		else if (self.pk_currentitem == PKPLUS_IT_PHONE)
+		{
+			self.currentammo = self.pkplus_phoneammo;
+			self.weaponframe = 0;
+		}
+// end pk_art
+	}
+	else if (self.weapon == IT_SHOTGUN)
+	{
+// EXPLODESHELLS_START
+		if (self.pk_explode_ammo) {
+			self.currentammo = self.pk_explode_ammo;
+			if (!self.eweapon) self.weaponmodel = "progs/v_eshot.mdl";
+
+		} else {
+			self.currentammo = self.ammo_shells;
+			if (!self.eweapon) self.weaponmodel = "progs/v_shot.mdl";
+		}
+		self.weaponframe = 0;
+		self.items = self.items | IT_SHELLS;
+	}
+	else if (self.weapon == IT_SUPER_SHOTGUN)
+	{
+// EXPLODESHELLS_START
+		if (self.pk_explode_ammo) {
+			self.currentammo = self.pk_explode_ammo;
+			if (!self.eweapon) self.weaponmodel = "progs/v_eshot2.mdl";
+
+		} else {
+			self.currentammo = self.ammo_shells;
+			if (!self.eweapon) self.weaponmodel = "progs/v_shot2.mdl";
+		}
+		self.weaponframe = 0;
+		self.items = self.items | IT_SHELLS;
+	}
+	else if (self.weapon == IT_NAILGUN)
+	{
+		self.currentammo = self.ammo_nails;
+		self.weaponframe = 0;
+		self.items = self.items | IT_NAILS;
+	}
+	else if (self.weapon == IT_SUPER_NAILGUN)
+	{
+		self.currentammo = self.ammo_nails;
+		self.items = self.items | IT_NAILS;
+		self.weaponframe = 0;
+		}
+	else if (self.weapon == IT_GRENADE_LAUNCHER)
+	{
+		self.currentammo = self.ammo_rockets;
+		self.weaponframe = 0;
+		self.items = self.items | IT_ROCKETS;
+	}
+	else if (self.weapon == IT_ROCKET_LAUNCHER)
+	{
+		self.currentammo = self.ammo_rockets;
+		self.weaponframe = 0;
+		self.items = self.items | IT_ROCKETS;
+	}
+	else if (self.weapon == IT_LIGHTNING)
+	{
+		self.currentammo = self.ammo_cells;
+		self.weaponframe = 0;
+		self.items = self.items | IT_CELLS;
+	}
+	else if (!self.eweapon)
+	{
+		self.currentammo = 0;
+		self.weaponmodel = "";
+		self.weaponframe = 0;
+	}
+// Cataboligne 8.8.9 purify - chase cam
+	// disable model in chase view
+		if ( (self.cam_x & CHSCAM_ON) || self.classname == OBSERVER)
+		{
+			self.weaponmodel = "";
+		}
 };
 
 // called from many places

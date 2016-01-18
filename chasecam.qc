@@ -88,7 +88,7 @@ void( entity player_ent ) Chase_cam_setweapon =
 	}
 	else
 	{
-		W_SetCurrentAmmo();
+		PK_SetCurrentAmmo();
 		cam_setbob(CL_BOBSET);
 	}
 	self = e;
