@@ -675,6 +675,7 @@ void (float skl) AddAnotherBot =
 	WriteByte (MSG_ALL,newbot.id);
 	WriteShort (MSG_ALL,newbot.frags);
 */
+	if (BOTFREEZE) bot_froze(newbot); // Cataboligne - 6.9.10 - bots get really cold now - dev code
 };
 
 void (entity ply, float n) addTeamBots =

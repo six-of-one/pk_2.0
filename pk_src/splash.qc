@@ -1,5 +1,7 @@
 /* splish splash */
 
+float SOLID_TIME = 120; // secs certain things can spend in solids
+
 float NOT_IN_WATER = 0;
 float pc;								// The content type the last entity to be checked just entered
 float splash_count;			// The amout of splashes around. Used to keep the number down so we do'nt get any "No Free Edicts" messages
@@ -97,6 +99,8 @@ void() CheckWaterLevels =
 {
 	local entity e;
 
+	cc_frame = framecount; // call only once per frame
+
 	e = find(world, water_notify, "yes");
 
 	while (e != world)
@@ -146,6 +150,27 @@ void() CheckWaterLevels =
 	    }
 	      
 		}
+
+// fall from grace - stuff out of level checks
+
+// suspect shot stuff is from bots fallen out & not returned yet
+
+		if (pc == CONTENT_SOLID)
+		{
+			if (!e.endtime) e.endtime = time;
+			else
+			if (e.endtime + SOLID_TIME < time)
+			if (e.velocity_z < -1000)
+			if (e.classname != "player" && e.classname != "pk*bot") // done elsewhere
+			{
+				if (e.flags & FL_MONSTER && e.solid != SOLID_NOT) e.th_die(); // swim monsters dont splash
+				else if (e.flags & FL_MONSTER) remove(e); // kill then remove
+				else if (e.touch == pulse_touch) remove(e); // pulse nails
+				else if (e.classname == "beartrap") remove(e);
+			}
+		}
+		else
+			e.endtime = 0;
 
 		e = find(e, water_notify, "yes");
 	}

@@ -98,6 +98,14 @@ void(entity e, entity p) rune_id =
 	local float f;
 
 	f = 1;
+
+	if (WARNING)
+	if (RUNES)
+	{
+		sprint(p, "*** Runes are turned off.\n");
+		return;
+	}
+
 	if (e == p) sprint(p, "You have");
 	else
 	{

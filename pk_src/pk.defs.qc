@@ -63,6 +63,9 @@ string ADMINCODE				= "float1\n"; // local command that loads admin security pas
 string ADMINIMPULSE			= "float2\n"; // load the impulse
 string ADMINTIME				= "float3\n"; // load the time out
 string ADMINMAPCMD			= "_mapcmd\n"; // append to mapname for alias cmd
+float BOTFREEZE;							// if true stop bots cold
+void (entity e) bot_froze;
+
 string() build_itemmenu;
 void() Admin_itembits;
 float(float msk) rnd_bit_mask;
@@ -133,6 +136,7 @@ float(float mcv, entity e) bit_mcode;
 .float mcode;								// map item code - handle sub lists
 .float scode;								// save item code - for restore
 .string sscode;							// map item code string - for find
+string sid_code;							// list of all codes as string, access = (code - 100) * 4;
 
 // respawn times
 //float RSP_AMMO; // these are dm 3 rules
@@ -140,6 +144,8 @@ float(float mcv, entity e) bit_mcode;
 //float RSP_ITEM;
 //float RSP_WEP;
 //float RSP_ART;
+
+float RE_LOC					= -666; // relocate restore point if .delay = this - pk_item_position_init
 float RSP_TIME; // respawn time
 float POW_TIME; // power time
 float PIC_TO					= 5; // place_item_control time out
@@ -518,6 +524,7 @@ void() PlayerJump;
 float() W_BestWeapon;
 void() W_SetCurrentAmmo;
 void() CheckWaterLevels;
+float cc_frame;
 // pk_postthink
 void () W_WeaponFrame;
 void() CheckPowerups;

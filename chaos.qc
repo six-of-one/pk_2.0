@@ -85,3 +85,8 @@ float(float fb, float rb) bit_cnt =
 
 	return(f);
 };
+
+void() SUB_Nop =
+{
+	return;
+};

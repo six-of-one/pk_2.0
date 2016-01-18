@@ -53,7 +53,7 @@ void () PlaceItem =
 	local float oldz;
  
 	self.mcode = pk_mcode("", self); // put map code on ent
-	self.sscode = ftos(self.mcode);
+	self.sscode = sid_code[(int)(self.mcode - 100) * %4];
 	if (!self.scode) self.scode = self.mcode;
 
 	self.mdl = self.model;		// so it can be restored on respawn

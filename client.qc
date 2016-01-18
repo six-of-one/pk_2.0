@@ -1020,7 +1020,6 @@ void () PlayerPreThink =
 	if (self.waterlevel == 2)
 		CheckWaterJump ();
 
-//		if (!Q_100 && !PK_100)
 	if (self.waterlevel)
 	if (! self.flags & FL_WATERJUMP)
 	if (self.cam_x & CHSCAM_ON)

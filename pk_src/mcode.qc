@@ -13,7 +13,7 @@
 //float MIN_ITEM					= 100;
 //float MAX_INVITEM			= 255;
 //float MAX_OLDQ				= 300;
-float MAX_ITEM					= 1023;
+float MAX_ITEM					= 999;
 
 float ITEM_SET1				= 1023;
 float ITEM_SET2				= 1047552; // allows multiplexing of 2 x 1023 bit values in 1 float if needed

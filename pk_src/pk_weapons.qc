@@ -360,7 +360,48 @@ void() PK_SetCurrentAmmo =
 				sprint(self, "Chain Thunderbolt\n");
 		}
 
-		if (PK_ART) pk_art_setcurrentammo(wchanged); // Cataboligne 8.12.9 purify - pk artifacts
+// Cataboligne 8.12.9 purify - pk artifacts
+		if (self.pk_currentitem == PKPLUS_IT_EGO)
+		{
+			self.currentammo = self.pkplus_egoammo;
+			self.weaponmodel = "progs/v_ego.mdl";
+			self.weaponframe = 0;
+			if (wchanged)
+				sprint (self,"Ego\n");
+		}
+		else if (self.pk_currentitem == PKPLUS_IT_TOMB)
+		{
+			self.currentammo = self.pkplus_tombammo;
+			self.weaponmodel = "progs/v_tomb.mdl";
+			self.weaponframe = 0;
+			if (wchanged)
+				sprint (self,"Tomb\n");
+		}
+		else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
+		{
+			if (self.pkplus_actorskin == PKPLUS_ACTORQUAD)
+			{
+				self.weaponmodel = "progs/v_actorb.mdl";
+			}
+			else
+//		if (self.pkplus_actorskin == PKPLUS_ACTORPENT)
+			{	
+					self.weaponmodel = "progs/v_actorr.mdl";
+			}
+			self.currentammo = self.pkplus_actorammo;
+			self.weaponframe = 0;
+			if (wchanged)
+				sprint (self,"Actor\n");
+		}
+		else if (self.pk_currentitem == PKPLUS_IT_PHONE)
+		{
+			self.currentammo = self.pkplus_phoneammo;
+			self.weaponmodel = "progs/v_phone.mdl";
+			self.weaponframe = 0;
+			if (wchanged)
+				sprint (self,"Cellular Phone\n");
+		}
+// end pk_art
 	}
 	else if (self.weapon == IT_SHOTGUN)
 	{
@@ -533,8 +574,28 @@ float(float weaponnum, float pknum) HasAmmo =
 				return FALSE;
 		}
 
-		if (PK_ART) if (pk_art_hasammo(pknum)) // Cataboligne 8.12.9 purify - pk artifacts
-			return FALSE;															// fn return TRUE indicates false code for pk artifacts
+// Cataboligne 8.12.9 purify - pk artifacts
+		else if (pknum == PKPLUS_IT_EGO)
+		{
+			if (self.pkplus_egoammo < 1)
+				return FALSE;
+		}
+		else if (pknum == PKPLUS_IT_TOMB)
+		{
+			if (self.pkplus_tombammo < 1)
+				return FALSE;
+		}
+		else if (pknum == PKPLUS_IT_ACTOR)
+		{
+			if (self.pkplus_actorammo < 1)
+				return FALSE;
+		}
+		else if (pknum == PKPLUS_IT_PHONE)
+		{
+			if (self.pkplus_phoneammo < 1)
+				return FALSE;
+		}
+// end pk_art
 	}
 	else if (weaponnum == IT_SHOTGUN)
 	{
@@ -931,6 +992,16 @@ float(float rot) PK_CheckLivEnt =
 	return(FALSE);
 };
 
+// reset wep when carrys run out
+
+void() pk_wep_reset =
+{
+	self.pk_currentInventory = PK_IT_AXE;
+	self.weapon = W_BestWeapon();
+	self.pk_currentitem = W_BestPKWeapon();
+	W_SetCurrentAmmo();
+};
+
 // called from below
 
 void() PK_Attack =
@@ -1060,8 +1131,76 @@ void() PK_Attack =
 			player_bolt1();
 			self.attack_finished = time + 0.1;
 		}
-		
-		if (PK_ART) pk_art_attack(); // Cataboligne 8.12.9 purify - pk artifacts
+// Cataboligne 8.12.9 purify - pk artifacts
+		else if (self.pk_currentitem == PKPLUS_IT_EGO)
+		{
+			ego_activate ();
+			self.pkplus_egoammo = (self.pkplus_egoammo - 1);
+			self.attack_finished = (time + 0.5);
+			if (self.pkplus_egoammo < 1)
+			{
+				self.pk_currentInventory = PK_IT_AXE;
+				self.weapon = W_BestWeapon ();
+				self.pk_currentitem = W_BestPKWeapon ();
+				W_SetCurrentAmmo ();
+
+				vwep_firecary(self, PKPLUS_IT_EGO); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
+			}
+		}
+		else	if (self.pk_currentitem == PKPLUS_IT_TOMB)
+		{
+			tomb_launch ();
+			self.pkplus_tombammo = (self.pkplus_tombammo - 1);
+			self.attack_finished = (time + 0.5);
+			if (self.pkplus_tombammo < 1)
+			{
+				self.pk_currentInventory = PK_IT_AXE;
+				self.weapon = W_BestWeapon ();
+				self.pk_currentitem = W_BestPKWeapon ();
+				W_SetCurrentAmmo ();
+
+				vwep_firecary(self, PKPLUS_IT_TOMB); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
+			}
+		}
+		else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
+		{
+			if (self.pkplus_actorskin == PKPLUS_ACTORQUAD)
+			{
+				actor_quad_activate ();
+			}
+			else
+			{
+				actor_pent_activate ();
+			}
+			self.pkplus_actorammo = (self.pkplus_actorammo - 1);
+			self.attack_finished = (time + 0.5);
+			if (self.pkplus_actorammo < 1)
+			{
+				self.pk_currentInventory = PK_IT_AXE;
+				self.weapon = W_BestWeapon ();
+				self.pk_currentitem = W_BestPKWeapon ();
+				W_SetCurrentAmmo ();
+
+				vwep_firecary(self, PKPLUS_IT_ACTOR); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
+			}
+		}
+		else if (self.pk_currentitem == PKPLUS_IT_PHONE)
+		{
+			phone_activate ();
+			self.pkplus_phoneammo = (self.pkplus_phoneammo - 1);
+			self.attack_finished = (time + 0.5);
+			if (self.pkplus_phoneammo < 1)
+			{
+				self.pk_currentInventory = PK_IT_AXE;
+				self.weapon = W_BestWeapon ();
+				self.pk_currentitem = W_BestPKWeapon ();
+				W_SetCurrentAmmo ();
+
+				vwep_firecary(self, PKPLUS_IT_PHONE); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
+			}
+		}
+// end pk_art
+
 	}
 	else if (self.weapon == IT_SHOTGUN)
 	{
@@ -1114,12 +1253,6 @@ void() PK_Attack =
 
 void() pk_cycleObjects =
 {
-	if (PK_ART)
-	{
-		pk_art_cycleobjects(); // Cataboligne 8.12.9 purify - pk artifacts
-		return;
-	}
-
 	while (1)
 	{
 		if (self.pk_currentitem == PK_IT_AXE)
@@ -1131,7 +1264,30 @@ void() pk_cycleObjects =
 		else if (self.pk_currentitem == PK_IT_BEARTRAP)
 			self.pk_currentitem = PK_IT_CANPAB;
 		else if (self.pk_currentitem == PK_IT_CANPAB)
+// Cataboligne 8.12.9 purify - pk artifacts
+			self.pk_currentitem = PKPLUS_IT_EGO;
+		else if (self.pk_currentitem == PKPLUS_IT_EGO)
+			self.pk_currentitem = PKPLUS_IT_TOMB;
+		else if (self.pk_currentitem == PKPLUS_IT_TOMB)
+		{
+			self.pkplus_actorskin = PKPLUS_ACTORQUAD;
+			self.pk_currentitem = PKPLUS_IT_ACTOR;
+		}
+		else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
+		{
+			if (self.pkplus_actorskin == PKPLUS_ACTORQUAD)
+			{
+				self.pkplus_actorskin = PKPLUS_ACTORPENT;
+			}
+			else
+			{
+			self.pkplus_actorskin = 0;
+			self.pk_currentitem = PKPLUS_IT_PHONE;
+			}
+		}
+		else if (self.pk_currentitem == PKPLUS_IT_PHONE)
 			self.pk_currentitem = PK_IT_AXE;
+// end pk_art
 		else
 			return;		// get's here when the currentitem == a normal pk weapon
 
@@ -1420,7 +1576,7 @@ void() PK_ImpulseCommands =
 
 	else if (self.impulse >= 30 && self.impulse <= 39 || self.impulse == 21 || self.impulse == 22) // user impulses
 		pk_special_impulse();
-	else if (PK_ART && self.impulse > 160 && self.impulse < 166) // Cataboligne 8.12.9 purify - pk artifacts
+	else if (self.impulse > 160 && self.impulse < 166) // Cataboligne 8.12.9 purify - pk artifacts
 	{
 		pk_art_specialimpulse(self.impulse);
 		return;

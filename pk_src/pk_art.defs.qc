@@ -15,11 +15,7 @@
  
 void(float sel) pk_art_parms;
 void() pk_art_precache;
-void() pk_art_attack;
-float(float pkn) pk_art_hasammo;
 void(float pkimp) pk_art_specialimpulse;
-void(float wch) pk_art_setcurrentammo;
-void() pk_art_cycleobjects;
 void() pk_art_prinv;
 void () pk_art_powerup_touch;
 float() pk_art_checkpwr;

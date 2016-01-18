@@ -1061,6 +1061,7 @@ void() ip_checkForMovement =
 		}
 	}
 	else
+	if (self.ip_orgOrigin != v0)
 	if (self.ip_orgOrigin != self.origin)
 	{ // position has changed... repawn after x minutes..
 		self.think = ip_regen;
@@ -1077,11 +1078,14 @@ void() pk_item_position =
 {
 	self.owner = world;
 
-	if (self.ip_orgOrigin == ' 0 0 0' && self.oldorigin != ' 0 0 0') // Cataboligne - in case mode was set to PK after some map items got loaded
-		self.ip_orgOrigin = self.oldorigin;
+// deprecated - .oldorigin never set
+//	if (self.ip_orgOrigin == ' 0 0 0' && self.oldorigin != ' 0 0 0') // Cataboligne - in case mode was set to PK after some map items got loaded
+//		self.ip_orgOrigin = self.oldorigin;
 
-	if (self.ip_orgOrigin != ' 0 0 0') // Cataboligne - tweak: in case this doesnt get set, we dont want to put any item like this at 0, 0, 0
+	if (self.ip_orgOrigin != v0) // Cataboligne - tweak: in case this doesnt get set, we dont want to put any item like this at 0, 0, 0
 		setorigin (self, self.ip_orgOrigin);
+	else
+		setorigin (self, self.origin);
 
 	self.think = ip_checkForMovement;
 	self.nextthink = time + 60;
@@ -1099,14 +1103,15 @@ void() pk_item_position_init =
 {
 	if (WARNING) if (!PK) bprint("*** warning: pk_item_position_init called when not in PK mode.\n");
 
-	self.ip_orgOrigin = self.origin;
+	if (self.ip_orgOrigin == v0 || self.delay == RE_LOC)
+		self.ip_orgOrigin = self.origin;
 
 	self.think = ip_checkForMovement;
 	self.nextthink = time + 60;
 
 // dynamic items should not end up here
-//if (self.classname == "dyn_item")
-//bprint("******** error: dynamic in ip *********");
+	if (WARNING)  if (self.classname == "dyn_item")
+		bprint("*** warning: dynamic item in pk_item_position_init() \n");
 
 };
 
@@ -1152,7 +1157,8 @@ void() pk_placeitem =
 	}
 
 	self.mcode = pk_mcode("", self); // put map code on ent - do we need this? placeitem sets these too
-	self.sscode = ftos(self.mcode);
+//	self.sscode = ftos(self.mcode);
+	self.sscode = sid_code[(int)(self.mcode - 100) * %4];
 	if (!self.scode) self.scode = self.mcode;
 };
 
