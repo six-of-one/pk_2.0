@@ -211,7 +211,7 @@ void() player_nail1   =[$lightfatt1, player_nail2  ]
 		self.weaponframe = 1;
 	SuperDamageSound();
 	W_FireSpikes (4);
-	self.attack_finished = time + 0.2;
+//	self.attack_finished = time + 0.2;
 };
 void() player_nail2   =[$lightfatt2, player_nail3  ] // *pk - viswep - Cataboligne - 9.29.9
 {
@@ -224,7 +224,7 @@ void() player_nail2   =[$lightfatt2, player_nail3  ] // *pk - viswep - Catabolig
 		self.weaponframe = 1;
 	SuperDamageSound();
 	W_FireSpikes (-4);
-	self.attack_finished = time + 0.2;
+//	self.attack_finished = time + 0.2;
 };
 
 //============================================================================

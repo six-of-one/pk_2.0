@@ -439,6 +439,9 @@ void () W_FireRocket =
 	missile.velocity = missile.velocity * 1000;
 	missile.angles = vectoangles (missile.velocity);
 
+	if (!rune_haste(0.4))
+		missile.velocity = missile.velocity * 2;
+
 	missile.touch = T_MissileTouch;
 
 // set missile duration
@@ -676,6 +679,9 @@ void () W_FireGrenade =
 		}
 	}
 
+	if (!rune_haste(0.3))
+		missile.velocity = missile.velocity * 2;
+
 	missile.avelocity = '300 300 300';
 
 	missile.angles = vectoangles (missile.velocity);
@@ -726,6 +732,9 @@ void (vector org, vector dir) launch_spike =
 	setorigin (newmis,org);
 
 	newmis.velocity = dir * 1000;
+	if (!rune_haste(0.1))
+		newmis.velocity = dir * 1000 * 2;
+
 	if (PK) pk_missile_splash(newmis); // *pk - splash & message setup
 };
 
@@ -778,7 +787,7 @@ void(float ox) W_FireSpikes =
 		return ;
 	}
 
-	if (PK)
+	if (PK) // && self.wad == "") /// FIX
 	{
 		W_FirePulseSpikes (ox);
 		return;
@@ -1058,18 +1067,21 @@ void () W_Attack =
         player_axec1 ();
       else
         player_axed1 ();
+		if (rune_haste(0.28))
       self.attack_finished = time + 0.5;
   	}
 	else if (self.weapon == IT_SHOTGUN)
 	{
 		player_shot1 ();
 		W_FireShotgun ();
+		if (rune_haste(0.28))
 		self.attack_finished = time + 0.5;
 	}
 	else if (self.weapon == IT_SUPER_SHOTGUN)
 	{
 		player_shot1 ();
 		W_FireSuperShotgun ();
+		if (rune_haste(0.38))
 		self.attack_finished = time + 0.7;
 	}
 	else if (self.weapon == IT_NAILGUN)
@@ -1084,12 +1096,14 @@ void () W_Attack =
 	{
 		player_rocket1();
 		W_FireGrenade();
+		if (rune_haste(0.3))
 		self.attack_finished = time + 0.6;
 	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
 		player_rocket1();
 		W_FireRocket();
+		if (rune_haste(0.4))
 		self.attack_finished = time + 0.8;
 	}
 	else if (self.weapon == IT_LIGHTNING)
@@ -1497,7 +1511,8 @@ Plays sound if needed
 */
 void () SuperDamageSound =
 {
-	if (self.super_damage_finished > time)
+	if (self.super_damage_finished > time
+		|| self.rune_flag & RUNE_FLG_DM)
 	{
 		if (self.super_sound < time)
 		{

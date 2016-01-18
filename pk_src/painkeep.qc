@@ -841,9 +841,13 @@ run_runes();
 				if (f < 100) bprint(" ");
 				if (f < 1000) bprint(" ");
 				bprint(ftos(f));
-				bprint("  -  ");
+				bprint("  -  (bit: ");
+				bit_print(MAXFL, bit_mcode(f, world)); // for use in bit masks
+				bprint(")  ");
 				bprint(cl);
-				bprint("\n");
+				bprint("  -  (bv: ");
+				bprint(ftos(bit_mcode(f, world)));
+				bprint(")\n");
 			}
 			f = f + 1;
 		}
@@ -972,6 +976,7 @@ void() pk_srvcmd_set =
 	RUNE_CNT = 4;
 	RUNE_MASK = 15;
 	RUNE_3_ACM = 0.2;
+	RUNE_AR1M = 0;
 
 	RUNE_RANDOM = 0;
 	R_EARTH = RUNE_FLG_RS; // allow power mix
@@ -1047,7 +1052,8 @@ void() pk_srvcmd_set =
 		registercvar("sv_c_rune_3acm", "0.2");
 		registercvar("sv_c_rune_random", "0"); // runes will have random powers
 		registercvar("sv_c_rune_set", "0");
-		
+		registercvar("sv_c_rune_allowrule1multi", "0"); // if true more than 1 rune can be gotten in rule 1
+
 		registercvar("sv_c_rsp_time", "30");
 		registercvar("sv_c_pow_time", "30"); // artifact power time
 

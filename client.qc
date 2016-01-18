@@ -613,6 +613,7 @@ void () PutClientInServer =
 	set_initBotLevel(); // *bot
 
 	Chase_cam_level_start(); // Cataboligne 8.9.9 purify - chase cam
+	self.rune_flag = 0;
 };
 
 
@@ -1264,6 +1265,9 @@ void () PlayerPostThink =
 	if (pk_itemovr & CON_INF)
 	if (ammo_frame < framecount)
 		infinite_ammo();
+
+// runes
+	if (self.rune_flag & RUNE_FLG_RG) rune_regen();
 
 	if (PK || custom_hub_loaded)
 	{

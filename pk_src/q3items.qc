@@ -42,8 +42,9 @@ item_quad				item_artifact_super_damage
 item_regen				item_artifact_invulnerability
 item_invis				item_artifact_invisibility
 item_enviro				item_artifact_envirosuit
-
-
+------------------------------------------
+holdable_medkit		item_painkeep_can
+holdable_teleporter	item_pkplus_phone
 
 FIX FIX FIX
 
@@ -371,6 +372,24 @@ void() item_enviro =
 {
 	self.classname = "item_artifact_envirosuit";
 	item_artifact_envirosuit();
+
+	if (self.spawnflags & SUSPENDED) q3_suspend();
+};
+
+// holdables
+
+void() holdable_medkit =
+{
+	self.classname = "item_painkeep_can";
+	item_painkeep_can();
+
+	if (self.spawnflags & SUSPENDED) q3_suspend();
+};
+
+void() holdable_teleporter =
+{
+	self.classname = "item_pkplus_phone";
+	item_pkplus_phone();
 
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 };

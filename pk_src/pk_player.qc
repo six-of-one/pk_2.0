@@ -171,6 +171,7 @@ void(float ox) pulse_fire =
 		self.weaponframe = 1;
 	SuperDamageSound();
 	W_FireSpikes (ox);
+	if (rune_haste(0.3))
 	self.attack_finished = time + 0.6;
 };
 

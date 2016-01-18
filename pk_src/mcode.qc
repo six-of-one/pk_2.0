@@ -102,6 +102,73 @@ float MC_AEXPLSH				= 153;
 float MC_PK						= 154;
 
 
+// fn(bit_mcode) - item bit assoc with given mcode
+
+float(float mcv, entity e) bit_mcode =
+{
+	local float mc;
+
+	mc = mcv;
+	if (!mc && e) mc = e.mcode;
+	if (!mc) return(0);
+	
+	if (mc == MC_SUPER_SHOTGUN)										return(IT_SUPER_SHOTGUN);
+	if (mc == MC_NAILGUN)												return(IT_NAILGUN);
+	if (mc == MC_SUPER_NAILGUN)										return(IT_SUPER_NAILGUN);
+	if (mc == MC_GRENADEL)												return(IT_GRENADE_LAUNCHER);
+	if (mc == MC_ROCKETL)												return(IT_ROCKET_LAUNCHER);
+	if (mc == MC_THUNDER)												return(IT_LIGHTNING);
+
+	if (mc == MC_PENT)													return(IT_INVULNERABILITY);
+	if (mc == MC_SUIT)													return(IT_SUIT);
+	if (mc == MC_RING)													return(IT_INVISIBILITY);
+	if (mc == MC_QUAD)													return(IT_QUAD);
+
+	if (mc == MC_ARMOR1)													return(IT_ARMOR1);
+	if (mc == MC_ARMOR2)													return(IT_ARMOR2);
+	if (mc == MC_ARMOR3)													return(IT_ARMOR3);
+
+	if (mc == MC_HEALTHROT)												return(0);
+	if (mc == MC_HEALTH)													return(0);
+	if (mc == MC_HEALTHMEGA)											return(IT_SUPERHEALTH);
+
+	if (mc == MC_KEY1)													return(IT_KEY1);
+	if (mc == MC_KEY2)													return(IT_KEY2);
+	if (mc == MC_SIGIL1)													return(R_EARTH);
+	if (mc == MC_SIGIL2)													return(R_BLACK);
+	if (mc == MC_SIGIL4)													return(R_HELL);
+	if (mc == MC_SIGIL8)													return(R_ELDER);
+
+	if (mc == MC_ASHELLS)												return(IT_SHELLS);
+	if (mc == MC_ANAILS)													return(IT_NAILS);
+	if (mc == MC_AROCKETS)												return(IT_ROCKETS);
+	if (mc == MC_ACELLS)													return(IT_CELLS);
+
+	if (mc == MC_ASHELLS_LG)											return(IT_SHELLS);
+	if (mc == MC_ANAILS_LG)												return(IT_NAILS);
+	if (mc == MC_AROCKETS_LG)											return(IT_ROCKETS);
+	if (mc == MC_ACELLS_LG)												return(IT_CELLS);
+
+	if (Q_100 || Q_99) // Cataboligne - 8.16.9 - quake 1 compatability mode(s)
+		return(0);
+	
+// pk item subs by special bits
+	if (mc == MC_GRAVITY)												return(PK_IT_GRAVITYWELL);
+	if (mc == MC_SENTRY)													return(PK_IT_TURRET);
+	if (mc == MC_BEARTRAP)												return(PK_IT_BEARTRAP);
+	if (mc == MC_AEXPLSH)												return(0);
+	if (mc == MC_CHTHUNDR)												return(PK_IT_CLIGHT);
+	if (mc == MC_PULSE_NAILGUN)										return(IT_NAILGUN);
+	if (mc == MC_GRAP)													return(PK_IT_GRAPGUN);
+	if (mc == MC_AIRGUN)													return(PK_IT_AIRGUN);
+	if (mc == MC_CANOBEANS)												return(PK_IT_CANPAB);
+	if (mc == MC_EGO)														return(PKPLUS_IT_EGO);
+	if (mc == MC_TOMB)													return(PKPLUS_IT_TOMB);
+	if (mc == MC_MASK)													return(PKPLUS_IT_ACTOR);
+	if (mc == MC_PHONE)													return(PKPLUS_IT_PHONE);
+
+};
+
 // fn(pk_mcode) - map code for items
 
 // e - ent being tested
@@ -115,6 +182,7 @@ float(string sc, entity e) pk_mcode =
 
 	tsc = sc;
 	if (sc == "" && e) tsc = e.classname;
+	if (tsc == "") return(0);
 
 	if (tsc == "dyn_item")												mc = 0;
 // q1

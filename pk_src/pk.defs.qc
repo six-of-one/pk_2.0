@@ -1,6 +1,7 @@
 // constants
 
 vector v0						= ' 0 0 0'; // zero vector |dimension
+float MAXFL						= 16777215; // max float - max bit mask
 // ADMIN section
 // dev - only enable this for painkeep maps or force pk mode (sv_ control) - any maps that loads a pk item / func
 float PK;									// if set true painkeep code is enabled
@@ -89,11 +90,14 @@ float RUNE_3_ACM; // amount to accumulate under rule 3
 float rune_set;
 void() run_runes;
 void(entity e, entity p) rune_id;
+void() rune_regen;
+float(float atf) rune_haste;
 
 float RUNES;
 float RUNE_CNT;
 float RUNE_MASK;
 float RUNE_RANDOM;
+float RUNE_AR1M;
 float rune_count; // total # on map
 void() rune_maker;
 
@@ -124,6 +128,7 @@ void() start_loopcyc;
 void(float mc, vector vo) fn_make;
 float(string sc, entity e) pk_mcode;
 void() place_item_control;
+float(float mcv, entity e) bit_mcode;
 
 .float mcode;								// map item code - handle sub lists
 .float scode;								// save item code - for restore

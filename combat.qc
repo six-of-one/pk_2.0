@@ -137,9 +137,18 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	damage_attacker = attacker;
 
 // check for quad damage powerup on the attacker
+	if (!((RUNES > 1) && (attacker.rune_flag & RUNE_FLG_DM))) // rune overpowers quad on higher rule sets 
 	if (attacker.super_damage_finished > time)
 		damage = damage * 4;
 
+	if (attacker.rune_flag & RUNE_FLG_DM){
+		damage = damage * 2;
+if (time & 2 == 2)
+{
+bprint("   ------    dmg used by: ");
+bprint(attacker.netname);
+bprint("\n");
+}}
 // save damage based on the target's armor level
 
 	// PAINKEEP_START Ignore armor stuff, used for drowning
@@ -147,18 +156,38 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	{
 		save = ceil(targ.armortype*damage);
 		if (save >= targ.armorvalue)
-		{
 			save = targ.armorvalue;
-			targ.armortype = 0;	// lost all armor
-			targ.items = targ.items - (targ.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3));
-		}
-
-		targ.armorvalue = targ.armorvalue - save;
-		take = ceil(damage-save);
 	}
 	else
 	{
-		take = damage;
+		save = 0;
+	}
+
+	take = ceil(damage-save);
+
+	if (targ.rune_flag & RUNE_FLG_RS)
+	{
+if (time & 2 == 2)
+{
+bprint("   ------    resist used by: ");
+bprint(targ.netname);
+bprint("\n");
+}
+		take = take / 2;
+		save = save / 2;
+		if (targ.invincible_sound < time)
+		{
+			sound (targ, CHAN_ITEM, "items/protect3.wav", 1, ATTN_NORM);
+			targ.invincible_sound = time + 2;
+		}
+	}
+
+	targ.armorvalue = targ.armorvalue - save;
+
+	if (targ.armorvalue < 1)
+	{
+		targ.armortype = 0;	// lost all armor
+		targ.items = targ.items - (targ.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3));
 	}
 
 // add to the damage total for clients, which will be sent as a single

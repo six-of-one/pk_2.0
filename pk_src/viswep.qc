@@ -641,7 +641,7 @@ void() player_nail3   =[$lightfatt3, player_nail4  ]
 		self.weaponframe = 1;
 	SuperDamageSound();
 	W_FireSpikes (4);
-	self.attack_finished = time + 0.2;
+//	self.attack_finished = time + 0.2;
 };
 void() player_nail4   =[$lightfatt4, player_nail1  ] // *pk - viswep - Cataboligne - 9.29.9
 {
@@ -654,7 +654,7 @@ void() player_nail4   =[$lightfatt4, player_nail1  ] // *pk - viswep - Catabolig
 		self.weaponframe = 1;
 	SuperDamageSound();
 	W_FireSpikes (-4);
-	self.attack_finished = time + 0.2;
+//	self.attack_finished = time + 0.2;
 };
 
 // run full viswep frames for chain thunderbolt

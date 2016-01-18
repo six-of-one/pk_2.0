@@ -951,6 +951,7 @@ void() PK_Attack =
 				player_axec1 ();
 			else
 				player_axed1 ();
+			if (rune_haste(0.25))
 			self.attack_finished = time + 0.5;
 		}
 		else if (self.pk_currentitem == PK_IT_GRAVITYWELL)
@@ -1057,12 +1058,14 @@ void() PK_Attack =
 	{
 		player_shot1();
 		W_FireShotgun ();
+		if (rune_haste(0.28))
 		self.attack_finished = time + 0.5;
 	}
 	else if (self.weapon == IT_SUPER_SHOTGUN)
 	{
 		player_shot1();
 		W_FireSuperShotgun ();
+		if (rune_haste(0.38))
 		self.attack_finished = time + 0.7;
 	}
 	else if (self.weapon == IT_NAILGUN)
@@ -1078,12 +1081,14 @@ void() PK_Attack =
 	{
 		player_rocket1();
 		W_FireGrenade();
+		if (rune_haste(0.3))
 		self.attack_finished = time + 0.6;
 	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
 		player_rocket1();
 		W_FireRocket();
+		if (rune_haste(0.4))
 		self.attack_finished = time + 0.8;
 	}
 	else if (self.weapon == IT_LIGHTNING)

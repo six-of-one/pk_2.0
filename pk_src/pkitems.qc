@@ -1103,6 +1103,16 @@ void() place_item_control =
 	}
 };
 
+// give tossed items eject velocity
+
+void(entity e, vector v1) item_eject =
+{
+	e.velocity_z = v1_z + 100 * random();
+	e.velocity_x = crandom() * v1_x;
+	e.velocity_y = crandom() * v1_y;
+
+};
+
 // called from PlaceItem - sorts many things now - happens 0.2 secs after map load
 
 void() pk_placeitem =
@@ -1114,9 +1124,7 @@ void() pk_placeitem =
 	}
 	else
 	{
-		self.velocity_z = 300 + 100 * random();
-		self.velocity_x = -170 + (random() * 340);
-		self.velocity_y = -170 + (random() * 340);
+		item_eject(self, ' 340 340 300');
 	}
 
 // handle extra item stuff
@@ -1247,10 +1255,10 @@ void(string cls) item_call =
 	else if (cls == "item_key1") item_key1();
 	else if (cls == "item_key2") item_key2();
 
-	else if (cls == "item_sigil1") { self.spawnflags = rune_bit(MC_SIGIL1); item_sigil(); scls = "item_sigil"; }
-	else if (cls == "item_sigil2") { self.spawnflags = rune_bit(MC_SIGIL2); item_sigil(); scls = "item_sigil"; }
-	else if (cls == "item_sigil4") { self.spawnflags = rune_bit(MC_SIGIL4); item_sigil(); scls = "item_sigil"; }
-	else if (cls == "item_sigil8") { self.spawnflags = rune_bit(MC_SIGIL8); item_sigil(); scls = "item_sigil"; }
+	else if (cls == "item_sigil1") { self.spawnflags = rune_bit_code(MC_SIGIL1, 0); item_sigil(); scls = "item_sigil"; }
+	else if (cls == "item_sigil2") { self.spawnflags = rune_bit_code(MC_SIGIL2, 0); item_sigil(); scls = "item_sigil"; }
+	else if (cls == "item_sigil4") { self.spawnflags = rune_bit_code(MC_SIGIL4, 0); item_sigil(); scls = "item_sigil"; }
+	else if (cls == "item_sigil8") { self.spawnflags = rune_bit_code(MC_SIGIL8, 0); item_sigil(); scls = "item_sigil"; }
 
 //	else if (cls == "item_") item_();
 
@@ -1275,6 +1283,8 @@ void(string cls) item_call =
 		self.nextthink = time + 1 + 3 * random(); // spread em out
 		self.model = string_null;
 	}
+	if (self.map == "rune" && RUNES) 
+		self.pk_touch = rune_touch;
 	self.solid = SOLID_NOT;
 };
 
@@ -2213,146 +2223,3 @@ void() start_loopcyc =
 	self.nextthink = time + 15; // recheck every 10 secs?
 };
 
-// rune 1 rules - runes expire in pow time
-
-void () rune_1_expire =
-{
-	self.owner.rune_flag = 0;
-	sprint(self.owner, "The power of the ");
-	sprint(self.owner, self.netname);
-	sprint(self.owner, " rune has expired.\n");
-	remove(self);
-};
-
-void () rune_touch =
-{
-	local entity e;
-
-	if (other.classname != "player")
-	if (other.classname != "pk*bot")
-			return;
-	if (other.health <= 0)
-		return ;
-	if (RUNES == 1)
-	if (other.rune_flag)
-		return ;
-
-	centerprint3 (other,"You got the ",self.netname," Rune!");
-	sprint(other,"You have the power of ");
-	rune_print(other, self.spawnflags, FALSE);
-
-	sound (other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
-	stuffcmd (other,"bf\n");
-
-	other.rune_flag = other.rune_flag | self.spawnflags;
-
-	if (RUNES == 1)
-	{
-		e = spawn();
-		if (e)
-		{
-			e.classname = "rune_1_expiry";
-			e.netname = self.netname;
-			e.think = rune_1_expire;
-			e.nextthink = time + POW_TIME;
-			e.owner = other;
-		}
-	}
-	if (RUNES == 3)
-	{
-		if (self.spawnflags & RUNE_FLG_RS) other.rune_3_resist = other.rune_3_resist + RUNE_3_ACM;
-		if (self.spawnflags & RUNE_FLG_DM) other.rune_3_dmg = other.rune_3_dmg + RUNE_3_ACM;
-		if (self.spawnflags & RUNE_FLG_HS) other.rune_3_haste = other.rune_3_haste + RUNE_3_ACM;
-		if (self.spawnflags & RUNE_FLG_RG) other.rune_3_rgn = other.rune_3_rgn + RUNE_3_ACM;
-	}
-
-// remove it in single player, or setup for respawning in deathmatch
-	self.model = string_null;
-	self.solid = SOLID_NOT;
-	self.cnt = 0;
-	self.count = self.count + 0.13; // increment for each grab - more activity = less chance of rune moving
-
-	if (RUNES == 1 || RUNES == 3)
-	{
-	if (deathmatch !=  2) // this is likely a meaningless deal for runes
-		self.nextthink = time + RSP_TIME;
-	self.think = SUB_regen;
-	}
-
-//	serverflags = serverflags | (self.spawnflags & 15);
-
-	activator = other;
-	SUB_UseTargets();				// fire all targets / killtargets
-};
-
-// make runes for runeserver
-float rune_map; // runes on level
-
-void() rune_maker =
-{
-	local entity e;
-	local float sf, f;
-
-	if (rune_count < RUNE_CNT)
-	{
-		if (rune_count < 2) // make at least 2 sort of quicker
-			self.nextthink = time + random() * 30;
-		else
-			self.nextthink = time + 10 + random() * 60;
-
-// make a rune
-		e = spawn();
-		if (e)
-		{
-			rune_count = rune_count + 1;
-			self = e;
-
-			self.mcode = MC_SIGIL1 + rint(random() * 3.3);
-			sf = 111;
-// if ((rune_map & 15) != (RUNE_MASK & 15))  // basic 4 runes spawn first, fulfilling mask goal, could be 0
-			if (rune_count < 4) // spawn 4 uinque runes on a map when starting
-			while (sf > 0)
-			{
-				f = rune_bit(self.mcode);
-				if (!(f & rune_map))
-					sf = 0;
-				else
-					self.mcode = MC_SIGIL1 + rint(random() * 3.3);
-				sf = sf - 1;
-			}
-			self.wad = item_by_mcode(self.mcode);
-
-			e = dyn_rndloc();
-			if (!e) 	e = findradius(world.origin, 256000);
-			if (!e) 
-			{
-				bprint("*** warning: rune_make could not find a random (or any) location - giving up\n");
-				remove(self);
-				return; // crap - no location
-			}
-			self.origin = e.origin + ' 0 0 8';
-			if (e.flags & FL_ITEM) // randomize away from other map items
-				self.origin = stdv_rndloc(e.origin + ' 0 0 8', 50, 100);
-
-			item_call(self.wad);
-			self.pk_touch = rune_touch;
-			AddToSplash(self); // splash code kills lava immersed runes
-
-			rune_map = rune_map | self.spawnflags;
-			self.count = 2 + random() * 3.8; // controls no-touch reposition code in check movement deal
-			self.cnt = 0;
-
-			bprint("\b*** RUNE spawned: ");
-			bprint(self.netname);
-			if (e)
-			{
-				bprint(" near: ");
-				bprint(e.classname);
-			}
-			else
-			bprint(" on the map");
-			bprint("\n");
-
-		}
-	}
-};
