@@ -377,6 +377,13 @@ void() rune_maker =
 
 			item_call(self.wad);
 
+		if (Q_100 || PK_100) // if *100 - need this here
+		{
+			self.think = SUB_regen; // dont go thru place_item - use regen method
+			self.nextthink = time + 1 + 3 * random(); // spread em out
+			self.model = string_null;
+		}
+
 			AddToSplash(self); // splash code kills lava immersed runes
 
 			rune_map = rune_map | self.spawnflags;
@@ -543,7 +550,7 @@ void() run_runes =
 	{
 		bprint("\bRunes:\n\n");
 		if (RUNES) bprint("Runes will appear in random locations\n");
-		else bprint("Rune server is deactivated\n"); // note: runes can still appear on map from func_dyn, rndize
+		else bprint("Rune server is deactivated\n"); // NOTE: runes can still appear on map from func_dyn, rndize
 		bprint("total rune count : ");
 		bprint(ftos(RUNE_CNT));
 		bprint("\n");
@@ -651,7 +658,7 @@ float(float atf) rune_haste =
 End of level sigil, pick up to end episode and return to jrstart.
 */
 
-// NOTE - q100 code never used because q100 can run a rune server - think on this
+// NOTE: q100 code never used because q100 can run a rune server - think on this
 
 // fix initial server map load runes where random is on
 

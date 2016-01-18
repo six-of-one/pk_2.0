@@ -135,6 +135,7 @@ void(string cls) item_call =
 
 		self.frame = 0;
 		self.skin = 0;
+		self.noise = ""; // grab sound items
 		self.noise4 = ""; // respawn sound
 	}
 
@@ -152,7 +153,7 @@ void(string cls) item_call =
 		else q100_weapon_lightning();
 	}
 	else if (cls == "weapon_lightning") q100_weapon_lightning();
-	else if (cls == "item_shells") { if (rd < 0.5) self.spawnflags = WEAPON_BIG2; item_shells(); }
+	else if (cls == "item_shells") { if (rd < 0.5) self.spawnflags = WEAPON_BIG2; item_shells(); } // IDEA: split rd < off to dyn_item only
 	else if (cls == "item_spikes") { if (rd < 0.4) self.spawnflags = WEAPON_BIG2; item_spikes(); }
 	else if (cls == "item_rockets") { if (rd < 0.2) self.spawnflags = WEAPON_BIG2; item_rockets(); }
 	else if (cls == "item_cells") { if (rd < 0.8) self.spawnflags = WEAPON_BIG2; item_cells(); }
@@ -224,6 +225,10 @@ void(string cls) item_call =
 	else if (cls == "weapon_mjolnir") weapon_mjolnir();
 	else if (cls == "weapon_laser_gun")	weapon_laser_gun();
 	else if (cls == "weapon_proximity_gun") weapon_proximity_gun();
+
+	else if (cls == "item_artifact_wetsuit") item_artifact_wetsuit();
+	else if (cls == "item_artifact_empathy_shields") item_artifact_empathy_shields();
+	else if (cls == "item_hornofconjuring") item_hornofconjuring();
 
 // doom
 	else if (cls == "d_weapon_shotgun") d_weapon_shotgun();
@@ -397,6 +402,11 @@ void(string cls) item_call =
 		q3_misc_explobox();
 		return;
 	}
+// chaos
+	else if (cls == "c_weapon_reggun") c_weapon_reggun();
+	else if (cls == "weapon_flamer") weapon_flamer();
+	else if (cls == "ammo_gas") ammo_gas();
+	else if (cls == "ammo_gas_lg") ammo_gas_lg();
 
 	else // fail - not valid
 	{
@@ -410,14 +420,17 @@ void(string cls) item_call =
 	{
 		self.classname = scls;
 		if (!NO_PI) pk_placeitem();
-		self.think = SUB_regen; // dont go thru place_item - use regen method
-		self.nextthink = time + 1 + 3 * random(); // spread em out
-		self.model = string_null;
+		if (!Q_100 && !PK_100) // if *100 translate dont do this stuff
+		{
+			self.think = SUB_regen; // dont go thru place_item - use regen method
+			self.nextthink = time + 1 + 3 * random(); // spread em out
+			self.model = string_null;
+		}
 		if (self.wait <= -888) self.wait = 0;
 	}
 	self.solid = SOLID_NOT;
 	NO_PI = 0;
-//	bot_item_linx(self); // *bot - item tie in - needs checked for use here -- FIX
+//	bot_item_linx(self); // *bot - item tie in - needs checked for use here -- ??? does anything need done here?
 };
 
 // save self, item call e
@@ -623,7 +636,8 @@ void() item_loop =
 
 float(float cn, entity e, string op) ammo_con =
 {
-	float f;
+	local float f;
+	local entity tr;
 
 	f = cn;
 
@@ -661,32 +675,42 @@ float(float cn, entity e, string op) ammo_con =
 	else if (op == "wpck") // wep check - allow auto sw to inf ammo wep
 	{
 		f = 0;
-		if (e)
-		if (pk_itemovr & CON_INF)
+		if (cn == IT_MJOLNIR)
 		{
-		if (cn == PK_IT_CLIGHT)
-		if (pk_itemovr & WEP_THUNDER) return(1);
-
-		if (cn == IT_LIGHTNING)
-		if (pk_itemovr & WEP_THUNDER) return(1);
-
-		if (cn == IT_ROCKET_LAUNCHER)
-		if (pk_itemovr & WEP_ROCKET) return(1);
-
-		if (cn == IT_GRENADE_LAUNCHER)
-		if (pk_itemovr & WEP_GREN) return(1);
-
-		if (cn == IT_SUPER_NAILGUN)
-		if (pk_itemovr & WEP_PERF) return(1);
-
-		if (cn == IT_NAILGUN)
-		if (pk_itemovr & WEP_NAILGUN) return(1);
-
-		if (cn == IT_SUPER_SHOTGUN)
-		if (pk_itemovr & WEP_SSHOT) return(1);
+			if (e) tr = e.vwepent;
+			while (tr)
+			{
+				if (tr.mdl == "progs/vw_mjolnir.mdl") return(1); // Cataboligne - 2.13.11 - hipnotic support special wep
+				tr = tr.vwepent;
+			}
 		}
 
-		if (cn == IT_MJOLNIR) return(1); // Cataboligne - 2.14.11 - hipnotic support special wep
+		if (pk_itemovr & CON_INF)
+		{
+			if (cn == PK_IT_CLIGHT)
+			if (pk_itemovr & WEP_THUNDER) return(1);
+
+			if (cn == IT_EXTRA_WEAPON)
+			if (pk_itemovr & WEP_THUNDER) return(1);
+
+			if (cn == IT_LIGHTNING)
+			if (pk_itemovr & WEP_THUNDER) return(1);
+
+			if (cn == IT_ROCKET_LAUNCHER)
+			if (pk_itemovr & WEP_ROCKET) return(1);
+
+			if (cn == IT_GRENADE_LAUNCHER)
+			if (pk_itemovr & WEP_GREN) return(1);
+
+			if (cn == IT_SUPER_NAILGUN)
+			if (pk_itemovr & WEP_PERF) return(1);
+
+			if (cn == IT_NAILGUN)
+			if (pk_itemovr & WEP_NAILGUN) return(1);
+
+			if (cn == IT_SUPER_SHOTGUN)
+			if (pk_itemovr & WEP_SSHOT) return(1);
+		}
 	}
 
 	return(f);
@@ -1082,7 +1106,7 @@ void() func_dynitem =
 	if (e)
 	{
 		e.think = dyn_spawn;
-		e.nextthink = 1 + self.delay * random(); // time spread -- FIX: get rid of neg number
+		e.nextthink = 1 + self.delay * random(); // time spread -- IDEA: get rid of neg number
 		e.classname = "dyn_item";
 
 		if (self.spawnflags & 1)

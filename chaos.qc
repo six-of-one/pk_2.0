@@ -604,6 +604,7 @@ float(string surf, vector v, entity e) sky_touch =
 		else last_texture = surf;
 		if (last_texture == "sky1" || last_texture == "sky4" || last_texture == "sky0" || last_texture == "sky2" || last_texture == "sky6") t = TRUE;
 		else if (last_texture == "skydark") t = TRUE;
+		else if (last_texture == "c1_") t = TRUE;
 		else if (last_texture == "textures/K_sky/rabbit_skybox" || last_texture == "textures/skies/pjbasesky_arena1_sky") t = TRUE;
 	}
 
@@ -613,7 +614,7 @@ float(string surf, vector v, entity e) sky_touch =
 void() sky_touch_pointer =
 {
 
-// FIX
+// UNKNOWN op - decide what is happening with this code
 //	if (sky_touch("", v0, self))
 //	if (self.content_flag & RM_SKY) // has a remove sky setting - wont work after content_clear
 //		SUB_Remove();
@@ -663,3 +664,96 @@ string(vector wt, string rs1, string rs2, string rs3, string rs4, string rs5) rn
 		}
 	return sl;
 };
+
+// fn(info_think) - think to display various info
+
+// TESTING
+float zz;
+
+void () info_think =
+{
+	if (self.button0) 
+	{
+		bprint(self.noise);
+		bprint(ftos(self.button0));
+		bprint("\n");
+	}
+	else if (self.noise) bprint(self.noise);
+
+	if (self.button1) 
+	{
+		bprint(self.noise1);
+		bprint(ftos(self.button1));
+		bprint("\n");
+	}
+	else if (self.noise1) bprint(self.noise1);
+
+	if (self.button2) 
+	{
+		bprint(self.noise2);
+		bprint(ftos(self.button2));
+		bprint("\n");
+	}
+	else if (self.noise2) bprint(self.noise2);
+
+	if (self.items) 
+	{
+		bprint(self.noise3);
+		bprint(ftos(self.items));
+		bprint("\n");
+	}
+	else if (self.noise3) bprint(self.noise3);
+
+	if (self.weapon)
+	{
+		bprint(self.noise4);
+		bit_print(MAXFL, self.weapon);
+		bprint("\n");
+	}
+	else
+	if (self.pos1) 
+	{
+		bprint(self.noise4);
+		bprint(vtos(self.pos1));
+		bprint("\n");
+	}
+	else if (self.noise4) bprint(self.noise4);
+
+	if (self.target) bprint(self.target);
+	if (self.target1) bprint(self.target1);
+	if (self.target2) bprint(self.target2);
+
+	remove(self);
+};
+
+float info_ttime;
+
+void(float tm, string l1, string l2, string l3, string l4, string l5, float f1, float f2, float f3, float f4, vector v1, float bp) spawn_infot =
+{
+	local entity e;
+	local float t;
+
+	if (!WARNING) return;
+
+	e = spawn();
+	if (l1) e.noise = l1;
+	if (l2) e.noise1 = l2;
+	if (l3) e.noise2 = l3;
+	if (l4) e.noise3 = l4;
+	if (l5) e.noise4 = l5;
+
+	if (f1) e.button0 = f1;
+	if (f2) e.button1 = f2;
+	if (f3) e.button2 = f3;
+	if (f4) e.items = f4;
+	if (v1 != v0) e.pos1 = v1;
+	if (bp) e.weapon = bp;
+
+	e.think = info_think;
+	t = time + tm;
+	if (t <= info_ttime) t = info_ttime + 1;
+	e.nextthink = t;
+	info_ttime = t;
+}
+
+// spawn_infot(1, "", "",  "",  "",  "", 0, 0, 0, 0, v0, 0);

@@ -14,7 +14,7 @@
 
 /*
 
-NOTES: frikbot code duplicates some of this, so that code was used and this commented out
+NOTE: frikbot code duplicates some of this, so that code was used and this commented out
 if removing frikbot for any reason this will need to be restored
 
 deprecated for same fn in frikbot
@@ -575,6 +575,8 @@ void(entity e) bot_BackpackSetup =
 }
 
 // remove item hooks & put here - code diverts here from PlaceItem
+
+// TDO: easy ver, all x stuff
 
 void(entity e) bot_item_linx =
 {

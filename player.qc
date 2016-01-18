@@ -133,7 +133,7 @@ void()	player_stand1 =[	$axstnd1,	player_stand1	]
 	if (self.velocity_x || self.velocity_y) // moved - allow frame to be set
 	{
 		self.walkframe=0;
-		self.think = player_run; // *fix - run / stand loop
+		self.think = player_run; // *fixed - run / stand loop
 		return;
 	}
 };
@@ -163,7 +163,7 @@ void()	player_run =[	$rockrun1,	player_run	]
 	if (!self.velocity_x && !self.velocity_y)
 	{
 		self.walkframe=0;
-		self.think = player_stand1; // *fix - run / stand loop
+		self.think = player_stand1; // *fixed - run / stand loop
 		return;
 	}
 };
@@ -296,7 +296,7 @@ local float		rs;
 // slime pain sounds
 	if (self.watertype == CONTENT_SLIME)
 	{
-// FIX ME	put in some steam here
+// FIXME	put in some steam here
 		if (random() > 0.5)
 			sound (self, CHAN_VOICE, "player/lburn1.wav", 1, ATTN_NORM);
 		else

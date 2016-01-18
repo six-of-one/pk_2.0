@@ -795,7 +795,7 @@ void(float ox) W_FireSpikes =
 		return ;
 	}
 
-	if (PK) // && self.wad == "") /// FIX
+	if (PK)
 	{
 		W_FirePulseSpikes (ox);
 		return;
@@ -909,7 +909,7 @@ void () W_SetCurrentAmmo =
 //	if (PK || custom_hub_loaded || (self.cam_x & CHSCAM_ON)) // Cataboligne 8.8.9 purify - cc thru pk code - chase cam
 	if (!Q_100)
 	{
-		if (PK_100 || !VW)
+		if (PK_100)// || !VW)
 			PK_SetCurrentAmmo(); // *pk - handle ammo for all pk items & cam
 		else
 			PK_SetCurrentAmmoOnly();
@@ -1305,7 +1305,7 @@ void () CycleWeaponCommand =
 				am = 1;
 		}
 
-// fix loop bug - we hope
+// fixed loop bug - we hope
 		if (sf < 1)
 		{
 			self.weapon = IT_AXE;
@@ -1394,7 +1394,7 @@ void () CycleWeaponReverseCommand =
 				am = 1;
 		}
 
-// fix loop bug - we hope
+// fixed loop bug - we hope
 		if (sf < 1)
 		{
 			self.weapon = IT_AXE;

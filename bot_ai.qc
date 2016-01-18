@@ -505,7 +505,7 @@ float () BotFoundTarget =
 		bprint (": ");
 		bprint (self.enemy.netname);
 		if (random() < 0.5)
-			bprint (" has got two empy halves of coconuts and is banging them together!\n");
+			bprint (" has got two empty halves of coconuts and is banging them together!\n");
 		else
 			bprint (" is the son of a silly person!\n");
 	}

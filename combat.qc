@@ -299,6 +299,7 @@ void (entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDa
 		if (head != ignore)
 		{
 			if (head.takedamage)
+			if (head.wad != "q1" || PK_100 || Q_100) // dont damage hidden replacement stuff 2.21.11
 			{
 				org = head.origin + (head.mins + head.maxs)*0.5;
 				points = 0.5*vlen (inflictor.origin - org);

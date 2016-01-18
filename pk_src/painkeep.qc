@@ -227,16 +227,19 @@ string (string s) precache_model =
 
 	if (time < PIC_TO) // only do this for map load items
 	{
-		if (s == "progs/g_airgun.mdl" || s == "progs/g_airgun2.mdl" || s == "progs/g_clight.mdl" || s == "progs/g_harp.mdl" || s == "progs/tpower.mdl" || s == "progs/beans.mdl" || s == "progs/bearpick.mdl" || s == "maps/b_eshel0.bsp" )
+		if (!Q_100 && !Q_99)
 		{
-			if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-			pk_ditems = pk_ditems + 1;
-		}
+			if (s == "progs/g_airgun.mdl" || s == "progs/g_airgun2.mdl" || s == "progs/g_clight.mdl" || s == "progs/g_harp.mdl" || s == "progs/tpower.mdl" || s == "progs/beans.mdl" || s == "progs/bearpick.mdl" || s == "maps/b_eshel0.bsp" )
+			{
+				if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+				pk_ditems = pk_ditems + 1;
+			}
 
-		if (s == "progs/ego.mdl" || s == "progs/tomb.mdl" || s == "progs/actor.mdl" || s == "progs/phone.mdl") // pkpitems.qc
-		{
-			if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-			pk_ditems = pk_ditems + 1;
+			if (s == "progs/ego.mdl" || s == "progs/tomb.mdl" || s == "progs/actor.mdl" || s == "progs/phone.mdl") // pkpitems.qc
+			{
+				if (!(pk_flags & PK_MAP) && !PK) PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+				pk_ditems = pk_ditems + 1;
+			}
 		}
 
 			return(precache_model__(s));
@@ -584,8 +587,17 @@ void() pk_liveupd =
 	DCAMTOACT = cvar("sv_cam_to_action");
 
 // viswep
-	VW = cvar("sv_vw"); // TDO: change out viswep models to qgun
 	VW_ARMOR = cvar("sv_vw_armor");
+	VW_HOLSTER = cvar("sv_vw_holster");
+	if (VW != cvar("sv_vw"))
+	{
+		VW = cvar("sv_vw");
+		if (!VW)
+		{
+			VW_ARMOR = FALSE;
+		}
+		viswep_togl(); // load it up
+	}
 
 	XENV = cvar("sv_c_xenv");
 
@@ -923,7 +935,7 @@ void() pk_srvcmd_set =
 	R_ELDER = RUNE_FLG_RG;
 
 // cam controls
-	DCAMTO = 0; // FIX - final release should have 2 mins & respawn
+	DCAMTO = 0; // RELEASE - final release default should have 2 mins & respawn
 	DCAMTOACT = 0;
 	FFW_LIMIT = 0;
 
@@ -932,6 +944,7 @@ void() pk_srvcmd_set =
 
 // vw controls
 	VW_ARMOR = FALSE; /// has issues - can be turned on with sv_vw_armor 1 // TRUE; // should only ever be 1 or 0 - used in conditionals
+	VW_HOLSTER = TRUE;
 	VW = TRUE;
 
 // dynamic item defaults
@@ -946,7 +959,7 @@ void() pk_srvcmd_set =
 // map translations
 
 	TR_Q1DEF = 1;
-	TR_Q1QRY = 1;
+	TR_Q1QRY = 1; // run on map load
 	TR_WOLF = 0;
 	TR_DOOM = 0;
 	TR_QUAKE = 0;
@@ -1135,6 +1148,7 @@ POW_TIME = 30;
 		registercvar("sv_c_pow_time", "30"); // artifact power time
 
 		registercvar("sv_vw", "1");
+		registercvar("sv_vw_holster", "1"); // show holstered weps
 		registercvar("sv_vw_armor", "0");
 // painkeep controls
 		registercvar("sv_pk99", "0");
@@ -1167,11 +1181,11 @@ POW_TIME = 30;
 		registercvar("pk_dyn_func_stop", "0"); // stop func_dynitem operation
 		registercvar("pk_art_rep", "1"); // replace artifacts w/pk items when off
 
-		registercvar("pk_explbox_resp", "1"); // respawn boom boxes / barrels
+		registercvar("pk_explbox_resp", "1"); // respawn boom boxes / barrels, set to negative value to remove in dm
 
 // map translations
 
-		registercvar("pk_tr_q1def", "1"); // if q100 or pk100 and no wad == "q1" on map - default to translate
+		registercvar("pk_tr_q1def", "1"); // if q100 or pk100 and no wad == "q1" on map - default to translate - otherwise hide items | alternate: translate extra doom / q2 /q3 items to pkitems on reg. translate
 		registercvar("pk_tr_wolf", "0");
 		registercvar("pk_tr_doom", "0");
 		registercvar("pk_tr_quake", "0");

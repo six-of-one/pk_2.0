@@ -327,7 +327,7 @@ void () cam_deathview =
 	if (self.owner.solid != SOLID_NOT)
 	{
 
-// FIX - viewport restore here
+// FIXED - viewport restore here
 		set_viewport(self.owner, self.owner); // test this
 
 		remove( self);

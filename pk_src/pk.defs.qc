@@ -93,7 +93,7 @@ void() mcode_load;
 
 // env
 
-/// *** DUMMY SECTION - move later - FIX
+/// *** DUMMY SECTION - IDEA: move to better location later on
 
 //float FL_NOPART		= 8192; //no particles when melting
 
@@ -452,7 +452,7 @@ float DEF_REMAMMO				= 512; // bit set in def_weap - if normal ammo set - remove
 
 
 float PK_ITEM_MASK = 4094; // mask off non items bits
-float WEP_MASK = 4351; // mask off other items bits for def weap
+float WEP_MASK = 4351; // mask off other items bits for def weap bits 1 + ... + 128 + 4096
 
 float DEF_AMMO_BULLETS; // initial ammo defaults if set
 float DEF_AMMO_SHELLS;
@@ -487,6 +487,7 @@ float FL_INIT_CGEN_MC		= 2; // genre by char - 1 map code per genre
 float FL_INIT_MGEN_BIT		= 4; // genre by map - bits per genre
 float FL_INIT_MGEN_MC		= 8; // genre by map - 1 map code per genre
 float FL_INIT_ARB_MC			= 16; // arbitrary map codes - 8 total, everyone gets this set
+float FL_INIT_PKO				= 32; // pk items added only when genre is pk
 //float FL_INIT_ADD				= 32; // add to initial weaps -- deprecated, happens when DEF_REMWEP is false
 //float FL_INIT_REP				= 64; // replaces initial weaps -- handled by DEF_REMWEP now
 
@@ -541,7 +542,14 @@ float X_Q2_KEY_CHEAD			= 4096;
 float X_D_MAP					= 16384;
 float X_D_VIS					= 32768;
 
-float X_INV						= 57331;
+float X_INV						= 57331; ///  1101111111110011
+
+// q3 goodies
+
+//float X_Q3_HTEL				= 65536;
+//float X_Q3_HMED				= 131072;
+
+//float X_INV						= 253939; ///  111101111111110011    --- 57331; //  1101111111110011
 
 void(entity e, float trv) master_item_control;
 void(string tri, float trv) master_item_control_loop;
@@ -702,12 +710,14 @@ entity EWEAP; // current firing pointer - dont use with thinks!
 
 void() viswep_pkbot;
 void() viswep_post;
+void() viswep_togl;
 void() viswep_pre;
 void(entity vh, float cd) viswep_ld;
 float(string wpm) ver_weaponmodel;
 void() player_nail3;
 float VW; // viswep support - set to 0 to return to generic gun / axe
 float VW_ARMOR; // viswep armor support - eventually admin controlled & cvar
+float VW_HOLSTER; // viswep - show holstered weps when true
 
 // Cataboligne - projectile / cartridge fire(d) positioning - 9.30.9
 
@@ -1257,6 +1267,7 @@ void(entity e) pk_missile_splash;
 // new features
 .void() pk_touch; 						// group all touch code mods here
 void() pk_placeitem;
+void () pkplus_touch;
 
 
 

@@ -10,12 +10,18 @@
  *
  */
 
-// started map pk100
 
 // TDO: finish translate codes
 // TDO: restore wad == "q1" item with doom item deactivate / pk_100 mode on (if ever allowed in map)
 
-// need to hide something from players & item controls
+void() tr_set_touch =
+{
+	self.enemy.pk_touch = self.pk_touch; // think just to set this for *100 stuff
+//	self.enemy.touch = self.touch;
+	remove(self);
+};
+
+// fn(hide_item) - hide something from players & item controls
 
 void(entity e) hide_item =
 {
@@ -30,13 +36,22 @@ string(entity e, float TR) map_trans =
 {
 	local float dr, wr, qr, q2r, q3r;
 	local string mc, mcd, mcw, mcq, mcq2, mcq3, mcg;
+	local void() sv;
 
 	if (TR == FL_TR_RANDIN || TR_NOT == FL_NOTRN_RNDIN)
 	{
 		wr = MC_W_KNIFE + floor(random() * (MC_W_RNDITM));
 		dr = MC_D_SAW + floor(random() * (MC_D_RNDITM - 1));
-		qr = MC_AXE + floor(random() * (MC_RNDITM + 2));
-		if (RUNES) qr = MC_AXE + floor(random() * (MC_NR_RNDITM));
+		if (Q_100 || PK_100) // translating items when these are set
+		{
+			qr = MC_SUPER_SHOTGUN + floor(random() * (MC_RNDITM));
+			if (RUNES) qr = MC_SUPER_SHOTGUN + floor(random() * (MC_NR_RNDITM)) - 2;
+		}
+		else
+		{
+			qr = MC_AXE + floor(random() * (MC_RNDITM + 2));
+			if (RUNES) qr = MC_AXE + floor(random() * (MC_NR_RNDITM));
+		}
 
 		q2r = MC_Q2_BLASTER + rint(random() * MC_Q2_RNDITM);
 		q3r = MC_Q3_GAUNTLET + rint(random() * MC_Q3_RNDITM);
@@ -257,29 +272,53 @@ string(entity e, float TR) map_trans =
 			return("");
 		}
 		if (TR == FL_TR_DOOM) return("d_weapon_shotgun");
-		if (TR == FL_TR_QUAKE) return("weapon_shotgun");
+		if (TR == FL_TR_QUAKE)
+		{
+			if (Q_100 || PK_100)
+			{
+				if (random() < 0.1) return("weapon_grenadelauncher");
+				return("weapon_supershotgun");
+			}
+			else return("weapon_shotgun");
+		}
 		if (TR == FL_TR_Q2) return("q2_weapon_shotgun");
 		if (TR == FL_TR_Q3) return("q3_weapon_shotgun"); // IDEA: need bg code here?
 		if (TR == FL_TR_RANDIN) return(mcg);
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_PISTOL || e.scode == MC_SHOTGUN || e.scode == MC_Q2_BLASTER)
+	else if (e.scode == MC_D_PISTOL || e.scode == MC_SHOTGUN || e.scode == MC_Q2_BLASTER) // will not happen on a normal translated map - no map items normally exist for these
 	{
 		if (TR == FL_TR_WOLF) return("w_weapon_pistol");
 		if (TR == FL_TR_DOOM) return("d_weapon_pistol");
-		if (TR == FL_TR_QUAKE) return("weapon_shotgun");
+		if (TR == FL_TR_QUAKE)
+		{
+			if (Q_100 || PK_100)
+			{
+				if (random() < 0.75) return("weapon_nailgun");
+				return("weapon_supershotgun");
+			}
+			else return("weapon_shotgun");
+		}
 		if (TR == FL_TR_Q2) return("q2_blaster");
 		if (TR == FL_TR_Q3) return("weapon_gauntlet");
 		if (TR == FL_TR_RANDIN) return(mcw);
 		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
-	else if (e.scode == MC_D_SAW || e.scode == MC_W_KNIFE || e.scode == MC_AXE || e.scode == MC_Q3_GAUNTLET)
+	else if (e.scode == MC_D_SAW || e.scode == MC_W_KNIFE || e.scode == MC_AXE || e.scode == MC_Q3_GAUNTLET) // another not too likely - saw is the only regular map item
 	{
 		if (TR == FL_TR_WOLF) return("w_weapon_knife");
 		if (TR == FL_TR_DOOM) return("d_weapon_saw");
-		if (TR == FL_TR_QUAKE) return("weapon_axe");
+		if (TR == FL_TR_QUAKE)
+		{
+			if (Q_100 || PK_100)
+			{
+				if (random() < 0.05) return("weapon_lightning");
+				return("weapon_supershotgun");
+			}
+			else return("weapon_axe");
+		}
 		if (TR == FL_TR_Q2) return("q2_weapon_blaster");
 		if (TR == FL_TR_Q3) return("weapon_gauntlet");
 		if (TR == FL_TR_RANDIN) return(mcg);
@@ -348,7 +387,7 @@ string(entity e, float TR) map_trans =
 	}
 	else if (e.scode == MC_D_AROCKETS_LG || e.scode == MC_AROCKETS_LG)
 	{
-		if (TR == FL_TR_WOLF) return("w_weapon_mortar"); // FIX
+		if (TR == FL_TR_WOLF) return("w_weapon_mortar"); // IDEA: new ammo
 		if (TR == FL_TR_DOOM) return("d_ammo_rockbox");
 		if (TR == FL_TR_QUAKE) return("item_rockets_lg");
 		if (TR == FL_TR_Q2) return("q2_ammo_rockets");
@@ -359,7 +398,7 @@ string(entity e, float TR) map_trans =
 	}
 	else if (e.scode == MC_Q2_AGRENADES || e.scode == MC_Q3_AGRENADES)
 	{
-		if (TR == FL_TR_WOLF) return("w_weapon_mortar"); // FIX
+		if (TR == FL_TR_WOLF) return("w_weapon_mortar"); // IDEA: new ammo
 		if (TR == FL_TR_DOOM) return("d_ammo_rockbox");
 		if (TR == FL_TR_QUAKE) return("item_rockets");
 		if (TR == FL_TR_Q2) return("q2_ammo_grenades");
@@ -518,8 +557,43 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_QUAKE)
 		{
 			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
-			else if (TR_NOT == FL_NOTRN_BG)
+			else if (TR_NOT == FL_NOTRN_BG || Q_100 || PK_100)
 			{
+				if (random() < 0.2) return("item_health_15");
+				if (Q_100) return("RMV");
+				if (PK_100)
+				{
+					e.enemy = spawn();
+					e.enemy.enemy = e;
+					e.enemy.think = tr_set_touch;
+					e.enemy.nextthink = time + 0.1;
+					e.enemy.pk_touch = painkeep_weapon_touch;
+					if (random() < 0.5) return("weapon_grapgun");
+					if (random() < 0.3) return("weapon_airfist");
+					if (random() < 0.1) return("weapon_chainlg");
+					e.enemy.pk_touch = painkeep_touch;
+					if (random() < 0.2) return("item_painkeep_turret");
+					return("RMV");
+				}
+				if (TR_Q1DEF) // if true and not *100 - try this
+				{
+					e.touch = painkeep_touch;
+					sv = e.pk_touch;
+					if (PK_ART && random() < 0.25)
+					{
+						e.pk_touch = pkplus_touch;
+						if (random() < 0.5) return("item_pkplus_tomb");
+						if (random() < 0.3) return("item_pkplus_ego");
+					}
+					e.pk_touch = painkeep_weapon_touch;
+					if (random() < 0.5) return("weapon_grapgun");
+					if (random() < 0.3) return("weapon_airfist");
+					if (random() < 0.1) return("weapon_chainlg");
+					e.pk_touch = painkeep_touch;
+					if (random() < 0.2) return("item_painkeep_turret");
+					e.pk_touch = sv;
+					return("RMV");
+				}
 				return("");
 			}
 			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcq);
@@ -552,8 +626,44 @@ string(entity e, float TR) map_trans =
 		{
 //			if (!TR_NOT) return("");
 			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
-			else if (TR_NOT == FL_NOTRN_BG)
+			else if (TR_NOT == FL_NOTRN_BG || Q_100 || PK_100)
 			{
+				if (Q_100) return("RMV");
+				if (PK_100)
+				{
+					e.enemy = spawn();
+					e.enemy.enemy = e;
+					e.enemy.think = tr_set_touch;
+					e.enemy.nextthink = time + 0.1;
+					e.enemy.pk_touch = painkeep_touch;
+					if (random() < 0.5) return("item_painkeep_beartrap");
+					if (random() < 0.3) return("item_painkeep_turret");
+					if (random() < 0.1) return("item_painkeep_gwell");
+					e.enemy.pk_touch = ammo_touch;
+					if (random() < 0.2) return("item_painkeep_expshells");
+					return("RMV");
+				}
+				if (TR_Q1DEF) // if true and not *100 - try this
+				{
+					e.touch = painkeep_touch;
+					sv = e.pk_touch;
+					if (PK_ART && random() < 0.25)
+					{
+						e.touch = pkplus_touch;
+						if (random() < 0.5) return("item_pkplus_tomb");
+						if (random() < 0.3) return("item_pkplus_ego");
+						if (random() < 0.2) return("item_pkplus_phone");
+						if (random() < 0.1) return("item_pkplus_actor");
+					}
+					e.pk_touch = painkeep_touch;
+					if (random() < 0.5) return("item_painkeep_beartrap");
+					if (random() < 0.3) return("item_painkeep_turret");
+					if (random() < 0.1) return("item_painkeep_gwell");
+					e.pk_touch = ammo_touch;
+					if (random() < 0.2) return("item_painkeep_expshells");
+					e.pk_touch = sv;
+					return("RMV");
+				}
 				return("");
 			}
 			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcq);
@@ -735,11 +845,12 @@ string(entity e, float TR) map_trans =
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 
-	else if (e.scode == MC_W_BARREL || e.scode == MC_D_BARREL || e.scode == MC_Q2_BARREL)
+	else if (e.scode == MC_W_BARREL || e.scode == MC_D_BARREL || e.scode == MC_Q2_BARREL || self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD1)
 	{
 		if (TR == FL_TR_WOLF)
 		{
 			setmodel(e, "progs/barrel2.mdl");
+			e.mdl = e.model;
 			e.frame = 1;
 			e.skin = 0;
 			return("");
@@ -747,6 +858,8 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_DOOM)
 		{
 			setmodel(e, "progs/barrel.mdl");
+			e.mdl = e.model;
+			e.noise = "doom/dsbarexp.wav";
 			e.frame = 0;
 			e.skin = 0;
 			return("");
@@ -757,6 +870,8 @@ string(entity e, float TR) map_trans =
 				setmodel(e, "maps/b_explob.bsp");
 			else
 				setmodel(e, "maps/b_exbox2.bsp");
+			e.noise = "weapons/r_exp3.wav";
+			e.mdl = e.model;
 			e.frame = 0;
 			e.skin = 0;
 			return("");
@@ -764,6 +879,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2)
 		{
 			setmodel(e, "progs/q2_barrel.mdl");
+			e.mdl = e.model;
 			e.frame = 0;
 			e.skin = 0;
 			return("");
@@ -774,28 +890,29 @@ string(entity e, float TR) map_trans =
 			r = rint(3 * random());
 			if (r == 1)
 			{
-			setmodel (e, "progs/q3_ammobox.mdl");
-			e.frame = 0;
-			e.skin = q3_bfg_amsk;
+				setmodel (e, "progs/q3_ammobox.mdl");
+				e.frame = 0;
+				e.skin = q3_bfg_amsk;
 			}
 			else if (r == 2)
 			{
-			setmodel (e, "progs/q3_arm.mdl");
-			e.frame = 0;
-			e.skin = 1;
+				setmodel (e, "progs/q3_arm.mdl");
+				e.frame = 0;
+				e.skin = 1;
 			}
 			else if (r == 3)
 			{
-			setmodel(e, "progs/q3_health.mdl");
-			e.frame = 1;
-			e.skin = Q3_HEALM;
+				setmodel(e, "progs/q3_health.mdl");
+				e.frame = 1;
+				e.skin = Q3_HEALM;
 			}
 			else //if (r == 0)
 			{
-			setmodel(e, "progs/q3_art.mdl");
-			e.frame = q3_regn_fsk;
-			e.skin = q3_regn_fsk;
+				setmodel(e, "progs/q3_art.mdl");
+				e.frame = q3_regn_fsk;
+				e.skin = q3_regn_fsk;
 			}
+			e.mdl = e.model;
 			return("");
 		}
 		if (TR == FL_TR_RANDIN) return(mcg);
@@ -1956,6 +2073,88 @@ string(entity e, float TR) map_trans =
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 
+/// hipnotic - for now just removes in case of *100
+	else if (e.scode == MC_HIP_MJOLNIR)
+	{
+		if (Q_100 || PK_100)
+		{
+			return("RMV");
+		}
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_HIP_LASERCAN)
+	{
+		if (Q_100 || PK_100)
+		{
+			return("RMV");
+		}
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_HIP_PROXGUN)
+	{
+		if (Q_100 || PK_100)
+		{
+			return("RMV");
+		}
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_HIP_WETSUIT)
+	{
+		if (Q_100 || PK_100)
+		{
+			return("RMV");
+		}
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_HIP_EMPSH)
+	{
+		if (Q_100 || PK_100)
+		{
+			return("RMV");
+		}
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_HIP_CORNUCOPIA)
+	{
+		if (Q_100 || PK_100)
+		{
+			return("RMV");
+		}
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_REGGUN)
+	{
+		if (Q_100 || PK_100)
+		{
+			return("RMV");
+		}
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_C_FLAMER)
+	{
+		if (Q_100 || PK_100)
+		{
+			return("RMV");
+		}
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_C_AGAS)
+	{
+		if (Q_100 || PK_100)
+		{
+			return("RMV");
+		}
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.scode == MC_C_AGAS_LG)
+	{
+		if (Q_100 || PK_100)
+		{
+			return("RMV");
+		}
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+
 	return("");
 };
 
@@ -2001,10 +2200,10 @@ void(entity e, float trvs) item_translate =
 void(entity e, float trv) master_item_control =
 {
 	if (e.classname == "func_make") return; // override
-	if (cvar("pk_place_item") == 1) return;
 
 	if (!PK_100 && !Q_100) // turned back on - come here from loop
 	{
+		if (cvar("pk_place_item") == 1) return;
 		if (e.wad == "q1")
 		{
 			hide_item (e);
@@ -2044,14 +2243,13 @@ void(entity e, float trv) master_item_control =
 	}
 };
 
-// allow live translate of doom items - later
+// allow live translate of any items
 // twiddled after map load
 
 void(string tri, float trv) master_item_control_loop =
 {
 	local entity e, sv;
 	local string sr;
-
 
 	sr = tri;
 	e = find(world,class_select,sr);
@@ -2358,6 +2556,8 @@ void() check_translate =
 };
 
 /*
+old translate chart used for permanent code xlates
+
 q3 wep					pk wep
 ------------------------------------------
 bfg						chain_lg
@@ -2783,7 +2983,7 @@ void(entity e, float mc) doom_alpha_tran =
 		else // release
 		{
 */
-		setmodel(self, "progs/d_vis.mdl");
+		setmodel(e, "progs/d_vis.mdl");
 		e.frame = 0;
 		e.skin = 0;
 //		}

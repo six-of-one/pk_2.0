@@ -415,8 +415,10 @@ void() pk_plcfg =
 		if (DARKPLACES)
 		{
 			stuffcmd(self, Q3_BOBHOFF);
-			if (!pk_map) // not a pk map (some hubX maps have no .wad!)
-			if (world.wad == "") // q3 map? - then set bob
+//			if (!pk_map) // not a pk map (some hubX maps have no .wad!)
+//			if (world.wad == "") // q3 map? - then set bob
+			if (!Q_100 && !PK_100)
+			if (MAP_MODE == "Q3")
 				q3_bob_height();
 		}
 	}

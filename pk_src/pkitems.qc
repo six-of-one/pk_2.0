@@ -27,6 +27,11 @@
  * light_painkeep_candle
  * item_painkeep_expshells
  *
+ pkplus
+*  item_pkplus_ego
+*  item_pkplus_tomb
+*  item_pkplus_actor
+*  item_pkplus_phone
  */
 
 
@@ -49,18 +54,49 @@ void () SUB_regen =
 
 void () PlaceItem =
 {
-//	local float oldz;
+	local float f;
+
 	bot_item_linx(self); // *bot - item tie in
- 
+
+// used for translate - if *_100 on
+	self.mcode = pk_mcode("", self); // put map code on ent
+	self.sscode = sid_code[(int)(self.mcode - 100) * %4];
+	if (!self.scode) self.scode = self.mcode;
+
+	if (Q_100 || PK_100) // TDO: include hip_item & x_item when xlates are available
+	{
+		f = 0;
+		if (TR_Q1QRY > 0)
+		{
+			TR_Q1QRY = 0;
+			if (find(world,wad,"q1")) TR_Q1QRY = -1; // map was designed for dual items - remove only
+		}
+		if (TR_Q1DEF && (TR_Q1QRY == 0)) f = FL_TR_QUAKE;
+		if (self.class_select == "wolf_item") master_item_control(self, f);
+		else if (self.class_select == "doom_item") master_item_control(self, f);
+		else if (self.class_select == "q2_item") master_item_control(self, f);
+		else if (self.class_select == "q3_item") master_item_control(self, f);
+		else if (self.class_select == "hip_item") master_item_control(self, f);
+		else if (self.class_select == "x_item") master_item_control(self, f);
+		else if (self.mcode == MC_AXE) master_item_control(self, f);
+		else if (self.mcode == MC_SHOTGUN) master_item_control(self, f);
+		if (self.think == PlaceItem) self.think = SUB_Null; // create calls start item - fix infinite loop because item_call sub regen not used in *100
+	}
+
+	if (self.scode == MC_Q2_BARREL || self.scode == MC_D_BARREL || self.scode == MC_Q3_BARREL || self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD1){
+		return;
+
+if (WARNING)
+bprint("placeitem barrel return\n");
+
+
+}
+
 	if (Q_100)
 	{
 		q100_PlaceItem(); // always encoding now
 		return;
 	}
-
-	self.mcode = pk_mcode("", self); // put map code on ent
-	self.sscode = sid_code[(int)(self.mcode - 100) * %4];
-	if (!self.scode) self.scode = self.mcode;
 
 	self.mdl = self.model;		// so it can be restored on respawn
 	self.flags = FL_ITEM;		// make extra wide
@@ -360,7 +396,7 @@ void() pk_ammo_touch =
 		sk = FALSE;
 	}	
 
-	if (self.lip == AMMO_GRENADES) // FIX: decide if this will be separate for q2 & q3 - add max & cvar
+	if (self.lip == AMMO_GRENADES) // IDEA: decide if this will be separate ammo (from rockets) for q2 & q3 - add max & cvar
 	{
 		if (other.ammo_rockets >= MAX) // Q1_ROCKETAMMO_MAX)
 			return;
@@ -783,7 +819,7 @@ void () item_painkeep_expshells =
 		return;
 	}
 
-	self.touch = ammo_touch;
+	self.touch = pk_ammo_touch;
 
 	precache_model ("maps/b_eshel0.bsp");
 	setmodel (self,"maps/b_eshel0.bsp");
@@ -1182,7 +1218,7 @@ void() DropBackpack =
 
 	newmis = world;
 	if (!(self.ammo_shells + self.ammo_nails + self.ammo_rockets + self.ammo_cells + self.pk_explode_ammo))
-		return;	// nothing in it - FIX
+		return;	// nothing in it - IDEA: randomize some stuff?
 
 	newmis = spawn();
 	newmis.origin = self.origin - '0 0 24';
@@ -1410,8 +1446,6 @@ void() pk_item_position_init =
 
 void() pk_placeitem =
 {
-	local float f;
-
 	if (self.classname != "dyn_item")
 	{
 		pk_item_position_init();
@@ -1426,7 +1460,8 @@ void() pk_placeitem =
 	{
 		self.pk_touch = self.touch;
 	}
-	self.touch = painkeep_touch; // take over - route everything here
+	if (self.th_stand != painkeep_touch) // pk100 mask
+		self.touch = painkeep_touch; // take over - route everything here
 
 // TESTING - see if we can q1 default class select
 	if (self.class_select == "") self.class_select = "quake_item";
@@ -1439,20 +1474,6 @@ void() pk_placeitem =
 		else if ((TR_ALL || TR_QUAKE) && self.class_select == "quake_item")  master_item_control(self, TR_QUAKE);
 		else if ((TR_ALL || TR_Q2) && self.class_select == "q2_item")  master_item_control(self, TR_Q2);
 		else if ((TR_ALL || TR_Q3) && self.class_select == "q3_item")  master_item_control(self, TR_Q3);
-	}
-	else
-	{
-		f = 0;
-		if (TR_Q1QRY > 0)
-		{
-			TR_Q1QRY = 0;
-			if (find(world,wad,"q1")) TR_Q1QRY = -1; // map was designed for dual items - remove only
-		}
-		if (TR_Q1DEF && (TR_Q1QRY == 0)) f = FL_TR_QUAKE;
-		if (self.class_select == "wolf_item") master_item_control(self, f);
-		else if (self.class_select == "doom_item") master_item_control(self, f);
-		else if (self.class_select == "q2_item") master_item_control(self, f);
-		else if (self.class_select == "q3_item") master_item_control(self, f);
 	}
 
 

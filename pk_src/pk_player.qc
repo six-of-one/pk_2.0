@@ -575,7 +575,7 @@ void() PK_GibPlayer =
 		sound (self, CHAN_VOICE, "player/gib.wav", 1, ATTN_NONE);
 	else
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NONE);
-	if (pk_xsound) pk_player_sound(6); // NOTE --- only functional extra sound because the files exist for this
+	if (pk_xsound) pk_player_sound(6); // NOTE: only functional extra sound because the files exist for this
 };
 
 // called from player die

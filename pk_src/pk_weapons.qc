@@ -1299,9 +1299,6 @@ float() PK_CheckNoAmmo =
 	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
 		return TRUE;
 
-	if (self.weapon == IT_MJOLNIR) // Cataboligne - 2.13.11 - hipnotic support special wep
-		return TRUE;
-
 	if (ammo_con(self.weapon, self, "wpck")) // see if its inf ammo wep
 		return TRUE;
 	
