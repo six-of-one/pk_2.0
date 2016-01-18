@@ -377,7 +377,7 @@ float () FindTarget =
 	{
 		client = sight_entity;
 		if (client.enemy == self.enemy)
-			return FALSE; // Cataboligne 9.17.3 - fix compiler warning
+			return FALSE; // Cataboligne 9.17.3 - fixed this compiler warning
 	}
 	else
 	{
@@ -602,7 +602,7 @@ float () DogCheckAttack;
 float () CheckAnyAttack =
 {
 	if (!enemy_vis)
-		return FALSE; // Cataboligne 9.17.3 - fix compiler warning
+		return FALSE; // Cataboligne 9.17.3 - fixed this compiler warning
 	if (self.classname == "monster_army")
 		return SoldierCheckAttack ();
 	if (self.classname == "monster_ogre")

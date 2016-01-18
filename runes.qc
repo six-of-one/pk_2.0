@@ -31,19 +31,19 @@ void(entity e, float f, float r) rune_print =
 	}
 
 	if (f == RUNE_FLG_RS) sprint(e, "Resistance = 1/2 damage all attacks.\n");
-	else if (f == RUNE_FLG_DM && RUNES == 1) 	sprint(e, "Damage = 2 x damage for 30 secs.  8 x damage if combined with quad.\n");
+	else if (f == RUNE_FLG_DM && RUNES < 2) 	sprint(e, "Damage = 2 x damage for 30 secs.  8 x damage if combined with quad.\n");
 	else if (f == RUNE_FLG_DM) 	sprint(e, "Damage = 2 x damage.\n");
-	else if (f == RUNE_FLG_HS) sprint(e, "Haste - double fire rate most weps.\n");
-	else if (f == RUNE_FLG_RG) sprint(e, "Regeneration - regen 5 health | armor every 1/2 second\n");
+	else if (f == RUNE_FLG_HS) sprint(e, "Haste - double fire rate for most weps.\n");
+	else if (f == RUNE_FLG_RG) sprint(e, "Regenerate 5 health | armor every 1/2 second\n");
 	else sprint(e, "Rune not identified - unknown power!\n");
 
 	return;
 	}
 	if (f == RUNE_FLG_RS) bprint("Resistance = 1/2 damage all attacks.\n");
-	else if (f == RUNE_FLG_DM && RUNES == 1) 	bprint("Damage = 2 x damage for 30 secs.  8 x damage if combined with quad.\n");
+	else if (f == RUNE_FLG_DM && RUNES < 2) 	bprint("Damage = 2 x damage for 30 secs.\n"); //  8 x damage if combined with quad.\n");
 	else if (f == RUNE_FLG_DM) 	bprint("Damage = 2 x damage.\n");
 	else if (f == RUNE_FLG_HS) bprint("Haste - double fire rate most weps.\n");
-	else if (f == RUNE_FLG_RG) bprint("Regeneration - regen 5 health | armor every 1/2 second\n");
+	else if (f == RUNE_FLG_RG) bprint("Regenerate 5 health | armor per .5 sec\n");
 	else bprint("Rune not identified - unknown power!\n");
 };
 
@@ -61,14 +61,26 @@ float(float mc, float bc) rune_bit_code =
 	else if (bc == R_EARTH) f = MC_SIGIL1;
 	else if (bc == R_BLACK) f = MC_SIGIL2;
 	else if (bc == R_HELL) f = MC_SIGIL4;
-	else if (bc == R_ELDER) f = MC_SIGIL;
+	else if (bc == R_ELDER) f = MC_SIGIL8;
 
 	return(f);
 };
 
+string(float b) rune_name =
+{
+	if (b == R_EARTH) return("Earth magic");
+	if (b == R_BLACK) return("Black magic");
+	if (b == R_HELL) return("Hell magic");
+	if (b == R_ELDER) return("Elder magic");
+	return("Unknown magic");
+}
+
+float map_rune_found;
+
 void(float b) rune_map_print =
 {
 	local float f;
+	local entity e;
 
 	f = 0 - b;
 	rune_print(world, f, FALSE);
@@ -76,6 +88,21 @@ void(float b) rune_map_print =
 	bprint(ftos(rune_bit_code(0, b)));
 	bprint(" bit:");
 	bit_print(RUNE_MASK_ALL, b);
+	e = find(world, netname, rune_name(b));
+	while (e && e.map != "rune")
+	{
+		map_rune_found = TRUE; // found a map spawned / dynamic / func_make rune
+		e = find(e, netname, rune_name(b));
+	}
+	if (e)
+	{
+		if (e.solid == SOLID_NOT)
+			bprint(" regen-- ");
+		else
+			bprint(" spawned ");
+	}
+	else
+		bprint(" ------- ");
 	bprint(") ");
 	rune_print(world, b, FALSE);
 };
@@ -445,7 +472,7 @@ void() run_runes =
 			{
 				e.classname = "rune_maker";
 				e.think = rune_maker;
-				e.nextthink = time + 30 * random(); // do this well after items spawn - PIC_TO
+				e.nextthink = time + PIC_TO + 2 + 23 * random(); // do this well after items spawn - PIC_TO
 			}
 			bprint("***   Runes of power will spawn on this map - keep an eye out\n");
 		}

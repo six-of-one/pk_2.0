@@ -200,7 +200,7 @@ void() hub_custom =
 
 	if (!self.map)
 	{
-		bprint("*** Custom hub without map designation - setting = Hub.");
+		bprint("*** Custom hub without map designation - setting = v1.1 Start Hub.");
 		self.map = "start";
 		self.message = "Painkeep Hub!";
 	}
@@ -209,7 +209,8 @@ void() hub_custom =
 	self.classname = "hub_teleport";
 	hub_teleport(); // init hub portal
 
-	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+//	if (!(pk_flags & PK_MAP) && !PK) 
+		pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 
 // set appearance - model has different frames & skins for variety
 // IDEA - set facing in cphub? - not for now, all portals should be "directionless"
@@ -247,9 +248,11 @@ void() hub_custom =
 };
 
 // fn(pk_cphub) - print custom hub portal info for current player location - just add a map descriptor, file name, model frame & skin
-// - bind key to impulse 35, get rid of all turrets and set saved1 = 482 or 483
+// - bind key to impulse 35, and set saved1 = 482 or 483
 // - saved1 = 482, no comments on fields
 // - saved1 = 483, add in comments for fields that need edited to add custom maps
+
+// IDEA: turn off stat messages ("you got the shells") if  pk_chubcon == 666
 
 float pk_chubcon;
 
@@ -705,6 +708,8 @@ void() hub_control =
 		return;
 	}
 	theHub = self;
+
+	pk_map = PK = TRUE; // *pk - in case its not an official pk hub
 
 // either triggered to by time
 	if (self.targetname)
@@ -1306,9 +1311,11 @@ void() bot_votereveal =
 	bprint("\n");
 };
 
-// Cataboligne - 5.12.10 - sneak in bot votes (since they dont seem to be real keen on going to the polls...)
+// Cataboligne - 5.12.10 - sneak in bot votes (yep, this is labor union heavy handedness - since they dont seem to be real keen on going to the polls...)
 
-// NOTE: if not dead, find way to hide bot disappearance from players view
+// despite my best efforts bots dont like to jump thru vote portals - so just cheat em' in when the bot dies
+
+// NOTE: if not going to do this while bot is dead, find way to hide bot disappearance from players view
 
 float(float cn) bot_vote =
 {

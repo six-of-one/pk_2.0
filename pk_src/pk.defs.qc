@@ -31,6 +31,7 @@ float MAP_OBSTR;							// object errors -> warnings that remove map items should
 float MAP_REPAIR;							// if true map repairs will execute
 void() q_startmap;						// fix start map issue for q single player
 .string class_select;					// allow selection by class
+//float GMODE;								// genre mode - cfg for ambig map items
 
 // q100 stuff
 void() q100_PlayerPreThink;
@@ -231,7 +232,6 @@ float(float cn, entity e, string op) ammo_con;
 // map translations
 
 void() check_translate;
-void() doom_item_control_loop;
 
 float TR_WOLF;
 float TR_DOOM;
@@ -257,6 +257,7 @@ float NO_PI;					// dont let item_call call place_item
 
 void() doom_precache;
 void(entity e, float trv) doom_item_control;
+void(string tri, float trv) doom_item_control_loop;
 
 // **************************************
 // painkeep protos

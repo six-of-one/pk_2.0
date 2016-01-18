@@ -971,7 +971,7 @@ void() pk_srvcmd_load =
 
 	e = spawn();
 	e.think = start_loopcyc;
-	e.nextthink = time + PIC_TO + random() * 3;
+	e.nextthink = time + PIC_TO + 4 + 2 * crandom();
 
 	e = spawn();
 	e.think = pk_monitor;
@@ -1660,8 +1660,9 @@ entity() PK_SelectSpawnPoint =
 	numspots = 0;
 	totalspots = 0;
 
-// testinfo_player_start is only found in regioned levels
+// testinfo_player_start is only found in regioned levels - NOTE: if this ever spawns, this is DUMB code for dm
 	spot = find (world, classname, "testplayerstart");
+	if (PK_100 || (!deathmatch && !coop) || cvar("saved1") == 666) // if a developer wanted this in dm | coop they need to set saved1
 	if (spot)
 		return spot;
 
@@ -1690,7 +1691,12 @@ entity() PK_SelectSpawnPoint =
 
 		spot = find (world,classname,"info_player_start");
 		if (!spot)
-			error ("PutClientInServer: no info_player_start on level");
+		{
+			if (PK_100 && PK_100_OBJERR)
+				error ("PutClientInServer: no info_player_start on level");
+			else
+				bprint ("*** Warning: PutClientInServer: no info_player_start on level - looking for dm start");
+		}
 		else
 			return(spot);
 	}
@@ -1700,6 +1706,7 @@ entity() PK_SelectSpawnPoint =
 
 	spots = world;
 	spot = find (world, classname, "info_player_deathmatch");
+// TDO: if there are no dm spawns, and dm is set & !PK_100, make some (cvar control?)
 	while (spot)
 	{
 		totalspots = totalspots + 1;
@@ -1708,7 +1715,7 @@ entity() PK_SelectSpawnPoint =
 		pcount=0;
 		while (thing)
 		{
-			if (thing.classname == "player")
+			if (thing.classname == "player") // NOTE: could be reason for bot spawn frag bork - doesnt see pk*bot
 				pcount=pcount + 1;
 			thing=thing.chain;
 		}
@@ -1722,7 +1729,8 @@ entity() PK_SelectSpawnPoint =
 		spot = find (spot, classname, "info_player_deathmatch");
 	}
 	totalspots=totalspots - 1;
-	if (!numspots) {
+	if (!numspots)
+	{
 		// ack, they are all full, just pick one at random
 //		bprint (PRINT_HIGH, "Ackk! All spots are full. Selecting random spawn spot\n");
 		totalspots = rint((random() * totalspots));
@@ -2040,7 +2048,24 @@ void () PlayerPostThink =
 //	if (self.weapon || self.vwepent) 
 	viswep_post(); // Cataboligne - 9.26.9 - viswep code link - always have to run this for 1 player + pk*bots deal
 
-	if (Q_100)
+	if ((PK_ADMIN && !ADMINLOCK) || (self.admin == USER_MENU && self.view_ofs != '0 0 0')) // *pk - run admin for both modes - any deactivation will 0 this || make sure user menu always works
+	if (self.admin || (self.impulse == pk_adminimp))
+	if (pk_adminframe != framecount)
+	if (admin_postthink()) return;
+
+	if (chaos)
+		if (!(self.cam_x & CHSCAM_ON))  // Cataboligne - 5.14.10 - cam purify - custom engine dont display vw_ for 1pv
+			{
+//			if (!(self.flags & FL_NDISMDL)) bprint("switching to not display vwep\n");
+			self.flags = self.flags | FL_NDISMDL; // old self.flags method, replacing with:
+			}
+		else
+			{
+//			if (self.flags & FL_NDISMDL) bprint("switching to display vwep\n");
+			self.flags = self.flags - (self.flags & FL_NDISMDL);
+			}
+
+	if (Q_100 || Q_99) // TDO: check q99-ness hereish
 	{
 		q100_PlayerPostThink();
 		return;
@@ -2049,11 +2074,6 @@ void () PlayerPostThink =
 
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
-
-	if ((PK_ADMIN && !ADMINLOCK) || self.admin == USER_MENU) // *pk - run admin for both modes - any deactivation will 0 this || make sure user menu always works
-	if (self.admin || (self.impulse == pk_adminimp))
-	if (pk_adminframe != framecount)
-	if (admin_postthink()) return;
 
 
 // runes
@@ -2069,18 +2089,6 @@ void () PlayerPostThink =
 		}
 		return;	 // dying, so do nothing
 	}
-
-	if (chaos)
-		if (!(self.dest2_x & CHSCAM_ON))  // Cataboligne - 5.14.10 - cam purify - custom engine dont display vw_ for 1pv
-			{
-//			if (!(self.flags & FL_NDISMDL)) bprint("switching to not display vwep\n");
-			self.flags = self.flags | FL_NDISMDL; // old self.flags method, replacing with:
-			}
-		else
-			{
-//			if (self.flags & FL_NDISMDL) bprint("switching to display vwep\n");
-			self.flags = self.flags - (self.flags & FL_NDISMDL);
-			}
 
 
 // do weapon stuff
@@ -2179,13 +2187,26 @@ void () PlayerPostThink =
 };
 
 // called from client connect
+void () q100_ClientConnect;
+void () q100_ClientDisconnect;
+void () ExitIntermission;
 
-void() pk_clientconnect =
+//void() pk_clientconnect =
+void () ClientConnect =
 {
 	local float v;
-	v = random() * 6;
 
-//	bprint(self.netname); // already printed this
+	if (FRIKBOT) ClientInRankings ();
+	bot_con(TRUE); // *bot - doesnt depend on active bots, must always happen
+	if (Q_100 || Q_99)
+	{
+		q100_ClientConnect();
+		return;
+	}
+
+
+	v = random() * 6;
+	bprint (self.netname);
 	if (v < 1)
 	{
 		bprint(" joined the carnage\n");
@@ -2211,14 +2232,29 @@ void() pk_clientconnect =
 		bprint(" entered the game\n");
 	}
 
+// a client connecting during an intermission can cause problems
+	if (intermission_running)
+		ExitIntermission ();
 // MOTD_START
 //	self.msgcount = 1;
 };
 
 // called from client disconnect
 
-void() pk_clientdisconnect =
+//void() pk_clientdisconnect =
+void () ClientDisconnect =
 {
+	if (FRIKBOT) ClientDisconnected ();
+	bot_con(FALSE); // *bot
+
+	if (gameover)
+		return;
+	// if the level end trigger has been activated, just return
+	// since they aren't *really* leaving
+
+	if (!Q_100 && !Q_99)
+	{
+
 // PK - set flag so that we know that it's a disconnected entity.
 	self.disconnectPlayer = 1;
 
@@ -2246,6 +2282,12 @@ void() pk_clientdisconnect =
 	self.bolt_lightningFire = world;
 
 	admin_sv_cfg();
+
+	bprint (self.teamname);
+
+	}
+// normal disc
+	q100_ClientDisconnect();
 };
 
 // fn(frag_plus) - return frag to add if frags should be counted after death & ffw limit set

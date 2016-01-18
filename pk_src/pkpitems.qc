@@ -200,19 +200,12 @@ void() pkplus_item_control_loop =
 //	if (cvar("pk_place_item") != 0)
 //		return;
 
-	sr = "150";									// IDEA: get these like this: = ftos(pk_mcode("item_pkplus_ego", world));
-	e = find(world,sscode,sr);
+	sr = "pkplus_item";
+	e = find(world,class_select,sr);
 	while (e)
 	{
 		pkplus_item_control(e);
-		e = find(e,sscode,sr);
-		if (!e)
-		{
-		if (sr == "150") sr = "151";
-		else if (sr == "151") sr = "152";
-		else if (sr == "152") sr = "153";
-		e = find(e,sscode,sr);
-		}
+		e = find(e,class_select,sr);
 	}
 };
 
@@ -226,6 +219,7 @@ void () item_pkplus_ego =
 	self.pk_items = PKPLUS_IT_EGO;
 	setsize (self,'-16 -16 -24','16 16 32');
 	StartItem ();
+	if (self.class_select == "") self.class_select = "pkplus_item";
 	if (!PK_ART) pkplus_item_control(self);
 };
 
@@ -239,6 +233,7 @@ void () item_pkplus_tomb =
 	self.pk_items = PKPLUS_IT_TOMB;
 	setsize (self,'-16 -16 -24','16 16 32');
 	StartItem ();
+	if (self.class_select == "") self.class_select = "pkplus_item";
 	if (!PK_ART) pkplus_item_control(self);
 };
 
@@ -251,6 +246,7 @@ void () item_pkplus_actor =
 	self.pk_items = PKPLUS_IT_ACTOR;
 	setsize (self,'-16 -16 -24','16 16 32');
 	StartItem ();
+	if (self.class_select == "") self.class_select = "pkplus_item";
 	if (!PK_ART) pkplus_item_control(self);
 };
 
@@ -263,6 +259,7 @@ void () item_pkplus_phone =
 	self.pk_items = PKPLUS_IT_PHONE;
 	setsize (self,'-16 -16 -24','16 16 32');
 	StartItem ();
+	if (self.class_select == "") self.class_select = "pkplus_item";
 	if (!PK_ART) pkplus_item_control(self);
 };
 

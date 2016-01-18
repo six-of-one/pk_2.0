@@ -726,7 +726,7 @@ void () NextLevel =
 		}
 	}
 
-	if (PK)
+	if (!Q_100 && !Q_99)
 	if (pk_flags & PK_SF_HUB) // *pk - using voting / hub system - nextmap is always hub
 		o.map = hub_select(); //"start"; // *pk - if we're working with the hub system, then let's override this and go to the hub
 
@@ -892,7 +892,7 @@ void () WaterMove =
 			self.dmg = self.dmg + 2;
 			if (self.dmg > 15)
 				self.dmg = 10;
-			if (!Q_100 && !Q_99) ignorearmor = TRUE; // *pk - no armor taken when drowning
+			if (!Q_100) ignorearmor = TRUE; // *pk - no armor taken when drowning
 			T_Damage (self, world, world, self.dmg);
 			ignorearmor = FALSE;
 			self.pain_finished = time + 1;
@@ -1215,23 +1215,10 @@ void () q100_PlayerPostThink =
 	local	float	mspeed, aspeed;
 	local float r;
 
-
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
-
-	if ((PK_ADMIN && !ADMINLOCK) || self.admin == USER_MENU) // *pk - run admin for both modes - any deactivation will 0 this || make sure user menu always works
-	if (self.admin || (self.impulse == pk_adminimp))
-	if (pk_adminframe != framecount)
-	if (admin_postthink()) return;
-
 	if (self.deadflag)
 		return;
-
-
-		if (chaos)
-//		if (!(self.dest2_x & CHSCAM_ON))  // Cataboligne - 5.14.10 - cam purify - custom engine dont display vw_ for 1pv
-	//			if (!(self.flags & FL_NDISMDL)) bprint("switching to not display vwep\n");
-			self.flags = self.flags | FL_NDISMDL; // old self.flags method, replacing with:
 
 // do weapon stuff
 
@@ -1268,15 +1255,11 @@ ClientConnect
 called when a player connects to a server
 ============
 */
-void () ClientConnect =
+void () q100_ClientConnect =
 {
-	if (FRIKBOT) ClientInRankings ();
 	bprint (self.netname);
-	if (PK) pk_clientconnect(); // *pk - variety connect msg
-	else
-					bprint (" entered the game\n");
+	bprint (" entered the game\n");
 
-	bot_con(TRUE); // *bot - doesnt depend on active bots, must always happen
 // a client connecting during an intermission can cause problems
 	if (intermission_running)
 		ExitIntermission ();
@@ -1290,18 +1273,14 @@ ClientDisconnect
 called when a player disconnects from a server
 ============
 */
-void () ClientDisconnect =
+void () q100_ClientDisconnect =
 {
-	if (FRIKBOT) ClientDisconnected ();
 	if (gameover)
 		return;
 	// if the level end trigger has been activated, just return
 	// since they aren't *really* leaving
 
-	if (PK) pk_clientdisconnect(); // *pk - clear stuff out
 	// let everyone else know
-	bot_con(FALSE); // *bot
-	bprint (self.teamname);
 	bprint (self.netname);
 	bprint (" left the game with ");
 	bprint (ftos (self.frags));
@@ -1332,7 +1311,7 @@ void(entity targ, entity attacker) ClientObituary =
 			bprint (attacker.owner.netname);
 			bprint ("\n");
 
-			attacker.owner.frags = attacker.owner.frags + frag_plus(attacker.owner);
+			attacker.owner.frags = attacker.owner.frags + 1;
 			return;
 		}
 
@@ -1342,17 +1321,16 @@ void(entity targ, entity attacker) ClientObituary =
 			bprint (targ.netname);
 			bprint ("'s telefrag\n");
 
-			targ.frags = targ.frags - frag_minus(targ);
+			targ.frags = targ.frags - 1;
 			return;
 		}
 
-		if (attacker.classname == "player" ||  attacker.classname == OBSERVER) // Cataboligne 9.23.9 - attacker could have died & become observer
+		if (attacker.classname == "player")
 		{
 			if (targ == attacker)
 			{
 				// killed self
-				attacker.frags = attacker.frags - frag_minus(attacker);
-				nocide(targ);
+				attacker.frags = attacker.frags - 1;
 				bprint (targ.netname);
 
 				if (targ.weapon == 64 && targ.waterlevel > 1)
@@ -1378,12 +1356,12 @@ void(entity targ, entity attacker) ClientObituary =
 					deathstring = " loses another friend\n";
 				bprint (attacker.netname);
 				bprint (deathstring);
-				attacker.frags = attacker.frags - frag_minus(attacker);
+				attacker.frags = attacker.frags - 1;
 				return;
 			}
 			else
 			{
-				attacker.frags = attacker.frags + frag_plus(attacker);
+				attacker.frags = attacker.frags + 1;
 
 				rnum = attacker.weapon;
 				if (rnum == IT_AXE)
@@ -1448,8 +1426,7 @@ void(entity targ, entity attacker) ClientObituary =
 		}
 		else
 		{
-			targ.frags = targ.frags - frag_minus(targ);
-			nocide(targ);
+			targ.frags = targ.frags - 1;
 			bprint (targ.netname);
 
 			// killed by a montser?
@@ -1500,7 +1477,6 @@ void(entity targ, entity attacker) ClientObituary =
 			if (attacker.solid == SOLID_BSP && attacker != world)
 			{	
 				bprint (" was squished\n");
-				noenvcide(targ);
 				return;
 			}
 			if (attacker.classname == "trap_shooter" || attacker.classname == "trap_spikeshooter")
@@ -1511,7 +1487,6 @@ void(entity targ, entity attacker) ClientObituary =
 			if (attacker.classname == "fireball")
 			{
 				bprint (" ate a lavaball\n");
-				noenvcide(targ);
 				return;
 			}
 			if (attacker.classname == "trigger_changelevel")
@@ -1528,7 +1503,6 @@ void(entity targ, entity attacker) ClientObituary =
 					bprint (" sleeps with the fishes\n");
 				else
 					bprint (" sucks it down\n");
-				noenvcide(targ);
 				return;
 			}
 			else if (rnum == -4)
@@ -1537,12 +1511,10 @@ void(entity targ, entity attacker) ClientObituary =
 					bprint (" gulped a load of slime\n");
 				else
 					bprint (" can't exist on slime alone\n");
-				noenvcide(targ);
 				return;
 			}
 			else if (rnum == -5)
 			{
-				noenvcide(targ);
 				if (targ.health < -15)
 				{
 					bprint (" burst into flames\n");
@@ -1560,7 +1532,6 @@ void(entity targ, entity attacker) ClientObituary =
 			{
 				targ.deathtype = "";
 				bprint (" fell to his death\n");
-				noenvcide(targ);
 				return;
 			}
 

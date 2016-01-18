@@ -89,8 +89,6 @@ void () weapon_bfg =
 	self.touch = painkeep_weapon_touch;
 	setsize (self,'-16 -16 0','16 16 56');
 	StartItem ();
-//	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-//	pk_ditems = pk_ditems + 1;
 
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 };
@@ -149,8 +147,6 @@ void () weapon_grapplinghook =
 	self.netname = "Harpoon Gun";
 	setsize (self,'-16 -16 0','16 16 56');
 	StartItem ();
-//	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
-//	pk_ditems = pk_ditems + 1;
 
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 };

@@ -150,6 +150,7 @@ void() loopcyc_think =
 				}
 				else
 					item_call(item_by_mcode(f)); // set replacement item
+				if (self.map == "rune") self.map = ""; // rune server deal - this is a just in case - map runes should be pic or nopic
 			}
 		}
 
@@ -300,6 +301,13 @@ void() start_loopcyc =
 {
 	local entity e;
 
+
+	self.nextthink = time + 15; // recheck every 10 secs?
+
+// no sense in cycling removed items or constantly rndize items
+	if (cvar("pk_place_item") == 1) return;
+	if (cvar("pk_place_item") == 2 && cvar("pk_place_item_reload")) return;
+	
 	if (!find(world, noise, "pk_cyc_lg_0"))
 	{
 	e = spawn();
@@ -376,8 +384,6 @@ void() start_loopcyc =
 	loop_var(e, "pk_cyc_itm_0", "pk_cyc_itm_1", "pk_cyc_itm_2", "pk_cyc_itm_3", "pk_cyc_itm_4", "pk_cyc_itm_5", "pk_cyc_itm_6", "pk_cyc_itm_t");
 	init_loopcyc(e);
 	}
-
-	self.nextthink = time + 15; // recheck every 10 secs?
 };
 
  // TDO: should warn if !pk_art

@@ -93,7 +93,7 @@ void(entity targ, entity attacker) Killed =
 	if (self.classname == "pk*bot" || attacker.classname == "pk*bot") 
 		bot_kill(self, attacker); // *bot - tie in to count bot kills / deaths
 	else
-	if (PK || custom_hub_loaded) PK_ClientObituary(self, damage_inflictor, attacker);
+	if (!Q_100) PK_ClientObituary(self, damage_inflictor, attacker);
 	else
 	ClientObituary(self, attacker);
 
@@ -142,7 +142,7 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 // save damage based on the target's armor level
 
 	// PAINKEEP_START Ignore armor stuff, used for drowning
-	if (!PK || !ignorearmor)
+	if (Q_100 || !ignorearmor)
 	{
 		save = ceil(targ.armortype*damage);
 		if (save >= targ.armorvalue)

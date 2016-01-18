@@ -10,7 +10,7 @@
  *
  */
 
-//float MIN_ITEM					= 100;
+///float MIN_ITEM					= 100;
 //float MAX_INVITEM			= 255;
 //float MAX_OLDQ				= 300;
 float MAX_ITEM					= 999;
@@ -159,7 +159,15 @@ float MC_D_PACK				= 195;
 float MC_D_NIGHTVS			= 196;
 float MC_D_AUTOMAP			= 197;
 
-float MC_D_BARREL				= 19;
+float MC_D_BARREL				= 198;
+
+/// wolf 3d
+
+float MC_W_PISTOL				= 199;
+float MC_W_MACHGUN			= 200;
+float MC_W_CHAINGUN			= 201;
+float MC_W_MORTAR				= 202;
+float MC_W_FLAMER				= 203;
 
 // fn(bit_mcode) - item bit assoc with given mcode
 
@@ -226,6 +234,47 @@ float(float mcv, entity e) bit_mcode =
 	if (mc == MC_MASK)													return(PKPLUS_IT_ACTOR);
 	if (mc == MC_PHONE)													return(PKPLUS_IT_PHONE);
 
+	if (mc == MC_D_SHOTGUN)												return(IT_SHOTGUN);
+	if (mc == MC_D_BOOMSTICK)											return(IT_SUPER_SHOTGUN);
+	if (mc == MC_D_CHAINGUN)											return(IT_SUPER_NAILGUN);
+	if (mc == MC_D_ROCKETL)												return(IT_ROCKET_LAUNCHER);
+	if (mc == MC_D_PLASMA)												return(IT_LIGHTNING);
+	if (mc == MC_D_BFG)													return(IT_EXTRA_WEAPON);
+	if (mc == MC_D_SAW)													return(IT_AXE);
+	if (mc == MC_D_PISTOL)												return(IT_NAILGUN);
+
+	if (mc == MC_D_BERS)													return(IT_QUAD);
+	if (mc == MC_D_INVUL)												return(IT_INVULNERABILITY);
+	if (mc == MC_D_INVIS)												return(IT_INVISIBILITY);
+	if (mc == MC_D_RADSUIT)												return(IT_SUIT);
+
+	if (mc == MC_D_ARM_GRN)												return(IT_ARMOR2);
+	if (mc == MC_D_ARM_BLU)												return(IT_ARMOR3);
+
+	if (mc == MC_D_SOULSPH)												return(IT_SUPERHEALTH);
+
+	if (mc == MC_D_KEY_RED_SK)											return(IT_KEY2);
+	if (mc == MC_D_KEY_BLU_SK)											return(IT_KEY1);
+//	if (mc == MC_D_KEY_YEL_SK)											return(IT_KEY3);
+	if (mc == MC_D_KEY_RED_CR)											return(IT_KEY2);
+	if (mc == MC_D_KEY_BLU_CR)											return(IT_KEY1);
+//	if (mc == MC_D_KEY_YEL_CR)											return(IT_KEY3);
+
+	if (mc == MC_D_ASHELLS)												return(IT_SHELLS);
+	if (mc == MC_D_ASHELLS_LG)											return(IT_SHELLS);
+//	if (mc == MC_D_ABULLETS)											return(IT_BULLETS);
+//	if (mc == MC_D_ABULLETS_LG)										return(IT_BULLETS);
+	if (mc == MC_D_AROCKET)												return(IT_ROCKETS);
+	if (mc == MC_D_AROCKETS_LG)										return(IT_ROCKETS);
+	if (mc == MC_D_ACELLS)												return(IT_CELLS);
+	if (mc == MC_D_ACELLS_LG)											return(IT_CELLS);
+
+	if (mc == MC_W_PISTOL)												return(IT_SHOTGUN);
+	if (mc == MC_W_MACHGUN)												return(IT_NAILGUN);
+	if (mc == MC_W_CHAINGUN)											return(IT_SUPER_NAILGUN);
+	if (mc == MC_W_MORTAR)												return(IT_ROCKET_LAUNCHER);
+	if (mc == MC_W_FLAMER)												return(IT_GRENADE_LAUNCHER);
+
 	return(0);
 };
 
@@ -246,46 +295,100 @@ float(string sc, entity e) pk_mcode =
 
 	if (tsc == "dyn_item")												return(0);
 // q1
-	else if (tsc == "weapon_supershotgun")							return(MC_SUPER_SHOTGUN);
-	else if (tsc == "weapon_nailgun")								return(MC_NAILGUN);
-	else if (tsc == "weapon_supernailgun")							return(MC_SUPER_NAILGUN);
-	else if (tsc == "weapon_grenadelauncher")						return(MC_GRENADEL);
-	else if (tsc == "weapon_rocketlauncher")						return(MC_ROCKETL);
-	else if (tsc == "weapon_lightning")								return(MC_THUNDER);
+	if (tsc == "weapon_supershotgun")								return(MC_SUPER_SHOTGUN);
+	if (tsc == "weapon_nailgun")										return(MC_NAILGUN);
+	if (tsc == "weapon_supernailgun")								return(MC_SUPER_NAILGUN);
+	if (tsc == "weapon_grenadelauncher")							return(MC_GRENADEL);
+	if (tsc == "weapon_rocketlauncher")								return(MC_ROCKETL);
+	if (tsc == "weapon_lightning")									return(MC_THUNDER);
 // ammo
-	else if (tsc == "item_shells")									return(MC_ASHELLS);
-	else if (tsc == "item_spikes")									return(MC_ANAILS);
-	else if (tsc == "item_rockets")									return(MC_AROCKETS);
-	else if (tsc == "item_cells")										return(MC_ACELLS);
+	if (tsc == "item_shells")											return(MC_ASHELLS);
+	if (tsc == "item_spikes")											return(MC_ANAILS);
+	if (tsc == "item_rockets")											return(MC_AROCKETS);
+	if (tsc == "item_cells")											return(MC_ACELLS);
 
-	else if (tsc == "item_artifact_invulnerability")			return(MC_PENT);
-	else if (tsc == "item_artifact_super_damage")				return(MC_QUAD);
-	else if (tsc == "item_artifact_invisibility")				return(MC_RING);
-	else if (tsc == "item_artifact_envirosuit")					return(MC_SUIT);
+	if (tsc == "item_artifact_invulnerability")					return(MC_PENT);
+	if (tsc == "item_artifact_super_damage")						return(MC_QUAD);
+	if (tsc == "item_artifact_invisibility")						return(MC_RING);
+	if (tsc == "item_artifact_envirosuit")							return(MC_SUIT);
 
-	else if (tsc == "item_health")									return(MC_HEALTH);
-	else if (tsc == "item_armor1")									return(MC_ARMOR1);
-	else if (tsc == "item_armor2")									return(MC_ARMOR2);
-	else if (tsc == "item_armorInv")									return(MC_ARMOR3);
-	else if (tsc == "item_key1")										return(MC_KEY1);
-	else if (tsc == "item_key2")										return(MC_KEY2);
-	else if (tsc == "item_sigil")										return(MC_SIGIL);
-	else if (tsc == "misc_explobox")									return(MC_EXPLOD1);
-	else if (tsc == "misc_explobox2")								return(MC_EXPLOD2);
+	if (tsc == "item_health")											return(MC_HEALTH);
+	if (tsc == "item_armor1")											return(MC_ARMOR1);
+	if (tsc == "item_armor2")											return(MC_ARMOR2);
+	if (tsc == "item_armorInv")										return(MC_ARMOR3);
+	if (tsc == "item_key1")												return(MC_KEY1);
+	if (tsc == "item_key2")												return(MC_KEY2);
+	if (tsc == "item_sigil")											return(MC_SIGIL);
+	if (tsc == "misc_explobox")										return(MC_EXPLOD1);
+	if (tsc == "misc_explobox2")										return(MC_EXPLOD2);
 // pk
-	else if (tsc == "weapon_airfist")								return(MC_AIRGUN);
-	else if (tsc == "weapon_chainlg")								return(MC_CHTHUNDR);
-	else if (tsc == "weapon_grapgun")								return(MC_GRAP);
-	else if (tsc == "weapon_pulsenail")								return(MC_PULSE_NAILGUN);
-	else if (tsc == "item_painkeep_gwell")							return(MC_GRAVITY);
-	else if (tsc == "item_painkeep_turret")						return(MC_SENTRY);
-	else if (tsc == "item_painkeep_beartrap")						return(MC_BEARTRAP);
-	else if (tsc == "item_painkeep_expshells")					return(MC_AEXPLSH);
-	else if (tsc == "item_painkeep_can")							return(MC_CANOBEANS);
-	else if (tsc == "item_pkplus_ego")								return(MC_EGO);
-	else if (tsc == "item_pkplus_tomb")								return(MC_TOMB);
-	else if (tsc == "item_pkplus_actor")							return(MC_MASK);
-	else if (tsc == "item_pkplus_phone")							return(MC_PHONE);
+	if (tsc == "weapon_airfist")										return(MC_AIRGUN);
+	if (tsc == "weapon_chainlg")										return(MC_CHTHUNDR);
+	if (tsc == "weapon_grapgun")										return(MC_GRAP);
+	if (tsc == "weapon_pulsenail")									return(MC_PULSE_NAILGUN);
+	if (tsc == "item_painkeep_gwell")								return(MC_GRAVITY);
+	if (tsc == "item_painkeep_turret")								return(MC_SENTRY);
+	if (tsc == "item_painkeep_beartrap")							return(MC_BEARTRAP);
+	if (tsc == "item_painkeep_expshells")							return(MC_AEXPLSH);
+	if (tsc == "item_painkeep_can")									return(MC_CANOBEANS);
+	if (tsc == "item_pkplus_ego")										return(MC_EGO);
+	if (tsc == "item_pkplus_tomb")									return(MC_TOMB);
+	if (tsc == "item_pkplus_actor")									return(MC_MASK);
+	if (tsc == "item_pkplus_phone")									return(MC_PHONE);
+
+// doom
+	if (tsc == "d_weapon_shotgun")									return(MC_D_SHOTGUN);
+	if (tsc == "d_weapon_supershotgun")								return(MC_D_BOOMSTICK);
+	if (tsc == "d_weapon_chaingun")									return(MC_D_CHAINGUN);
+	if (tsc == "d_weapon_rocketlauncher")							return(MC_D_ROCKETL);
+	if (tsc == "d_weapon_plasma")										return(MC_D_PLASMA);
+	if (tsc == "d_weapon_bfg")											return(MC_D_BFG);
+	if (tsc == "d_weapon_saw")											return(MC_D_SAW);
+	if (tsc == "d_weapon_pistol")										return(MC_D_PISTOL);
+
+	if (tsc == "d_art_berserker")										return(MC_D_BERS);
+	if (tsc == "d_art_invulnerable")									return(MC_D_INVUL);
+	if (tsc == "d_art_invisible")										return(MC_D_INVIS);
+	if (tsc == "d_art_radsuit")										return(MC_D_RADSUIT);
+	if (tsc == "d_art_soulsphere")									return(MC_D_SOULSPH);
+	if (tsc == "d_art_megasphere")									return(MC_D_MEGASPH);
+
+	if (tsc == "d_item_spiritarmor")									return(MC_D_ARM_SPR);
+	if (tsc == "d_item_armorgreen")									return(MC_D_ARM_GRN);
+	if (tsc == "d_item_armorblue")									return(MC_D_ARM_BLU);
+
+	if (tsc == "d_item_healthbottle")								return(MC_D_HBOTTLE);
+	if (tsc == "d_item_healthstimpak")								return(MC_D_STIMPAK);
+	if (tsc == "d_item_healthmedkit")								return(MC_D_MEDKIT);
+
+	if (tsc == "d_key_redskull")										return(MC_D_KEY_RED_SK);
+	if (tsc == "d_key_blueskull")										return(MC_D_KEY_BLU_SK);
+	if (tsc == "d_key_yellowskull")									return(MC_D_KEY_YEL_SK);
+	if (tsc == "d_key_bluecard")										return(MC_D_KEY_RED_CR);
+	if (tsc == "d_key_redcard")										return(MC_D_KEY_BLU_CR);
+	if (tsc == "d_key_yellowcard")									return(MC_D_KEY_YEL_CR);
+
+	if (tsc == "d_ammo_4shell")										return(MC_D_ASHELLS);
+	if (tsc == "d_ammo_shellbox")										return(MC_D_ASHELLS_LG);
+	if (tsc == "d_ammo_clip")											return(MC_D_ABULLETS);
+	if (tsc == "d_ammo_ammobox")										return(MC_D_ABULLETS_LG);
+	if (tsc == "d_ammo_1rocket")										return(MC_D_AROCKET);
+	if (tsc == "d_ammo_rockbox")										return(MC_D_AROCKETS_LG);
+	if (tsc == "d_ammo_cellbox")										return(MC_D_ACELLS);
+	if (tsc == "d_ammo_cellpack")										return(MC_D_ACELLS_LG);
+
+	if (tsc == "d_item_pack")											return(MC_D_PACK);
+	if (tsc == "d_item_nightvis")										return(MC_D_NIGHTVS);
+	if (tsc == "d_item_automap")										return(MC_D_AUTOMAP);
+
+	if (tsc == "d_barrel")												return(MC_D_BARREL);
+
+// wolf
+	if (tsc == "w_weapon_pistol")										return(MC_W_PISTOL);
+	if (tsc == "w_weapon_machinegun")								return(MC_W_MACHGUN);
+	if (tsc == "w_weapon_chaingun")									return(MC_W_CHAINGUN);
+	if (tsc == "w_weapon_mortar")										return(MC_W_MORTAR);
+	if (tsc == "w_weapon_flamer")										return(MC_W_FLAMER);
 
 // q3 - translates classname for now
 //	else if (tsc == "")								return(MC_);
@@ -293,16 +396,16 @@ float(string sc, entity e) pk_mcode =
 	if (e) // qualify ent
 	{
 	if ((tsc == "item_shells") && (e.spawnflags & 1))			return(MC_ASHELLS_LG);
-	else if ((tsc == "item_spikes") && (e.spawnflags & 1))	return(MC_ANAILS_LG);
-	else if ((tsc == "item_rockets") && (e.spawnflags & 1))	return(MC_AROCKETS_LG);
-	else if ((tsc == "item_cells") && (e.spawnflags & 1))		return(MC_ACELLS_LG);
-	else if ((tsc == "item_health") && (e.spawnflags & 1))	return(MC_HEALTHROT);
-	else if ((tsc == "item_health") && (e.spawnflags & 2))	return(MC_HEALTHMEGA);
+	if ((tsc == "item_spikes") && (e.spawnflags & 1))	return(MC_ANAILS_LG);
+	if ((tsc == "item_rockets") && (e.spawnflags & 1))	return(MC_AROCKETS_LG);
+	if ((tsc == "item_cells") && (e.spawnflags & 1))		return(MC_ACELLS_LG);
+	if ((tsc == "item_health") && (e.spawnflags & 1))	return(MC_HEALTHROT);
+	if ((tsc == "item_health") && (e.spawnflags & 2))	return(MC_HEALTHMEGA);
 
-	else if ((tsc == "item_sigil") && (e.spawnflags & R_EARTH))		return(MC_SIGIL1);
-	else if ((tsc == "item_sigil") && (e.spawnflags & R_BLACK))		return(MC_SIGIL2);
-	else if ((tsc == "item_sigil") && (e.spawnflags & R_HELL))		return(MC_SIGIL4);
-	else if ((tsc == "item_sigil") && (e.spawnflags & R_ELDER))		return(MC_SIGIL8);
+	if ((tsc == "item_sigil") && (e.spawnflags & R_EARTH))		return(MC_SIGIL1);
+	if ((tsc == "item_sigil") && (e.spawnflags & R_BLACK))		return(MC_SIGIL2);
+	if ((tsc == "item_sigil") && (e.spawnflags & R_HELL))		return(MC_SIGIL4);
+	if ((tsc == "item_sigil") && (e.spawnflags & R_ELDER))		return(MC_SIGIL8);
 	}
 
 	if (tsc != "dyn_item") // && mc == 0)
@@ -400,6 +503,60 @@ string (float mc) item_by_mcode =
 	if (mc == MC_MASK)													return("item_pkplus_actor");
 	if (mc == MC_PHONE)													return("item_pkplus_phone");
 
+// doom
+	if (mc == MC_D_SHOTGUN)												return("d_weapon_shotgun");
+	if (mc == MC_D_BOOMSTICK)											return("d_weapon_supershotgun");
+	if (mc == MC_D_CHAINGUN)											return("d_weapon_chaingun");
+	if (mc == MC_D_ROCKETL)												return("d_weapon_rocketlauncher");
+	if (mc == MC_D_PLASMA)												return("d_weapon_plasma");
+	if (mc == MC_D_BFG)													return("d_weapon_bfg");
+	if (mc == MC_D_SAW)													return("d_weapon_saw");
+	if (mc == MC_D_PISTOL)												return("d_weapon_pistol");
+
+	if (mc == MC_D_BERS)													return("d_art_berserker");
+	if (mc == MC_D_INVUL)												return("d_art_invulnerable");
+	if (mc == MC_D_INVIS)												return("d_art_invisible");
+	if (mc == MC_D_RADSUIT)												return("d_art_radsuit");
+	if (mc == MC_D_SOULSPH)												return("d_art_soulsphere");
+	if (mc == MC_D_MEGASPH)												return("d_art_megasphere");
+
+	if (mc == MC_D_ARM_SPR)												return("d_item_spiritarmor");
+	if (mc == MC_D_ARM_GRN)												return("d_item_armorgreen");
+	if (mc == MC_D_ARM_BLU)												return("d_item_armorblue");
+
+	if (mc == MC_D_HBOTTLE)												return("d_item_healthbottle");
+	if (mc == MC_D_STIMPAK)												return("d_item_healthstimpak");
+	if (mc == MC_D_MEDKIT)												return("d_item_healthmedkit");
+
+	if (mc == MC_D_KEY_RED_SK)											return("d_key_redskull");
+	if (mc == MC_D_KEY_BLU_SK)											return("d_key_blueskull");
+	if (mc == MC_D_KEY_YEL_SK)											return("d_key_yellowskull");
+	if (mc == MC_D_KEY_RED_CR)											return("d_key_redcard");
+	if (mc == MC_D_KEY_BLU_CR)											return("d_key_bluecard");
+	if (mc == MC_D_KEY_YEL_CR)											return("d_key_yellowcard");
+
+	if (mc == MC_D_ASHELLS)												return("d_ammo_4shell");
+	if (mc == MC_D_ASHELLS_LG)											return("d_ammo_shellbox");
+	if (mc == MC_D_ABULLETS)											return("d_ammo_clip");
+	if (mc == MC_D_ABULLETS_LG)										return("d_ammo_ammobox");
+	if (mc == MC_D_AROCKET)												return("d_ammo_1rocket");
+	if (mc == MC_D_AROCKETS_LG)										return("d_ammo_rockbox");
+	if (mc == MC_D_ACELLS)												return("d_ammo_cellbox");
+	if (mc == MC_D_ACELLS_LG)											return("d_ammo_cellpack");
+
+	if (mc == MC_D_PACK)													return("d_item_pack");
+	if (mc == MC_D_NIGHTVS)												return("d_item_nightvis");
+	if (mc == MC_D_AUTOMAP)												return("d_item_automap");
+
+	if (mc == MC_D_BARREL)												return("d_barrel");
+
+// wolf
+	if (mc == MC_W_PISTOL)												return("w_weapon_pistol");
+	if (mc == MC_W_MACHGUN)												return("w_weapon_machinegun");
+	if (mc == MC_W_CHAINGUN)											return("w_weapon_chaingun");
+	if (mc == MC_W_MORTAR)												return("w_weapon_mortar");
+	if (mc == MC_W_FLAMER)												return("w_weapon_flamer");
+
 //	if (mc == MC_) return("item_");
 
 	return("");
@@ -447,7 +604,7 @@ void(float mc, vector vo) fn_make =
 	self.velocity_x = -170 + (random() * 340);
 	self.velocity_y = -170 + (random() * 340);
 
-	self.map = ""; // rune server deal
+	if (self.map == "rune") self.map = ""; // rune server deal
 
 	bprint("\b*** fn_make item spawned: ");
 	bprint(self.wad);

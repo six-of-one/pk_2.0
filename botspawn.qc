@@ -267,6 +267,7 @@ void () PutBotInServer =
 	local string tmp;
 	local float aimvar;
 	self.classname = "pk*bot";
+	self.class_select = "pk*bot";
 	self.health = 100;
 	self.takedamage = DAMAGE_AIM;
 	self.solid = SOLID_SLIDEBOX;

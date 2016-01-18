@@ -197,6 +197,60 @@ void(string cls) item_call =
 	else if (cls == "item_pkplus_tomb") item_pkplus_tomb();
 	else if (cls == "item_pkplus_actor") item_pkplus_actor();
 	else if (cls == "item_pkplus_phone") item_pkplus_phone();
+// doom
+	else if (cls == "d_weapon_shotgun") d_weapon_shotgun();
+	else if (cls == "d_weapon_supershotgun") d_weapon_supershotgun();
+	else if (cls == "d_weapon_chaingun") d_weapon_chaingun();
+	else if (cls == "d_weapon_rocketlauncher") d_weapon_rocketlauncher();
+	else if (cls == "d_weapon_plasma") d_weapon_plasma();
+	else if (cls == "d_weapon_bfg") d_weapon_bfg();
+//	else if (cls == "d_weapon_saw") d_weapon_saw();
+//	else if (cls == "d_weapon_pistol") d_weapon_pistol();
+
+//	else if (cls == "d_art_berserker") d_art_berserker();
+	else if (cls == "d_art_invulnerable") d_art_invulnerable();
+	else if (cls == "d_art_invisible") d_art_invisible();
+	else if (cls == "d_art_radsuit") d_art_radsuit();
+	else if (cls == "d_art_soulsphere") d_art_soulsphere();
+	else if (cls == "d_art_megasphere") d_art_megasphere();
+
+	else if (cls == "d_item_spiritarmor") d_item_spiritarmor();
+	else if (cls == "d_item_armorgreen") d_item_armorgreen();
+	else if (cls == "d_item_armorblue") d_item_armorblue();
+
+	else if (cls == "d_item_healthbottle") d_item_healthbottle();
+	else if (cls == "d_item_healthstimpak") d_item_healthstimpak();
+	else if (cls == "d_item_healthmedkit") d_item_healthmedkit();
+
+	else if (cls == "d_key_redskull") d_key_redskull();
+	else if (cls == "d_key_blueskull") d_key_blueskull();
+	else if (cls == "d_key_yellowskull") d_key_yellowskull();
+//	else if (cls == "d_key_bluecard") d_key_bluecard();
+//	else if (cls == "d_key_redcard") d_key_redcard();
+//	else if (cls == "d_key_yellowcard") d_key_yellowcard();
+
+	else if (cls == "d_ammo_4shell") d_ammo_4shell();
+	else if (cls == "d_ammo_shellbox") d_ammo_shellbox();
+	else if (cls == "d_ammo_clip") d_ammo_clip();
+	else if (cls == "d_ammo_ammobox") d_ammo_ammobox();
+	else if (cls == "d_ammo_1rocket") d_ammo_1rocket();
+	else if (cls == "d_ammo_rockbox") d_ammo_rockbox();
+	else if (cls == "d_ammo_cellbox") d_ammo_cellbox();
+	else if (cls == "d_ammo_cellpack") d_ammo_cellpack();
+
+//	else if (cls == "d_item_pack") d_item_pack();
+//	else if (cls == "d_item_nightvis") d_item_nightvis();
+//	else if (cls == "d_item_automap") d_item_automap();
+
+	else if (cls == "d_barrel") d_barrel();
+
+// wolf
+	else if (cls == "w_weapon_pistol") w_weapon_pistol();
+	else if (cls == "w_weapon_machinegun") w_weapon_machinegun();
+	else if (cls == "w_weapon_chaingun") w_weapon_chaingun();
+	else if (cls == "w_weapon_mortar") w_weapon_mortar();
+	else if (cls == "w_weapon_flamer") w_weapon_flamer();
+
 	else return;
 	self.mdl = self.model;
 	self.flags = FL_ITEM;
@@ -737,7 +791,7 @@ void() func_dynitem =
 	if (cvar("pk_dyn_func_stop")) return;
 
 // dont make dyn while place item control handles map items
-	if (time < PIC_TO) return;
+	if (time < (PIC_TO + 2)) return;
 
 // spawn an item
 	e = spawn();
@@ -802,6 +856,8 @@ void() rndize_restore =
 		self.think = rndize_item;
 	}
 };
+
+// IDEA: rndize once should make a better effort of providing a good set of items (rndize inside type, weps health, etc)
 
 void() rndize_item =
 {
@@ -998,109 +1054,91 @@ void() check_translate =
 {
 	TR_NOT = cvar("pk_tr_not");
 
-	if (TR_DOOM != cvar("pk_tr_doom" ) || TR_ALL != cvar("pk_tr_all" ))
+	if (TR_ALL != cvar("pk_tr_all" ))
 	{
-		if (TR_ALL != cvar("pk_tr_all" )) 
-			TR_DOOM = cvar("pk_tr_all" );
-		else
-			TR_DOOM = fabs(cvar("pk_tr_doom" ));
-		if (!TR_DOOM) TR_DOOM = FL_TR_RESTORE; // turned off & we need restore controls
+		if (!TR_ALL) TR_ALL = FL_TR_RESTORE; // turned off & we need restore controls
 
-		if (WARNING && !TR_ALL)
+		if (WARNING)
 		{
-		bprint("*** Translate: DooM to ");
-		bprint(tran_str(TR_DOOM));
-		bprint("\n");
+		bprint("*** Translate: ALL to ");
+		bprint(tran_str(TR_ALL));
+		bprint("\n\n");
 		}
-
-		doom_item_control_loop("doom_item");
 	}
 
-	if (TR_WOLF != cvar("pk_tr_wolf" ) || TR_ALL != cvar("pk_tr_all" ))
+	if (TR_WOLF != cvar("pk_tr_wolf" ) || TR_ALL)
 	{
-		if (TR_ALL != cvar("pk_tr_all" )) 
-			TR_WOLF = cvar("pk_tr_all" );
-		else
-			TR_WOLF = fabs(cvar("pk_tr_wolf" ));
+		TR_WOLF = fabs(cvar("pk_tr_wolf" ));
 		if (!TR_WOLF) TR_WOLF = FL_TR_RESTORE; // turned off & we need restore controls
 
-		if (WARNING && !TR_ALL)
+		if (WARNING)
 		{
 		bprint("*** Translate: Wolf to ");
 		bprint(tran_str(TR_WOLF));
 		bprint("\n");
 		}
 
-		doom_item_control_loop("wolf_item");
+		doom_item_control_loop("wolf_item", TR_WOLF);
 	}
 
-	if (TR_QUAKE != cvar("pk_tr_quake" ) || TR_ALL != cvar("pk_tr_all" ))
+	if (TR_DOOM != cvar("pk_tr_doom" ) || TR_ALL)
 	{
-		if (TR_ALL != cvar("pk_tr_all" )) 
-			TR_QUAKE = cvar("pk_tr_all" );
-		else
-			TR_QUAKE = fabs(cvar("pk_tr_quake" ));
+		TR_DOOM = fabs(cvar("pk_tr_doom" ));
+		if (!TR_DOOM) TR_DOOM = FL_TR_RESTORE; // turned off & we need restore controls
+
+		if (WARNING)
+		{
+		bprint("*** Translate: DooM to ");
+		bprint(tran_str(TR_DOOM));
+		bprint("\n");
+		}
+
+		doom_item_control_loop("doom_item", TR_DOOM);
+	}
+
+	if (TR_QUAKE != cvar("pk_tr_quake" ) || TR_ALL)
+	{
+		TR_QUAKE = fabs(cvar("pk_tr_quake" ));
 		if (!TR_QUAKE) TR_QUAKE = FL_TR_RESTORE; // turned off & we need restore controls
 
-		if (WARNING && !TR_ALL)
+		if (WARNING)
 		{
 		bprint("*** Translate: Quake to ");
 		bprint(tran_str(TR_QUAKE));
 		bprint("\n");
 		}
 
-		doom_item_control_loop("quake_item");
+		doom_item_control_loop("quake_item", TR_QUAKE);
 	}
 
-	if (TR_Q2 != cvar("pk_tr_q2" ) || TR_ALL != cvar("pk_tr_all" ))
+	if (TR_Q2 != cvar("pk_tr_q2" ) || TR_ALL)
 	{
-		if (TR_ALL != cvar("pk_tr_all" )) 
-			TR_Q2 = cvar("pk_tr_all" );
-		else
-			TR_Q2 = fabs(cvar("pk_tr_q2" ));
+		TR_Q2 = fabs(cvar("pk_tr_q2" ));
 		if (!TR_Q2) TR_Q2 = FL_TR_RESTORE; // turned off & we need restore controls
 
-		if (WARNING && !TR_ALL)
+		if (WARNING)
 		{
 		bprint("*** Translate: Quake 2 to ");
 		bprint(tran_str(TR_Q2));
 		bprint("\n");
 		}
 
-		doom_item_control_loop("q2_item");
+		doom_item_control_loop("q2_item", TR_Q2);
 	}
 
-	if (TR_Q3 != cvar("pk_tr_q3" ) || TR_ALL != cvar("pk_tr_all" ))
+	if (TR_Q3 != cvar("pk_tr_q3" ) || TR_ALL)
 	{
-		if (TR_ALL != cvar("pk_tr_all" )) 
-			TR_Q3 = cvar("pk_tr_all" );
-		else
-			TR_Q3 = fabs(cvar("pk_tr_q2" ));
+		TR_Q3 = fabs(cvar("pk_tr_q2" ));
 		if (!TR_Q3) TR_Q3 = FL_TR_RESTORE; // turned off & we need restore controls
 
-		if (WARNING && !TR_ALL)
+		if (WARNING)
 		{
 		bprint("*** Translate: Quake 3 to ");
 		bprint(tran_str(TR_Q3));
 		bprint("\n");
 		}
 
-		doom_item_control_loop("q3_item");
-	}
-
-	if (TR_ALL != cvar("pk_tr_all" ))
-	{
-//		set_translate();
-//		if (!TR_ALL) TR_ALL = FL_TR_RESTORE; // turned off & we need restore controls
-
-		if (WARNING)
-		{
-		bprint("*** Translate: ALL to ");
-		bprint(tran_str(TR_ALL));
-		bprint("\n");
-		}
-
-//		doom_item_control_loop();
+		doom_item_control_loop("q3_item", TR_Q3);
 	}
 	set_translate();
 
