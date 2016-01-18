@@ -1,14 +1,16 @@
 // constants
 
+// base values
 vector v0						= ' 0 0 0'; // zero vector |dimension
-float MAXFL						= 16777215; // max float - max bit mask
-float WARNING;									// display warnings
+float MAXFL						= 16777215; // max (non mantissa) float - max bit mask
+
+float chaos;									// detect customized glquake engine - has cvars compiled
+float CHAOS_ENG				= 10100010110111; // chaos engine id
 float DARKPLACES;								// for detecting darkplaces
 
-float CHAOS_ENG				= 10100010110111; // chaos engine id
-float chaos;
-
 // ADMIN section
+float WARNING;									// display warnings - dev work mainly
+
 // dev - only enable this for painkeep maps or force pk mode (sv_ control) - any maps that loads a pk item / func
 float PK;									// if set true painkeep code is enabled
 float PK_MAP					= 6144;	// bit * = FALSE -- map sets painkeep mode  - PK = TRUE if: any pk*.bsp loaded, start.bsp loaded and message == "hub", a map loads any painkeep map item, PK = FALSE otherwise
@@ -85,6 +87,9 @@ float pk_srvcfg;
 
 void() pk_srvcmd_set;
 void() mcode_load;
+// end main admin
+
+
 
 // env
 
@@ -150,6 +155,7 @@ float RUBBLE_SHOT				= 0.07; // % chance a bullet hitting solid will release a m
 void(vector rorg, vector vel, float vibe, float rskn) rubble_debris;
 
 
+// DARKPLACES specials
 // wrap - fix fte broke ass shit
 
 float(entity e, float s) getsurfacenumpoints_wrap = #434;
@@ -166,6 +172,7 @@ vector(entity e, float s) getsurfacenormal;
 string(entity e, float s) getsurfacetexture;
 float(entity e, vector p) getsurfacenearpoint;
 vector(entity e, float s, vector p) getsurfaceclippedpoint;
+// end specials
 
 
 // runes
@@ -205,6 +212,8 @@ float RUNE_FLG_RG				= 8;
 float RUNE_MASK_ALL			= 15; // because manual config must have mask off for bad bits
 
 float RUNE_AMMO				= 16; // no rune code yet - for packs
+// end runes
+
 
 // item override admin
 float DYN_OVR;
@@ -234,28 +243,6 @@ string sid_code;							// list of all codes as string, access = (code - 100) * 4
 ///float item_op;								// item operation currently in progress
 ///float IT_CALL					= 16;		// op is item call
 ///float IT_MAP					= 8;		// op is map call
-
-float EF_FULLBRIGHT			= 512;
-
-
-//DP_SV_MODELFLAGS_AS_EFFECTS
-//this extension allows model flags to be specified on entities so you can add a rocket trail and glow to any entity, etc.
-//setting any of these will override the flags the model already has, to disable the model's flags without supplying any of your own you must use EF_NOMODELFLAGS.
-//idea: LordHavoc, Dresk - darkplaces implementation: LordHavoc
-
-// not used yet - chaos will want this
-
-.float modelflags;
-
-float EF_NOMODELFLAGS		= 8388608; // ignore any effects in a model file and substitute your own
-float MF_ROCKET  				= 1; // leave a trail
-float MF_GRENADE 				= 2; // leave a trail
-float MF_GIB     				= 4; // leave a trail
-float MF_ROTATE  				= 8; // rotate (bonus items)
-float MF_TRACER  				= 16; // green split trail
-float MF_ZOMGIB  				= 32; // small blood trail
-float MF_TRACER2 				= 64; // orange split trail
-float MF_TRACER3 				= 128; // purple trail
 
 // respawn times
 //float RSP_AMMO; // these are dm 3 rules
@@ -336,6 +323,8 @@ void() item_control_menu;
 float ammo_frame;
 float(float cn, entity e, string op) ammo_con;
 void () PlaceItem;
+// end item overrides
+
 
 // map translations
 
@@ -444,6 +433,29 @@ float FL_HELD					= 128;
 float NO_BUBBLES				= -1; // this ent wont make bubbles
 float FL_VANM					= 131072; // vmodel animation in progress
 
+float EF_FULLBRIGHT			= 512;
+
+
+//DP_SV_MODELFLAGS_AS_EFFECTS
+//this extension allows model flags to be specified on entities so you can add a rocket trail and glow to any entity, etc.
+//setting any of these will override the flags the model already has, to disable the model's flags without supplying any of your own you must use EF_NOMODELFLAGS.
+//idea: LordHavoc, Dresk - darkplaces implementation: LordHavoc
+
+// not used yet - chaos will want this
+
+.float modelflags;
+
+float EF_NOMODELFLAGS		= 8388608; // ignore any effects in a model file and substitute your own
+float MF_ROCKET  				= 1; // leave a trail
+float MF_GRENADE 				= 2; // leave a trail
+float MF_GIB     				= 4; // leave a trail
+float MF_ROTATE  				= 8; // rotate (bonus items)
+float MF_TRACER  				= 16; // green split trail
+float MF_ZOMGIB  				= 32; // small blood trail
+float MF_TRACER2 				= 64; // orange split trail
+float MF_TRACER3 				= 128; // purple trail
+
+
 float HEAL_ROT					= 1;
 float HEAL_NORM				= 2;
 float HEAL_MEGA				= 3;
@@ -511,6 +523,9 @@ float Q2_BFG_TRACE			= 1000;
 float Q2_BFG_LASER			= 256;
 float Q2_BFG_LASER_DMG		= 5; // 5 pts every 10th sec
 
+.float silencer_finished; // q2 silencer
+float Q2_SILENCE; // value of silence as percentage of original volume
+
 // q3
 
 string Q3_DET					= "q3_snd/respawn1.wav"; // against	self.noise4 - NOTE: artifacts are different
@@ -524,6 +539,10 @@ void() q3_weapon_shotgun;
 void() q3_item_health;
 void(entity e, float v) q3_ha_rot;
 void() q3_bob_height;
+
+// hipnotic
+
+.float wetsuit_finished; // used by hip wetsuit & q2 rebreather
 
 void() inventory;
 

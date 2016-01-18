@@ -777,6 +777,9 @@ void () CheckPowerups =
 			{
 				sprint (self, "Air supply in Biosuit expiring\n");
 				stuffcmd (self, "bf\n");
+				if (self.noise3 != "")
+					sound (self, CHAN_AUTO, self.noise3, 1, ATTN_NORM);
+				else
 				sound (self, CHAN_AUTO, "items/suit2.wav", 1, ATTN_NORM);
 				self.rad_time = time + 1;
 			}
@@ -790,9 +793,48 @@ void () CheckPowerups =
 
 		if (self.radsuit_finished < time)
 		{	// just stopped
-			self.items = self.items - IT_SUIT;
+			self.items = self.items - (self.items & IT_SUIT);
 			self.rad_time = 0;
 			self.radsuit_finished = 0;
+		}
+	}
+
+	if (self.wetsuit_finished) // hip wetsuit (not in yet), q2 rebreather
+	{
+		self.air_finished = time + 12;		// don't drown
+
+		if (self.wetsuit_finished < time + 3)
+		{
+			if (self.rad_time == 1)
+			{
+				if (!self.items & IT_SUIT)
+				{
+					sprint (self, "Air supply in Re-breather expiring\n"); // IDEA: item stored messages
+					sound (self, CHAN_AUTO, "q2_snd/airout.wav", 1, ATTN_NORM);
+				}
+				else
+				{
+				sprint (self, "Air supply in Enviro suit expiring\n");
+//				sound (self, CHAN_AUTO, self.noise3, 1, ATTN_NORM);
+				sound (self, CHAN_AUTO, "q3_snd/airout.wav", 1, ATTN_NORM); // IDEA: make item store .noise3 work
+				}
+
+				stuffcmd (self, "bf\n");
+				self.rad_time = time + 1;
+			}
+
+			if (self.rad_time < time)
+			{
+				self.rad_time = time + 1;
+				stuffcmd (self, "bf\n");
+			}
+		}
+
+		if (self.wetsuit_finished < time)
+		{	// just stopped
+			self.items = self.items - (self.items & IT_SUIT); // re-breather does not set suit flag
+			self.rad_time = 0;
+			self.wetsuit_finished = 0;
 		}
 	}
 

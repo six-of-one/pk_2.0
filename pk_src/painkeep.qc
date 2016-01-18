@@ -629,6 +629,8 @@ void() pk_liveupd =
 
 	PK_MAX_LIVENT = cvar("pk_max_livent");
 
+	Q2_SILENCE = cvar("q2_silence");
+
 // turrets
 	if (PK_TUR_AMMO != cvar("pk_tur_ammo") || 
 		PK_TUR_TIME != cvar("pk_tur_time") || 
@@ -951,6 +953,7 @@ void() pk_srvcmd_set =
 	LASER_VEL = 600;
 	ROCKET_FUSE = 5.0;
 	WEPHUM = 1;
+	Q2_SILENCE = 0.2; // 20% vol default
 
 // pk artifacts
 	PK_ART = TRUE; // Cataboligne - 8.12.9 - pk artifacts support
@@ -1112,6 +1115,8 @@ void() pk_srvcmd_set =
 		registercvar("q1_cellammo_max", "100");
 
 		registercvar("pk_cellammo_max", "200");
+
+		registercvar("q2_silence", "0.2");
 
 // item ammo levels
 		registercvar("pk_max_gravitywellammo", "1");
@@ -1307,10 +1312,14 @@ void() pk_srvcmd_set =
 // called from many places - handles pk_mode 0 where map sets whether or not we use PK stuff
 
 // really sound(), mod for frikbot code
+// called from sound(...) in frikbot/bot.qc
+
 void(entity e, float chan, string samp, float vol, float atten) pk_sound = 
 {
 	local string psamp;
+	local float svol;
 
+	svol = vol;
 	psamp = samp; // sample that actually plays
 
 	if (!PK)
@@ -1320,8 +1329,21 @@ void(entity e, float chan, string samp, float vol, float atten) pk_sound =
 		if (samp == "misc/secret.wav") psamp = "alt_sounds/misc/secret.wav";
 	}
 
+// TDO: q2 silencer for wep channel stuff
+	if (chan == CHAN_WEAPON)
+	if (e.silencer_finished)
+	if (e.silencer_finished > time)
+	{
+		svol = vol * Q2_SILENCE;
+	}
+	else
+	{
+		e.silencer_finished = 0;
+		sprint (e, "Silencer used up\n");
+	}
+
 // pk_sound() - fn() here plays actual sound
-	frik_sound(e, chan, psamp, vol, atten);
+	frik_sound(e, chan, psamp, svol, atten);
 };
 
 void(vector pos, string samp, float vol, float atten) ambientsound =

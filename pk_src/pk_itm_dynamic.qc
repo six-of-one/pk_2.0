@@ -259,9 +259,9 @@ void(string cls) item_call =
 	else if (cls == "d_ammo_cellbox") d_ammo_cellbox();
 	else if (cls == "d_ammo_cellpack") d_ammo_cellpack();
 
-//	else if (cls == "d_item_pack") d_item_pack();
-//	else if (cls == "d_item_nightvis") d_item_nightvis();
-//	else if (cls == "d_item_automap") d_item_automap();
+	else if (cls == "d_item_pack") d_item_pack();
+	else if (cls == "d_item_nightvis") d_item_nightvis();
+	else if (cls == "d_item_automap") d_item_automap();
 
 	else if (cls == "d_barrel")
 	{
