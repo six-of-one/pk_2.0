@@ -839,12 +839,12 @@ void () printIntro =
 			addTeamBots (self,num);
 		}
 //		centerprint (self,"Server running team pk*bots v1.1\nand PainKeep v1.1");
-		centerprint (self,"Server running team pk*bots v2.0.1, frikbot 0.10.1");
+		centerprint (self,"Server running team pk*bots v2.2, frikbot 0.10.1");
 	}
 	else
 	{
 //		centerprint (self,"Server running pk*bots v1.1\nand PainKeep v1.1");
-		centerprint (self,"Server running pk*bots v2.0.1, frikbot 0.10.1");
+		centerprint (self,"Server running pk*bots v2.2, frikbot 0.10.1");
 	}
 };
 

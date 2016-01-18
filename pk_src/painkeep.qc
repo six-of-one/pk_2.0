@@ -1328,7 +1328,7 @@ POW_TIME = 30;
 // plain loop
 /// 0 not set, 1 set - 2 - 6 not set, exit / remove - 2+ set, loop starting with id 1
 
-		registercvar("pk_cyc_master", "0"); // if true no individual loops
+ 		registercvar("pk_cyc_master", "0"); // if true no individual loops
 		registercvar("pk_cyc_halt", "0"); // if true halt all loops, restore original items (0 or 1)
 		registercvar("pk_cyc_dyn", "0"); // if true include dynamic items in loop change
 		registercvar("pk_place_item", "0"); // place_item will if this is:  1 - not load regular map items, 2 - randomize all items (at time < 5 secs)
