@@ -908,6 +908,12 @@ void() BotAI =
 		if (time > 15)
 		if (bot_vote(0.7)) return;
 
+		if (time < 20)						// Cataboligne - 2.27.11 - spawn frag bork fix
+		{
+			if (time < 7) return; // if killed in first 7 secs bot waits to respawn
+			if (random() < 0.86) return; // still chance to wait up to 13 more secs
+		}
+
 		self.button0 = floor(random() * 2);
 		self.button2 = 0;
 		self.keys = 0;
