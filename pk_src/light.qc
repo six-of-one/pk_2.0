@@ -143,7 +143,7 @@ void() light_lightning =
 	if (self.style != 14)
 	{
 		if (PK_100 && PK_100_OBJERR) objerror("light_lightning with style != 14\n");
-		bprint("\n*** warning:\nlight_lightning with style != 14 - removing.\n\n");
+		if (WARNING) bprint("\n*** warning:\nlight_lightning with style != 14 - removing.\n\n");
 		remove(self);
 		return;
 	}

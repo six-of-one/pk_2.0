@@ -70,7 +70,7 @@ string (float bt) ammo_by_bit =
 	if (bt == WEP_AIRG) return("weapon_airfist");
 	if (bt == WEP_CPNB) return("item_painkeep_can");
 
-	if (!PK_ART) return(""); // Cataboligne 8.12.9 purify - pk artifacts
+//	if (!PK_ART) return(""); // Cataboligne 8.12.9 purify - pk artifacts
 // pk art item subs by special bits
 	if (bt == WEP_EGO) return("item_pkplus_ego");
 	if (bt == WEP_TOMB) return("item_pkplus_tomb");
@@ -140,13 +140,18 @@ void(string cls) item_call =
 	else if (cls == "weapon_grapgun") weapon_grapgun();
 	else if (cls == "weapon_airfist") weapon_airfist();
 	else if (cls == "item_painkeep_can") item_painkeep_can();
-	else if (PK_ART) { if (! pk_art_item_call(cls)) return; }// Cataboligne 8.12.9 purify - pk artifacts
+//	else if (!PK_ART) return; // Cataboligne 8.12.9 purify - pk artifacts
+	else if (cls == "item_pkplus_ego") item_pkplus_ego();
+	else if (cls == "item_pkplus_tomb") item_pkplus_tomb();
+	else if (cls == "item_pkplus_actor") item_pkplus_actor();
+	else if (cls == "item_pkplus_phone") item_pkplus_phone();
 	else return;
 	self.mdl = self.model;
+	self.flags = FL_ITEM;
+	self.movetype = MOVETYPE_TOSS;
 	if (self.classname != "dyn_item") // dont do these for dyn items
 	{
 		self.classname = scls;
-//		if (PK)  // try this out
 		pk_placeitem();
 		self.think = SUB_regen; // dont go thru place_item - use regen method
 		self.nextthink = time + 1 + 3 * random(); // spread em out
@@ -154,6 +159,7 @@ void(string cls) item_call =
 	}
 	if (self.map  == "rune") self.delay = 0; 
 	self.solid = SOLID_NOT;
+//	bot_item_linx(self); // *bot - item tie in - needs checked for use here -- FIX
 };
 
 // this section implements admin override of map items, remove (& replace), cycle & inf ammo
@@ -748,7 +754,7 @@ void() rndize_item =
 	if (self.owner.mcode < MC_Q1)
 		self.owner.mcode = 102 + rint(random() * 30);
 	else if (self.owner.mcode < MC_PK)
-		self.owner.mcode = 141 + rint(random() * 12);
+		self.owner.mcode = 141 + rint(random() * 12); // TDO: should resp !pk_art 
 
 	sf = 100;
 	if (RUNES)

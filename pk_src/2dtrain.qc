@@ -50,7 +50,7 @@ void() func_train_2d_use =
 	        if (PK_100 && PK_100_OBJERR) objerror("func_train_2d_use: button does not specify direction in cnt");
 	        else
 			  {
-				  bprint("\n*** warning:\nfunc_train_2d_use: button does not specify direction in cnt - removing\n\n");
+				  if (WARNING) bprint("\n*** warning:\nfunc_train_2d_use: button does not specify direction in cnt - removing\n\n");
 				  MAP_OBSTR = TRUE;
 				  remove(self);
 				  return;
@@ -85,7 +85,7 @@ void(float n) func_train_2d_next =
 					if (PK_100 && PK_100_OBJERR) objerror("func_train_2d_next: path_corner has no target1");
 					else
 					{
-						bprint("\n*** warning:\nfunc_train_2d_next: path_corner has no target1 - removing\n\n");
+						if (WARNING) bprint("\n*** warning:\nfunc_train_2d_next: path_corner has no target1 - removing\n\n");
 						MAP_OBSTR = TRUE;
 						remove(self);
 						return;
@@ -101,7 +101,7 @@ void(float n) func_train_2d_next =
 					if (PK_100 && PK_100_OBJERR) objerror("func_train_2d_next: path_corner has no target2");
 					else
 					{
-						bprint("\n*** warning:\nfunc_train_2d_next: path_corner has no target2 - removing\n\n");
+						if (WARNING) bprint("\n*** warning:\nfunc_train_2d_next: path_corner has no target2 - removing\n\n");
 						MAP_OBSTR = TRUE;
 						remove(self);
 						return;
@@ -117,7 +117,7 @@ void(float n) func_train_2d_next =
 					if (PK_100 && PK_100_OBJERR) objerror("func_train_2d_next: no next target");
 					else
 					{
-						bprint("\n*** warning:\nfunc_train_2d_next: no next target - removing\n\n");
+						if (WARNING) bprint("\n*** warning:\nfunc_train_2d_next: no next target - removing\n\n");
 						MAP_OBSTR = TRUE;
 						remove(self);
 						return;
@@ -148,7 +148,7 @@ void() func_train_2d =
 					if (PK_100 && PK_100_OBJERR) objerror("func_train_2d without a target");
 					else
 					{
-						bprint("\n*** warning:\nfunc_train_2d without a target - removing\n\n");
+						if (WARNING) bprint("\n*** warning:\nfunc_train_2d without a target - removing\n\n");
 						MAP_OBSTR = TRUE;
 						remove(self);
 						return;

@@ -277,30 +277,7 @@ void() pk_art_cycleobjects =
 	}
 };
 
-// fn(pk_art_cheat) - pk artifacts cheat command implementation
-
-void() pk_art_cheat =
-{
-	self.pkplus_egoammo = PKPLUS_EGOAMMO_MAX;
-	self.pkplus_tombammo = PKPLUS_TOMBAMMO_MAX;
-	self.pkplus_actorammo = PKPLUS_ACTORAMMO_MAX;
-	self.pkplus_phoneammo = PKPLUS_PHONEAMMO_MAX;
-};
-
-// fn(pk_art_bound_ammo) - pk artifacts ammo limits
-
-void(entity oth)  pk_art_bound_ammo =
-{
-	if (oth.pkplus_egoammo > PKPLUS_EGOAMMO_MAX)
-		oth.pkplus_egoammo = PKPLUS_EGOAMMO_MAX;
-	if (oth.pkplus_tombammo > PKPLUS_TOMBAMMO_MAX)
-		oth.pkplus_tombammo = PKPLUS_TOMBAMMO_MAX;
-	if (oth.pkplus_actorammo > PKPLUS_ACTORAMMO_MAX)
-		oth.pkplus_actorammo = PKPLUS_ACTORAMMO_MAX;
-	if (oth.pkplus_phoneammo > PKPLUS_PHONEAMMO_MAX)
-		oth.pkplus_phoneammo = PKPLUS_PHONEAMMO_MAX;
-};
-
+ 
 // fn(pk_art_powerup_touch) - pk artifacts powerup touch replacement
 
 // NOTE: dont really like this
@@ -371,78 +348,6 @@ void () pk_art_powerup_touch =
 	SUB_UseTargets();				// fire all targets / killtargets
 };
 
-// fn(pk_art_backpack_touch) - pk artifacts in packs
-
-// self is pack ent
-
-void(entity oth, float acnt) pk_art_backpack_touch =
-{
-	local string bs;
-
-	oth.pkplus_egoammo = (oth.pkplus_egoammo + self.pkplus_egoammo);
-	oth.pkplus_tombammo = (oth.pkplus_tombammo + self.pkplus_tombammo);
-	oth.pkplus_actorammo = (oth.pkplus_actorammo + self.pkplus_actorammo);
-	oth.pkplus_phoneammo = (oth.pkplus_phoneammo + self.pkplus_phoneammo);
-
-	if ( self.pkplus_egoammo )
-	{
-		if ( acnt )
-			sprint (oth,", ");
-		acnt = 1;
-		bs = ftos (self.pkplus_egoammo);
-		sprint (oth,bs);
-		sprint (oth," EGOs");
-	}
-	if ( self.pkplus_tombammo )
-	{
-		if ( acnt )
-			sprint (oth,", ");
-		acnt = 1;
-		bs = ftos (self.pkplus_tombammo);
-		sprint (oth,bs);
-		sprint (oth," Tombs");
-	}
-	if ( self.pkplus_actorammo )
-	{
-		if ( acnt )
-			sprint (oth,", ");
-		acnt = 1;
-		bs = ftos (self.pkplus_actorammo);
-		sprint (oth,bs);
-		sprint (oth," Actors");
-	}
-	if ( self.pkplus_phoneammo )
-	{
-		if ( acnt )
-			sprint (oth,", ");
-		acnt = 1;
-		bs = ftos (self.pkplus_phoneammo);
-		sprint (oth,bs);
-		sprint (oth," Cell Phones");
-	}
-};
-
-// fn(pk_art_backpack_drop) - pk artifacts in packs, drop some
-
-// itm is pack ent
-
-void(entity itm) pk_art_backpack_drop =
-
-{
-	if (self.pk_currentitem == PKPLUS_IT_EGO)
-		itm.netname = "EGO";
-	else if (self.pk_currentitem == PKPLUS_IT_TOMB)
-		itm.netname = "Tomb";
-	else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
-		itm.netname = "Actor";
-	else if (self.pk_currentitem == PKPLUS_IT_PHONE)
-		itm.netname = "Cell Phone";
-
-	itm.pkplus_egoammo = self.pkplus_egoammo;
-	itm.pkplus_tombammo = self.pkplus_tombammo;
-	itm.pkplus_actorammo = self.pkplus_actorammo;
-	itm.pkplus_phoneammo = self.pkplus_phoneammo;
-};
 
 
 // fn(pk_art_checkpwr) - print pk artifacts run powerups
@@ -538,80 +443,6 @@ float() pk_art_checkpwr =
 		
 		return TRUE;
 	}
-
-	return FALSE;
-};
-
-// fn(pk_art_obit) - print pk artifacts obituarys
-
-// returns TRUE if obit complete
-
-float(entity trg, entity infl, entity atkr) pk_art_obit =
-{
-	local float rnum;
-
-		if (infl.classname == "ego")
-		{
-			rnum = random ();
-			bprint (trg.netname);
-			if (infl.owner == trg)
-			{
-				trg.frags = (trg.frags - frag_minus(trg));
-				nocide(trg);
-				if (rnum < 0.250)
-					bprint (" had a mental breakdown!\n");
-				else if (rnum < 0.5)
-					bprint (" let his EGO get out of control!\n");
-				else if (rnum < 0.750)
-					bprint ("'s own EGO was self destructive!\n");
-				else
-					bprint ("'s EGO sometimes has a mind of its own!\n");
-				return TRUE;
-			}
-			atkr.frags = (atkr.frags + frag_plus(atkr));
-			if (rnum < 0.250)
-				bprint (" was impressed by the power of ");
-			else if (rnum < 0.5)
-				bprint (" was counseled by ");
-			else if (rnum < 0.750)
-				bprint (" was overpowered by ");
-			else
-				bprint (" was manipulated by ");
-			bprint (atkr.netname);
-			bprint ("'s EGO\n");
-			return TRUE;
-		}
-		if (infl.classname == "corpse")
-		{
-			rnum = random ();
-			bprint (trg.netname);
-			if (infl.owner == trg)
-			{
-				trg.frags = (trg.frags - frag_minus(trg));
-				nocide(trg);
-				if (rnum < 0.250)
-					bprint (" was caught robbing the family grave!\n");
-				else if (rnum < 0.5)
-						bprint (" could not get away from a relative's corpse\n");
-				else if (rnum < 0.750)
-					bprint (" should not have gone for the family's jewelry\n");
-				else
-					bprint (" was brought down by an old friend\n");
-				return TRUE;
-			}
-			atkr.frags = (atkr.frags + frag_plus(atkr));
-			if (rnum < 0.250)
-				bprint (" was dragged down by an old friend in ");
-			else if (rnum < 0.5)
-				bprint (" was laid to rest by ");
-			else if (rnum < 0.750)
-				bprint (", poor kid, got tuckered out dragging someone in ");
-			else
-				bprint (" should not have defiled ");
-			bprint (atkr.netname);
-			bprint ("'s Tomb\n");
-			return TRUE;
-		}
 
 	return FALSE;
 };

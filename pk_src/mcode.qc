@@ -359,7 +359,7 @@ void(float mc, vector vo) fn_make =
 	if (!e) e = findradius(world.origin, 256000);
 	if (!e) 
 	{
-		bprint("*** warning: fn_make could not find a random (or any) location - giving up\n");
+		if (WARNING) bprint("*** warning: fn_make could not find a random (or any) location - giving up\n");
 		return; // crap - no location
 	}
 	v1 = e.origin + ' 0 0 16';

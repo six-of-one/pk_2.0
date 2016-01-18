@@ -20,20 +20,18 @@ float(float pkn) pk_art_hasammo;
 void(float pkimp) pk_art_specialimpulse;
 void(float wch) pk_art_setcurrentammo;
 void() pk_art_cycleobjects;
-void() pk_art_cheat;
 void() pk_art_prinv;
-void(entity oth)  pk_art_bound_ammo;
 void () pk_art_powerup_touch;
-void(entity oth, float acnt) pk_art_backpack_touch;
-void(entity itm) pk_art_backpack_drop;
 float() pk_art_checkpwr;
-float(entity trg, entity infl, entity atkr) pk_art_obit;
 float(entity ck, string prv) pk_art_movshot_ck;
 float(entity ck) pk_art_actor_ck;
-string (float bt) pk_art_ammo_by_bit;
-float(string cls) pk_art_item_call;
 float(string mapNamed) pk_art_hubmapmsg;
 void () phone_teleport;
+
+void () item_pkplus_ego;
+void () item_pkplus_tomb;
+void () item_pkplus_actor;
+void () item_pkplus_phone;
 
  // prototypes - from
  // splash.qc

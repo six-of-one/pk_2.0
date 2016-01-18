@@ -125,7 +125,7 @@ void() hub_teleport =
 	if (!self.map)
 	{
 		if (PK_100 && PK_100_OBJERR) objerror("hub_teleport without map");
-		bprint("\n*** warning:\nhub_teleport without map - removing, this portal will not cull votes.\n\n");
+		if (WARNING) bprint("\n*** warning:\nhub_teleport without map - removing, this portal will not cull votes.\n\n");
 		remove(self);
 		return;
 	}
@@ -700,7 +700,7 @@ void() hub_control =
 		if (PK_100 && PK_100_OBJERR) objerror("Only 1 hub may be in existance.");
 // Cataboligne 10.2.8 - improvment:
 // already have a hub - why not remove and continue?
-		bprint("\n*** warning:\nMap tried to create a second hub - removing.\n\n");
+		if (WARNING) bprint("\n*** warning:\nMap tried to create a second hub - removing.\n\n");
 		remove(self);
 		return;
 	}

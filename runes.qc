@@ -254,7 +254,7 @@ void() rune_maker =
 						f = f * 2;
 					if (f > RUNE_MASK_ALL) // failed somehow to make any rune that fit rules
 					{
-						bprint("*** warning: rune_make could not find a rune that fit mask rules - giving up\n");
+						if (WARNING) bprint("*** warning: rune_make could not find a rune that fit mask rules - giving up\n");
 						remove(self);
 						return; // crap - no location
 					}
@@ -268,7 +268,7 @@ void() rune_maker =
 			if (!e) e = findradius(world.origin, 256000);
 			if (!e) 
 			{
-				bprint("*** warning: rune_make could not find a random (or any) location - giving up\n");
+				if (WARNING) bprint("*** warning: rune_make could not find a random (or any) location - giving up\n");
 				remove(self);
 				return; // crap - no location
 			}

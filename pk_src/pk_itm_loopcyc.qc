@@ -145,7 +145,7 @@ void() loopcyc_think =
 				e.pk_touch = (void()) 0;
 				if (!f)
 				{
-					bprint("\b*** warning: loop code changed on live item loop - restoring item.\n");
+					if (WARNING) bprint("\b*** warning: loop code changed on live item loop - restoring item.\n");
 					item_call(item_by_mcode(e.scode));
 				}
 				else
@@ -380,3 +380,4 @@ void() start_loopcyc =
 	self.nextthink = time + 15; // recheck every 10 secs?
 };
 
+ // TDO: should warn if !pk_art

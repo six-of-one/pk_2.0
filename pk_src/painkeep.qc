@@ -718,6 +718,7 @@ void() pk_liveupd =
 	Q_100_OBJERR = cvar("sv_q100_objerr");
 	PK_100_OBJERR = cvar("sv_pk100_objerr");
 	ADMINLOCK = cvar("sv_c_adminlock");
+	WARNING = cvar("sv_c_warning");
 
 	NOCIDE = 	cvar("sv_pl_nocide");
 	NOENVCIDE = cvar("sv_pl_nolavacide");
@@ -767,7 +768,7 @@ void() pk_liveupd =
 
 // dynamic items
 	DYN_OVR = cvar("pk_dyn_ovr");
-	DYN_ART = cvar("pk_dyn_art");
+	DYN_ART = cvar("pk_dyn_art"); // TDO: should resp !pk_art
 	if (!DYN_OVR) DYN_FORCE = cvar("pk_dyn_force");
 	DYN_ARTFR = cvar("pk_dyn_art_force");
 	DYN_FORCE_CNT = cvar("pk_dyn_force_cnt");
@@ -812,7 +813,7 @@ void() pk_liveupd =
 		e = find(world,classname,"dyn_spawner");
 		while (e)
 		{
-			bprint("*** Warning - dynamic items deactivated\n");
+			if (WARNING) bprint("*** Warning - dynamic items deactivated\n");
 			e.nextthink = -1;
 			remove(e);
 			e = find(e,classname,"dyn_spawner");
@@ -975,6 +976,7 @@ void() pk_srvcmd_set =
 	PK_100 = FALSE; // if true run 100% true to pk v1.11
 	PK_100_OBJERR = FALSE;
 	ADMINLOCK = 0;
+	WARNING = FALSE;
 
 // q1 control
 	Q_99 = FALSE;
@@ -1057,6 +1059,7 @@ void() pk_srvcmd_set =
 		registercvar("sv_c_mapcmd", "1");
 		registercvar("sv_c_mapcfg", "1");
 		registercvar("sv_c_srvcfg", "1");
+		registercvar("sv_c_warning", "0");
 		registercvar("sv_c_adminlock", "0"); // if true, admin menu is locked out
 // rune server
 		registercvar("sv_c_rune", "0");
@@ -2120,7 +2123,70 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			return;
 		}
 
-		if (PK_ART) if (pk_art_obit(targ, inflictor, attacker)) return; // Cataboligne 8.12.9 purify - pk artifacts
+// Cataboligne 8.12.9 purify - pk artifacts
+		if (inflictor.classname == "ego")
+		{
+			rnum = random ();
+			bprint (targ.netname);
+			if (inflictor.owner == targ)
+			{
+				targ.frags = (targ.frags - frag_minus(targ));
+				nocide(targ);
+				if (rnum < 0.250)
+					bprint (" had a mental breakdown!\n");
+				else if (rnum < 0.5)
+					bprint (" let his EGO get out of control!\n");
+				else if (rnum < 0.750)
+					bprint ("'s own EGO was self destructive!\n");
+				else
+					bprint ("'s EGO sometimes has a mind of its own!\n");
+				return;
+			}
+			attacker.frags = (attacker.frags + frag_plus(attacker));
+			if (rnum < 0.250)
+				bprint (" was impressed by the power of ");
+			else if (rnum < 0.5)
+				bprint (" was counseled by ");
+			else if (rnum < 0.750)
+				bprint (" was overpowered by ");
+			else
+				bprint (" was manipulated by ");
+			bprint (attacker.netname);
+			bprint ("'s EGO\n");
+			return;
+		}
+		if (inflictor.classname == "corpse")
+		{
+			rnum = random ();
+			bprint (targ.netname);
+			if (inflictor.owner == targ)
+			{
+				targ.frags = (targ.frags - frag_minus(targ));
+				nocide(targ);
+				if (rnum < 0.250)
+					bprint (" was caught robbing the family grave!\n");
+				else if (rnum < 0.5)
+						bprint (" could not get away from a relative's corpse\n");
+				else if (rnum < 0.750)
+					bprint (" should not have gone for the family's jewelry\n");
+				else
+					bprint (" was brought down by an old friend\n");
+				return;
+			}
+			attacker.frags = (attacker.frags + frag_plus(attacker));
+			if (rnum < 0.250)
+				bprint (" was dragged down by an old friend in ");
+			else if (rnum < 0.5)
+				bprint (" was laid to rest by ");
+			else if (rnum < 0.750)
+				bprint (", poor kid, got tuckered out dragging someone in ");
+			else
+				bprint (" should not have defiled ");
+			bprint (attacker.netname);
+			bprint ("'s Tomb\n");
+			return;
+		}
+// end pk_art
 
 		if (attacker.classname == "player" ||  attacker.classname == OBSERVER) // Cataboligne 9.23.9 - attacker could have died & become observer
 		{

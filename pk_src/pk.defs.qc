@@ -2,6 +2,12 @@
 
 vector v0						= ' 0 0 0'; // zero vector |dimension
 float MAXFL						= 16777215; // max float - max bit mask
+float WARNING;									// display warnings
+float DARKPLACES;								// for detecting darkplaces
+
+float CHAOS_ENG				= 10100010110111; // chaos engine id
+float chaos;
+
 // ADMIN section
 // dev - only enable this for painkeep maps or force pk mode (sv_ control) - any maps that loads a pk item / func
 float PK;									// if set true painkeep code is enabled
@@ -27,14 +33,8 @@ void() q_startmap;						// fix start map issue for q single player
 
 
 float PK_HUB2					= 131072; // bit if TRUE, using custom hub - only used for level transtion from hub vote
-//float PK_HUB3					= 262144; // bit if TRUE, using hub3 - reload at hub loads - deprecated
 float PK_ADHUB					= 1;		// set to 0 PK_mapmode and admin menu will ignore new maps - item load can still set PK mode for any pk map
-//float PK_HUBEXIT;							// TRUE - loading a non PK map while running a custom hub exits the hub loop, FALSE - always return to a custom hub from any map load
 float PK_ADMINMAP;						// if true this is an admin map command that overrides custom hub call from GotoNextMap
-//float PK_CUSTOMHUB;						// if TRUE, level running is a custom hub
-
-string st_hub2					= "hub2"; // map names for 2nd & 3rd hub
-string st_hub3					= "hub3";
 
 float pk_flags;							// replaces old usage of temp1, savedgamecfg stores this
 float pk_xsound;							// set to state of PK_XSOUND bit for sound code toggle
@@ -44,10 +44,6 @@ float pk_map;								// true if a painkeep map is loaded
 float pk_ditems;							// count painkeep items for dyn_items code
 float PK_DYNTO;							// timeout in 120 secs
 float PK_DYNRAD				= 8000;	// dynamic radius search 8000 units
-float DARKPLACES;							// for detecting darkplaces - modded engine sets cvar("chaos") to this value
-
-float CHAOS_ENG				= 10100010110111; // chaos engine id
-float chaos;
 
 float PK_ADMIN;							// allow admin - set this to 0 to completely disable all admin
 float pk_adminimp;						// impulse set in admin.cfg to access admin commands, defaults to 255

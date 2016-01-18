@@ -563,7 +563,7 @@ void() rotate_train_next =
    if ( targ.classname != "path_rotate" )
       {
 		if (Q_100 && Q_100_OBJERR) objerror( "Next target is not path_rotate" );
-		bprint( "\n*** warning:\nNext target is not path_rotate - removed.\n\n" );
+		if (WARNING) bprint( "\n*** warning:\nNext target is not path_rotate - removed.\n\n" );
 		MAP_OBSTR = TRUE;
 		remove(self);
 		return;
@@ -580,7 +580,7 @@ void() rotate_train_next =
    if (!self.path )
       if (Q_100 && Q_100_OBJERR) objerror ("rotate_train_next: no next target");
       {
-		bprint( "\n*** warning:\nrotate_train_next: no next target - removed.\n\n" );
+		if (WARNING) bprint( "\n*** warning:\nrotate_train_next: no next target - removed.\n\n" );
 	  MAP_OBSTR = TRUE;
 		remove(self);
 		return;
@@ -685,7 +685,7 @@ void() rotate_train_next =
          if (!self.speed)
 			{
 				if (Q_100 && Q_100_OBJERR) objerror("No speed is defined!");
-				bprint( "\n*** warning:\nNo speed is defined - default 50.\n\n" );
+				if (WARNING) bprint( "\n*** warning:\nNo speed is defined - default 50.\n\n" );
 				self.speed = 50;
 			}
 
@@ -740,7 +740,7 @@ void() rotate_train_find =
    if ( targ.classname != "path_rotate" )
       {
       if (Q_100 && Q_100_OBJERR) objerror( "Next target is not path_rotate" );
-		bprint( "\n*** warning:\nNext target is not path_rotate - removed.\n\n" );
+		if (WARNING) bprint( "\n*** warning:\nNext target is not path_rotate - removed.\n\n" );
 	  MAP_OBSTR = TRUE;
 		remove(self);
 		return;
@@ -813,8 +813,8 @@ void() rotate_train =
 	}
 
    if (Q_100 && Q_100_OBJERR) objerror ("rotate_train entities should be changed to rotate_object with\nfunc_rotate_train controllers\n");
-	bprint("\n*** warning:\n");
-	bprint("\brotate_train entities should be changed to rotate_object with\nfunc_rotate_train controllers\n\n");
+	if (WARNING) bprint("\n*** warning:\n");
+	if (WARNING) bprint("\brotate_train entities should be changed to rotate_object with\nfunc_rotate_train controllers\n\n");
 	MAP_OBSTR = TRUE;
 	remove(self);
 };
@@ -832,7 +832,7 @@ void() func_rotate_train =
 	if (!self.target)
       {
 		if (Q_100 && Q_100_OBJERR) objerror ("rotate_train without a target");
-		bprint( "\n*** warning:\nrotate_train without a target - removed.\n\n" );
+		if (WARNING) bprint( "\n*** warning:\nrotate_train without a target - removed.\n\n" );
 	  MAP_OBSTR = TRUE;
 		remove(self);
 		return;
@@ -1193,7 +1193,7 @@ void() func_rotate_door =
    if (!self.target)
       {
       if (Q_100 && Q_100_OBJERR) objerror( "rotate_door without target." );
-		bprint( "\n*** warning:\nrotate_door without target - removed.\n\n" );
+		if (WARNING) bprint( "\n*** warning:\nrotate_door without target - removed.\n\n" );
 	  MAP_OBSTR = TRUE;
 		remove(self);
 		return;

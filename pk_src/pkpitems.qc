@@ -12,6 +12,11 @@
 
 // painkeep artifacts support
 
+
+/*
+
+deprecated - handled by pk v1.2.1 code - not used at all !!
+
 void () pkplus_weapon_touch =
 {
 	local float hadammo;
@@ -32,10 +37,6 @@ void () pkplus_weapon_touch =
 		leave = 1;
 	else
 		leave = 0;
-
-/*
-
-deprecated - handled by pk v1.2.1 code
 
 	if (self.pk_currentitem == PK_IT_GRAPGUN)
 	{
@@ -67,7 +68,7 @@ deprecated - handled by pk v1.2.1 code
 			}
 		}
 	}
-*/
+
 	sprint (other,"You got the ");
 	sprint (other,self.netname);
 	sprint (other,"\n");
@@ -95,6 +96,7 @@ deprecated - handled by pk v1.2.1 code
 	activator = other;
 	SUB_UseTargets ();
 };
+*/
 
 void () pkplus_touch =
 {
@@ -155,7 +157,7 @@ void () pkplus_touch =
 
 void () item_pkplus_ego =
 {
-	if (!PK_ART)
+	if (!PK_ART) // ISSUE for chaos
 	{
 		remove(self);
 		return;
@@ -219,50 +221,4 @@ void () item_pkplus_phone =
 	StartItem ();
 };
 
-// fn (pk_art_ammo_by_bit) - pk artifacts ammo for a given wep 
 
-string (float bt) pk_art_ammo_by_bit =
-{
-// pk art item subs by special bits
-	if (bt == WEP_EGO) return("item_pkplus_ego");
-	if (bt == WEP_TOMB) return("item_pkplus_tomb");
-	if (bt == WEP_ACTOR) return("item_pkplus_actor");
-	if (bt == WEP_PHONE) return("item_pkplus_phone");
-
-	return("");
-};
-
-// fn (pk_art_item_call) - pk artifacts call to create item
-
-// return TRUE if attemp was made
-// NOTE: must be called with proper self ent!
-
-float(string cls) pk_art_item_call =
-{
-	local float ev;
-
-	ev = FALSE;
-
-	if (cls == "item_pkplus_ego")
-	{
-		item_pkplus_ego();
-		ev = TRUE;
-	}
-	else if (cls == "item_pkplus_tomb")
-	{
-		item_pkplus_tomb();
-		ev = TRUE;
-	}
-	else if (cls == "item_pkplus_actor")
-	{
-		item_pkplus_actor();
-		ev = TRUE;
-	}
-	else if (cls == "item_pkplus_phone")
-	{
-		item_pkplus_phone();
-		ev = TRUE;
-	}
-
-	return(ev);
-};

@@ -91,9 +91,12 @@ void () painkeep_weapon_touch =
 		if (PK_100 && PK_100_OBJERR) objerror("painkeep_weapon_touch: unknown classname");
 		else
 		{
+			if (WARNING)
+			{
 			bprint("\n*** warning:\npainkeep_weapon_touch: unknown classname (");
 			bprint(self.classname);
 			bprint(") - ignoring\n\n");
+			}
 			self.touch = SUB_Null;
 			return;
 		}
@@ -378,9 +381,12 @@ void() painkeep_touch =
 
 	if (self.pk_touch == (void()) 0)
 	{
+		if (WARNING)
+		{
 		bprint("\b *** warning: in painkeep_touch for: ");
 		bprint(self.classname);
-		bprint(" and pk_touch is (void) 0 !!\n");
+		bprint(" and pk_touch is (void) 0 - reloading\n");
+		}
 		if (self.classname != "dyn_item") item_call(self.classname);
 		else if (self.wad != "") item_call(self.wad);
 		else if (self.scode) item_call(item_by_mcode(self.scode));
@@ -645,7 +651,17 @@ void() pk_bound_ammo =
 	if (other.pk_explode_ammo > PK_EXPLODEAMMO_MAX)
 		other.pk_explode_ammo = PK_EXPLODEAMMO_MAX;
 
-	if (PK_ART) pk_art_bound_ammo(other); // Cataboligne 8.12.9 purify - pk artifacts
+// Cataboligne 8.12.9 purify - pk artifacts
+	if (other.pkplus_egoammo > PKPLUS_EGOAMMO_MAX)
+		other.pkplus_egoammo = PKPLUS_EGOAMMO_MAX;
+	if (other.pkplus_tombammo > PKPLUS_TOMBAMMO_MAX)
+		other.pkplus_tombammo = PKPLUS_TOMBAMMO_MAX;
+	if (other.pkplus_actorammo > PKPLUS_ACTORAMMO_MAX)
+		other.pkplus_actorammo = PKPLUS_ACTORAMMO_MAX;
+	if (other.pkplus_phoneammo > PKPLUS_PHONEAMMO_MAX)
+		other.pkplus_phoneammo = PKPLUS_PHONEAMMO_MAX;
+// end pk_art
+
 };
 
 // called from below - replacement for RankForWeapon - provides rank for some pk stuff
@@ -746,7 +762,49 @@ void() PK_BackpackTouch =
 	other.pk_beartrapammo = other.pk_beartrapammo + self.pk_beartrapammo;
  	other.pk_explode_ammo = other.pk_explode_ammo + self.pk_explode_ammo;
 
-	if (PK_ART) pk_art_backpack_touch(other, acount); // Cataboligne 8.12.9 purify - pk artifacts
+// Cataboligne 8.12.9 purify - pk artifacts
+	other.pkplus_egoammo = (other.pkplus_egoammo + self.pkplus_egoammo);
+	other.pkplus_tombammo = (other.pkplus_tombammo + self.pkplus_tombammo);
+	other.pkplus_actorammo = (other.pkplus_actorammo + self.pkplus_actorammo);
+	other.pkplus_phoneammo = (other.pkplus_phoneammo + self.pkplus_phoneammo);
+
+	if ( self.pkplus_egoammo )
+	{
+		if ( acount )
+			sprint (other,", ");
+		acount = 1;
+		bs = ftos (self.pkplus_egoammo);
+		sprint (other,bs);
+		sprint (other," EGOs");
+	}
+	if ( self.pkplus_tombammo )
+	{
+		if ( acount )
+			sprint (other,", ");
+		acount = 1;
+		bs = ftos (self.pkplus_tombammo);
+		sprint (other,bs);
+		sprint (other," Tombs");
+	}
+	if ( self.pkplus_actorammo )
+	{
+		if ( acount )
+			sprint (other,", ");
+		acount = 1;
+		bs = ftos (self.pkplus_actorammo);
+		sprint (other,bs);
+		sprint (other," Actors");
+	}
+	if ( self.pkplus_phoneammo )
+	{
+		if ( acount )
+			sprint (other,", ");
+		acount = 1;
+		bs = ftos (self.pkplus_phoneammo);
+		sprint (other,bs);
+		sprint (other," Cell Phones");
+	}
+// end pk_art
 
 	new = self.items;
 	if (!new)
@@ -915,7 +973,21 @@ void() PK_DropBackpack =
 	newmis.pk_beartrapammo = self.pk_beartrapammo;
 	newmis.pk_explode_ammo = self.pk_explode_ammo;
 
-		if (PK_ART) pk_art_backpack_drop(newmis); // Cataboligne 8.12.9 purify - pk artifacts
+// Cataboligne 8.12.9 purify - pk artifacts
+	if (self.pk_currentitem == PKPLUS_IT_EGO)
+		newmis.netname = "EGO";
+	else if (self.pk_currentitem == PKPLUS_IT_TOMB)
+		newmis.netname = "Tomb";
+	else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
+		newmis.netname = "Actor";
+	else if (self.pk_currentitem == PKPLUS_IT_PHONE)
+		newmis.netname = "Cell Phone";
+
+	newmis.pkplus_egoammo = self.pkplus_egoammo;
+	newmis.pkplus_tombammo = self.pkplus_tombammo;
+	newmis.pkplus_actorammo = self.pkplus_actorammo;
+	newmis.pkplus_phoneammo = self.pkplus_phoneammo;
+// end pk_art
 
 	newmis.velocity_z = 300;
 	newmis.velocity_x = -100 + (random() * 200);
@@ -1025,7 +1097,7 @@ void() pk_item_position =
 
 void() pk_item_position_init =
 {
-	if (!PK) bprint("*** pk_item_position_init called when not in PK mode.\n");
+	if (WARNING) if (!PK) bprint("*** warning: pk_item_position_init called when not in PK mode.\n");
 
 	self.ip_orgOrigin = self.origin;
 

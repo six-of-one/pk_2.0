@@ -205,7 +205,7 @@ void() func_frame =
 	{
 		// no targetname, no way to group
 		if (PK_100 && PK_100_OBJERR) objerror("func_frame without a targetname\n");
-		bprint("\n*** warning:\nfunc_frame without a targetname - removing,\n\n");
+		if (WARNING) bprint("\n*** warning:\nfunc_frame without a targetname - removing,\n\n");
 		remove(self);
 		return;
 	}
@@ -213,7 +213,7 @@ void() func_frame =
 	{
 		// no cnt, no way to know which frame this is
 		if (PK_100 && PK_100_OBJERR) objerror("func_frame without a cnt\n");
-		bprint("\n*** warning:\nfunc_frame without a cnt - removing,\n\n");
+		if (WARNING) bprint("\n*** warning:\nfunc_frame without a cnt - removing,\n\n");
 		remove(self);
 		return;
 	}

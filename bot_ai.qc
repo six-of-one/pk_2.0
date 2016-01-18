@@ -155,7 +155,7 @@ void () CallForHelp =
 								if (self.goalentity.classname != "BotTarget")
 								{
 									if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 1\n");
-									bprint("\n*** warning:\nbad bot target in bot_ai - 1.\n\n");
+									if (WARNING) bprint("\n*** warning:\nbad bot target in bot_ai - 1.\n\n");
 									ai_botstand();
 									return;
 								}
@@ -304,7 +304,7 @@ void () BotHuntTarget =
 	if (self.goalentity.classname != "BotTarget")
 	{
 		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 2\n");
-		bprint("\n*** warning:\nbad bot target in bot_ai - 2.\n\n");
+		if (WARNING) bprint("\n*** warning:\nbad bot target in bot_ai - 2.\n\n");
 		ai_botstand();
 		return;
 	}
@@ -973,7 +973,7 @@ void (float dist) ai_botcharge =
 		if (self.goalentity.classname != "BotTarget")
 		{
 			if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 3\n");
-			bprint("\n*** warning:\nbad bot target in bot_ai - 3.\n\n");
+			if (WARNING) bprint("\n*** warning:\nbad bot target in bot_ai - 3.\n\n");
 			ai_botstand();
 			return;
 		}
@@ -1052,7 +1052,7 @@ void (float dist) ai_botrun =
 		{
 			eprint (self.goalentity);
 			if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 4\n");
-			bprint("\n*** warning:\nbad bot target in bot_ai - 4.\n\n");
+			if (WARNING) bprint("\n*** warning:\nbad bot target in bot_ai - 4.\n\n");
 			ai_botstand();
 			return;
 		}
@@ -1122,7 +1122,7 @@ void () aibot_setupchase =
 	if (self.goalentity.classname != "BotTarget")
 	{
 		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 1\n");
-		bprint("\n*** warning:\nbad bot target in bot_ai - 1.\n\n");
+		if (WARNING) bprint("\n*** warning:\nbad bot target in bot_ai - 1.\n\n");
 		ai_botstand();
 		return;
 	}
@@ -1159,7 +1159,7 @@ void (float dist) aibot_chase =
 		if (self.goalentity.classname != "BotTarget")
 		{
 			if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 1\n");
-			bprint("\n*** warning:\nbad bot target in bot_ai - 1.\n\n");
+			if (WARNING) bprint("\n*** warning:\nbad bot target in bot_ai - 1.\n\n");
 			ai_botstand();
 			return;
 		}
@@ -1316,7 +1316,7 @@ float (float minweight) aibot_checkforGoodies =
 			if (botTarget.classname != "BotTarget")
 			{
 				if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 6\n");
-				bprint("\n*** warning:\nbad bot target in bot_ai - 6.\n\n");
+				if (WARNING) bprint("\n*** warning:\nbad bot target in bot_ai - 6.\n\n");
 				ai_botstand();
 				return(0);
 			}
@@ -1339,7 +1339,7 @@ void (float dist) ai_endgetGoody =
 	if (self.goalentity.classname != "BotTarget")
 	{
 		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 7\n");
-		bprint("\n*** warning:\nbad bot target in bot_ai - 7.\n\n");
+		if (WARNING) bprint("\n*** warning:\nbad bot target in bot_ai - 7.\n\n");
 		ai_botstand();
 		return;
 	}
@@ -1448,7 +1448,7 @@ void (float dist) ai_botgetGoody =
 	if (self.goalentity.classname != "BotTarget")
 	{
 		if (Q_100 && Q_100_OBJERR) objerror ("bad bot target in bot_ai! 8\n");
-		bprint("\n*** warning:\nbad bot target in bot_ai - 8.\n\n");
+		if (WARNING) bprint("\n*** warning:\nbad bot target in bot_ai - 8.\n\n");
 		ai_botstand();
 		return;
 	}

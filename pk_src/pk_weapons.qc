@@ -910,9 +910,18 @@ float(float rot) PK_CheckLivEnt =
 	}
 	else return(TRUE);
 
+	if (WARNING)
+	{
 	bprint(" *** warning: too many live ents to fire selected weapon = ");
 	bprint(ftos(pk_livent));
 	bprint(".\n");
+	}
+	else
+	{
+	sprint(self, " *** warning: too many live ents to fire selected weapon = ");
+	sprint(self, ftos(pk_livent));
+	sprint(self, ".\n");
+	}
 
 	if (rot) // rotate weapons if we cant fire
 	if (self.weapon == IT_AXE)
@@ -1377,7 +1386,15 @@ void() PK_CheatCommand =
 
 	self.pk_items = self.pk_items | PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT;
 
-	if (PK_ART) pk_art_cheat(); // Cataboligne 8.12.9 purify - pk artifacts
+// Cataboligne 8.12.9 purify - pk artifacts
+	if (PK_ART)
+	{
+	self.pkplus_egoammo = PKPLUS_EGOAMMO_MAX;
+	self.pkplus_tombammo = PKPLUS_TOMBAMMO_MAX;
+	self.pkplus_actorammo = PKPLUS_ACTORAMMO_MAX;
+	self.pkplus_phoneammo = PKPLUS_PHONEAMMO_MAX;
+	}
+// end pk_art
 
 	self.weapon = IT_ROCKET_LAUNCHER;
 	self.impulse = 0;
