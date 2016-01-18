@@ -139,7 +139,11 @@ void() PK_init =
 
 // load pk bots w/enh. engine
 
-	if (DARKPLACES || chaos) cvar_set("sv_bot_pkset", "1");
+	if (DARKPLACES || chaos)
+	{
+		cvar_set("sv_bot_pkset", "1");
+		localcmd("unalias blvl bmap\n"); // unalias - not needed
+	}
 
 // extra sounds by...are apparently not supplied, except gib_?.wav
 

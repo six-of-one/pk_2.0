@@ -83,6 +83,7 @@ void() SetChangeParms =
 		self.health = 50;
 	parm1 = self.items;
 	parm2 = self.health;
+	armorsave_rev(self);
 	parm3 = self.armorvalue;
 	if (self.ammo_shells < 25)
 		parm4 = 25;
@@ -236,8 +237,7 @@ void () ClientKill =
 	bprint (" suicides\n");
 	set_suicide_frame();
 	self.modelindex = modelindex_player;
-	if (!NOCIDE)
-	self.frags = self.frags - 2 * frag_minus(self);	// extra penalty
+	self.frags = self.frags - 2 * frag_minus_cide(self);	// extra penalty
 	respawn ();
 };
 
@@ -665,20 +665,10 @@ void () CheckPowerups =
 			self.armorvalue = self.ammo_cells;
 		}
 		else
-		if (self.armorsave)
-		{
-			if (self.armorsave < 1) self.armorvalue = 0;
-			else self.armorvalue = self.armorsave;
-			self.armorsave = 0;
-		}
+			armorsave_rev(self);
 	}
 	else
-	if (self.armorsave)
-	{
-		if (self.armorsave < 1) self.armorvalue = 0;
-		else self.armorvalue = self.armorsave;
-		self.armorsave = 0;
-	}
+		armorsave_rev(self);
 
 // invisibility
 	if (self.invisible_finished)
@@ -1018,7 +1008,7 @@ void () PlayerPostThink =
 			DropBotPath ();
 		}
 
-		if (DARKPLACES || chaos)
+		if (!(DARKPLACES || chaos)) // handle other engines
 		if (cvar("botlevel")) // hack so alias can load new map & keep pk*bots - set by console command aliases for map & changelevel - bmap & blvl
 		{
 			bot_changelevel(); // map change MUST happen - this clears bots from map!
@@ -1301,7 +1291,28 @@ float(entity e) frag_minus =
 	return(1); // chaos mod vector!
 };
 
+// suicide frags / enviroment frags
+
+float(entity e) frag_minus_cide =
+{
+	if (NOCIDE) return(0);
+	return(1);
+};
+
+float world_frags; // how many env kills world gets
+
+float(entity e) frag_minus_envcide =
+{
+	if (NOENVCIDE) return(0);
+	world_frags = world_frags + 1;
+	return(1);
+};
+
 // fn(no*cide) - dont count some suicide frags
+
+/* deprecated for conditionals below
+
+float NOCIDE_DEFRAG; // restore lost frags
 
 // frag already removed - so we add it back in - chaos mod vectors
 
@@ -1316,6 +1327,7 @@ void(entity e) noenvcide =
 {
 	if (!NOCIDE && NOENVCIDE) e.frags = e.frags + 1;
 };
+*/
 
 // called from killed - updated client obit for pk items
 
@@ -1355,8 +1367,9 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			bprint (targ.netname);
 			if (inflictor.owner == targ)
 			{
-				targ.frags = (targ.frags - frag_minus(targ));
-				nocide(targ);
+				if (!NOPKCIDE)
+					targ.frags = (targ.frags - frag_minus(targ));
+//				nocide(targ);
 				if (rnum < 0.250)
 					bprint (" had a mental breakdown!\n");
 				else if (rnum < 0.5)
@@ -1386,8 +1399,9 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			bprint (targ.netname);
 			if (inflictor.owner == targ)
 			{
-				targ.frags = (targ.frags - frag_minus(targ));
-				nocide(targ);
+				if (!NOPKCIDE)
+					targ.frags = (targ.frags - frag_minus(targ));
+//				nocide(targ);
 				if (rnum < 0.250)
 					bprint (" was caught robbing the family grave!\n");
 				else if (rnum < 0.5)
@@ -1418,25 +1432,29 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			if (targ == attacker)
 			{
 				// killed self
-				attacker.frags = attacker.frags - frag_minus(attacker);
-				nocide(targ);
-				bprint (targ.netname);
-
-				if ((inflictor.weapon == IT_LIGHTNING) || ((inflictor.weapon == IT_AXE) && (targ.pk_currentitem == PK_IT_CLIGHT)) && attacker.waterlevel > 1)
-				{
-					bprint (" discharges into the water.\n");
-					return;
-				}
-
 				if (inflictor.weapon == IT_AXE && inflictor.pk_currentitem == PK_IT_GRAVITYWELL)
 				{
 					bprint (" visits another dimension\n");
+					if (!NOPKCIDE)
+						targ.frags = (targ.frags - frag_minus(targ));
 					return;
 				}
 
 				if (inflictor.weapon == IT_AXE && inflictor.pk_currentitem == PK_IT_BEARTRAP)
 				{
 					bprint (" forget about his beartrap\n");
+					if (!NOPKCIDE)
+						targ.frags = (targ.frags - frag_minus(targ));
+					return;
+				}
+
+				targ.frags = targ.frags - frag_minus_cide(targ);
+//				nocide(targ);
+				bprint (targ.netname);
+
+				if ((inflictor.weapon == IT_LIGHTNING) || ((inflictor.weapon == IT_AXE) && (targ.pk_currentitem == PK_IT_CLIGHT)) && attacker.waterlevel > 1)
+				{
+					bprint (" discharges into the water.\n");
 					return;
 				}
 
@@ -1625,8 +1643,12 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			if (attacker.netname) bprint(attacker.netname); // main message
 			if (attacker.noise) bprint(attacker.noise); // other strings
 			bprint("\n");
-			if (attacker.frags) targ.frags = targ.frags - (attacker.frags * frag_minus(targ)); 
-			if (attacker.deadflag & 2) noenvcide(targ);
+			if (attacker.frags)
+			{
+				if (attacker.deadflag & 2) // any custom death msg ent with deadflag & 2 is classed as environmental suicide
+					targ.frags = targ.frags - (attacker.frags * frag_minus_envcide(targ));
+//				if (attacker.deadflag & 2) noenvcide(targ);
+			}
 			return;
 		}
 // TURRET_START
@@ -1637,7 +1659,8 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 	 	// check if killed the droper of the turret.
 		if (attacker.owner == targ) {
 				// killed self
-				targ.frags = targ.frags - frag_minus(targ);
+				if (!NOPKCIDE)
+					targ.frags = targ.frags - frag_minus(targ);
 				bprint(" forgot to hide from his own AutoSentry!\n");
 			return;
 		}
@@ -1653,14 +1676,12 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 // TURRET_END
 		else
 		{
-			targ.frags = targ.frags - frag_minus(targ);
-			nocide(targ);
-
 			bprint (targ.netname);
 
 			// killed by a montser?
 			if (attacker.flags & FL_MONSTER)
 			{
+				targ.frags = targ.frags - frag_minus(targ);
 				if (attacker.classname == "monster_army")
 					bprint (" was shot by a Grunt\n");
 				if (attacker.classname == "monster_demon1")
@@ -1700,13 +1721,22 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			// tricks and traps
 			if (attacker.classname == "explo_box")
 			{
+				targ.frags = targ.frags - frag_minus(targ);
 				bprint (" blew up\n");
 				return;
 			}
+			if (attacker.classname == "trigger_changelevel")
+			{
+				targ.frags = targ.frags - frag_minus(targ);
+				bprint (" tried to leave\n");
+				return;
+			}
+// all env after this
+			targ.frags = targ.frags - frag_minus_envcide(targ); 
 			if (attacker.solid == SOLID_BSP && attacker != world)
 			{
 				bprint (" was squished\n");
-				noenvcide(targ);
+//				noenvcide(targ);
 				return;
 			}
 			if (attacker.classname == "trap_shooter" || attacker.classname == "trap_spikeshooter")
@@ -1717,12 +1747,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			if (attacker.classname == "fireball")
 			{
 				bprint (" ate a lavaball\n");
-				noenvcide(targ);
-				return;
-			}
-			if (attacker.classname == "trigger_changelevel")
-			{
-				bprint (" tried to leave\n");
+//				noenvcide(targ);
 				return;
 			}
 
@@ -1734,7 +1759,7 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 					bprint (" sleeps with the fishes\n");
 				else
 					bprint (" sucks it down\n");
-				noenvcide(targ);
+//				noenvcide(targ);
 				return;
 			}
 			else if (rnum == -4)
@@ -1743,12 +1768,12 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 					bprint (" gulped a load of slime\n");
 				else
 					bprint (" can't exist on slime alone\n");
-				noenvcide(targ);
+//				noenvcide(targ);
 				return;
 			}
 			else if (rnum == -5)
 			{
-				noenvcide(targ);
+//				noenvcide(targ);
 				if (targ.health < -15)
 				{
 					bprint (" burst into flames\n");
@@ -1766,11 +1791,12 @@ void(entity targ, entity inflictor, entity attacker) PK_ClientObituary =
 			{
 				targ.deathtype = "";
 				bprint (" fell to his death\n");
-				noenvcide(targ);
+//				noenvcide(targ);
 				return;
 			}
 
 			// its worse than that - he's dead Jim
+			// this puts all mystery deaths under envcide rules
 			bprint (" died\n");
 		}
 	}

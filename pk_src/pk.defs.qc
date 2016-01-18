@@ -718,6 +718,8 @@ void(entity vh, float cd) viswep_ld;
 float(string wpm) ver_weaponmodel;
 void vw_range_base(float v_frm);
 void vw_melee_base(float v_frm);
+void vw_harpoon_pnt(float v_frm); // harpoon rope point
+vector(entity hent) grap_vw_adj;
 .void(float v_frm) vv_draw; // viswep code - weapon drawn
 .void(float v_frm) vv_holster; // viswep code -weapon hosltered
 void() player_nail3;

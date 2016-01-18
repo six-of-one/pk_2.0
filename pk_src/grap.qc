@@ -197,7 +197,7 @@ void() grap_releaseHarpoon =
 float() grap_maintainRope =
 {
 	local entity corner;
-	local vector cornerOrigin;
+	local vector cornerOrigin, v1;
 	local float totalLength,sf;
 
 	totalLength = 0;
@@ -226,15 +226,16 @@ float() grap_maintainRope =
 
 	// for each segment between corners
 	corner = self;
-	cornerOrigin = corner.origin + '0 0 16';
+// Cataboligne - 4.4.11 - start point of rope at end of harpoon gun, new vw calc
+  	if (!PK_100)
+		v1 = cornerOrigin = corner.origin + grap_vw_adj(corner);
+	else
+		cornerOrigin = corner.origin + '0 0 16';
 
 	sf = SAFE_LOOP;
 	while(corner.grap_cornerchainNext && sf > 0)
 	{
 		sf = sf - 1;
-
-		if (!PK_100)
-		if (corner.flags & FL_CLIENT) cornerOrigin = cornerOrigin + grap_vw_adj(corner);
 
 		totalLength = totalLength + vlen(corner.grap_cornerchainNext.origin - cornerOrigin);
 
@@ -244,6 +245,20 @@ float() grap_maintainRope =
 		cornerOrigin = corner.origin;
 	}
 
+// Cataboligne - 4.4.11 - 
+// TEST - attempt to move closeset seg fwd if backing past start point
+  	if (!PK_100)
+	{
+		corner = self.grap_cornerchainNext.grap_ropechainPrev;
+		while (corner.grap_ropechainPrev)
+			corner = corner.grap_ropechainPrev;
+		if (vlen(v1 - corner.origin) < 40)
+		{
+			v1 = normalize(corner.origin - v1);
+			corner.origin = corner.origin + (v1 * 16);
+		}
+	}
+	
 	return totalLength;
 };
 
@@ -251,7 +266,7 @@ float() grap_maintainRope =
 void(entity corner, vector cornerOrigin) grep_createCornerRope =
 {
 	local entity rope, ropeOwner;
-	local vector startPoint, dir, vangle, vwa;
+	local vector startPoint, dir, vangle;
 	local float sf;
 
 	// Calculate viewing angle
@@ -262,14 +277,10 @@ void(entity corner, vector cornerOrigin) grep_createCornerRope =
 
 	ropeOwner.angles = vangle;
 
-	vwa = v0;
-	if (!PK_100)
-	if (ropeOwner.flags & FL_CLIENT) vwa = grap_vw_adj(corner);
-
 	// if going out, create coil's
 	if (self.grap_state == GRAP_OUT)
 	{
-		if(vlen(cornerOrigin - ropeOwner.origin + vwa) < 86)
+		if(vlen(cornerOrigin - ropeOwner.origin) < 86)
 	  {
 	    // if there is rope, then delete
 	    if (ropeOwner.grap_ropechainPrev)
@@ -279,11 +290,11 @@ void(entity corner, vector cornerOrigin) grep_createCornerRope =
 	    return;
 	  }
 
-	  // Calculate direction to owner.
-		dir = normalize(cornerOrigin - ropeOwner.origin + vwa);
+// Calculate direction to owner.
+		dir = normalize(cornerOrigin - ropeOwner.origin);
 
 	  // Calculate start point of the coil
-		startPoint = ropeOwner.origin + vwa + (dir * 68);
+		startPoint = ropeOwner.origin + (dir * 68);
 
 	  if (ropeOwner.grap_ropechainPrev)
 	  {
@@ -814,6 +825,9 @@ void(entity grapOwner) grap_remove =
 	  }
 
 	  grap_removeRope(f);
+// Cataboligne - 4.4.11 - remove harpoon positioner rope at start point
+	  if (f.enemy) remove (f.enemy);
+
 	  remove(f);
 	}
 

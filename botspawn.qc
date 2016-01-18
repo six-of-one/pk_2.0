@@ -79,6 +79,7 @@ bprint("\n");
 	{
 		i = BOT_SAVE_SKILL; // no more than this many
 	}
+
 	while (num > 0 || i > 0)
 	{
 		c_skill = skill;
