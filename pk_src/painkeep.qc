@@ -694,7 +694,7 @@ void(float bt, float st) pk_bas_flags =
 
 	if (bt == PK_TP_SPARKSFLASH)
 	{
-		if (st)	pk_flags = pk_flags | PK_TP_SPARKSFLASH;
+		if (!st)	pk_flags = pk_flags | PK_TP_SPARKSFLASH;
 		else		pk_flags = pk_flags - (pk_flags & PK_TP_SPARKSFLASH);
 		if (DARKPLACES || chaos) cvar_set("sv_pk_sfx", ftos(st));
 		st_pk_sfx = st;
@@ -723,7 +723,7 @@ void() pk_liveupd =
 	NOENVCIDE = cvar("sv_pl_nolavacide");
 
 // pk basics - if a cvar is changed, update status bit
-	
+
 	if (st_pk_sfx != cvar("sv_pk_sfx")) pk_bas_flags(PK_TP_SPARKSFLASH, cvar("sv_pk_sfx"));
 	if (st_pk_hub != cvar("sv_pk_hub")) pk_bas_flags(PK_SF_HUB, cvar("sv_pk_hub"));
 	if (st_pk_duty != cvar("sv_pk_duty")) pk_bas_flags(PK_TP_DUTYON, cvar("sv_pk_duty"));
@@ -732,7 +732,10 @@ void() pk_liveupd =
 	Q1_SHELLAMMO_MAX				= cvar("q1_shellammo_max");
 	Q1_NAILAMMO_MAX					= cvar("q1_nailammo_max");
 	Q1_ROCKETAMMO_MAX				= cvar("q1_rocketammo_max");
-	Q1_CELLAMMO_MAX					= cvar("q1_cellammo_max");
+	if (Q_100 || Q_99)
+		Q1_CELLAMMO_MAX					= cvar("q1_cellammo_max");
+	else 
+		Q1_CELLAMMO_MAX					= cvar("pk_cellammo_max");
 
 // item ammo levels
 	PK_GRAVITYWELLAMMO_MAX	= cvar("pk_max_gravitywellammo");
@@ -752,7 +755,6 @@ void() pk_liveupd =
 	RSP_TIME = cvar("sv_c_rsp_time");
 	POW_TIME = cvar("sv_c_pow_time");
 
-	PK_MAX_LIVENT = cvar("pk_max_livent");
 
 // cam stuff
 	DCAMTO = cvar("sv_cam_timeout");
@@ -917,6 +919,10 @@ void() pk_monitor =
 {
 	pk_liveupd();
 
+	if (pic_tsk != cvar("pk_place_item"))
+	if (!pic_tsk)
+		place_item_control_loop();
+
 	self.nextthink = time + 3 + random();
 };
 
@@ -928,18 +934,22 @@ void() pk_srvcmd_load =
 
 	e = spawn();
 	e.think = start_loopcyc;
-	e.nextthink = time + 5.1;
+	e.nextthink = time + PIC_TO + random() * 3;
 
 	e = spawn();
 	e.think = pk_monitor;
-	e.nextthink = time + 4.5;
+	e.nextthink = time + PIC_TO;
 
 // set server flag bit stored states
 
 	st_pk_sfx = st_pk_hub = st_pk_duty = 0;
-	if (pk_flags & PK_TP_SPARKSFLASH) st_pk_sfx = 1;
+	if (!pk_flags & PK_TP_SPARKSFLASH) st_pk_sfx = 1;
 	if (pk_flags & PK_SF_HUB) st_pk_hub = 1;
 	if (pk_flags & PK_TP_DUTYON) st_pk_duty = 1;
+
+	if (st_pk_sfx != cvar("sv_pk_sfx")) pk_bas_flags(PK_TP_SPARKSFLASH, st_pk_sfx);
+	if (st_pk_hub != cvar("sv_pk_hub")) pk_bas_flags(PK_SF_HUB, st_pk_hub);
+	if (st_pk_duty != cvar("sv_pk_duty")) pk_bas_flags(PK_TP_DUTYON, st_pk_duty);
 
 // these all req. map reload for full effectiveness
 	PK_99 = cvar("sv_pk99");
@@ -1005,6 +1015,7 @@ void() pk_srvcmd_set =
 	DYN_ARTFR = FALSE;
 	DYN_FORCE_CNT = 6;
 	PK_DYNTO = 120;
+	pic_tsk = 0;
 
 // respawn times
 	RSP_TIME = 30;
@@ -1109,7 +1120,9 @@ void() pk_srvcmd_set =
 		registercvar("q1_shellammo_max", "100"); // caution - level transiton limits in parm{*} for all of these
 		registercvar("q1_nailammo_max", "200");
 		registercvar("q1_rocketammo_max", "100");
-		registercvar("q1_cellammo_max", "200");
+		registercvar("q1_cellammo_max", "100");
+
+		registercvar("pk_cellammo_max", "200");
 
 // item ammo levels
 		registercvar("pk_max_gravitywellammo", "1");

@@ -327,7 +327,8 @@ string (float mc) item_by_mcode =
 	if (mc == MC_GRAP)													return("weapon_grapgun");
 	if (mc == MC_AIRGUN)													return("weapon_airfist");
 	if (mc == MC_CANOBEANS)												return("item_painkeep_can");
-//	if (PK_ART) return(pk_art_ammo_by_bit(bt)); // Cataboligne 8.12.9 purify - pk artifacts
+
+//	if (!PK_ART) return(""); // Cataboligne 8.12.9 purify - pk artifacts
 	if (mc == MC_EGO)														return("item_pkplus_ego");
 	if (mc == MC_TOMB)													return("item_pkplus_tomb");
 	if (mc == MC_MASK)													return("item_pkplus_actor");
@@ -355,7 +356,7 @@ void(float mc, vector vo) fn_make =
   if (vo == v0) // no origin sent, get random one around some other object
   {	  
 	e = dyn_rndloc();
-	if (!e) 	e = findradius(world.origin, 256000);
+	if (!e) e = findradius(world.origin, 256000);
 	if (!e) 
 	{
 		bprint("*** warning: fn_make could not find a random (or any) location - giving up\n");
@@ -370,7 +371,7 @@ void(float mc, vector vo) fn_make =
 	self = spawn();
 	self.wad = sc;
 
-	self.origin = v1;
+	setorigin(self, v1);
 	item_call(sc);
 	self.velocity_z = 300 + 100 * random();
 	self.velocity_x = -170 + (random() * 340);

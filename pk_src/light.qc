@@ -134,7 +134,10 @@ void() light_lightning =
 {
 
 	if (pk_flags & PK_TP_SPARKSFLASH)
+	{
 		remove(self);
+		return;
+	}
 
 	// error checking
 	if (self.style != 14)

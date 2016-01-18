@@ -28,7 +28,6 @@ void(entity oth, float acnt) pk_art_backpack_touch;
 void(entity itm) pk_art_backpack_drop;
 float() pk_art_checkpwr;
 float(entity trg, entity infl, entity atkr) pk_art_obit;
-void(entity en) pk_art_ck_lava;
 float(entity ck, string prv) pk_art_movshot_ck;
 float(entity ck) pk_art_actor_ck;
 string (float bt) pk_art_ammo_by_bit;

@@ -151,6 +151,8 @@ void () rune_touch =
 	if (other.rune_flag & self.spawnflags)
 		return;
 
+	if (self.delay < 0 || !deathmatch) sigil_touch(); // map rune, or sp
+
 	centerprint3 (other,"You got the ",self.netname," Rune!");
 	sprint(other,"You have the power of ");
 	rune_print(other, self.spawnflags, FALSE);
@@ -191,7 +193,7 @@ void () rune_touch =
 	{
 //	if (deathmatch !=  2) // this is likely a meaningless deal for runes
 		self.nextthink = time + RSP_TIME;
-	self.think = SUB_regen;
+		self.think = SUB_regen;
 	}
 
 //	serverflags = serverflags | (self.spawnflags & 15);
@@ -208,6 +210,7 @@ void() rune_maker =
 {
 	local entity e;
 	local float sf, f;
+	local vector v1;
 
 	if (rune_count < RUNE_CNT)
 	{
@@ -262,19 +265,17 @@ void() rune_maker =
 			self.wad = item_by_mcode(self.mcode);
 
 			e = dyn_rndloc();
-			if (!e) 	e = findradius(world.origin, 256000);
+			if (!e) e = findradius(world.origin, 256000);
 			if (!e) 
 			{
 				bprint("*** warning: rune_make could not find a random (or any) location - giving up\n");
 				remove(self);
 				return; // crap - no location
 			}
-			setorigin(self, e.origin + ' 0 0 8');
+			v1 = e.origin + ' 0 0 8';
 			if (e.flags & FL_ITEM) // randomize away from other map items
-			{
-				self.origin = stdv_rndloc(e.origin + ' 0 0 8', 50, 100);
-				setorigin(self, self.origin);
-			}
+				v1 = stdv_rndloc(e.origin + ' 0 0 8', 50, 100);
+			setorigin(self, v1);
 
 			item_call(self.wad);
 
@@ -315,14 +316,17 @@ void(float r1, float p) remove_rune =
 		f = f - 1;
 		if (f < 1)
 		{
-			if (p)
+			if (e.delay > -1)
 			{
+				if (p)
+				{
 				bprint("\b*** RUNE removed: ");
 				bprint(e.netname);
 				bprint("\n");
+				}
+				remove(e);
+				e = world;
 			}
-			remove(e);
-			e = world;
 		}
 		e = find(e, map, "rune");
 	}
@@ -389,7 +393,8 @@ void() run_runes =
 		e = find(world,map,"rune"); // off or on, rid map of runes & makers
 		while (e)
 		{
-			remove(e);
+			if (e.delay > -1)
+				remove(e);
 			e = find(e,map,"rune");
 		}
 		e = find(world, classname, "rune_maker");
@@ -407,7 +412,7 @@ void() run_runes =
 			{
 				e.classname = "rune_maker";
 				e.think = rune_maker;
-				e.nextthink = time + 30 * random(); // do this well after items spawn
+				e.nextthink = time + 30 * random(); // do this well after items spawn - PIC_TO
 			}
 			bprint("***   Runes of power will spawn on this map - keep an eye out\n");
 		}

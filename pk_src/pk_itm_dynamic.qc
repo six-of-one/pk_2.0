@@ -69,7 +69,13 @@ string (float bt) ammo_by_bit =
 	if (bt == WEP_GRAP) return("weapon_grapgun");
 	if (bt == WEP_AIRG) return("weapon_airfist");
 	if (bt == WEP_CPNB) return("item_painkeep_can");
-	if (PK_ART) return(pk_art_ammo_by_bit(bt)); // Cataboligne 8.12.9 purify - pk artifacts
+
+	if (!PK_ART) return(""); // Cataboligne 8.12.9 purify - pk artifacts
+// pk art item subs by special bits
+	if (bt == WEP_EGO) return("item_pkplus_ego");
+	if (bt == WEP_TOMB) return("item_pkplus_tomb");
+	if (bt == WEP_ACTOR) return("item_pkplus_actor");
+	if (bt == WEP_PHONE) return("item_pkplus_phone");
 
 	return("");
 };
@@ -146,8 +152,7 @@ void(string cls) item_call =
 		self.nextthink = time + 1 + 3 * random(); // spread em out
 		self.model = string_null;
 	}
-	if (self.map == "rune" && RUNES) 
-		self.pk_touch = rune_touch;
+	if (self.map  == "rune") self.delay = 0; 
 	self.solid = SOLID_NOT;
 };
 
@@ -344,43 +349,6 @@ bprint("repm: restore on con_only\n");
 		remove(self);
 };
 
-// fn(infinite_ammo) - admin set infinite flag - load everyone up
-
-void() infinite_ammo =
-{
-	local entity e;
-	local string src;
-
-	ammo_frame = framecount + 6; // not every frame
-	src = "player";
-	e = find(world,classname,src);
-	while (e)
-	{
-		if (e.health > 0)
-		{
-			if (e.weapon == IT_SUPER_SHOTGUN)
-			if (pk_itemovr & WEP_SSHOT) e.ammo_shells = 99;
-			if (e.weapon == IT_NAILGUN)
-			if (pk_itemovr & WEP_NAILGUN) e.ammo_nails = 99;
-			if (e.weapon == IT_SUPER_NAILGUN)
-			if (pk_itemovr & WEP_PERF) e.ammo_nails = 99;
-			if (e.weapon == IT_GRENADE_LAUNCHER)
-			if (pk_itemovr & WEP_GREN) e.ammo_rockets = 99;
-			if (e.weapon == IT_ROCKET_LAUNCHER)
-			if (pk_itemovr & WEP_ROCKET) e.ammo_rockets = 99;
-			if (e.weapon == IT_LIGHTNING || e.pk_items & PK_IT_CLIGHT)
-			if (pk_itemovr & WEP_THUNDER) e.ammo_cells = 99;
-		}
-		e = find(e, classname,src);
-		if (!e)
-		if (src != "pk*bot")
-		{
-			src = "pk*bot";
-			e = find(world, classname,src);
-		}
-	}
-};
-
 // fn(ammo_con) - handle admin infinite flag, runes, chaos, etc
 
 // NOTE: need to sw to inf ammo wep if ammo = 0
@@ -536,8 +504,9 @@ void() dyn_spawn =
   if (self.origin == v0)
   {
 		sv = dyn_rndloc();
+		if (!sv) sv = findradius(world.origin, 256000);
 		if (!sv) return; // nothing found!
-		self.origin = sv.origin + ' 0 0 16';
+		setorigin(self, sv.origin + ' 0 0 16');
   }
   else
   {
@@ -579,7 +548,7 @@ void() dyn_item =
 	if (self.classname != "dyn_spawner")
 	{
 		self.classname = "dyn_spawner";
-		self.nextthink = time + 5;// TEST 40 + 20 * crandom();
+		self.nextthink = time + 7;// TEST 40 + 20 * crandom(); // PIC_TO
 		self.count = 4 + 4 * random();
 		if (DYN_FORCE || DYN_ARTFR_ONLY) self.count = pk_ditems + DYN_FORCE_CNT;
 		if (!DYN_FORCE && !DYN_ARTFR && pk_ditems > 6) remove(self);
@@ -694,6 +663,8 @@ void() func_dynitem =
 // stop item spawn when set true - leaves func_ ents on map
 	if (cvar("pk_dyn_func_stop")) return;
 
+	if (time < PIC_TO) return;
+
 // spawn an item
 	e = spawn();
 	if (e)
@@ -752,3 +723,145 @@ void() func_dynitem =
 	}
 };
 
+// randomize any item
+
+void() rndize_item;
+void() place_item_control;
+
+// rndize with no loop & need restore checks on active items
+
+void() rndize_restore =
+{
+	self.nextthink = time + 10 + random() * 10;
+	if (cvar("pk_place_item") != 2)
+	{
+		self.nextthink = time + 0.1;
+		self.think = rndize_item;
+	}
+};
+
+void() rndize_item =
+{
+	local entity e;
+	local float sf;
+
+	if (self.owner.mcode < MC_Q1)
+		self.owner.mcode = 102 + rint(random() * 30);
+	else if (self.owner.mcode < MC_PK)
+		self.owner.mcode = 141 + rint(random() * 12);
+
+	sf = 100;
+	if (RUNES)
+	while (self.owner.mcode >= MC_SIGIL1 && self.owner.mcode <= MC_SIGIL8 && sf > 0) // runes dont allow runes to be made here
+	{
+		self.owner.mcode = 102 + rint(random() * 30);
+		sf = sf - 1;
+		if (sf < 1) self.owner.mcode = self.owner.scode; // fail
+	}
+
+	self.owner.wad = item_by_mcode(self.owner.mcode);
+	e = self;
+	self = self.owner;
+	self.pk_touch = (void()) 0; // so we can touch the new things
+
+// TDO: chaos mod vector here
+	e.cnt = cvar("pk_place_item_reload"); // randomize every so often
+
+//	bprint("*** rndize item: ");
+	if (cvar("pk_place_item") == 0)
+	{
+//		bprint("admin turned off & exiting randomize items & restoring\n");
+		self.wad = item_by_mcode(self.scode);
+		remove(e);
+		pic_tsk = 0;
+	}
+	else
+	if (cvar("pk_place_item") == 1)
+	{
+		place_item_control();
+		remove(e);
+		return;
+	}
+	else
+	{
+		if (!e.cnt)
+		{
+			e.nextthink = time + 10 + random() * 10;
+			e.think = rndize_restore;
+		}
+		else
+			e.nextthink = time + fabs(e.cnt) + random() * e.cnt;
+	}
+//	bprint(self.classname);
+//	bprint(" is now: ");
+//	bprint(self.wad);
+//	bprint("\n");
+
+	item_call(self.wad);
+};
+
+void() pic_restore_item =
+{
+	self.nextthink = time + 10 + random() * 10;
+	if (cvar("pk_place_item") == 0)
+	{
+		pic_tsk = 0;
+		self.wad = item_by_mcode(self.scode);
+		item_call(self.wad);
+	}
+	else
+	if (cvar("pk_place_item") == 2)
+	{
+		place_item_control();
+	}
+};
+
+// Called by place item under specific conditions for map load
+
+void() place_item_control =
+{
+	if (self.classname == "dyn_item")
+		return;
+
+	if(self.map == "") self.map = "pic_item";
+
+	if (cvar("pk_place_item") == 1)
+	{
+		pic_tsk = 1;
+		self.modelindex = 0;
+		self.touch = SUB_Null;
+		self.think = pic_restore_item;
+		self.nextthink = time + 10 + random() * 10;
+		return;
+	}
+	else if (cvar("pk_place_item") == 2)
+	{
+		local entity e;
+		e = spawn();
+		if (e)
+		{
+			e.owner = self;
+			e.think = rndize_item;
+			e.nextthink = time + 5 + random() * 2;
+			e.classname = "rndize_item";
+		}
+		pic_tsk = 2;
+	}
+};
+
+// twiddled after map load
+
+void() place_item_control_loop =
+{
+	local entity e, sv;
+
+	sv = self;
+	e = find(world,map,"pic_item");
+	while (e)
+	{
+		self = e;
+		place_item_control();
+		e = find(e,map,"pic_item");
+	}
+	self = sv;
+};

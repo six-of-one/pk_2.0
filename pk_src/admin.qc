@@ -101,7 +101,7 @@ void(float msk, float bt) bit_print =
 	local float b, f, sf ;
 	local string b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11 , b12, b13, b14, b15, b16, b17, b18, b19, b20, b21, b22, b23, b24;  
 
-	if (msk < 1 || bt < 0) return;
+	if (msk < 1 || bt < 1) return;
 
 	b = fabs(bt);
 	f = fabs(msk);
@@ -1008,6 +1008,7 @@ void() Admin_itembits =
 			bprint(adv);
 			bprint(": ");
 			bprint(it);
+			if (it != "pki" || ad2 != " - Infinite ammo")
 			if (f < WEP_STOP) bprint(ad2);
 			bprint("\n");
 		}
@@ -1044,8 +1045,8 @@ void() Admin_itembits =
 	if (pk_itemovr & CON_INF)
 	{
 		bprint("Infinite ammo on selected weapons\n");
-		if (pk_itemovr & WEP_WEPSQ) bprint("\b- no weapon bits set!\n");
-		if (PK & (pk_itemovr & WEP_PKI)) bprint("- sub pk items for ammo boxes\n");
+		if (! pk_itemovr & WEP_WEPSQ) bprint("\b- no weapon bits set!\n");
+		if (PK && (pk_itemovr & WEP_PKI)) bprint("- sub pk items for ammo boxes\n");
 	}
 	if (!f) bprint("\n\bNo control bits!\n\n");
 	else

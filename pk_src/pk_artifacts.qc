@@ -617,19 +617,6 @@ float(entity trg, entity infl, entity atkr) pk_art_obit =
 };
 
 
-// fn(pk_art_ck_lava) - pk artifacts check for things in lava
-
-// en is ent to check
-
-void(entity en) pk_art_ck_lava =
-{
-	if (en.classname == "tomb")
-	{
-		en.think = tombdie;
-		en.nextthink = (time + 0.1);
-	}
-};
-
 // fn(pk_art_movshot_ck) - check pk artifacts to see if they can be moved or shot at
 
 // return TRUE if none are or not using pk art

@@ -478,9 +478,9 @@ void() painkeep_touch =
 	if (deathmatch != 2)
 	{
 		if (self.pk_items == PK_IT_GRAVITYWELL)
-			self.nextthink = time + RSP_TIME * 2;
+			self.nextthink = time + RSP_TIME * 4;
 		else
-			self.nextthink = time + RSP_TIME;
+			self.nextthink = time + RSP_TIME * 2;
 	}
 	self.think = SUB_regen;
 
@@ -624,106 +624,6 @@ void () item_painkeep_expshells =
 	self.netname = "Exploding Shells";
 	setsize (self, '0 0 0', '32 32 56');
 	StartItem ();
-};
-
-// moved from items.qc - Cataboligne - 3.27.8
-
-// think to reset to SUB_regen after item moved & timeout
-
-void() ip_regen =
-{
-	self.model = string_null;
-	self.solid = SOLID_NOT;
-
-	self.nextthink = time + 1;
-	self.think = SUB_regen;
-};
-
-// think to check for item movement, set respawn think if moved
-// chaos mod vector
-
-void() ip_checkForMovement =
-{
-	local entity e;
-
-	if (self.solid != SOLID_NOT)
- {
-	if (self.map == "rune" && RUNES)
-	if (self.classname != "dyn_item")  // !chaos
-	{
-		self.cnt = self.cnt + 1;
-		self.delay = self.delay + 1;
-		if (self.cnt > self.count || self.delay > RUNE_MOVE) // not touched in 2 - 6 mins or > 10 mins
-		{
-			if (self.delay > RUNE_MOVE) // reload val
-				RUNE_MOVE = 10 + rint(random() * 2.5 + random() * 2.5);
-			e = dyn_rndloc();
-			if (!e) 	e = findradius(world.origin, 256000);
-			if (e)
-			{
-				setorigin(self, e.origin + ' 0 0 4');
-				if (e.flags & FL_ITEM) // randomize away from other map items
-					self.origin = stdv_rndloc(e.origin + ' 0 0 4', 50, 100);
-				self.ip_orgOrigin = self.origin;
-				self.count = 2 + random() * 3.8; // reset for new location
-				self.cnt = 0;
-
-				bprint("\b*** RUNE relocating: ");
-				bprint(self.netname);
-				bprint(" near: ");
-				bprint(e.classname);
-				bprint("\n");
-			}
-		}
-	}
-	else
-	if (self.ip_orgOrigin != self.origin)
-	{ // position has changed... repawn after x minutes..
-		self.think = ip_regen;
-		self.nextthink = time + (ip_timeout * (RSP_TIME * 2));
-		return;
-	}
- }
-	self.nextthink = time + 60;
-};
-
-// called from SUB_regen - restors position, rethinks
-
-void() pk_item_position =
-{
-	self.owner = world;
-
-	if (self.ip_orgOrigin == ' 0 0 0' && self.oldorigin != ' 0 0 0') // Cataboligne - in case mode was set to PK after some map items got loaded
-		self.ip_orgOrigin = self.oldorigin;
-
-	if (self.ip_orgOrigin != ' 0 0 0') // Cataboligne - tweak: in case this doesnt get set, we dont want to put any item like this at 0, 0, 0
-		setorigin (self, self.ip_orgOrigin);
-
-	self.think = ip_checkForMovement;
-	self.nextthink = time + 60;
-
-// dynamic items should not end up here
-//if (self.classname == "dyn_item")
-//bprint("********* error: dynamic in item position *********");
-
-};
-
-// called from PlaceItem, starts position think checks
-// chaos mod vector
-
-void() pk_item_position_init =
-{
-	if (!PK) bprint("*** pk_item_position_init called when not in PK mode.\n");
-
-	self.ip_orgOrigin = self.origin;
-
-	self.think = ip_checkForMovement;
-	self.nextthink = time + 60;
-
-// dynamic items should not end up here
-//if (self.classname == "dyn_item")
-//bprint("******** error: dynamic in ip *********");
-
 };
 
 // called from bound_ammo - bounds for pk ammo
@@ -1033,78 +933,109 @@ void() PK_DropBackpack =
 	AddToSplash(newmis); // *pk - splash tossed items
 };
 
-// randomize any item
 
-void() rndize_item =
+// moved from items.qc - Cataboligne - 3.27.8
+
+// think to reset to SUB_regen after item moved & timeout
+
+void() ip_regen =
 {
-	local entity e;
-	local float sf;
+	self.model = string_null;
+	self.solid = SOLID_NOT;
 
-	if (self.owner.mcode < MC_Q1)
-		self.owner.mcode = 102 + rint(random() * 30);
-	else if (self.owner.mcode < MC_PK)
-		self.owner.mcode = 141 + rint(random() * 12);
-
-	sf = 100;
-	if (RUNES)
-	while (self.owner.mcode >= MC_SIGIL1 && self.owner.mcode <= MC_SIGIL8 && sf > 0) // runes dont allow runes to be made here
-	{
-		self.owner.mcode = 102 + rint(random() * 30);
-		sf = sf - 1;
-		if (sf < 1) self.owner.mcode = self.owner.scode; // fail
-	}
-
-	self.owner.wad = item_by_mcode(self.owner.mcode);
-	e = self;
-	self = self.owner;
-	self.pk_touch = (void()) 0; // so we can touch the new things
-
-// TDO: chaos mod vector here
-	e.cnt = cvar("pk_place_item_reload"); // randomize every so often
-
-//	bprint("*** rndize item: ");
-	if (cvar("pk_place_item") == 0)
-	{
-//		bprint("admin turned off & exiting randomize items & restoring\n");
-		self.wad = item_by_mcode(self.scode);
-		e.cnt = 0;
-	}
-//	bprint(self.classname);
-//	bprint(" is now: ");
-//	bprint(self.wad);
-//	bprint("\n");
-
-	item_call(self.wad);
-
-	if (!e.cnt)
-		remove(e);
-	else
-	{
-		e.nextthink = time + fabs(e.cnt) + random() * e.cnt;
-	}
+	self.nextthink = time + 1;
+	self.think = SUB_regen;
 };
 
-// Called by place item under specific conditions for map load
+// think to check for item movement, set respawn think if moved
+// chaos mod vector
 
-void() place_item_control =
+void() ip_checkForMovement =
 {
-	if (cvar("pk_place_item") == 1)
+	local entity e;
+	local vector v1;
+
+	if (self.solid != SOLID_NOT)
+ {
+	if (self.map == "rune" && RUNES && self.classname != "dyn_item" && self.delay > -1)  // !chaos
 	{
-		remove(self);
-		return;
-	}
-	else if (cvar("pk_place_item") == 2)
-	{
-		local entity e;
-		e = spawn();
-		if (e)
+		self.cnt = self.cnt + 1;
+		self.delay = self.delay + 1;
+		if (self.cnt > self.count || self.delay > RUNE_MOVE) // not touched in 2 - 6 mins or > 10 mins
 		{
-			e.owner = self;
-			e.think = rndize_item;
-			e.nextthink = time + 5 + random() * 2;
-			e.classname = "rndize_item";
+			if (self.delay > RUNE_MOVE) // reload val
+			{
+				RUNE_MOVE = 10 + rint(random() * 2.5 + random() * 2.5);
+				self.delay = 0;
+			}
+			e = dyn_rndloc();
+			if (!e) e = findradius(world.origin, 256000);
+			if (e)
+			{
+				v1 = e.origin + ' 0 0 4';
+				if (e.flags & FL_ITEM) // randomize away from other map items
+					v1 = stdv_rndloc(e.origin + ' 0 0 4', 50, 100);
+				setorigin(self, v1);
+				self.ip_orgOrigin = self.origin;
+				self.count = 2 + random() * 3.8; // reset for new location
+				self.cnt = 0;
+
+				bprint("\b*** RUNE relocating: ");
+				bprint(self.netname);
+				bprint(" near: ");
+				bprint(e.classname);
+				bprint("\n");
+			}
 		}
 	}
+	else
+	if (self.ip_orgOrigin != self.origin)
+	{ // position has changed... repawn after x minutes..
+		self.think = ip_regen;
+		self.nextthink = time + (ip_timeout * (RSP_TIME * 2));
+		return;
+	}
+ }
+	self.nextthink = time + 60;
+};
+
+// called from SUB_regen - restors position, rethinks
+
+void() pk_item_position =
+{
+	self.owner = world;
+
+	if (self.ip_orgOrigin == ' 0 0 0' && self.oldorigin != ' 0 0 0') // Cataboligne - in case mode was set to PK after some map items got loaded
+		self.ip_orgOrigin = self.oldorigin;
+
+	if (self.ip_orgOrigin != ' 0 0 0') // Cataboligne - tweak: in case this doesnt get set, we dont want to put any item like this at 0, 0, 0
+		setorigin (self, self.ip_orgOrigin);
+
+	self.think = ip_checkForMovement;
+	self.nextthink = time + 60;
+
+// dynamic items should not end up here
+//if (self.classname == "dyn_item")
+//bprint("********* error: dynamic in item position *********");
+
+};
+
+// called from PlaceItem, starts position think checks
+// chaos mod vector
+
+void() pk_item_position_init =
+{
+	if (!PK) bprint("*** pk_item_position_init called when not in PK mode.\n");
+
+	self.ip_orgOrigin = self.origin;
+
+	self.think = ip_checkForMovement;
+	self.nextthink = time + 60;
+
+// dynamic items should not end up here
+//if (self.classname == "dyn_item")
+//bprint("******** error: dynamic in ip *********");
+
 };
 
 // give tossed items eject velocity

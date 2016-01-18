@@ -195,6 +195,7 @@ void(entity e) init_loopcyc =
 	local entity sr, s2;
 	local string cl;
 	local float f0, f1;
+	local vector v1;
 
 	e.theowner = world;
 	cl = "";
@@ -261,14 +262,16 @@ void(entity e) init_loopcyc =
 			if (sr)
 			{
 				s2 = dyn_rndloc();
+				if (!s2) s2 = findradius(world.origin, 256000);
 				if (!s2)
 				{
 					remove(e);
 					return; // no location - fail!
 				}
-				sr.origin = s2.origin + ' 0 0 8';
+				v1 = s2.origin + ' 0 0 8';
 				if (s2.flags & FL_ITEM)
-					sr.origin = stdv_rndloc(s2.origin + ' 0 0 8', 50, 100);
+					v1 = stdv_rndloc(s2.origin + ' 0 0 8', 50, 100);
+				setorigin(sr, v1);
 				s2 = self;
 				self = sr;
 				self.wad = cl;

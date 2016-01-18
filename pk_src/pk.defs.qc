@@ -92,6 +92,7 @@ void() run_runes;
 void(entity e, entity p) rune_id;
 void() rune_regen;
 float(float atf) rune_haste;
+void () rune_touch;
 
 float RUNES;
 float RUNE_CNT;
@@ -145,6 +146,9 @@ float(float mcv, entity e) bit_mcode;
 //float RSP_ART;
 float RSP_TIME; // respawn time
 float POW_TIME; // power time
+float PIC_TO					= 5; // place_item_control time out
+float pic_tsk;
+void() place_item_control_loop;
 
 float WEP_SSHOT				= 1; 	 // admin of super shotgun
 float WEP_NAILGUN				= 2; 	 // admin of nailgun

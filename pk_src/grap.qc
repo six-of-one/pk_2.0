@@ -127,7 +127,7 @@ void() grap_fire =
 
 	if (trace_fraction != 1.0 && !trace_ent.takedamage)
 	{
-		// To near a wall, can't shoot
+		// To near a wall, can't throw turret
 	  sprint(self, "Too close to a wall!!\n");
 	  return;
 	}

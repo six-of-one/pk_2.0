@@ -141,7 +141,7 @@ void () pkplus_touch =
 	{
 		if ((self.pk_items == PKPLUS_IT_EGO) || (self.pk_items == PKPLUS_IT_PHONE))
 		{
-			self.nextthink = (time + (RSP_TIME * 10));
+			self.nextthink = (time + (RSP_TIME * 4));
 		}
 		else
 		{

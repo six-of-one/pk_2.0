@@ -137,7 +137,11 @@ void() CheckWaterLevels =
 				 f = find(world,classname,"rune_maker");
 				 if (f) f.nextthink = time + 10 + random() * 60;
 			  }
-			  if (PK_ART) pk_art_ck_lava(e); // Cataboligne 8.12.9 purify - pk artifacts
+			  else if (e.classname == "tomb") // Cataboligne 8.12.9 purify - pk artifacts
+			  {
+					e.think = tombdie;
+					e.nextthink = (time + 0.1);
+			  }
 	      }
 	    }
 	      

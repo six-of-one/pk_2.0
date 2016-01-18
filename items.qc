@@ -51,10 +51,6 @@ plants the object on the floor
 void () PlaceItem =
 {
 	local float oldz;
-
-	if (chaos || DARKPLACES)
-	if (time < 5)
-		place_item_control();
  
 	self.mcode = pk_mcode("", self); // put map code on ent
 	self.sscode = ftos(self.mcode);
@@ -72,11 +68,38 @@ void () PlaceItem =
 		dprint ("Bonus item fell out of level at ");
 		dprint (vtos (self.origin));
 		dprint ("\n");
-		remove (self);
-		return ;
+		if (PK_100 || Q_100)
+		{
+			remove (self);
+			return ;
+		}
+		else
+		{
+			local entity e;
+			local vector v1;
+
+			e = dyn_rndloc();
+			if (!e) e = findradius(world.origin, 256000);
+			if (!e) 
+			{
+				dprint("Bonus item restore could not find a random (or any) location - giving up\n");
+				remove(self);
+				return;
+			}
+			v1 = e.origin + ' 0 0 8';
+			if (e.flags & FL_ITEM) // randomize away from other map items
+				v1 = stdv_rndloc(e.origin + ' 0 0 8', 50, 100);
+			setorigin(self, v1);
+		}
 	}
-	if (PK || custom_hub_loaded) pk_placeitem(); // *pk - set item details, handle custom hub - non pk levels deal
+	if (!Q_100) pk_placeitem(); // *pk - set item details
 	bot_item_linx(self); // *bot - item tie in
+
+	if (!Q_100 && !PK_100)
+	if (chaos || DARKPLACES)
+	if (time < PIC_TO)
+	if (self.map != "nopic")
+		place_item_control();
 };
 
 /*
@@ -1095,6 +1118,10 @@ void () item_sigil =
 	}
 
 	self.map = "rune"; // Cataboligne - 5.32.10 - for rune server
+	self.delay = -6; // dont let map runes relocate
+	if (RUNES)
+		self.touch = rune_touch;
+	else
 	self.touch = sigil_touch;
 	setsize (self, '-16 -16 -24', '16 16 32');
 	StartItem ();
