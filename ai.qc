@@ -11,12 +11,6 @@
  */
 
 
-void () movetarget_f;
-void () t_movetarget;
-void () knight_walk1;
-void () knight_bow6;
-void () knight_bow1;
-void(entity etemp, entity stemp, entity stemp, float dmg) T_Damage;
 /*
 
 .enemy
@@ -42,6 +36,12 @@ time > .pausetime.
 
 walkmove(angle, speed) primitive is all or nothing
 */
+void () movetarget_f;
+void () t_movetarget;
+void () knight_walk1;
+void () knight_bow6;
+void () knight_bow1;
+void(entity etemp, entity stemp, entity stemp, float dmg) T_Damage;
 
 
 //
@@ -394,6 +394,11 @@ float () FindTarget =
 	if (client.items & IT_INVISIBILITY)
 		return FALSE;
 
+// Cataboligne 9.11.3 purify - chase cam
+// cam death view workaround
+	if (client.solid == SOLID_NOT)
+		return FALSE;
+
 	r = range (client);
 	if (r == RANGE_FAR)
 		return FALSE;
@@ -695,11 +700,17 @@ void (float dist) ai_run =
 	
 	movedist = dist;
 // see if the enemy is dead
-	if (self.enemy.health <= 0)
+// Cataboligne 9.11.3 purify - chase cam
+	// change detection method so monsters won't keep attacking
+	// a dead player with health reset to one (no view tilting hack for cam view)
+	if (self.enemy.solid == SOLID_NOT)
+	//if (self.enemy.health <= 0)
 	{
 		self.enemy = world;
 	// FIXME: look all around for other targets
-		if (self.oldenemy.health > 0)
+// Cataboligne 9.11.3 purify - chase cam
+		if (self.oldenemy.solid != SOLID_NOT)
+		//if (self.oldenemy.health > 0)
 		{
 			self.enemy = self.oldenemy;
 			HuntTarget ();

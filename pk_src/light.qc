@@ -30,7 +30,7 @@ void(float r) lightning_flash =
 	local entity oself;
 	local string pattern;
 	local string soundfile;
-	local float duration;
+	local float pkduration;
 
 	// call the .next's flash
 	if (self.next != world)
@@ -46,35 +46,35 @@ void(float r) lightning_flash =
 	{
 		r = 1;
 		pattern = "zzzzmmdzzaaazzzmmma";
-		duration = 2.0;
+		pkduration = 2.0;
 		soundfile = "misc/thunder/thunder5.wav";
 	}
 	else if (r < 2)
 	{
 		r = 2;
 		pattern = "zzddzzzzmddmmmddzzddzddzzzzzmm";
-		duration = 3.0;
+		pkduration = 3.0;
 		soundfile = "misc/thunder/thunder1.wav";
 	}
 	else if (r < 3)
 	{
 		r = 3;
 		pattern = "zzzzfffzzz";
-		duration = 1.0;
+		pkduration = 1.0;
 		soundfile = "misc/thunder/thunder2.wav";
 	}
 	else if (r < 4)
 	{
 		r = 4;
 		pattern = "zzzdddzzzzzmmf";
-		duration = 1.4;
+		pkduration = 1.4;
 		soundfile = "misc/thunder/thunder3.wav";
 	}
 	else
 	{
 		r = 5;
 		pattern = "zzzzzddzzm";
-		duration = 1.0;
+		pkduration = 1.0;
 		soundfile = "misc/thunder/thunder4.wav";
 	}
 
@@ -83,7 +83,7 @@ void(float r) lightning_flash =
 	if (self.cnt == 1)
 	{
 		lightstyle(14, pattern);
-		self.nextthink = time + duration;
+		self.nextthink = time + pkduration;
 		self.think = lightning_stop;
 
 		// print a message

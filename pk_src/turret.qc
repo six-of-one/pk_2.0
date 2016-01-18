@@ -1,3 +1,4 @@
+/* auto sentry / turret */
 
 $frame gunsearch gunfire1 gunfire2 gunfire3 gunfire4 gunmisfire1 gunmisfire2
 

@@ -739,6 +739,7 @@ void() Admin_itemmenu =
 							"  20: Substitute removed    \n" // 542288
 							"  21: Infinite ammo         \n" // 1048576
 							"  22: Cycle selected items  \n" // 2097152
+							"  29: All bits off          \n" 
 							"  30: Show item bits        \n" 
 							"  31: Update map now        \n"
 							" 666:  main menu            \n"
@@ -1349,6 +1350,11 @@ void() AdminCommands =
 		self.admin = 26;
 		if (self.lefty == 666)
 			Admin_mainmenu();
+		else if (self.lefty == 29)
+		{
+			pk_itemovr = 0;
+			admin_sv_cfg();
+		}
 		else if (self.lefty == 30)
 			Admin_itembits();
 		else if (self.lefty == 31)
@@ -1442,14 +1448,16 @@ void() PK_SetAdmin =
 		pk_admintime = cvar("saved2");
 		localcmd("saved2 0\n");
 		remove(e);
-if (0) {
+if (0) // devmsg
+{
 bprint("admin impulse: ");
 bprint(ftos(pk_adminimp));
 bprint(", code: ");
 bprint(ftos(pk_admincode));
 bprint(", timeout: ");
 bprint(ftos(pk_admintime));
-bprint("\n"); }
+bprint("\n");
+}
 	}
 	else
 		remove(e);
@@ -1805,6 +1813,16 @@ void() PK_AdminImpulse =
 		{
 			as = ftos(floor(admin_time - time));
 			centerprint3(self, "Enter admin password - seconds left: ", as, "\n");
+if (0) // devmsg
+{
+	bprint("imp: ");
+	bprint(ftos(pk_adminimp));
+	bprint("  pwd: ");
+	bprint(ftos(pk_admincode));
+	bprint("  tim: ");
+	bprint(ftos(pk_admintime));
+	bprint("\n");
+}
 		}
 	}
 };

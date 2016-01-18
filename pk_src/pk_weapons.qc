@@ -1,4 +1,3 @@
-
 // pk weapon code moved here for adaptive code 
 
 // exploding shotgun shells - brilliant really, who thought this up?	and would it really work - I think this needs to be on mythbusters
@@ -262,7 +261,9 @@ void() PK_SetCurrentAmmo =
 		wchanged = TRUE;
 	}
 
-	if (self.items & IT_INVISIBILITY && wchanged)
+	wchanged = wchanged & ((self.items & IT_INVISIBILITY) || (self.dest2_x & CHSCAM_ON));
+
+	if (wchanged)
 		sprint(self, "You have selected the ");
 
 	if (self.weapon == IT_AXE)
@@ -272,7 +273,7 @@ void() PK_SetCurrentAmmo =
 			self.currentammo = 0;
 			self.weaponmodel = "progs/v_axe.mdl";
 			self.weaponframe = 0;
-			if (self.items & IT_INVISIBILITY && wchanged)
+			if (wchanged)
 				sprint(self, "Axe\n");
 		}
 		else if (self.pk_currentitem == PK_IT_GRAVITYWELL)
@@ -280,7 +281,7 @@ void() PK_SetCurrentAmmo =
 			self.currentammo = self.pk_gravitywellammo;
 			self.weaponmodel = "progs/v_cube.mdl";
 			self.weaponframe = 0;
-			if (self.items & IT_INVISIBILITY && wchanged)
+			if (wchanged)
 				sprint(self, "Gravity Well\n");
 		}
 		else if (self.pk_currentitem == PK_IT_TURRET)
@@ -288,7 +289,7 @@ void() PK_SetCurrentAmmo =
 			self.currentammo = self.pk_turretammo;
 			self.weaponmodel = "progs/v_turret.mdl";
 			self.weaponframe = 0;
-			if (self.items & IT_INVISIBILITY && wchanged)
+			if (wchanged)
 				sprint(self, "AutoSentry\n");
 		}
 		else if (self.pk_currentitem == PK_IT_CANPAB)
@@ -296,7 +297,7 @@ void() PK_SetCurrentAmmo =
 			self.currentammo = self.pk_canpabammo;
 			self.weaponmodel = "progs/v_beans.mdl";
 			self.weaponframe = 0;
-			if (self.items & IT_INVISIBILITY && wchanged)
+			if (wchanged)
 				sprint(self, "Can of Pork & Beans\n");
 		}
 		else if (self.pk_currentitem == PK_IT_GRAPGUN)
@@ -313,7 +314,7 @@ void() PK_SetCurrentAmmo =
 			{
 				self.weaponframe = 0;
 			}
-			if (self.items & IT_INVISIBILITY && wchanged)
+			if (wchanged)
 				sprint(self, "Harpoon Gun\n");
 		}
 		else if (self.pk_currentitem == PK_IT_BEARTRAP)
@@ -321,7 +322,7 @@ void() PK_SetCurrentAmmo =
 			self.currentammo = self.pk_beartrapammo;
 			self.weaponmodel = "progs/v_bear.mdl";
 			self.weaponframe = 0;
-			if (self.items & IT_INVISIBILITY && wchanged)
+			if (wchanged)
 				sprint(self, "Beartrap\n");
 		}
 		else if (self.pk_currentitem == PK_IT_AIRGUN)
@@ -329,7 +330,7 @@ void() PK_SetCurrentAmmo =
 			self.currentammo = 1;
 			self.weaponmodel = "progs/v_airgun.mdl";
 			self.weaponframe = 0;
-			if (self.items & IT_INVISIBILITY && wchanged)
+			if (wchanged)
 				sprint(self, "AirFist\n");
 		}
 // BOLT_START
@@ -346,7 +347,7 @@ void() PK_SetCurrentAmmo =
 			}
 			self.weaponframe = 0;
 			self.items = self.items | IT_CELLS;
-			if (self.items & IT_INVISIBILITY && wchanged)
+			if (wchanged)
 				sprint(self, "Chain Thunderbolt\n");
 		}
 	}
@@ -363,7 +364,7 @@ void() PK_SetCurrentAmmo =
 		}
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
-		if (self.items & IT_INVISIBILITY && wchanged)
+		if (wchanged)
 			sprint(self, "Shotgun\n");
 	}
 	else if (self.weapon == IT_SUPER_SHOTGUN)
@@ -379,7 +380,7 @@ void() PK_SetCurrentAmmo =
 		}
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
-		if (self.items & IT_INVISIBILITY && wchanged)
+		if (wchanged)
 			sprint(self, "Super Shotgun\n");
 	}
 	else if (self.weapon == IT_NAILGUN)
@@ -389,7 +390,7 @@ void() PK_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_fnail.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
-		if (self.items & IT_INVISIBILITY && wchanged)
+		if (wchanged)
 			sprint(self, "Pulse Rifle\n");
 	}
 	else if (self.weapon == IT_SUPER_NAILGUN)
@@ -398,7 +399,7 @@ void() PK_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_nail2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
-		if (self.items & IT_INVISIBILITY && wchanged)
+		if (wchanged)
 			sprint(self, "Super Nailgun\n");
 	}
 	else if (self.weapon == IT_GRENADE_LAUNCHER)
@@ -407,7 +408,7 @@ void() PK_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_rock.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
-		if (self.items & IT_INVISIBILITY && wchanged)
+		if (wchanged)
 			sprint(self, "Grenade Launcher\n");
 	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
@@ -416,7 +417,7 @@ void() PK_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_rock2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
-		if (self.items & IT_INVISIBILITY && wchanged)
+		if (wchanged)
 			sprint(self, "Rocket Launcher\n");
 	}
 	else if (self.weapon == IT_LIGHTNING)
@@ -425,7 +426,7 @@ void() PK_SetCurrentAmmo =
 		self.weaponmodel = "progs/v_light.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_CELLS;
-		if (self.items & IT_INVISIBILITY && wchanged)
+		if (wchanged)
 			sprint(self, "Thunderbolt\n");
 	}
 	else
@@ -433,9 +434,16 @@ void() PK_SetCurrentAmmo =
 		self.currentammo = 0;
 		self.weaponmodel = "";
 		self.weaponframe = 0;
-		if (self.items & IT_INVISIBILITY && wchanged)
+		if (wchanged)
 			sprint(self, "An Unknown Weapon???\n");
 	}
+
+// Cataboligne 8.8.9 purify - chase cam
+	// disable model in chase view
+		if ( (self.dest2_x & CHSCAM_ON) )
+		{
+			self.weaponmodel = "";
+		}
 };
 
 // called from many places
@@ -975,6 +983,9 @@ void() PK_Attack =
 		{
 			// Fire chain ligthning gun
 // BOLT_START
+	// Cataboligne 8.8.9 purify - chase cam
+	// disable model in chase view
+		if ( !(self.dest2_x & CHSCAM_ON) )
 			self.weaponmodel = "progs/v_cl_on.mdl"; // change to fire model...
 			player_bolt1();
 			self.attack_finished = time + 0.1;

@@ -10,6 +10,13 @@
  *
  */
 
+/*
+=============================================================================
+
+				LEVEL CHANGING / INTERMISSION
+
+=============================================================================
+*/
 
 // prototypes
 void () W_WeaponFrame;
@@ -21,13 +28,6 @@ void (vector org, entity death_owner) spawn_tdeath;
 
 float	modelindex_eyes, modelindex_player;
 
-/*
-=============================================================================
-
-				LEVEL CHANGING / INTERMISSION
-
-=============================================================================
-*/
 
 float intermission_running;
 float intermission_exittime;
@@ -76,6 +76,9 @@ void () SetChangeParms =
 	if (PK) PK_ChangeParms();
 	if (find(world,classname,"pk*bot")) bot_changeParms();
 //	bot_skinParms();
+
+// Cataboligne 9.11.3 purify - chase cam
+	cam_parms(0);
 };
 
 void () SetNewParms =
@@ -90,6 +93,9 @@ void () SetNewParms =
 	parm8 = 1;
 	parm9 = 0;
 	if (PK) PK_SetNewParms();
+
+// Cataboligne 9.11.3 purify - chase cam
+	cam_parms(2);
 };
 
 void () DecodeLevelParms =
@@ -112,6 +118,9 @@ void () DecodeLevelParms =
 	self.weapon = parm8;
 	self.armortype = parm9 * 0.01;
 	if (PK) PK_DecodeLevelParms();
+
+// Cataboligne 9.11.3 purify - chase cam
+	cam_parms(1);
 };
 
 /*
@@ -582,6 +591,8 @@ void () PutClientInServer =
 	if (PK) PK_CIS(); // *pk - set client pk elements
 	self.admin = 0;
 	set_initBotLevel(); // *bot
+
+	Chase_cam_level_start(); // Cataboligne 8.9.9 purify - chase cam
 };
 
 
@@ -1022,6 +1033,9 @@ Check for turning off powerups
 */
 void () CheckPowerups =
 {
+// Cataboligne 8.9.9 purify - chase cam
+	if (self.classname == "deadcam") return;
+
 	if (self.health <= 0)
 		return;
 

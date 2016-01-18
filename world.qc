@@ -307,6 +307,9 @@ void () worldspawn =
 	precache_model ("progs/v_light.mdl");
 	setBotGravity (); // *bot
 
+// Cataboligne 9.11.3 purify - chase cam
+	chase_cam_precache();
+
 
 //
 // Setup light animation tables. 'a' is total darkness, 'z' is maxbright.

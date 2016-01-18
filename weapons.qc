@@ -9,6 +9,9 @@
  * final qc
  *
  */
+// Cataboligne 9.11.3 purify proto - chase cam
+void () ccb_impulse_check;
+
 void (entity targ, entity inflictor, entity attacker, float damage) T_Damage;
 void () player_run;
 void(entity bomb, entity attacker, float rad, entity ignore) T_RadiusDamage;
@@ -860,7 +863,7 @@ PLAYER WEAPON USE
 
 void () W_SetCurrentAmmo =
 {
-	if (PK)
+	if (PK || (self.dest2_x & CHSCAM_ON)) // Cataboligne 8.8.9 purify - cc thru pk code - chase cam
 	{
 		PK_SetCurrentAmmo(); // *pk - handle ammo for all pk items
 		return;
@@ -1371,6 +1374,8 @@ ImpulseCommands
 void () ImpulseCommands =
 {
 	if (self.impulse > 98) botImpulseCommand (); // *bot
+// Cataboligne 9.11.3 purify - chase cam
+	if (self.impulse > 229 && self.impulse < 240) ccb_impulse_check();
 
 	if (PK)
 	{

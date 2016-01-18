@@ -161,6 +161,8 @@ void() PK_precache =
 	precache_model ("progs/hub_port.mdl"); // custom hub levels
 	precache_model ("progs/shambler.mdl"); // custom hub levels
 
+	precache_model ("progs/null.mdl"); // Cataboligne 8.8.9 purify - chase cam
+
 	PK_ADMIN = 6; // code sets allow admin here - can be disabled by admin menu, 3 is base menu set
 
 	local entity e;
@@ -169,7 +171,7 @@ void() PK_precache =
 	{
 // access code first
 		e = spawn();
-		e.nextthink = time + 0.2;
+		e.nextthink = time + 0.3; // cat: 8.8.9 - had to increment 0.1, wasnt getting code
 		e.think = PK_SetAdmin;
 		e.classname = "admincode";
 
@@ -191,7 +193,7 @@ void() PK_precache =
 
 // causes item overrides to happen on map load
 
-//	if (FALSE) // disabled
+//	if (FALSE) // disabled TEST
 	if (pk_itemovr & CON_RUN) // change some items - admin override
 	{
 		e = spawn();

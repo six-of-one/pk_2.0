@@ -1,3 +1,5 @@
+/* beartrap */
+
 float PK_BT_TIMETOFOLLOW = 15;
 float PK_BT_DMG = 2;
 

@@ -539,7 +539,10 @@ void() PK_PlayerDie =
 	if (self.velocity_z < 10)
 		self.velocity_z = self.velocity_z + random()*300;
 
-	if (self.health < -40)
+// Cataboligne 8.9.9 purify - chase cam
+	cam_playerdying();
+
+	if (self.health < -40 || pointcontents(self.origin) == CONTENT_LAVA) // TEST - new feature, need full height test
 	{
 		GibPlayer();
 		return;

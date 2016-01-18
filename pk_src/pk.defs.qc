@@ -1,4 +1,3 @@
-
 // constants
 
 // ADMIN section
@@ -448,6 +447,16 @@ void(entity e) pk_missile_splash;
 // new features
 .void() pk_touch; 						// group all touch code mods here
 void() pk_placeitem;
+
+// Rotation
+.vector neworigin;
+.vector rotate;
+.float  endtime;
+.float  rotate_type;
+.string path;
+.string group;
+.string event;
+.float      duration;
 
 /*
 

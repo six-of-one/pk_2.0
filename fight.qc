@@ -1,4 +1,3 @@
-
 /*
 
 A monster is in fight mode if it thinks it can effectively attack its

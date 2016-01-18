@@ -1,4 +1,4 @@
-
+/* splish splash */
 
 float NOT_IN_WATER = 0;
 float pc;								// The content type the last entity to be checked just entered

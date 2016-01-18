@@ -438,6 +438,9 @@ void() bolt_checkTargets =
 	if (self.pk_currentitem == PK_IT_CLIGHT)
 	if (self.bolt_changeModelTimeout < time)
 	{
+	// Cataboligne 9.11.3 purify - chase cam
+	// disable model in chase view
+		if ( !(self.dest2_x & CHSCAM_ON) )
 		self.weaponmodel = "progs/v_cl_off.mdl";
 	}
 

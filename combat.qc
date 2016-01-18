@@ -10,6 +10,8 @@
  *
  */
 
+// Cataboligne 9.11.3 purify proto - chase cam
+void() dead_cam_set;
 
 void () T_MissileTouch;
 void () info_player_start;
@@ -103,6 +105,9 @@ void(entity targ, entity attacker) Killed =
 
 	monster_death_use ();
 	self.th_die ();
+
+// Cataboligne 9.11.3 purify - chase cam
+	dead_cam_set();
 
 	self = oself;
 };

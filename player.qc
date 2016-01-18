@@ -1,6 +1,3 @@
-
-void() bubble_bob;
-
 /*
 ==============================================================================
 
@@ -8,6 +5,9 @@ PLAYER
 
 ==============================================================================
 */
+
+void() bubble_bob;
+
 
 $cd id1/models/player_4
 $origin 0 -6 24
@@ -93,12 +93,6 @@ void()	player_stand1 =[	$axstnd1,	player_stand1	]
 	if (PK) pk_harpoon_frames();
 	else
 	self.weaponframe=0;
-	if (self.velocity_x || self.velocity_y)
-	{
-		self.walkframe=0;
-		self.think = player_run; // *fix - run / stand loop
-		return;
-	}
 
 	if (PK && self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
 	{
@@ -120,6 +114,13 @@ void()	player_stand1 =[	$axstnd1,	player_stand1	]
 		self.frame = $stand1 + self.walkframe;
 	}
 	self.walkframe = self.walkframe + 1;
+
+	if (self.velocity_x || self.velocity_y) // moved - allow frame to be set
+	{
+		self.walkframe=0;
+		self.think = player_run; // *fix - run / stand loop
+		return;
+	}
 };
 
 void()	player_run =[	$rockrun1,	player_run	]
@@ -127,12 +128,6 @@ void()	player_run =[	$rockrun1,	player_run	]
 	if (PK) pk_harpoon_frames();
 	else
 	self.weaponframe=0;
-	if (!self.velocity_x && !self.velocity_y)
-	{
-		self.walkframe=0;
-		self.think = player_stand1; // *fix - run / stand loop
-		return;
-	}
 
 	if (PK && self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
 	{
@@ -154,6 +149,13 @@ void()	player_run =[	$rockrun1,	player_run	]
 		self.frame = self.frame + self.walkframe;
 	}
 	self.walkframe = self.walkframe + 1;
+
+	if (!self.velocity_x && !self.velocity_y)
+	{
+		self.walkframe=0;
+		self.think = player_stand1; // *fix - run / stand loop
+		return;
+	}
 };
 
 
@@ -591,6 +593,9 @@ void() PlayerDie =
 	self.movetype = MOVETYPE_TOSS;
 	if (self.velocity_z < 10)
 		self.velocity_z = self.velocity_z + random()*300;
+
+// Cataboligne 8.9.9 purify - chase cam
+	cam_playerdying();
 
 	if (self.health < -40)
 	{
