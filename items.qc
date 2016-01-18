@@ -74,23 +74,7 @@ void () PlaceItem =
 			return ;
 		}
 		else
-		{
-			local entity e;
-			local vector v1;
-
-			e = dyn_rndloc();
-			if (!e) e = findradius(world.origin, 256000);
-			if (!e) 
-			{
-				dprint("Bonus item restore could not find a random (or any) location - giving up\n");
-				remove(self);
-				return;
-			}
-			v1 = e.origin + ' 0 0 8';
-			if (e.flags & FL_ITEM) // randomize away from other map items
-				v1 = stdv_rndloc(e.origin + ' 0 0 8', 50, 100);
-			setorigin(self, v1);
-		}
+			dtf_handle();
 	}
 	if (!Q_100) pk_placeitem(); // *pk - set item details
 	bot_item_linx(self); // *bot - item tie in

@@ -342,7 +342,6 @@ string (float mc) item_by_mcode =
 
 // fn_make - make an item from map code value
 
-// handles map call - set wait to valid map code
 
 void(float mc, vector vo) fn_make =
 {
@@ -353,10 +352,7 @@ void(float mc, vector vo) fn_make =
 	sv = self;
 	sc = item_by_mcode(mc);
 
-	if (self.classname != "fn_make") // map call
-		self = spawn();
-	else
-		sc = item_by_mcode(self.wait);
+	self = spawn();
 
  if (sc != "")
  {
@@ -406,5 +402,48 @@ void(float mc, vector vo) fn_make =
 	bprint(" -------------->  ");
 	bprint(ftos(mc));
 	bprint("\n");
+	}
+};
+
+// func_make handles map call - set wait to valid map code
+
+void() func_make =
+{
+	local float d, f;
+
+	if (self.spawnflags & 1) self.origin = v0;
+
+	d = self.wait;
+	f = 30;
+	if (RUNES && self.wait == -1) f = 26; // dont rndize runes if server on
+	if (self.wait == -1 || self.wait == -2) d = 102 + rint(random() * f);
+
+	f = 8;
+	if (PK_ART || self.wait == -4) f = 12;
+	if (self.wait == -3 || self.wait == -4) d = 141 + rint(random() * f);
+
+	f = 38;
+	if (self.wait == -5)
+	{
+		d = 102 + rint(random() * f);
+		if (self.wait >= MC_Q1) d = d + 7;
+	}
+
+	fn_make(d, self.origin);
+
+	if (self.count > 0)
+	{
+		if (self.count > 0)
+		if (self.delay < 1) self.delay = 30;
+	
+		if (self.count < 1) self.delay = 0;
+
+		self.count = self.count - 1;
+	}
+
+	if (self.delay > 0)
+	{
+		self.nextthink = time + self.delay;
+		self.think = func_make;
 	}
 };

@@ -129,6 +129,7 @@ float DYN_START_TIME			= 5;	// seconds till dynamic spawner starts its thing - p
 string (float mc) item_by_mcode;
 void(string cls) item_call;
 string(entity e) item_ident;
+void() dtf_handle;
 entity() dyn_rndloc;
 vector(vector v1, float d1, float r1) stdv_rndloc
 void() start_loopcyc;
@@ -216,6 +217,10 @@ float CYC_TIME					= 60; // TEST - 240; // seconds for cycle base - 4 mins +|- 2
 void() item_loop;
 float ammo_frame;
 float(float cn, entity e, string op) ammo_con;
+
+// doom
+
+void() doom_precache;
 
 // **************************************
 // painkeep protos

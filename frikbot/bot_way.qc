@@ -261,18 +261,14 @@ entity(vector org) make_waypoint =
 	if (pointcontents(org) == CONTENT_SOLID) // Cataboligne - 5.31.10 - in case a bot falls out of level
 	{
 		self.cnt = self.cnt + 1;
-		
+
+		if (WARNING)
 		if (self.cnt < 5)
 		{
 			bprint("*** Warning - ent tried to make way point in solid: ");
 			bprint(self.classname);
 			bprint("\n");
-			return(world);
 		}
-		else 
-		if (self.cnt > 2000)
-		if (IROBOT(self))
-			T_Damage(self, self, self, 10000);
 		return(world);
 	}
 

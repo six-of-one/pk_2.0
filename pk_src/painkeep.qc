@@ -225,6 +225,7 @@ void() PK_precache =
 	precache_model ("progs/end2.mdl");
 	precache_model ("progs/end3.mdl");
 	precache_model ("progs/end4.mdl");
+	precache_sound ("boss1/sight1.wav");
 // artifacts
 	precache_model ("progs/invulner.mdl");
 	precache_sound ("items/protect.wav");
@@ -250,6 +251,8 @@ void() PK_precache =
 	precache_model ("progs/v2_rock2.mdl");
 	precache_model ("progs/v2_pulsenail.mdl");
 	precache_model ("progs/v2_harp.mdl");
+
+	doom_precache();
 
 	viswep_pre();
 

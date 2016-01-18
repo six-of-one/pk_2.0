@@ -113,7 +113,8 @@ pk_src/phone.qc
 pk_src/pk_artifacts.qc
 
 // support for q3 maps in darkplaces
-pk_src/q3items.qc
+pk_src/q3ents.qc
+pk_src/dooments.qc
 
 // support for rotating brushes - Ariochs Heaven map
 rotate.qc

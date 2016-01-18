@@ -418,6 +418,8 @@ void() turret_attackEnemy =
 	// set the gun, so always lines up with the stand
 	setorigin(self, self.turret_base.origin);
 
+	self.nextthink = time + 0.1; // Cataboligne - 6.14.10 - moved here to stop turret freeze ups
+
 	// check if needs to be seet solid
 	if (self.solid == SOLID_NOT)
 	{
@@ -558,8 +560,6 @@ void() turret_attackEnemy =
 			}
 	  head = head.chain;
 	}
-
-	self.nextthink = time + 0.1;
 };
 
 

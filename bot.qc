@@ -752,7 +752,7 @@ void (entity e) bot_freeze =
 		e.style = e.movetype;
 		e.movetype = MOVETYPE_NONE;
 		e.attack_finished = MAXFL;
-		e.think1 = e.think;
+		if (e.think != SUB_Nop) e.think1 = e.think;
 		e.think = SUB_Nop;
 		b_frz = b_frz + 1;
 	}

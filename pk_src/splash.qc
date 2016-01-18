@@ -165,23 +165,46 @@ void() CheckWaterLevels =
 			{
 				d = TRUE;
 				if (WARNING)
+				if (e.wait > -888)
 				{
+					e.wait = -888;
 					bprint("*** warning: falling item hit -2011 vel*_z (terminal) - ");
 					bprint(item_ident(e));
 					bprint("\n");
 				}
 				if ((e.flags & FL_ITEM) && e.ip_orgOrigin != v0) // put items back now
 				{
-					setorigin (e, e.ip_orgOrigin + ' 0 0 24');
-					if (!droptofloor(0,0))
-						setorigin (e, e.ip_orgOrigin + ' 0 0 36');
-					e.velocity_z = 100;
+					e.wait = e.wait - 1;
+					if (e.wait < -895) e.movetype = MOVETYPE_NONE;
+					e.ip_orgOrigin_z = e.ip_orgOrigin_z + 4;
+					setorigin (e, e.ip_orgOrigin);
+					e.velocity = v0;
 					e.think = ip_checkForMovement;
 					e.nextthink = time + CFM_TIME;
 					d = FALSE;
+					if (WARNING)
+					{
+						bprint("*** warning: falling item reset - ");
+						bprint(item_ident(e));
+						if (e.movetype == MOVETYPE_NONE) bprint(" - FROZEN");
+						bprint("\n");
+					}
+				}
+				else if (e.flags & FL_MONSTER && e.solid != SOLID_NOT) e.th_die(); // note: swim monsters dont set splash
+				else if (IROBOT(e)) T_Damage(e, e, e, 10000); // TDO: obit for this - nocide
+				else if (e.classname != "player")
+				{
+					if (WARNING)
+					{
+						bprint("*** warning: removed falling item - ");
+						bprint(item_ident(e));
+						bprint("\n");
+					}
+					if (e.classname == "turret") remove(e.turret_base);
+					remove(e); // remove all else
 				}
 			}
-
+/*
 			if (!e.endtime) e.endtime = time;
 			else
 			if (e.endtime + SOLID_TIME < time)
@@ -209,6 +232,7 @@ void() CheckWaterLevels =
 					bprint("\n");
 				}
 			}
+			*/
 		}
 		else
 			e.endtime = 0;

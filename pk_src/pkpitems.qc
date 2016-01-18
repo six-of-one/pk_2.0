@@ -159,6 +159,8 @@ void () pkplus_touch =
 
 void(entity e) pkplus_item_control =
 {
+	if (e.classname == "func_make") return; // override
+
 	if (PK_ART) // turned back on - come here from loop
 	{
 		setmodel (e,e.mdl);

@@ -689,12 +689,12 @@ void() func_dynitem =
 		e.classname = "dyn_item";
 
 		if (self.spawnflags & 1)
+			setorigin(e, v0);
+		else
 		{
 			v1 = stdv_rndloc(self.origin, 0, self.lip);
 			setorigin(e, v1);
 		}
-		else
-			setorigin(e, v0);
 		if (self.dest1_x)
 		{
 			sb = e.cnt = bit_cnt(self.dest1_x, TRUE);

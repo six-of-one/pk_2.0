@@ -126,6 +126,7 @@ void( entity cam_owner, vector vpos ) Start_chase_cam =
 
 	chase_cam.solid = SOLID_NOT;
 	chase_cam.movetype = MOVETYPE_FLY;
+	chase_cam.water_notify = ""; // Cataboligne - 6.13.10 - cam splash issue - just in case fix
 
 
 	chase_cam.angles = chase_cam.owner.angles;
@@ -292,6 +293,7 @@ void () cam_deathmove =
 		self.owner.takedamage = DAMAGE_NO;
 		self.owner.wait = 0;
 		self.owner.view_ofs_z = 1;
+		self.owner.water_notify = ""; // Cataboligne - 6.13.10 - deadcam splash issue
 		self.oldorigin = self.owner.origin;
 		setorigin(self.owner, self.origin);
 		set_viewport(self.owner, self.owner);
