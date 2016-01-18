@@ -293,7 +293,7 @@ void () W_FireShotgun =
 
 	self.punchangle_x = -2;
 
-		self.currentammo =self.ammo_shells = self.ammo_shells - ammo_con(1, self, "");
+		self.currentammo =self.ammo_shells = self.ammo_shells - 1;
 		if (self.classname == "pk*bot")
 			dir = botaim ();
 		else
@@ -327,7 +327,7 @@ void () W_FireSuperShotgun =
 
 	self.punchangle_x = -4;
 	
-		self.currentammo = self.ammo_shells = self.ammo_shells - ammo_con(2, self, "");
+		self.currentammo = self.ammo_shells = self.ammo_shells - 2;
 		if (self.classname == "pk*bot")
 			dir = botaim ();
 		else
@@ -385,7 +385,7 @@ void () T_MissileTouch =
 
 	// don't do radius damage to the other, because all the damage
 	// was done in the impact
-	T_RadiusDamage (self, self.owner, 120, other);
+	T_RadiusDamage (self,self.owner,120,other);
 
 //	sound (self, CHAN_WEAPON, "weapons/r_exp3.wav", 1, ATTN_NORM);
 	self.origin = self.origin - 8*normalize(self.velocity);
@@ -411,18 +411,17 @@ void () W_FireRocket =
 	local	entity missile, mpuff;
 	vector bfwd;
 
-	self.currentammo = self.ammo_rockets = self.ammo_rockets - ammo_con(1, self, "");
+	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
 
 	sound (self, CHAN_WEAPON, "weapons/sgun1.wav", 1, ATTN_NORM);
 
 	self.punchangle_x = -2;
 
-	newmis = missile = spawn ();
+	missile = spawn ();
 	missile.owner = self;
 	missile.movetype = MOVETYPE_FLYMISSILE;
 	missile.solid = SOLID_BBOX;
 	missile.classname = "missile";
-	newmis.weapon = IT_ROCKET_LAUNCHER; // Cataboligne - 2.19.11 - correct obit in pk_clientobit
 
 // set missile speed
 
@@ -437,9 +436,6 @@ void () W_FireRocket =
 	missile.velocity = aim (self,1000);
 	missile.velocity = missile.velocity * 1000;
 	missile.angles = vectoangles (missile.velocity);
-
-	if (!rune_haste(0.4))
-		missile.velocity = missile.velocity * 2;
 
 	missile.touch = T_MissileTouch;
 
@@ -574,7 +570,7 @@ void () W_FireLightning =
 	self.punchangle_x = -2;
 	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
 
-	self.currentammo = self.ammo_cells = self.ammo_cells - ammo_con(1, self, "");
+	self.currentammo = self.ammo_cells = self.ammo_cells - 1;
 
 	if (PK_100 || Q_100)
 		org = self.origin + '0 0 16';
@@ -610,9 +606,6 @@ void () W_FireLightning =
 
 void () GrenadeExplode =
 {
-	if (self.dodmg)
-		T_RadiusDamage (self,self.owner,self.dodmg,world);
-	else
 	T_RadiusDamage (self,self.owner,120,world);
 
 	WriteByte (MSG_BROADCAST,SVC_TEMPENTITY);
@@ -633,9 +626,6 @@ void () GrenadeTouch =
 		GrenadeExplode ();
 		return ;
 	}
-	if (self.noise != "")
-		sound (self, CHAN_WEAPON, self.noise, 1, ATTN_NORM);	// bounce sound
-	else
 	sound (self, CHAN_WEAPON, "weapons/bounce.wav", 1, ATTN_NORM);	// bounce sound
 	if (self.velocity == '0 0 0')
 		self.avelocity = '0 0 0';
@@ -650,19 +640,18 @@ void () W_FireGrenade =
 {
 	local	entity missile, mpuff;
 
-	self.currentammo = self.ammo_rockets = self.ammo_rockets - ammo_con(1, self, "");
+	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
 
 	sound (self, CHAN_WEAPON, "weapons/grenade.wav", 1, ATTN_NORM);
 
 	self.punchangle_x = -2;
 
-	newmis = missile = spawn ();
+	missile = spawn ();
 	missile.owner = self;
 	missile.movetype = MOVETYPE_BOUNCE;
 	missile.solid = SOLID_BBOX;
 	missile.classname = "grenade";
-	newmis.weapon = IT_GRENADE_LAUNCHER; // Cataboligne - 2.19.11 - correct obit in pk_clientobit
-	
+
 // set missile speed
 
 	makevectors (self.v_angle);
@@ -684,9 +673,6 @@ void () W_FireGrenade =
 		missile.velocity_z = 200;
 		}
 	}
-
-	if (!rune_haste(0.3))
-		missile.velocity = missile.velocity * 2;
 
 	missile.avelocity = '300 300 300';
 
@@ -738,9 +724,6 @@ void (vector org, vector dir) launch_spike =
 	setorigin (newmis,org);
 
 	newmis.velocity = dir * 1000;
-	if (!rune_haste(0.1))
-		newmis.velocity = dir * 1000 * 2;
-
 	if (!Q_100) pk_missile_splash(newmis); // *pk - splash & message setup
 };
 
@@ -751,7 +734,7 @@ void () W_FireSuperSpikes =
 
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
 	self.attack_finished = time + 0.2;
-	self.currentammo = self.ammo_nails = self.ammo_nails - ammo_con(2, self, "");
+	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
 	if (self.classname == "pk*bot")
 		dir = botaim ();
 	else
@@ -762,7 +745,6 @@ void () W_FireSuperSpikes =
 	else
 		launch_spike (self.origin + v_up * VWZ_SNAILG + v_right * VWY_SNAILG + v_forward * VWX_SNAILG, dir);
 	newmis.touch = superspike_touch;
-	newmis.weapon = IT_SUPER_NAILGUN; // Cataboligne - 2.19.11 - correct obit in pk_clientobit
 	setmodel (newmis,"progs/s_spike.mdl");
 	setsize (newmis,VEC_ORIGIN,VEC_ORIGIN);
 	self.punchangle_x = -2;
@@ -776,13 +758,12 @@ void(float ox) W_FireSpikes =
 
 	makevectors (self.v_angle);
 
-	if (self.ammo_nails >= 2 || ammo_con(IT_SUPER_NAILGUN, self, "wpck") && self.weapon == IT_SUPER_NAILGUN)
+	if (self.ammo_nails >= 2 && self.weapon == IT_SUPER_NAILGUN)
 	{
 		W_FireSuperSpikes ();
 		return ;
 	}
 
-	if (!ammo_con(IT_NAILGUN, self, "wpck"))
 	if (self.ammo_nails < 1)
 	{
 		self.weapon = W_BestWeapon ();
@@ -802,7 +783,7 @@ void(float ox) W_FireSpikes =
 	}
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
 	self.attack_finished = time + 0.2;
-	self.currentammo = self.ammo_nails = self.ammo_nails - ammo_con(1, self, "");
+	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
 	if (self.classname == "pk*bot")
 		dir = botaim ();
 	else
@@ -813,7 +794,6 @@ void(float ox) W_FireSpikes =
 	else
 		launch_spike (self.origin + v_up * VWZ_NAILG + v_right * ox + v_right * VWY_NAILG + v_forward * VWX_NAILG, dir);
 
-	newmis.weapon = IT_NAILGUN; // Cataboligne - 2.19.11 - correct obit in pk_clientobit
 	self.punchangle_x = -2;
 	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
 };
@@ -906,13 +886,9 @@ PLAYER WEAPON USE
 
 void () W_SetCurrentAmmo =
 {
-//	if (PK || custom_hub_loaded || (self.cam_x & CHSCAM_ON)) // Cataboligne 8.8.9 purify - cc thru pk code - chase cam
-	if (!Q_100)
+	if (!Q_100 || (self.cam_x & CHSCAM_ON)) // Cataboligne 8.8.9 purify - cc thru pk code - chase cam
 	{
-		if (PK_100)// || !VW)
-			PK_SetCurrentAmmo(); // *pk - handle ammo for all pk items & cam
-		else
-			PK_SetCurrentAmmoOnly();
+		PK_SetCurrentAmmo(); // *pk - handle ammo for all pk items
 		return;
 	}
 	if (self.classname == "player") // *bot
@@ -944,28 +920,40 @@ void () W_SetCurrentAmmo =
 	else if (self.weapon == IT_NAILGUN)
 	{
 		self.currentammo = self.ammo_nails;
+		if (PK_100 || Q_100)
 			self.weaponmodel = "progs/v_nail.mdl";
+		else
+			self.weaponmodel = "progs/v2_nail.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
 	}
 	else if (self.weapon == IT_SUPER_NAILGUN)
 	{
 		self.currentammo = self.ammo_nails;
+		if (PK_100 || Q_100)
 			self.weaponmodel = "progs/v_nail2.mdl";
+		else
+			self.weaponmodel = "progs/v2_nail2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
 	}
 	else if (self.weapon == IT_GRENADE_LAUNCHER)
 	{
 		self.currentammo = self.ammo_rockets;
+		if (PK_100 || Q_100)
 			self.weaponmodel = "progs/v_rock.mdl";
+		else
+			self.weaponmodel = "progs/v2_rock.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
 	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
 		self.currentammo = self.ammo_rockets;
+		if (PK_100 || Q_100)
 			self.weaponmodel = "progs/v_rock2.mdl";
+		else
+			self.weaponmodel = "progs/v2_rock2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
 	}
@@ -1068,21 +1056,18 @@ void () W_Attack =
         player_axec1 ();
       else
         player_axed1 ();
-		if (rune_haste(0.28))
       self.attack_finished = time + 0.5;
   	}
 	else if (self.weapon == IT_SHOTGUN)
 	{
 		player_shot1 ();
 		W_FireShotgun ();
-		if (rune_haste(0.28))
 		self.attack_finished = time + 0.5;
 	}
 	else if (self.weapon == IT_SUPER_SHOTGUN)
 	{
 		player_shot1 ();
 		W_FireSuperShotgun ();
-		if (rune_haste(0.38))
 		self.attack_finished = time + 0.7;
 	}
 	else if (self.weapon == IT_NAILGUN)
@@ -1097,14 +1082,12 @@ void () W_Attack =
 	{
 		player_rocket1();
 		W_FireGrenade();
-		if (rune_haste(0.3))
 		self.attack_finished = time + 0.6;
 	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
 		player_rocket1();
 		W_FireRocket();
-		if (rune_haste(0.4))
 		self.attack_finished = time + 0.8;
 	}
 	else if (self.weapon == IT_LIGHTNING)
@@ -1447,12 +1430,6 @@ ImpulseCommands
 */
 void () ImpulseCommands =
 {
-	if (self.impulse == 51)
-		rune_id(self, self);
-	if (self.impulse == 52 || self.impulse == 53)
-		inventory();
-	if (self.impulse == 54)
-		power_armor_impulse();
 	if (self.impulse > 98) botImpulseCommand (); // *bot
 // Cataboligne 9.11.3 purify - chase cam
 	if (self.impulse > 229 && self.impulse < 240) ccb_impulse_check();
@@ -1504,6 +1481,11 @@ void () W_WeaponFrame =
 		if (inHubMap) if (self.hubstartupmessage > time) self.hubstartupmessage = 0; // *pk - clear hub message
 		SuperDamageSound ();
 		W_Attack ();
+
+// Cataboligne 4.17.11 - saver fn tie in
+		if (self.aiment)
+		if (self.aiment.classname == "saver")
+			self.aiment.button0 = TRUE;
 	}
 };
 
@@ -1516,8 +1498,7 @@ Plays sound if needed
 */
 void () SuperDamageSound =
 {
-	if (self.super_damage_finished > time
-		|| self.rune_flag & RUNE_FLG_DM)
+	if (self.super_damage_finished > time)
 	{
 		if (self.super_sound < time)
 		{

@@ -230,7 +230,7 @@ float() grap_maintainRope =
   	if (!PK_100)
 		v1 = cornerOrigin = corner.origin + grap_vw_adj(corner);
 	else
-		cornerOrigin = corner.origin + '0 0 16';
+	cornerOrigin = corner.origin + '0 0 16';
 
 	sf = SAFE_LOOP;
 	while(corner.grap_cornerchainNext && sf > 0)
@@ -290,7 +290,7 @@ void(entity corner, vector cornerOrigin) grep_createCornerRope =
 	    return;
 	  }
 
-// Calculate direction to owner.
+	  // Calculate direction to owner.
 		dir = normalize(cornerOrigin - ropeOwner.origin);
 
 	  // Calculate start point of the coil
@@ -459,19 +459,6 @@ void() grap_touch =
 		self.grap_pull = self;
 		grap_touchOwner();
 		return;
-	}
-
-// advanced code - grap hit kills infinite (xtreme) turrets
-	grapOwner = findradius(self.origin, 50);
-	while (grapOwner)
-	{
-		if (grapOwner.classname == "turret")
-		if (grapOwner.delay == TRUE)
-		{
-			turret_KillStraker(grapOwner, 1 + random() * 5);
-		}
-
-		grapOwner = grapOwner.chain;
 	}
 
 	self.touch = SUB_Null;

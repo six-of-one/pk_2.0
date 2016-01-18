@@ -10,6 +10,7 @@
  *
  */
 
+
 void () corpsefollow;
 void () corpse_drag1 =  [ 56, corpse_drag2  ] { 	corpsefollow (); };
 void () corpse_drag2 =  [ 57, corpse_drag3  ] { };
@@ -173,7 +174,7 @@ void () touchtomb_think =
 
 void () tomb_think =
 {
-	if ( self.tomb_death_time && (self.tomb_death_time < time) )
+	if ( (self.tomb_death_time < time) )
 	{
 		self.think = tombdie;
 		self.nextthink = (time + 0.1);
@@ -220,22 +221,6 @@ void () tomb_launch =
 		player_run ();
 		return ;
 	}
-
-	if (!PK_TOMB_SET)
-	{
-		PK_TOMB_SET = TRUE;
-// defs
-		PKPLUS_TOMB_TIME = 90;  // MOVE to tomb.qc
-
-		if (!PK_100)
-		if (DARKPLACES || chaos)
-		{
-			PKPLUS_TOMB_TIME = cvar("pk_tomb_time");
-			if (PKPLUS_TOMB_TIME < 0) PKPLUS_TOMB_TIME = 90;
-		}
-	}
-		
-
 	tomb = spawn ();
 	tomb.owner = self;
 	tomb.movetype = MOVETYPE_TOSS;
@@ -257,8 +242,7 @@ void () tomb_launch =
 	tomb.angles_z = 0;
 	tomb.v_angle = self.v_angle;
 	tomb.v_angle_z = 0;
-	if (PKPLUS_TOMB_TIME)
-		tomb.tomb_death_time = (time + PKPLUS_TOMB_TIME);
+	tomb.tomb_death_time = (time + 90);
 	tomb.think = tomb_checkonground;
 	tomb.nextthink = (time + 0.5);
 	AddToSplash (tomb);

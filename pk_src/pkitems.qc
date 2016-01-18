@@ -27,101 +27,7 @@
  * light_painkeep_candle
  * item_painkeep_expshells
  *
- pkplus
-*  item_pkplus_ego
-*  item_pkplus_tomb
-*  item_pkplus_actor
-*  item_pkplus_phone
  */
-
-
-void () SUB_regen =
-{
-	if (Q_100)
-	{
-		q100_SUB_regen();
-		return;
-	}
-
-	self.model = self.mdl;		// restore original model
-	self.solid = SOLID_TRIGGER;	// allow it to be touched again
-	if (self.noise4 != "")
-		sound (self, CHAN_VOICE, self.noise4, 1, ATTN_NORM);	// play respawn sound - doom / other resp sounds
-	else
-		sound (self, CHAN_VOICE, "items/itembk2.wav", 1, ATTN_NORM);	// play respawn sound
-	pk_item_position();  // *pk - reposition moved items (horn & harp effects) on respawn
-};
-
-void () PlaceItem =
-{
-	local float f;
-
-	bot_item_linx(self); // *bot - item tie in
-
-// used for translate - if *_100 on
-	self.mcode = pk_mcode("", self); // put map code on ent
-	self.sscode = sid_code[(int)(self.mcode - 100) * %4];
-	if (!self.scode) self.scode = self.mcode;
-
-	if (Q_100 || PK_100) // TDO: include hip_item & x_item when xlates are available
-	{
-		f = 0;
-		if (TR_Q1QRY > 0)
-		{
-			TR_Q1QRY = 0;
-			if (find(world,wad,"q1")) TR_Q1QRY = -1; // map was designed for dual items - remove only
-		}
-		if (TR_Q1DEF && (TR_Q1QRY == 0)) f = FL_TR_QUAKE;
-		if (self.class_select == "wolf_item") master_item_control(self, f);
-		else if (self.class_select == "doom_item") master_item_control(self, f);
-		else if (self.class_select == "q2_item") master_item_control(self, f);
-		else if (self.class_select == "q3_item") master_item_control(self, f);
-		else if (self.class_select == "hip_item") master_item_control(self, f);
-		else if (self.class_select == "x_item") master_item_control(self, f);
-		else if (self.mcode == MC_AXE) master_item_control(self, f);
-		else if (self.mcode == MC_SHOTGUN) master_item_control(self, f);
-		if (self.think == PlaceItem) self.think = SUB_Null; // create calls start item - fix infinite loop because item_call sub regen not used in *100
-	}
-
-	if (self.scode == MC_Q2_BARREL || self.scode == MC_D_BARREL || self.scode == MC_Q3_BARREL || self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD1){
-		return;
-
-if (WARNING)
-bprint("placeitem barrel return\n");
-
-
-}
-
-	if (Q_100)
-	{
-		q100_PlaceItem(); // always encoding now
-		return;
-	}
-
-	self.mdl = self.model;		// so it can be restored on respawn
-	self.flags = FL_ITEM;		// make extra wide
-	self.solid = SOLID_TRIGGER;
-	self.movetype = MOVETYPE_TOSS;
-	self.velocity = '0 0 0';
-	self.origin_z = self.origin_z + 6;
-//	oldz = self.origin_z;
-	if (!droptofloor(0,0)) // Cataboligne 9.17.3 - fix compiler warning
-	{
-		dprint ("Bonus item fell out of level at ");
-		dprint (vtos (self.origin));
-		dprint ("\n");
-		if (PK_100)
-		{
-			remove (self);
-			return ;
-		}
-		else
-			dtf_handle();
-	}
-	pk_placeitem(); // *pk - set item details
-
-	pic_test();
-};
 
 
 // New weapons
@@ -129,7 +35,7 @@ bprint("placeitem barrel return\n");
 void () painkeep_weapon_touch =
 // The touch func for our new items
 {
-	local	float best, new;
+	local	float	hadammo, best, new, oldi;
 	local	entity	stm2;
 	local float leave;
 
@@ -170,26 +76,12 @@ void () painkeep_weapon_touch =
 		other.ammo_cells = other.ammo_cells + 30;
 		new = PK_IT_CLIGHT;
 	}
-	else if (self.classname == "weapon_pulsenail" || self.mcode == MC_PULSE_NAILGUN)
-	{
-		if (leave && (other.items & IT_NAILGUN))
-			return ;
-		new = 0;
-		other.items = other.items | IT_NAILGUN; // special for this
-		other.ammo_nails = other.ammo_nails + 30;
-		PK_Deathmatch_Weapon (IT_AXE, IT_NAILGUN);
-	}
 	else
 	{
 		if (PK_100 && PK_100_OBJERR) objerror("painkeep_weapon_touch: unknown classname");
 		else
 		{
-			if (WARNING)
-			{
-			bprint("\n*** warning:\npainkeep_weapon_touch: unknown classname (");
-			bprint(self.classname);
-			bprint(") - ignoring\n\n");
-			}
+			bprint("\n*** warning:\npainkeep_weapon_touch: unknown classname - ignoring\n\n");
 			self.touch = SUB_Null;
 			return;
 		}
@@ -206,6 +98,7 @@ void () painkeep_weapon_touch =
 	bound_other_ammo ();
 
 // change to the weapon
+	oldi = other.pk_items;
 	other.pk_items = other.pk_items | new;
 
 	stm2 = self;
@@ -235,7 +128,7 @@ void () painkeep_weapon_touch =
 	self.solid = SOLID_NOT;
 	if (deathmatch == 1)
 	{
-		self.nextthink = time + RSP_TIME;
+		self.nextthink = time + 30;
 		self.think = SUB_regen;
 	}
 
@@ -256,16 +149,8 @@ void () weapon_airfist =
 		return;
 	}
 
-	if (PK_100)
-	{
-		precache_model ("progs/g_airgun.mdl");
-		setmodel (self,"progs/g_airgun.mdl");
-	}
-	else
-	{
-		precache_model ("progs/g_airgun2.mdl");
-		setmodel (self,"progs/g_airgun2.mdl");
-	}
+	precache_model ("progs/g_airgun2.mdl");
+	setmodel (self,"progs/g_airgun2.mdl");
 	self.pk_currentitem = PK_IT_AIRGUN;
 	self.netname = "AirFist";
 	self.touch = painkeep_weapon_touch;
@@ -337,7 +222,7 @@ void() pk_dyn_touch =
 void() pk_ammo_touch =
 {
 	local entity	sv;
-	local float best, bestpk, sk, MAX; // *pk - best pk wep
+	local float best, bestpk; // *pk - best pk wep
 
 	if (other.classname != "player")
 		return;
@@ -351,125 +236,51 @@ void() pk_ammo_touch =
 	bestpk = W_BestPKWeapon(); // *pk - best pk wep
 	self = sv;
 
-	sk = TRUE; // skip old method if false
 
-// Cataboligne - 7.19.10 - pack & ammo runes mod
-	MAX = bound_ammo_pack(self.lip);
-
-	if (self.lip == AMMO_SLUGS) // slugs
-	{
-		if (other.ammo_slug >= MAX) //PK_SLUGAMMO_MAX)
-			return;
-		other.ammo_slug = other.ammo_slug + self.currentammo;
-		sk = FALSE;
-	}	
-
-	if (self.lip == AMMO_BULLETS) // any bullets
-	{
-		if (other.ammo_bullet >= MAX) // PK_BULLETAMMO_MAX)
-			return;
-		other.ammo_bullet = other.ammo_bullet + self.currentammo;
-		sk = FALSE;
-	}	
-
-	if (self.lip == AMMO_CELLS)
-	{
-		if (other.ammo_cells >= MAX) // Q1_CELLAMMO_MAX)
-			return;
-		other.ammo_cells = other.ammo_cells + self.currentammo;
-		sk = FALSE;
-	}	
-
-	if (self.lip == AMMO_NAILS)
-	{
-		if (other.ammo_cells >= MAX) // Q1_NAILAMMO_MAX)
-			return;
-		other.ammo_nails = other.ammo_nails + self.currentammo;
-		sk = FALSE;
-	}	
-
-	if (self.lip == AMMO_ROCKETS)
-	{
-		if (other.ammo_rockets >= MAX) // Q1_ROCKETAMMO_MAX)
-			return;
-		other.ammo_rockets = other.ammo_rockets + self.currentammo;
-		sk = FALSE;
-	}	
-
-	if (self.lip == AMMO_GRENADES) // IDEA: decide if this will be separate ammo (from rockets) for q2 & q3 - add max & cvar
-	{
-		if (other.ammo_rockets >= MAX) // Q1_ROCKETAMMO_MAX)
-			return;
-		other.ammo_rockets = other.ammo_rockets + self.currentammo;
-		sk = FALSE;
-	}	
-
-	if (self.lip == AMMO_SHELLS)
-	{
-		if (other.ammo_shells >= MAX) // Q1_SHELLAMMO_MAX)
-			return;
-		other.ammo_shells = other.ammo_shells + self.currentammo;
-		sk = FALSE;
-	}	
-
-	if (self.lip == AMMO_GAS)
-	{
-		if (other.ammo_gaspr >= MAX) // Q1_GASAMMO_MAX)
-			return;
-		other.ammo_gaspr = other.ammo_gaspr + self.currentammo;
-		sk = FALSE;
-	}	
-
-	if (sk)
-	{
 // shotgun
-		if (self.weapon == 1)
-		{
-			if (other.ammo_shells >= Q1_SHELLAMMO_MAX)
-				return;
-			other.ammo_shells = other.ammo_shells + self.aflag;
-		}
-
-// spikes
-		if (self.weapon == 2)
-		{
-			if (other.ammo_nails >= Q1_NAILAMMO_MAX)
-				return;
-			other.ammo_nails = other.ammo_nails + self.aflag;
-		}
-
-//	rockets
-		if (self.weapon == 3)
-		{
-			if (other.ammo_rockets >= Q1_ROCKETAMMO_MAX)
-				return;
-			other.ammo_rockets = other.ammo_rockets + self.aflag;
-		}
-
-//	cells
-		if (self.weapon == 4)
-		{
-			if (other.ammo_cells >= Q1_CELLAMMO_MAX)
-				return;
-			other.ammo_cells = other.ammo_cells + self.aflag;
-		}
-
-		if (self.weapon == 5) // *pk exploding shells
-		{
-			if (other.pk_explode_ammo >= PK_EXPLODEAMMO_MAX)
-				return;
-			other.pk_explode_ammo = other.pk_explode_ammo + self.aflag;
-		}	
+	if (self.weapon == 1)
+	{
+		if (other.ammo_shells >= 100)
+			return;
+		other.ammo_shells = other.ammo_shells + self.aflag;
 	}
 
-	pk_bound_ammo ();
+// spikes
+	if (self.weapon == 2)
+	{
+		if (other.ammo_nails >= 200)
+			return;
+		other.ammo_nails = other.ammo_nails + self.aflag;
+	}
+
+//	rockets
+	if (self.weapon == 3)
+	{
+		if (other.ammo_rockets >= 100)
+			return;
+		other.ammo_rockets = other.ammo_rockets + self.aflag;
+	}
+
+//	cells
+	if (self.weapon == 4)
+	{
+		if (other.ammo_cells >= 200)
+			return;
+		other.ammo_cells = other.ammo_cells + self.aflag;
+	}
+
+	if (self.weapon == 5) // *pk exploding shells
+	{
+		if (other.pk_explode_ammo >= PK_EXPLODEAMMO_MAX)
+			return;
+		other.pk_explode_ammo = other.pk_explode_ammo + self.aflag;
+	}	
+	
+	bound_other_ammo ();
 
 	sprint (other, "You got the ");
 	sprint (other, self.netname);
 	sprint (other, "\n");
-	if (self.noise != "")
-		sound (other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
-	else
 // ammo touch sound
 	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
@@ -497,13 +308,8 @@ void() pk_ammo_touch =
 	self.model = string_null;
 	self.solid = SOLID_NOT;
 	if (deathmatch == 1 || deathmatch == 3)
-	{
-//		if (self.wait)
-//			self.nextthink = time + self.wait;
-//		else
-	  self.nextthink = time + RSP_TIME;
-		self.think = SUB_regen;
-	}
+	  self.nextthink = time + 30;
+	self.think = SUB_regen;
 
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
@@ -551,57 +357,18 @@ void() painkeep_touch =
 		return;
 	}
 
-	if (self.pk_touch == SUB_Null) // deactivated
-		return;
-	if (self.pk_touch == (void()) 0)
-	{
-		if (WARNING)
-		{
-		bprint("\b *** warning: in painkeep_touch for: ");
-		bprint(self.classname);
-		bprint(" and pk_touch is (void) 0 - reloading\n");
-		}
-		if (self.classname != "dyn_item") item_call(self.classname);
-		else if (self.wad != "") item_call(self.wad);
-		else if (self.scode) item_call(item_by_mcode(self.scode));
-		return;
-	}
-	else
 	if (self.pk_touch != painkeep_touch) // all items route through here - handle special cases, other touch fns & return
 	{
-		armorsave_rev(other); // get armor if power on
 		if (self.pk_touch == ammo_touch) self.pk_touch = pk_ammo_touch; // new fn for ammo collections
 
 		self.pk_touch();
-
 		if (self.solid == SOLID_NOT)
-		if (self.think == SUB_regen)
-		if (deathmatch == 1 || deathmatch == 3)
+		if (deathmatch == 3) // *pk - new dm mode settings
 		{
-			if (self.wait)
-				self.nextthink = time + self.wait;
-
-			if (deathmatch == 3) // *pk - new dm mode settings - NOTE: this overrides genre ".wait" respawn times on all ents routed via armor & ammo touch listed below
-			{
-				if (self.pk_touch == pk_ammo_touch)
-					self.nextthink = time + RSP_TIME * 0.5; //15;
-				else if (self.pk_touch == armor_touch)
-					self.nextthink = time + RSP_TIME * 0.666; //20;
-			}
-
-
-
-if (WARNING)
-{
-bprint("\b *** respawn: time set in painkeep_touch for: ");
-bprint(item_ident(self));
-bprint(", time = (");
-bprint(ftos(self.nextthink - time));
-bprint(")\n");
-}
-
-
-
+			if (self.pk_touch == ammo_touch)
+				self.nextthink = time + 15;
+			if (self.pk_touch == armor_touch)
+				self.nextthink = time + 20;
 		}
 
 		if (e)
@@ -678,18 +445,14 @@ bprint(")\n");
 	// remove object until it is time to respawn
 	self.solid = SOLID_NOT;
 	self.model = string_null;
-	if (deathmatch)
-	if (deathmatch == 1 || deathmatch == 3)
+	if (deathmatch != 2)
 	{
-		if (self.wait) // IDEA: this prob. never happens
-			self.nextthink = time + self.wait;
-		else
 		if (self.pk_items == PK_IT_GRAVITYWELL)
-			self.nextthink = time + RSP_TIME * 4;
+			self.nextthink = time + 60*2;
 		else
-			self.nextthink = time + RSP_TIME * 2;
-		self.think = SUB_regen;
+			self.nextthink = time + 60;
 	}
+	self.think = SUB_regen;
 
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
@@ -806,6 +569,7 @@ void () light_painkeep_candle =
 	setmodel (self,"progs/candle.mdl");
 	FireAmbient ();
 	makestatic (self);
+	if (!(pk_flags & PK_MAP) && !PK) pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 };
 
 
@@ -820,7 +584,7 @@ void () item_painkeep_expshells =
 		return;
 	}
 
-	self.touch = pk_ammo_touch;
+	self.touch = ammo_touch;
 
 	precache_model ("maps/b_eshel0.bsp");
 	setmodel (self,"maps/b_eshel0.bsp");
@@ -832,37 +596,76 @@ void () item_painkeep_expshells =
 	StartItem ();
 };
 
-// called from bound_ammo - bounds for pk ammo
+// moved from items.qc - Cataboligne - 3.27.8
 
-// Cataboligne - 7.19.10 - added ammo pack bounding
+// think to reset to SUB_regen after item moved & timeout
+
+void() ip_regen =
+{
+	self.model = string_null;
+	self.solid = SOLID_NOT;
+
+	self.nextthink = time + 1;
+	self.think = SUB_regen;
+};
+
+// think to check for item movement, set respawn think if moved
+
+void() ip_checkForMovement =
+{
+	if (self.solid != SOLID_NOT)
+	if (self.ip_orgOrigin != self.origin)
+	{ // position has changed... repawn after x minutes..
+		self.think = ip_regen;
+		self.nextthink = time + (ip_timeout * 60);
+		return;
+	}
+
+	self.nextthink = time + 60;
+};
+
+// called from SUB_regen - restors position, rethinks
+
+void() pk_item_position =
+{
+	self.owner = world;
+
+	if (self.ip_orgOrigin == ' 0 0 0' && self.oldorigin != ' 0 0 0') // Cataboligne - in case mode was set to PK after some map items got loaded
+		self.ip_orgOrigin = self.oldorigin;
+
+	if (self.ip_orgOrigin != ' 0 0 0') // Cataboligne - tweak: in case this doesnt get set, we dont want to put any item like this at 0, 0, 0
+		setorigin (self, self.ip_orgOrigin);
+
+	self.think = ip_checkForMovement;
+	self.nextthink = time + 60;
+
+// dynamic items should not end up here
+//if (self.classname == "dyn_item")
+//bprint("********* error: dynamic in item position *********");
+
+};
+
+// called from PlaceItem, starts position think checks
+
+void() pk_item_position_init =
+{
+	self.ip_orgOrigin = self.origin;
+
+	self.think = ip_checkForMovement;
+	self.nextthink = time + 60;
+
+// dynamic items should not end up here
+//if (self.classname == "dyn_item")
+//bprint("******** error: dynamic in ip *********");
+
+};
+
+// called from bound_ammo - bounds for pk ammo
 
 void() pk_bound_ammo =
 {
-// st ammo pack code
-	if (other.rune_flag & RUNE_AMMO) // ammo packs & ammo rune increase carry capy
-	{
-		bound_ammo_pack(0);
-	}
-	else
-	{
-// end ammo pack code
-
-	if (other.ammo_shells > Q1_SHELLAMMO_MAX)
-		other.ammo_shells = Q1_SHELLAMMO_MAX;
-	if (other.ammo_nails > Q1_NAILAMMO_MAX)
-		other.ammo_nails = Q1_NAILAMMO_MAX;
-	if (other.ammo_rockets > Q1_ROCKETAMMO_MAX)
-		other.ammo_rockets = Q1_ROCKETAMMO_MAX;
-	if (other.ammo_cells > Q1_CELLAMMO_MAX)
-		other.ammo_cells = Q1_CELLAMMO_MAX;
-// new ammo
-	if (other.ammo_bullet > PK_BULLETAMMO_MAX)
-		other.ammo_bullet = PK_BULLETAMMO_MAX;
-	if (other.ammo_slug > PK_SLUGAMMO_MAX)
-		other.ammo_slug = PK_SLUGAMMO_MAX;
-	if (other.ammo_gaspr > PK_GASAMMO_MAX)
-		other.ammo_gaspr = PK_GASAMMO_MAX;
-	}
+	if (other.ammo_cells > 200)
+		other.ammo_cells = 200;
 
 	if (other.pk_gravitywellammo > PK_GRAVITYWELLAMMO_MAX)
 		other.pk_gravitywellammo = PK_GRAVITYWELLAMMO_MAX;
@@ -876,44 +679,32 @@ void() pk_bound_ammo =
 	if (other.pk_explode_ammo > PK_EXPLODEAMMO_MAX)
 		other.pk_explode_ammo = PK_EXPLODEAMMO_MAX;
 
-// Cataboligne 8.12.9 purify - pk artifacts
-	if (other.pkplus_egoammo > PKPLUS_EGOAMMO_MAX)
-		other.pkplus_egoammo = PKPLUS_EGOAMMO_MAX;
-	if (other.pkplus_tombammo > PKPLUS_TOMBAMMO_MAX)
-		other.pkplus_tombammo = PKPLUS_TOMBAMMO_MAX;
-	if (other.pkplus_actorammo > PKPLUS_ACTORAMMO_MAX)
-		other.pkplus_actorammo = PKPLUS_ACTORAMMO_MAX;
-	if (other.pkplus_phoneammo > PKPLUS_PHONEAMMO_MAX)
-		other.pkplus_phoneammo = PKPLUS_PHONEAMMO_MAX;
-// end pk_art
-
+	pk_art_bound_ammo(other); // Cataboligne 8.12.9 purify - pk artifacts
 };
 
 // called from below - replacement for RankForWeapon - provides rank for some pk stuff
 
-/// Cataboligne - 7.10.10 - expanded range for xweap ranking system
-
 float(float w, float w2) PK_RankForWeapon =
 {
 	if (w == IT_AXE && w2 == PK_IT_CLIGHT)
-		return 10;
+		return 1;
 	if (w == IT_LIGHTNING)
-		return 20;
+		return 2;
 	if (w == IT_ROCKET_LAUNCHER)
-		return 30;
+		return 3;
 	if (w == IT_SUPER_NAILGUN)
-		return 40;
+		return 4;
 	if (w == IT_GRENADE_LAUNCHER)
-		return 50;
+		return 5;
 	if (w == IT_SUPER_SHOTGUN)
-		return 60;
+		return 6;
 	if (w == IT_NAILGUN)
-		return 70;
+		return 7;
 	if (w == IT_SHOTGUN)
-		return 80;
+		return 8;
 	if (w == IT_AXE && w2 == PK_IT_AIRGUN)
-		return 90;
-	return 100;
+		return 9;
+	return 10;
 };
 
 // replacement for Deathmatch_Weapon - handles high risk wep switch
@@ -943,18 +734,12 @@ void(float new, float new2) PK_Deathmatch_Weapon =
 
 // refered from below
 
-void() BackpackTouch =
+void() PK_BackpackTouch =
 {
 	local string	bs;
 	local	float	best, new;
 	local		entity	st1;
 	local	float	acount;
-
-	if (Q_100)
-	{
-		q100_BackpackTouch();
-		return;
-	}
 
 	if (other.classname != "player") // pk - this is where the grap can grab stuff
 	{
@@ -967,13 +752,7 @@ void() BackpackTouch =
 	acount = 0;
 	sprint (other, "You get ");
 
-// st ammo pack code
-	if (self.netname == "Ammo Pack") sprint (other, "an Ammo Pack with ");
-	else
-// end ammo pack code
-
 	if (self.items)
-	{
 // PAINKEEP_START
 		if ((other.items & self.items) == 0 || (self.items == IT_AXE && (other.pk_items & self.pk_items) == 0))
 // PAINKEEP_END
@@ -988,17 +767,12 @@ void() BackpackTouch =
 	self = other;
 	best = W_BestWeapon();
 	self = st1;
-	}
 
 // change weapons
 	other.ammo_shells = other.ammo_shells + self.ammo_shells;
 	other.ammo_nails = other.ammo_nails + self.ammo_nails;
 	other.ammo_rockets = other.ammo_rockets + self.ammo_rockets;
 	other.ammo_cells = other.ammo_cells + self.ammo_cells;
-// new ammo
-	other.ammo_bullet = other.ammo_bullet + self.ammo_bullet;
-	other.ammo_slug = other.ammo_slug + self.ammo_slug;
-	other.ammo_gaspr = other.ammo_gaspr + self.ammo_gaspr;
 
 	other.pk_gravitywellammo = other.pk_gravitywellammo + self.pk_gravitywellammo;
 	other.pk_turretammo = other.pk_turretammo + self.pk_turretammo;
@@ -1006,49 +780,7 @@ void() BackpackTouch =
 	other.pk_beartrapammo = other.pk_beartrapammo + self.pk_beartrapammo;
  	other.pk_explode_ammo = other.pk_explode_ammo + self.pk_explode_ammo;
 
-// Cataboligne 8.12.9 purify - pk artifacts
-	other.pkplus_egoammo = (other.pkplus_egoammo + self.pkplus_egoammo);
-	other.pkplus_tombammo = (other.pkplus_tombammo + self.pkplus_tombammo);
-	other.pkplus_actorammo = (other.pkplus_actorammo + self.pkplus_actorammo);
-	other.pkplus_phoneammo = (other.pkplus_phoneammo + self.pkplus_phoneammo);
-
-	if ( self.pkplus_egoammo )
-	{
-		if ( acount )
-			sprint (other,", ");
-		acount = 1;
-		bs = ftos (self.pkplus_egoammo);
-		sprint (other,bs);
-		sprint (other," EGOs");
-	}
-	if ( self.pkplus_tombammo )
-	{
-		if ( acount )
-			sprint (other,", ");
-		acount = 1;
-		bs = ftos (self.pkplus_tombammo);
-		sprint (other,bs);
-		sprint (other," Tombs");
-	}
-	if ( self.pkplus_actorammo )
-	{
-		if ( acount )
-			sprint (other,", ");
-		acount = 1;
-		bs = ftos (self.pkplus_actorammo);
-		sprint (other,bs);
-		sprint (other," Actors");
-	}
-	if ( self.pkplus_phoneammo )
-	{
-		if ( acount )
-			sprint (other,", ");
-		acount = 1;
-		bs = ftos (self.pkplus_phoneammo);
-		sprint (other,bs);
-		sprint (other," Cell Phones");
-	}
-// end pk_art
+	if (PK_ART) pk_art_backpack_touch(other, acount); // Cataboligne 8.12.9 purify - pk artifacts
 
 	new = self.items;
 	if (!new)
@@ -1095,35 +827,6 @@ void() BackpackTouch =
 		sprint (other, bs);
 		sprint (other, " cells");
 	}
-// st x weap ammo annc
-	if (self.ammo_bullet)
-	{
-		if (acount)
-			sprint(other, ", ");
-		acount = 1;
-		bs = ftos(self.ammo_bullet);
-		sprint (other, bs);
-		sprint (other, " bullets");
-	}
-	if (self.ammo_slug)
-	{
-		if (acount)
-			sprint(other, ", ");
-		acount = 1;
-		bs = ftos(self.ammo_slug);
-		sprint (other, bs);
-		sprint (other, " slugs");
-	}
-	if (self.ammo_gaspr)
-	{
-		if (acount)
-			sprint(other, ", ");
-		acount = 1;
-		bs = ftos(self.ammo_gaspr);
-		sprint (other, bs);
-		sprint (other, " lbs gas pressure");
-	}
-// end x weap ammo
 	if (self.pk_gravitywellammo)
 	{
 		if (acount)
@@ -1175,28 +878,9 @@ void() BackpackTouch =
 	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
 
-// st ammo pack code
-	if (self.netname != "Bandolier" && self.netname != "Ammo Pack") // handled a pack load up - dont want remove or wep chg
-	{
-
-
-
-if (WARNING)
-{
-bprint("\b *** warning: pack touch q1 ret for: ");
-bprint(item_ident(self));
-bprint("\n");
-}
-
-
-
 // remove the backpack, change self to the player
 	remove(self);
 	self = other;
-	}
-	else
-		return;
-// end ammo pack code
 
 // change to the weapon
 	if (!deathmatch)
@@ -1209,17 +893,11 @@ bprint("\n");
 
 // called from DropBackpack
 
-void() DropBackpack =
+void() PK_DropBackpack =
 {
-	if (Q_100)
-	{
-		q100_DropBackpack();
-		return;
-	}
-
 	newmis = world;
 	if (!(self.ammo_shells + self.ammo_nails + self.ammo_rockets + self.ammo_cells + self.pk_explode_ammo))
-		return;	// nothing in it - IDEA: randomize some stuff?
+		return;	// nothing in it
 
 	newmis = spawn();
 	newmis.origin = self.origin - '0 0 24';
@@ -1242,16 +920,6 @@ void() DropBackpack =
 			newmis.netname = "AirFist";
 		else if (self.pk_currentitem == PK_IT_CLIGHT)
 			newmis.netname = "Chain Thunderbolt";
-// Cataboligne 8.12.9 purify - pk artifacts
-		else if (self.pk_currentitem == PKPLUS_IT_EGO)
-			newmis.netname = "EGO";
-		else if (self.pk_currentitem == PKPLUS_IT_TOMB)
-			newmis.netname = "Tomb";
-		else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
-			newmis.netname = "Actor";
-		else if (self.pk_currentitem == PKPLUS_IT_PHONE)
-			newmis.netname = "Cell Phone";
-// end pk_art
 	}
 	else if (newmis.items == IT_SHOTGUN)
 		newmis.netname = "Shotgun";
@@ -1268,17 +936,12 @@ void() DropBackpack =
 	else if (newmis.items == IT_LIGHTNING)
 		newmis.netname = "Thunderbolt";
 	else
-		newmis.netname = "Pack of ammo";
+		newmis.netname = "";
 
 	newmis.ammo_shells = self.ammo_shells;
 	newmis.ammo_nails = self.ammo_nails;
 	newmis.ammo_rockets = self.ammo_rockets;
 	newmis.ammo_cells = self.ammo_cells;
-
-// new ammo
-	newmis.ammo_bullet = self.ammo_bullet;
-	newmis.ammo_slug = self.ammo_slug;
-	newmis.ammo_gaspr = self.ammo_gaspr;
 
 	newmis.pk_gravitywellammo = self.pk_gravitywellammo;
 	newmis.pk_turretammo = self.pk_turretammo;
@@ -1286,12 +949,7 @@ void() DropBackpack =
 	newmis.pk_beartrapammo = self.pk_beartrapammo;
 	newmis.pk_explode_ammo = self.pk_explode_ammo;
 
-// Cataboligne 8.12.9 purify - pk artifacts
-	newmis.pkplus_egoammo = self.pkplus_egoammo;
-	newmis.pkplus_tombammo = self.pkplus_tombammo;
-	newmis.pkplus_actorammo = self.pkplus_actorammo;
-	newmis.pkplus_phoneammo = self.pkplus_phoneammo;
-// end pk_art
+		if (PK_ART) pk_art_backpack_drop(newmis); // Cataboligne 8.12.9 purify - pk artifacts
 
 	newmis.velocity_z = 300;
 	newmis.velocity_x = -100 + (random() * 200);
@@ -1304,143 +962,9 @@ void() DropBackpack =
 	setsize (newmis, '-16 -16 0', '16 16 56');
 	newmis.touch = BackpackTouch;
 
-	newmis.nextthink = time + 120;	// remove after 2 minutes - TDO: cvar + stdev
+	newmis.nextthink = time + 120;	// remove after 2 minutes
 	newmis.think = SUB_Remove;
 	AddToSplash(newmis); // *pk - splash tossed items
-
-	bot_BackpackSetup(newmis); // *bot
-};
-
-
-// moved from items.qc - Cataboligne - 3.27.8
-
-// think to reset to SUB_regen after item moved & timeout
-
-void() ip_regen =
-{
-	self.model = string_null;
-	self.solid = SOLID_NOT;
-
-	self.nextthink = time + 1;
-	self.think = SUB_regen;
-};
-
-// think to check for item movement, set respawn think if moved
-// chaos mod vector
-
-void() ip_checkForMovement =
-{
-	local entity e;
-	local vector v1;
-
-	if (self.solid != SOLID_NOT)
- {
-	if (self.map == "rune" && RUNES && self.classname == "item_sigil")// && self.delay > -1)  // !chaos
-	{
-		self.cnt = self.cnt + 1;
-		self.delay = self.delay + 1;
-		if (self.cnt > self.count || self.delay > RUNE_MOVE) // not touched in 2 - 6 mins or > 10 mins
-		{
-			if (self.delay > RUNE_MOVE) // reload val
-			{
-				RUNE_MOVE = 10 + rint(random() * 2.5 + random() * 2.5);
-				self.delay = 0;
-			}
-			e = dyn_rndloc();
-			if (!e) e = findradius(world.origin, 256000);
-			if (e)
-			{
-				v1 = e.origin + ' 0 0 4';
-				if (e.flags & FL_ITEM) // randomize away from other map items
-					v1 = stdv_rndloc(e.origin + ' 0 0 4', 50, 100);
-				setorigin(self, v1);
-				self.ip_orgOrigin = self.origin;
-				self.count = 2 + random() * 3.8; // reset for new location
-				self.cnt = 0;
-
-				bprint("\b*** RUNE relocating: ");
-				bprint(self.netname);
-				bprint(" near: ");
-				bprint(e.classname);
-				bprint("\n");
-			}
-		}
-	}
-	else
-	if (self.ip_orgOrigin != v0)
-	if (self.ip_orgOrigin != self.origin)
-	{ // position has changed... repawn after x minutes..
-		if (self.mcode != self.scode) // item was changed by rndize
-		{
-			self.nextthink = time + CFM_TIME;
-			if (self.ip_orgOrigin_x == self.origin_x)
-			if (self.ip_orgOrigin_y == self.origin_y) return;
-		}
-
-		self.think = ip_regen;
-		self.nextthink = time + (ip_timeout * (RSP_TIME * 2));
-		return;
-	}
- }
-	self.nextthink = time + CFM_TIME;
-};
-
-// called from SUB_regen - restors position, rethinks
-
-void() pk_item_position =
-{
-	self.owner = world;
-
-	self.think = ip_checkForMovement;
-	self.nextthink = time + CFM_TIME;
-
-	if (self.mcode != self.scode) // item was changed by rndize
-	{
-		if (self.ip_orgOrigin_x == self.origin_x)
-		if (self.ip_orgOrigin_y == self.origin_y) return;
-	}
-
-	if (self.ip_orgOrigin != self.origin)
-	if (self.ip_orgOrigin != v0) // Cataboligne - tweak: in case this doesnt get set, we dont want to put any item like this at 0, 0, 0
-		setorigin (self, self.ip_orgOrigin);
-	else
-		setorigin (self, self.origin);
-};
-
-// give tossed items eject velocity
-
-void(entity e, vector v1) item_eject =
-{
-	e.velocity_z = v1_z + 100 * random();
-	e.velocity_x = crandom() * v1_x;
-	e.velocity_y = crandom() * v1_y;
-
-};
-
-// called from PlaceItem, starts position think checks
-// chaos mod vector
-
-void() pk_item_position_init =
-{
-//	if (WARNING) if (!PK) bprint("*** warning: pk_item_position_init called when not in PK mode.\n");
-
-	if (self.mcode != self.scode) // item was changed by rndize
-	{
-		item_eject(self, ' 0 0 400'); // shoot up
-	}
-
-	if (self.ip_orgOrigin == v0 || self.delay == RE_LOC)
-		self.ip_orgOrigin = self.origin;
-
-	if (self.delay == RE_LOC) self.delay = 0;
-
-	self.think = ip_checkForMovement;
-	self.nextthink = time + CFM_TIME;
-
-// dynamic items should not end up here
-	if (WARNING)  if (self.classname == "dyn_item")
-		bprint("*** warning: dynamic item in pk_item_position_init() \n");
-
 };
 
 // called from PlaceItem - sorts many things now - happens 0.2 secs after map load
@@ -1453,7 +977,9 @@ void() pk_placeitem =
 	}
 	else
 	{
-		item_eject(self, ' 340 340 300');
+		self.velocity_z = 300 + 100 * random();
+		self.velocity_x = -170 + (random() * 340);
+		self.velocity_y = -170 + (random() * 340);
 	}
 
 // handle extra item stuff
@@ -1461,164 +987,16 @@ void() pk_placeitem =
 	{
 		self.pk_touch = self.touch;
 	}
-	if (self.th_stand != painkeep_touch) // pk100 mask
-		self.touch = painkeep_touch; // take over - route everything here
-
-// TESTING - see if we can q1 default class select
-	if (self.class_select == "") self.class_select = "quake_item";
-
-	if (!PK_100 && !Q_100)
-	{
-		if (self.wad == "q1") master_item_control(self, 0);
-		else if ((TR_ALL || TR_WOLF) && self.class_select == "wolf_item")  master_item_control(self, TR_WOLF);
-		else if ((TR_ALL || TR_DOOM) && self.class_select == "doom_item")  master_item_control(self, TR_DOOM);
-		else if ((TR_ALL || TR_QUAKE) && self.class_select == "quake_item")  master_item_control(self, TR_QUAKE);
-		else if ((TR_ALL || TR_Q2) && self.class_select == "q2_item")  master_item_control(self, TR_Q2);
-		else if ((TR_ALL || TR_Q3) && self.class_select == "q3_item")  master_item_control(self, TR_Q3);
-	}
-
+	self.touch = painkeep_touch; // take over - route everything here
 
 // Cataboligne - added check here because new mode (not permanently PK & loaded a PK map can set PK mode after nailguns get loaded on map
-	if (PK) // pulse nail replace
-	if (self.wad == "")
+	if (PK)
 	if (self.classname == "weapon_nailgun" || self.weapon == IT_NAILGUN)
 	if (self.model == "progs/g_nail.mdl")
 	{
 		setmodel (self, "progs/g_fnail.mdl");
 		self.netname = "Pulse Rifle";
 	}
-
-	self.mcode = pk_mcode("", self); // put map code on ent - do we need this? placeitem sets these too
-//	self.sscode = ftos(self.mcode);
-	self.sscode = sid_code[(int)(self.mcode - 100) * %4];
-	if (!self.scode) self.scode = self.mcode;
-
-	AddToSplashBig(self); // Cataboligne - 6.11.10 - items move so they should & restore on fall from grace
-};
-
-// handle drop to floor - new style
-
-void() dtf_handle =
-{
-	local entity e;
-	local vector v1;
-
-	e = dyn_rndloc();
-	if (!e) e = findradius(world.origin, 256000);
-	if (!e) 
-	{
-		dprint("Bonus item restore could not find a random (or any) location - giving up\n");
-		remove(self);
-		return;
-	}
-	v1 = e.origin + ' 0 0 8';
-	if (e.flags & FL_ITEM) // randomize away from other map items
-		v1 = stdv_rndloc(e.origin + ' 0 0 8', 50, 100);
-	setorigin(self, v1);
 };
 
 
-/// items tags
-
-/*
-vars used by items
-
-standard:
-
-.model = string descriptor of model for item appearance
-.modelindex = numeric index into set of models indicated by model string
-.mdl = model string for regen hide
-.size = bounding box / model sizing + following 4 vars
-.absmin
-.absmax
-.mins
-.maxs
-.origin = location in map
-.skin = for multi skinned items (armor)
-
-.netname = descriptive string for grab announce
-.classname = map spawn func name, sometimes used in item ops
-.solid = SOLID_TRIGGER
-.movetype = MOVETYPE_TOSS
-.flags  = FL_ITEM, FL_ONGROUND
-.velocity = used for eject sometimes
-
-.touch = fn for grab
-.nextthink = ip move timeout - 60 secs
-.think = ip_checkForMovement (mostly under pk)
-.items = regular item inventory value
-
-ops values:
-
-.armorvalue = amount of armor prot
-.healtype = what health box does (mod affects this)
-.aflag = ammo box adds this ammo (not used by xweaps)
-,spawnflags = map load control (ammo) rune server flag
-
-pk stuff:
-
-.ip_orgOrigin = return location for moved items
-.pk_items = pk item inventory value
-.splash_func = fn call to "splash" an item in liquid
-.water_notify = if "yes" (for search) check against splash in liq and call fn above
-
-bot stuff:
-
---- so pk bots understand items
-.th_weight
-.th_cache
-.th_update
-.state = status set by bot route handling?
-
-extended mod codes
-
-.pk_touch = holds actual touch call for wrap code
-.*code = map codes [s] = original [m, ss] = current, search string
-.class_select = genre tag
-.wad = map loaded items can have q1 here mode - dual items 
-.wad = dynamic items store (new) classname here
-.map = pic_item or rune for server runes
-.wait = respawn time
-.dmgtime = artifact run time
-
-.lip = ammo type for weps / boxes
-,currentammo = ammo to add
-.volume = max value code for health, armor, ammo
-,spawnflags = rune power indicator
-
-.noise = pickup sound
-.noise4 = respawn sound
-
-xweps:
-
-.weaponmodel = v_* model for fpv
-.vwepmdl = viswep model
-.noise2 = ominous hum played while wep is not holstered
-.noise3 = wep fired sound
-.target = projectile strike sound
-
-.items = inv slot for this wep
-.attack_finished = time an attack takes before wep can fire again
-.dmg = damage one attack / projectile / pellet does
-.dodmg = splash damage for explosions / plasmas
-.dmg_save = ammo used per shot
-.dmg_take = amount shot (pellets usually)
-.duration = indicates melee weap or sound override or ignore inventory bit
-
-_fr_attack = attack frame code to call on fire
-_attack = attack code to call on fire
---- it either attack is SUB_Null the other fn does all attack ops - usually for fire by frames
-
-RUNES
---- these 3 run random relocation code
-.count = count val till rune gets moved due to non grab
-.cnt = counter measured against .cnt
-.delay = counter measured against RUNE_MOVE master move - all runes move even if well sought
-.duration = original server flag for map runes
-
-NOT DONE YET:
-
-xweps -
-.distance = ranking
-
-*/

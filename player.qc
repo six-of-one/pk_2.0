@@ -211,7 +211,7 @@ void() player_nail1   =[$lightfatt1, player_nail2  ]
 		self.weaponframe = 1;
 	SuperDamageSound();
 	W_FireSpikes (4);
-//	self.attack_finished = time + 0.2;
+	self.attack_finished = time + 0.2;
 };
 void() player_nail2   =[$lightfatt2, player_nail3  ] // *pk - viswep - Cataboligne - 9.29.9
 {
@@ -224,7 +224,7 @@ void() player_nail2   =[$lightfatt2, player_nail3  ] // *pk - viswep - Catabolig
 		self.weaponframe = 1;
 	SuperDamageSound();
 	W_FireSpikes (-4);
-//	self.attack_finished = time + 0.2;
+	self.attack_finished = time + 0.2;
 };
 
 //============================================================================
@@ -281,13 +281,8 @@ local float		rs;
 		return;
 	}
 
-// Cataboligne - 3.8.11 - custom death message ent causing specific pain sounds (by watertype specced in self.sounds of ent)
-	local float fs;
-	if (damage_attacker.class_select == "CDM")
-		fs = damage_attacker.sounds;
-
 // water pain sounds
-	if (self.watertype == CONTENT_WATER && self.waterlevel == 3 || fs == CONTENT_WATER)
+	if (self.watertype == CONTENT_WATER && self.waterlevel == 3)
 	{
 		DeathBubbles(1);
 		if (random() > 0.5)
@@ -299,9 +294,9 @@ local float		rs;
 	}
 
 // slime pain sounds
-	if (self.watertype == CONTENT_SLIME || fs == CONTENT_SLIME)
+	if (self.watertype == CONTENT_SLIME)
 	{
-// FIXME	put in some steam here
+// FIX ME	put in some steam here
 		if (random() > 0.5)
 			sound (self, CHAN_VOICE, "player/lburn1.wav", 1, ATTN_NORM);
 		else
@@ -310,7 +305,7 @@ local float		rs;
 		return;
 	}
 
-	if (self.watertype == CONTENT_LAVA || fs == CONTENT_LAVA)
+	if (self.watertype == CONTENT_LAVA)
 	{
 		if (random() > 0.5)
 			sound (self, CHAN_VOICE, "player/lburn1.wav", 1, ATTN_NORM);
@@ -614,7 +609,7 @@ void() PlayerDie =
 	if (self.velocity_z < 10)
 		self.velocity_z = self.velocity_z + random()*300;
 
-	if (self.health < -40 || (!XENV && pointcontents(self.origin) == CONTENT_LAVA)) // TEST - new feature, need full height test
+	if (self.health < -40 || (!PK_100 && !PK_99 && !Q_100 && pointcontents(self.origin) == CONTENT_LAVA)) // TEST - new feature, need full height test
 	{
 		GibPlayer ();
 		return;

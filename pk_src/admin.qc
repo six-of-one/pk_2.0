@@ -7,6 +7,8 @@
 // doug.keegan@tamu.edu
 
 // Cataboligne - advanced admin, 4.11.8
+// .map to .path for admin on voting hub - 3.3.11
+// tweak up menu item 24 - 3.3.11
 
 /*  new admin features:
 
@@ -92,6 +94,50 @@ void() admin_sv_cfg =
 	pk_itemovr_ck = pk_itemovr;
 
 	if (pk_admintime > 0) admin_resettimeout();
+};
+
+// return 2^rl, bounded by 2^0 (lowest bit, 1) to 2^23 (highest bit, 8388608)
+
+/*  code table:
+1					0
+2					1
+4					2
+8					3
+16					4
+32					5
+64					6
+128				7
+256				8
+512				9
+1024				10
+2048				11
+4096				12
+8192				13
+16384				14
+32768				15
+65536				16
+131072			17
+262144			18
+524288			19
+1048576			20
+2097152			21
+4194304			22
+8388608			23
+*/
+
+float (float rl) AdminBitFlag =
+{
+	local float f, e;
+
+	f = floor(rl);
+	if (f < 0 || f > 23) return(0);
+	e = 1;
+	while (f > 0)
+	{
+		f = f - 1;
+		e = e * 2;
+	}
+	return(e);
 };
 
 
@@ -604,85 +650,85 @@ float() MapDM =
 				bprint("---------------------\nHub NOT FOUND\n---------------------\n\n");
 			else
 			{
-				bprint("---------------------\nHub map set\n---------------------\n\n");
-				while (e)
+			bprint("---------------------\nHub map set\n---------------------\n\n");
+			while (e)
+			{
+				if (e.model == "progs/hub_port.mdl" || e.model == "progs/null.mdl")
 				{
-					if (e.model == "progs/hub_port.mdl" || e.model == "progs/null.mdl")
+					if (v1 != ' 0 0 0' && mm < 2)
 					{
-						if (v1 != ' 0 0 0' && mm < 2)
-						{
-							bprint("\nmixed mode --- custom hub + regular hub!\n\n");
-							mm = 2;
-						}
-						else
-							if (mm < 2) mm = -1;
-						bprint(e.map);
-						bprint(", trg: ");
-						b = e.enemy; // we know trigger messages for custom hubs
-						if (!b) bprint("NO TRIGGER!");
-						else { bprint(b.message); if (fabs(b.origin_z - e.origin_z) > 25) { bprint(" : Z > 25");} }
-						bprint("\n");
-						e = find(e, classname, "hub_teleport");
+						bprint("\nmixed mode --- custom hub + regular hub!\n\n");
+						mm = 2;
 					}
 					else
-				 {
-						if (!v1) bprint("hub_control maps:\n\n");
-						if (mm < 0)
-						{
-							bprint("\nmixed mode --- custom hub + regular hub!\n\n");
-							mm = 2;
-						}
-						bprint(e.map);
-
-	// possible target message - list all after this
-					dx = 8001;
-					v1 = (e.absmin + e.absmax) * 0.5;
-					f = findradius(v1, 8000);
-					b = world;
-					while (f)
+						if (mm < 2) mm = -1;
+					bprint(e.map);
+					bprint(", trg: ");
+					b = e.enemy; // we know trigger messages for custom hubs
+					if (!b) bprint("NO TRIGGER!");
+					else { bprint(b.message); if (fabs(b.origin_z - e.origin_z) > 25) { bprint(" : Z > 25");} }
+					bprint("\n");
+					e = find(e, classname, "hub_teleport");
+				}
+				else
+			 {
+					if (!v1) bprint("hub_control maps:\n\n");
+					if (mm < 0)
 					{
-						if (f.classname == "trigger_multiple")
-						if (f.message != "" && f.message != "\n" && f.message != " ")
-						{
-							v2 = (f.mins + f.maxs) * 0.5;
-							if (vlen(v1 - v2) < dx)
-							{
-								b = f;
-								dx = vlen(v1 - v2);
-							}
-						}
-					f = f.chain;
+						bprint("\nmixed mode --- custom hub + regular hub!\n\n");
+						mm = 2;
 					}
-					if (b)
+					bprint(e.map);
+
+// possible target message - list all after this
+				dx = 8001;
+				v1 = (e.absmin + e.absmax) * 0.5;
+				f = findradius(v1, 8000);
+				b = world;
+				while (f)
+				{
+					if (f.classname == "trigger_multiple")
+					if (f.message != "" && f.message != "\n" && f.message != " ")
 					{
-						bprint(", possible trg: ");
-						bprint(b.message);
-						if (fabs(b.origin_z - e.origin_z) > 25) bprint(" : Z > 25");
+						v2 = (f.mins + f.maxs) * 0.5;
+						if (vlen(v1 - v2) < dx)
+						{
+							b = f;
+							dx = vlen(v1 - v2);
+						}
 					}
+				f = f.chain;
+				}
+				if (b)
+				{
+					bprint(", possible trg: ");
+					bprint(b.message);
+					if (fabs(b.origin_z - e.origin_z) > 25) bprint(" : Z > 25");
+				}
 
 
+					bprint("\n");
+					e = find(e, classname, "hub_teleport");
+				if (!e)
+				{
+				bprint("\npossible map messages:\n\n");
+				f = findradius(world.origin, 32000);
+				while (f)
+				{
+					if (f.classname == "trigger_multiple")
+					if (f.message != "" && f.message != "\n" && f.message != " ")
+					{
+						bprint(f.message);
 						bprint("\n");
-						e = find(e, classname, "hub_teleport");
-					if (!e)
-					{
-					bprint("\npossible map messages:\n\n");
-					f = findradius(world.origin, 32000);
-					while (f)
-					{
-						if (f.classname == "trigger_multiple")
-						if (f.message != "" && f.message != "\n" && f.message != " ")
-						{
-							bprint(f.message);
-							bprint("\n");
-						}
-					f = f.chain;
 					}
-						
-					}
-				 }
-			  }
+				f = f.chain;
+				}
+					
+				}
+			 }
+		  }
 
-				bprint("\n---------------------\n");
+			bprint("\n---------------------\n");
 		  }
 		}
 
@@ -860,6 +906,7 @@ void() Admin_itembits =
 			bprint(adv);
 			bprint(": ");
 			bprint(it);
+// added to pk 2.1 code 1/31/11
 			if (it != "pki" || ad2 != " - Infinite ammo")
 			if (f < WEP_STOP) bprint(ad2);
 			bprint("\n");
@@ -897,6 +944,7 @@ void() Admin_itembits =
 	if (pk_itemovr & CON_INF)
 	{
 		bprint("Infinite ammo on selected weapons\n");
+// fixes to pk 2.1 code 1/31/11
 		if (! pk_itemovr & WEP_WEPSQ) bprint("\b- no weapon bits set!\n");
 		if (PK && (pk_itemovr & WEP_PKI)) bprint("- sub pk items for ammo boxes\n");
 	}
@@ -909,49 +957,6 @@ void() Admin_itembits =
 		if (f > 1) bprint("\bPossible control conflict!\n");
 	}
 	bprint("\b--------------------------------\n");
-};
-
-string() build_itemmenu =
-{
-	local string f;
-
-	f =		       "\b     Admin Items Menu:     \n"
-				       "\b+--------------------------+\n"
-							"  +------- \bweapons\b ------+  \n"
-							"  01: Double shotgun        \n" // 1
-							"  02: Nailgun               \n" // 2
-							"  03: Preforator            \n" // 4
-							"  04: Grenade launcher      \n" // 8
-							"  05: Rocket launcher       \n" // 16
-							"  06: Lightning gun         \n" // 32
-							"  07: Painkeep items        \n" // 64
-							"  +------ \bartifacts\b -----+  \n" 
-							"  08: Quad damage           \n" // 128
-							"  09: Invulnerability       \n" // 256
-							"  10: Radiation suit        \n" // 512
-							"  11: Ring of shadows       \n" // 1024
-							"  +-------- \barmor\b -------+  \n" 
-							"  12: Green Armor           \n" // 2048
-							"  13: Yellow Armor          \n" // 4096
-							"  14: Red Armor             \n" // 8192
-							"  +------- \bhealth\b -------+  \n" 
-							"  15: 15 Health             \n" // 16384
-							"  16: 25 Health             \n" // 32768
-							"  17: Mega Health           \n" // 65536
-							"  +------ \bcontrols\b ------+  \n" 
-							"  18: Only these items      \n" // 131072
-							"  19: None of these items   \n" // 262144
-							"  20: Substitute removed    \n" // 542288
-							"  21: Infinite ammo         \n" // 1048576
-							"  22: Cycle selected items  \n" // 2097152
-							"  29: All bits off          \n" 
-							"  30: Show item bits        \n" 
-							"  31: Update map now        \n"
-							" 666:  main menu            \n"
-							" admin impulse: exit admin  \n"
-				       "\b+--------------------------+\n"
-						 "\b  Enter code: ";
-	return(f);
 };
 
 void() Admin_itemmenu =
@@ -998,7 +1003,43 @@ void() Admin_itemmenu =
 	}
 	else
 	{
-	self.message = build_itemmenu();
+	self.message =
+				       "\b     Admin Items Menu:     \n"
+				       "\b+--------------------------+\n"
+							"  +------- \bweapons\b ------+  \n"
+							"  01: Double shotgun        \n" // 1
+							"  02: Nailgun               \n" // 2
+							"  03: Preforator            \n" // 4
+							"  04: Grenade launcher      \n" // 8
+							"  05: Rocket launcher       \n" // 16
+							"  06: Lightning gun         \n" // 32
+							"  07: Painkeep items        \n" // 64
+							"  +------ \bartifacts\b -----+  \n" 
+							"  08: Quad damage           \n" // 128
+							"  09: Invulnerability       \n" // 256
+							"  10: Radiation suit        \n" // 512
+							"  11: Ring of shadows       \n" // 1024
+							"  +-------- \barmor\b -------+  \n" 
+							"  12: Green Armor           \n" // 2048
+							"  13: Yellow Armor          \n" // 4096
+							"  14: Red Armor             \n" // 8192
+							"  +------- \bhealth\b -------+  \n" 
+							"  15: 15 Health             \n" // 16384
+							"  16: 25 Health             \n" // 32768
+							"  17: Mega Health           \n" // 65536
+							"  +------ \bcontrols\b ------+  \n" 
+							"  18: Only these items      \n" // 131072
+							"  19: None of these items   \n" // 262144
+							"  20: Substitute removed    \n" // 542288
+							"  21: Infinite ammo         \n" // 1048576
+							"  22: Cycle selected items  \n" // 2097152
+							"  29: All bits off          \n" 
+							"  30: Show item bits        \n" 
+							"  31: Update map now        \n"
+							" 666:  main menu            \n"
+							" admin impulse: exit admin  \n"
+				       "\b+--------------------------+\n"
+						 "\b  Enter code: ";
 	}
 	self.wad = "";
 	self.admin = 26;
@@ -1460,6 +1501,8 @@ void() AdminCommands =
 				if (self.lefty != 3) AddAnotherBot (f);
 				if (e != NUMBOTS) self.wad = "\nLoaded requested pk*bot(s) on server.";
 			}
+			if (e != NUMBOTS)
+			if (DARKPLACES || chaos) th_bot_changeParms(1);
 			self.lefty = 0;
 		}
 		else if (self.lefty == 11 || self.lefty == 13 || self.lefty == 14)
@@ -1480,6 +1523,8 @@ void() AdminCommands =
 				if (self.lefty != 13) BotConnect(0, 0, f);
 				if (e != bot_count) self.wad = "\nLoaded requested frikbot(s) on server.";
 			}
+			if (e != bot_count)
+			if (DARKPLACES || chaos) th_bot_changeParms(1);
 			self.lefty = 0;
 		}
 		else if (self.lefty == 2)
@@ -1596,12 +1641,12 @@ void() AdminCommands =
 			if (pk_flags & PK_TP_SPARKSFLASH)
 			{
 				self.wad = "\nSFX Enabled.";
-				pk_bas_flags(PK_TP_SPARKSFLASH, 1);
+				pk_flags = pk_flags - PK_TP_SPARKSFLASH;
 			}
 			else
 			{
 				self.wad = "\nSFX Disabled.";
-				pk_bas_flags(PK_TP_SPARKSFLASH, 0);
+				pk_flags = pk_flags | PK_TP_SPARKSFLASH;
 			}
 		}
 		else if (self.lefty == 2)
@@ -1609,12 +1654,12 @@ void() AdminCommands =
 			if (pk_flags & PK_SF_HUB)
 			{
 				self.wad = "\nHub mode OFF";
-				pk_bas_flags(PK_SF_HUB, 0);
+				pk_flags = pk_flags - PK_SF_HUB;
 			}
 			else
 			{
 				self.wad = "\nHub mode ON";
-				pk_bas_flags(PK_SF_HUB, 1);
+				pk_flags = pk_flags | PK_SF_HUB;
 			}
 		}
 		else if (self.lefty == 3)
@@ -1622,12 +1667,12 @@ void() AdminCommands =
 			if (pk_flags & PK_TP_DUTYON)
 			{
 				self.wad = "\nDuty Checking OFF";
-				pk_bas_flags(PK_TP_DUTYON, 0);
+				pk_flags = pk_flags - PK_TP_DUTYON;
 			}
 			else
 			{
 				self.wad = "\nDuty Checking ON";
-				pk_bas_flags(PK_TP_DUTYON, 1);
+				pk_flags = pk_flags | PK_TP_DUTYON;
 			}
 		}
 		else if (self.lefty == 4)
@@ -1636,24 +1681,24 @@ void() AdminCommands =
 			sprint(self, "\n\nPainkeep main controls:\n");
 			sprint(self, "\b-----------------------\n");
 			if (!(pk_flags & PK_SF_HUB))
-				sprint(self, "Voting Hub On       --- (sv_pk_hub)\n");
+				sprint(self, "Voting Hub On\n");
 			else
-				sprint(self, "Voting Hub \bOFF\b      --- (sv_pk_hub)\n");
+				sprint(self, "Voting Hub \bOFF\n");
 
 			if (pk_flags & PK_TP_USERMAPON)
-				sprint(self, "Server map loop \bON\b  --- (sv_pk_cmap)\n");
+				sprint(self, "Server map loop \bON\n");
 			else
-				sprint(self, "Server map loop Off --- (sv_pk_cmap)\n");
+				sprint(self, "Server map loop Off\n");
 
 			if (pk_flags & PK_TP_DUTYON)
-				sprint(self, "Duty Checking On    --- (sv_pk_duty)\n");
+				sprint(self, "Duty Checking On\n");
 			else
-				sprint(self, "Duty Checking Off   --- (sv_pk_duty)\n");
+				sprint(self, "Duty Checking Off\n");
 
 			if (!(pk_flags & PK_TP_SPARKSFLASH))
-				sprint(self, "SFX On              --- (sv_pk_sfx)\n");
+				sprint(self, "SFX O\n");
 			else
-				sprint(self, "SFX \bOFF\b             --- (sv_pk_sfx)\n");
+				sprint(self, "SFX \bOFF\n");
 
 			if (pk_flags & PK_TP_STATUSON)
 				sprint(self, "Status \bON\n");
@@ -1676,7 +1721,7 @@ void() AdminCommands =
 			{
 				sprint(self, "PK_100 set:\n");
 				sprint(self, "Spkike traps DISABLED\n");
-				sprint(self, "Dynamic Painkeep items Off\n");
+					sprint(self, "Dynamic Painkeep items Off\n");
 			}
 			sprint(self, "\b-----------------------\n\n");
 		}
@@ -1685,12 +1730,13 @@ void() AdminCommands =
 			if (pk_flags & PK_DYNAMIC)
 			{
 				self.wad = "\nDynamic Painkeep items OFF";
-				pk_bas_flags(PK_DYNAMIC, 0);
+				pk_flags = pk_flags - PK_DYNAMIC;
+				if (DARKPLACES || chaos) cvar_set("pk_dyn_ovr","0"); // set this var if it exists
 			}
 			else
 			{
 				self.wad = "\nDynamic Painkeep items ON";
-				pk_bas_flags(PK_DYNAMIC, 1);
+				pk_flags = pk_flags | PK_DYNAMIC;
 				z = find(world,classname,"dyn_spawner");
 				if (!z)
 				{
@@ -1698,9 +1744,10 @@ void() AdminCommands =
 					if (z)
 					{
 						z.think = dyn_item;
-						z.nextthink = time + 1;
+						z.nextthink = time + 1; // do this well after items spawn
 					}
 				}
+				if (DARKPLACES || chaos) cvar_set("pk_dyn_ovr","1");
 			}
 		}
 		else if (self.lefty == 6 && !PK_100)

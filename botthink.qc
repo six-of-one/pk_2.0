@@ -308,18 +308,6 @@ void () BotPostThink =
 		return ;
 	}
 
-// fix pk*bot viswep item sync - we hope
-
-	if (!self.items & IT_INVISIBILITY)
-	if (self.vwepent)
-	{
-		if ((self.vwepent.origin) != self.origin || self.vwepent.angles != self.angles || self.vwepent.weaponframe != self.frame) // WATCH: monitor vofs in viswep for use
-		viswep_post();
-	}
-
-// fix get item issue with rndize
-	if (self.classname != "pk*bot")	self.classname = "pk*bot";
-
 // bot post think checks
 		if (self.copb_timeout)
 		{
@@ -333,7 +321,5 @@ void () BotPostThink =
 			}
 		}
 
-// runes
-	if (self.rune_flag & RUNE_FLG_RG) rune_regen();
 };
 

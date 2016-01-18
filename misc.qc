@@ -232,7 +232,8 @@ void () fire_touch =
 
 //============================================================================
 
-void () q100_barrel_explode =
+
+void () barrel_explode =
 {
 	self.takedamage = DAMAGE_NO;
 	self.classname = "explo_box";
@@ -251,7 +252,7 @@ void () q100_barrel_explode =
 TESTING THING
 */
 
-void () q100_misc_explobox =
+void () misc_explobox =
 {
 	local float oldz;
 
@@ -261,7 +262,7 @@ void () q100_misc_explobox =
 	setmodel (self,"maps/b_explob.bsp");
 	precache_sound ("weapons/r_exp3.wav");
 	self.health = 20;
-	self.th_die = q100_barrel_explode;
+	self.th_die = barrel_explode;
 	self.takedamage = DAMAGE_AIM;
 
 	self.origin_z = self.origin_z + 2;
@@ -283,7 +284,7 @@ void () q100_misc_explobox =
 Smaller exploding box, REGISTERED ONLY
 */
 
-void () q100_misc_explobox2 =
+void () misc_explobox2 =
 {
 	local float oldz;
 
@@ -293,7 +294,7 @@ void () q100_misc_explobox2 =
 	setmodel (self,"maps/b_exbox2.bsp");
 	precache_sound ("weapons/r_exp3.wav");
 	self.health = 20;
-	self.th_die = q100_barrel_explode;
+	self.th_die = barrel_explode;
 	self.takedamage = DAMAGE_AIM;
 
 	self.origin_z = self.origin_z + 2;
@@ -547,6 +548,9 @@ This is just a solid wall if not inhibitted
 */
 void () func_wall =
 {
+	// Cataboligne - 4.11.11 - doors not in mod maps
+	if (notmod(self)) return;
+
 	self.angles = '0 0 0';
 	self.movetype = MOVETYPE_PUSH;	// so it doesn't get pushed by anything
 	self.solid = SOLID_BSP;
@@ -561,6 +565,9 @@ A simple entity that looks solid but lets you walk through it.
 void () func_illusionary =
 
 {
+// Cataboligne - 4.11.11 - doors not in mod maps
+	if (notmod(self)) return;
+
 	self.angles = '0 0 0';
 	self.movetype = MOVETYPE_NONE;
 	self.solid = SOLID_NOT;

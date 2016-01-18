@@ -1030,8 +1030,6 @@ void(float whichteam, float whatbot, float whatskill) BotConnect =
 	cvar_set("scratch2", h);
 	h = ftos(saved_skills2);
 	cvar_set("scratch3", h);
-
-	if (BOTFREEZE) bot_froze(self); // Cataboligne - 6.9.10 - bots get really cold now - dev code
 	self = uself;
 
 };

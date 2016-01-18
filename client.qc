@@ -29,7 +29,7 @@ void (vector org, entity death_owner) spawn_tdeath;
 float	modelindex_eyes, modelindex_player;
 
 
-//float intermission_running; - moved to painkeep.qc - q100 rules
+float intermission_running;
 float intermission_exittime;
 
 /*QUAKED info_intermission (1 0.5 0.5) (-16 -16 -16) (16 16 16)
@@ -42,17 +42,21 @@ void () info_intermission =
 
 
 
-void () q100_SetChangeParms =
+void () SetChangeParms =
 {
-	if (self.health <= 0)
+	if (find(world,classname,"pk*bot")) bot_changeParms();
+// Cataboligne 9.11.3 purify - chase cam
+	cam_parms(0);
+
+	if (self.health <= 0 || self.classname == OBSERVER) // Cataboligne - 5.3.10 - fix level change issue when in dead observer or admin observer
 	{
-		q100_SetNewParms ();
+		SetNewParms_PK();
+		if (!Q_100) parm16 = parm16 | 256; // Cataboligne - 8.22.9 - pk orig oper
 		return ;
 	}
 
 // remove items
-	self.items = self.items - (self.items & 
-	(IT_KEY1 | IT_KEY2 | IT_INVISIBILITY | IT_INVULNERABILITY | IT_SUIT | IT_QUAD) );
+	self.items = self.items - (self.items & (IT_KEY1 | IT_KEY2 | IT_INVISIBILITY | IT_INVULNERABILITY | IT_SUIT | IT_QUAD));
 
 // cap super health
 	if (self.health > 100)
@@ -71,9 +75,15 @@ void () q100_SetChangeParms =
 	parm7 = self.ammo_cells;
 	parm8 = self.weapon;
 	parm9 = self.armortype * 100;
+	parm10 = parm11 = parm15 = parm16 = 0;
+//	if (PK) PK_ChangeParms();
+//	else if (!Q_100 && !Q_99 && ((self.pk_items & PK_IT_RANGE) | self.pk_explode_ammo | self.pk_turretammo | self.pk_canpabammo | self.pk_beartrapammo | self.pk_gravitywellammo))
+	if (!Q_100 && !Q_99) PK_ChangeParms(); // always encoding now
+//	bot_skinParms();
+
 };
 
-void () q100_SetNewParms =
+void () SetNewParms =
 {
 	parm1 = IT_SHOTGUN | IT_AXE;
 	parm2 = 100;
@@ -84,15 +94,23 @@ void () q100_SetNewParms =
 	parm7 = 0;
 	parm8 = 1;
 	parm9 = 0;
+	if (!Q_100) 
+		PK_SetNewParms();
+
+// Cataboligne 9.11.3 purify - chase cam
+	cam_parms(2);
 };
 
-void () q100_DecodeLevelParms =
+void () DecodeLevelParms =
 {
+	if (!PK)
 	if (serverflags)
 	{
-		if (world.model == "maps/start.bsp")
-			q100_SetNewParms ();   // take away all stuff on starting new episode
+		if (world.model == "maps/start.bsp" || world.model == "maps/qstart.bsp") // Cataboligne - 5.19.10 - q1 SP hack for using forced dyn items
+			SetNewParms ();   // take away all stuff on starting new episode
+		if (world.model == "maps/qstart.bsp") PK_SetNewParms();
 	}
+//	bot_skinDecode();
 
 	self.items = parm1;
 	self.health = parm2;
@@ -103,6 +121,12 @@ void () q100_DecodeLevelParms =
 	self.ammo_cells = parm7;
 	self.weapon = parm8;
 	self.armortype = parm9 * 0.01;
+//	if (PK)  // fixed - possible to go from PK level to non PK level w/ custom hub - keep pk gooides
+	if (!Q_100 && !Q_99)
+		PK_DecodeLevelParms();
+
+// Cataboligne 9.11.3 purify - chase cam
+	cam_parms(1);
 };
 
 /*
@@ -149,13 +173,29 @@ entity () FindIntermission =
 string nextmap;
 void () GotoNextMap =
 {
-	if (cvar("samelevel"))	// if samelevel is set, stay on same level - overrides all pk rules
+	if (cvar("samelevel"))	// if samelevel is set, stay on same level
 		changelevel (mapname);
 	else
 	{
 		changelevel (nextmap);
-		PK_GotoNextMap();
+		if (!Q_100 && !Q_99 && !PK_ADMINMAP)
+		if (pk_flags & PK_TP_USERMAPON) // *pk - user supplied map loop deal
+		{
+			if (!execed)
+			{
+				execed = 1;
+				localcmd ("pknextmap\n");
+			}
+			return;
+		}
+
+		if(!PK_100 && !PK_ADMINMAP) 
+		{
+			if (check_custom_hub()) // *pk --- Cataboligne - 8.16.9 - do custom hub load from any exit here
+				return;
+		}
 	}
+
 };
 
 
@@ -411,7 +451,7 @@ ClientKill
 Player entered the suicide command
 ============
 */
-void () q100_ClientKill =
+void () ClientKill =
 {
 	bprint (self.netname);
 	bprint (" suicides\n");
@@ -505,11 +545,14 @@ void() DecodeLevelParms;
 void () PlayerDie;
 
 
-void () q100_PutClientInServer =
+void () PutClientInServer =
 {
 	local entity spot;
 
+	if (!Q_100) spot = PK_SelectSpawnPoint (); // *pk - get a spawn point, pk style 
+	else
 	spot = SelectSpawnPoint ();
+	if (!Q_100) ClearSpawnPoint(spot); // *pk
 
 	self.classname = "player";
 	self.health = 100;
@@ -528,7 +571,7 @@ void () q100_PutClientInServer =
 	self.effects = 0;
 	self.invincible_time = 0;
 
-	q100_DecodeLevelParms ();
+	DecodeLevelParms ();
 
 	W_SetCurrentAmmo ();
 
@@ -566,6 +609,11 @@ void () q100_PutClientInServer =
 	}
 
 	spawn_tdeath (self.origin,self);
+	if (!Q_100 && !Q_99) PK_CIS(); // *pk - set client pk elements
+	self.admin = 0;
+	set_initBotLevel(); // *bot
+
+	Chase_cam_level_start(); // Cataboligne 8.9.9 purify - chase cam
 };
 
 
@@ -899,7 +947,7 @@ void () WaterMove =
 		self.dmgtime = 0;
 	}
 
-	if (!PK) // *pk - done elsewhere CHECK:
+	if (!PK) // *pk - done elsewhere
 	if (! (self.flags & FL_WATERJUMP))
 		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
 };
@@ -941,10 +989,13 @@ PlayerPreThink
 Called every frame before physics are run
 ================
 */
-void () q100_PlayerPreThink =
+void () PlayerPreThink =
 {
 	local	float	mspeed, aspeed;
 	local float r;
+	if (FRIKBOT)
+	if (BotPreFrame ())
+		return ;
 
 	if (intermission_running)
 	{
@@ -957,11 +1008,25 @@ void () q100_PlayerPreThink =
 
 	makevectors (self.v_angle);		// is this still used
 
+	if (!Q_100)
+	{
+		pk_pre_think();
+		return;
+	}
+
 	CheckRules ();
 	WaterMove ();
 
 	if (self.waterlevel == 2)
 		CheckWaterJump ();
+
+//		if (!Q_100 && !PK_100)
+	if (self.waterlevel)
+	if (! self.flags & FL_WATERJUMP)
+	if (self.cam_x & CHSCAM_ON)
+	{
+		cam_waterjump();  // Cataboligne 8.22.9 purify - chase cam
+	}
 
 	if (self.deadflag >= DEAD_DEAD)
 	{
@@ -997,8 +1062,17 @@ CheckPowerups
 Check for turning off powerups
 ================
 */
-void () q100_CheckPowerups =
+void () CheckPowerups =
 {
+	if (self.classname == OBSERVER) // Cataboligne 8.9.9 purify - chase cam (dead) & observer - clear all effects
+	{
+		self.super_damage_finished = self.invisible_finished = self.invincible_finished = self.radsuit_finished = 0;
+		self.super_time = self.invisible_time = self.invincible_time = self.rad_time = 0;
+		self.items = self.items - (self.items & (IT_QUAD | IT_SUIT | IT_INVISIBILITY | IT_INVULNERABILITY));
+		self.effects = 0;
+		return;
+	}						// NOTE: great place for some interesting chaos effects
+
 	if (self.health <= 0)
 		return;
 
@@ -1153,20 +1227,73 @@ PlayerPostThink
 Called every frame after physics are run
 ================
 */
-void () q100_PlayerPostThink =
+void () PlayerPostThink =
 {
 	local	float	mspeed, aspeed;
 	local float r;
+	if (FRIKBOT)
+	if (BotPostFrame ())
+		return ;
+
+	if (find(world,classname,"pk*bot"))
+  {
+		if ((self.view_ofs != '0 0 0') && !self.deadflag)
+		if (CheckDropPath ()) // *bot
+		{
+			DropBotPath ();
+		}
+
+		if (!(DARKPLACES || chaos)) // handle other engines
+		if (cvar("botlevel")) // hack so alias can load new map & keep pk*bots - set by console command aliases for map & changelevel - bmap & blvl
+		{
+			bot_changelevel(); // map change MUST happen - this clears bots from map!
+	//		bot_changeParms(); // save bots for change
+			cvar_set("botlevel", "0");
+		}
+  }
+
+//	if (self.weapon || self.vwepent) 
+	viswep_post(); // Cataboligne - 9.26.9 - viswep code link - always have to run this for 1 player + pk*bots deal
 
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
+
+	if (PK_ADMIN || self.admin == USER_MENU) // *pk - run admin for both modes - any deactivation will 0 this || make sure user menu always works
+	if (self.admin || (self.impulse == pk_adminimp))
+	if (pk_adminframe != framecount)
+	if (admin_postthink()) return;
+
+	if (pk_itemovr & CON_INF)
+	if (ammo_frame < framecount)
+		infinite_ammo();
+
+	if (!Q_100)
+	{
+		pk_post_think();
+		return;
+	}
+
 	if (self.deadflag)
 		return;
+
+
+	if (chaos)
+		if (!(self.dest2_x & CHSCAM_ON))  // Cataboligne - 5.14.10 - cam purify - custom engine dont display vw_ for 1pv
+			{
+//			if (!(self.flags & FL_NDISMDL)) bprint("switching to not display vwep\n");
+			self.flags = self.flags | FL_NDISMDL; // old self.flags method, replacing with:
+			}
+		else
+			{
+//			if (self.flags & FL_NDISMDL) bprint("switching to display vwep\n");
+			self.flags = self.flags - (self.flags & FL_NDISMDL);
+			}
 
 // do weapon stuff
 
 	W_WeaponFrame ();
 
+	if (self.classname != OBSERVER) // Cataboligne - 8.16.9 - dont need this for observers
 // check to see if player landed and play landing sound	
 	if ((self.jump_flag < -300) && (self.flags & FL_ONGROUND) && (self.health > 0))
 	{
@@ -1198,11 +1325,15 @@ ClientConnect
 called when a player connects to a server
 ============
 */
-void () q100_ClientConnect =
+void () ClientConnect =
 {
+	if (FRIKBOT) ClientInRankings ();
 	bprint (self.netname);
-	bprint (" entered the game\n");
+	if (!Q_100) pk_clientconnect(); // *pk - variety connect msg
+	else
+					bprint (" entered the game\n");
 
+	bot_con(TRUE); // *bot - doesnt depend on active bots, must always happen
 // a client connecting during an intermission can cause problems
 	if (intermission_running)
 		ExitIntermission ();
@@ -1216,14 +1347,18 @@ ClientDisconnect
 called when a player disconnects from a server
 ============
 */
-void () q100_ClientDisconnect =
+void () ClientDisconnect =
 {
+	if (FRIKBOT) ClientDisconnected ();
 	if (gameover)
 		return;
 	// if the level end trigger has been activated, just return
 	// since they aren't *really* leaving
 
+	if (!Q_100) pk_clientdisconnect(); // *pk - clear stuff out
 	// let everyone else know
+	bot_con(FALSE); // *bot
+	bprint (self.teamname);
 	bprint (self.netname);
 	bprint (" left the game with ");
 	bprint (ftos (self.frags));
@@ -1268,14 +1403,14 @@ void(entity targ, entity attacker) ClientObituary =
 			return;
 		}
 
-		if (attacker.classname == "player")
+		if (attacker.classname == "player" ||  attacker.classname == OBSERVER) // Cataboligne 9.23.9 - attacker could have died & become observer
 		{
 			if (targ == attacker)
 			{
 				// killed self
 				attacker.frags = attacker.frags - 1;
 				bprint (targ.netname);
-
+				
 				if (targ.weapon == 64 && targ.waterlevel > 1)
 				{
 					bprint (" discharges into the water.\n");

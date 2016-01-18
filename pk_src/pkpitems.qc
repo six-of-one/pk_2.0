@@ -12,6 +12,89 @@
 
 // painkeep artifacts support
 
+void () pkplus_weapon_touch =
+{
+	local float hadammo;
+	local float best;
+	local float new;
+	local float oldi;
+	local float leave;
+	if ( !(other.flags & FL_CLIENT))
+	{
+		grap_checkIfGrap();
+		return ;
+	}
+	stemp = self;
+	self = other;
+	best = W_BestWeapon ();
+	self = stemp;
+	if (((deathmatch == 2) || (deathmatch == 3)) || coop)
+		leave = 1;
+	else
+		leave = 0;
+
+/*
+
+deprecated - handled by pk v1.2.1 code
+
+	if (self.pk_currentitem == PK_IT_GRAPGUN)
+	{
+		if (leave && (other.pk_items & PK_IT_GRAPGUN)) return ;
+
+		new = PK_IT_GRAPGUN;
+	}
+	else
+	{
+		if (self.pk_currentitem == PK_IT_AIRGUN)
+		{
+			if (leave && (other.pk_items & PK_IT_AIRGUN)) return ;
+
+			new = PK_IT_AIRGUN;
+		}
+		else
+		{
+			if (self.pk_currentitem == PK_IT_CLIGHT)
+			{
+				if (leave && (other.pk_items & PK_IT_CLIGHT)) return ;
+
+				other.ammo_cells = (other.ammo_cells + 30);
+				new = PK_IT_CLIGHT;
+			}
+			else
+			{
+				dprint ("painkeep_weapon_touch: unknown classname");
+				return;
+			}
+		}
+	}
+*/
+	sprint (other,"You got the ");
+	sprint (other,self.netname);
+	sprint (other,"\n");
+	sound (other,CHAN_ITEM,"weapons/pkup.wav",1,ATTN_NORM);
+	stuffcmd (other,"bf\n");
+	bound_other_ammo ();
+	oldi = other.pk_items;
+	other.pk_items = (other.pk_items | new);
+	stemp = self;
+	self = other;
+//	Deathmatch_Weapon (0,IT_AXE,new); // fix
+	W_SetCurrentAmmo ();
+	self = stemp;
+	if ( leave )
+	{
+		return ;
+	}
+	self.model = string_null;
+	self.solid = SOLID_NOT;
+	if (deathmatch == 1)
+	{
+		self.nextthink = (time + 30);
+		self.think = SUB_regen;
+	}
+	activator = other;
+	SUB_UseTargets ();
+};
 
 void () pkplus_touch =
 {
@@ -43,132 +126,40 @@ void () pkplus_touch =
 		if (other.pkplus_phoneammo >= PKPLUS_PHONEAMMO_MAX) return ;
 		other.pkplus_phoneammo = (other.pkplus_phoneammo + 1);
 	}
-
 	sprint (other,"You got the ");
 	sprint (other,self.netname);
 	sprint (other,"\n");
-
 	sound (other,CHAN_ITEM,"misc/pickup/tone2.wav",1,ATTN_NORM);
 	stuffcmd (other,"bf\n");
-
 	stemp = self;
 	self = other;
 	W_SetCurrentAmmo ();
 	self = stemp;
-
 	self.solid = SOLID_NOT;
 	self.model = string_null;
-
-	if (deathmatch == 1 || deathmatch == 3)
+	if (deathmatch != 2) // PK ART FIX ***
 	{
 		if ((self.pk_items == PKPLUS_IT_EGO) || (self.pk_items == PKPLUS_IT_PHONE))
 		{
-			self.nextthink = (time + (RSP_TIME * 4));
+			self.nextthink = (time + (60 * 2));
 		}
 		else
 		{
-			self.nextthink = (time + RSP_TIME * 2);
+			self.nextthink = (time + 60);
 		}
-		self.think = SUB_regen;
 	}
-
+	self.think = SUB_regen;
 	activator = other;
 	SUB_UseTargets ();
 };
 
-// handle live pk_art on startup
-
-void(entity e) pkplus_item_control =
-{
-	if (e.classname == "func_make") return; // override
-
-// no sense in working removed items or constantly rndize items
-	if (cvar("pk_place_item") == 1) return;
-	if (cvar("pk_place_item") == 2 || cvar("pk_place_item") == 3)
-	{
-		if (cvar("pk_place_item_reload"))
-		if (cvar("pk_place_item_reload") < 60) return;
-		if (!PK_ART)
-		{
-			e.class_select = "";
-			e.classname = "";
-		}
-		return;
-	}
-// TDO: fix where rndize once made pkplus and they got turned off - re-rndize them
-
-	if (PK_ART) // turned back on - come here from loop
-	{
-		if (e.mcode != e.scode)
-		{
-			e.mcode = e.scode;
-			e.wad = item_by_mcode(e.mcode);
-			item_call_save(e, e.wad);
-		}
-		else
-		{
-			setmodel (e,e.mdl);
-			e.touch = painkeep_touch;
-			e.pk_touch = pkplus_touch;
-		}
-		return;
-	}
-
-	if (e.classname == "dyn_item")
-		{
-			if (WARNING) bprint("*** Warning - dynamic items: pk_art is off and dynamic made a pkplus item - hiding\n");
-		}
-//		else
-//		if (WARNING) bprint("*** Warning - pk_art is off and code made a pkplus item - hiding\n");
-
-	if (!cvar("pk_art_rep"))
-		{
-			setmodel (e,"");
-			e.touch = SUB_Null;
-		}
-	else
-		{
-			local float f;
-			f = MC_PK_RNDITM;
-//			if (e.mcode > 149 && e.mcode < MC_PK)
-			e.mcode = MC_PULSE_NAILGUN + rint(random() * f); // NOTE: starts with pulse gun - this could change if item order in mcode is changed!
-			e.wad = item_by_mcode(e.mcode);
-			if (e.wad != "")
-			{
-				e.pk_touch = (void()) 0; // so we can touch the new things
-				item_call_save(e, e.wad);
-			}
-			else
-			{
-				e.mcode = e.scode;
-				setmodel (e,"");
-				e.touch = SUB_Null;
-			}
-		}
-};
-
-// twiddled after map load
-
-void() pkplus_item_control_loop =
-{
-	local entity e, sv;
-	local string sr;
-
-// note: disabled - if rndize makes any that get clobbered we want to restore them
-//	if (cvar("pk_place_item") != 0)
-//		return;
-
-	sr = "pkplus_item";
-	e = find(world,class_select,sr);
-	while (e)
-	{
-		pkplus_item_control(e);
-		e = find(e,class_select,sr);
-	}
-};
-
 void () item_pkplus_ego =
 {
+	if (!PK_ART)
+	{
+		remove(self);
+		return;
+	}
 	self.touch = pkplus_touch;
 	precache_model ("progs/ego.mdl");
 	self.noise = "items/protect.wav";
@@ -177,12 +168,15 @@ void () item_pkplus_ego =
 	self.pk_items = PKPLUS_IT_EGO;
 	setsize (self,'-16 -16 -24','16 16 32');
 	StartItem ();
-	if (self.class_select == "") self.class_select = "pkplus_item";
-	if (!PK_ART) pkplus_item_control(self);
 };
 
 void () item_pkplus_tomb =
 {
+	if (!PK_ART)
+	{
+		remove(self);
+		return;
+	}
 	self.touch = pkplus_touch;
 	precache_model ("progs/tomb.mdl");
 	self.noise = "items/protect.wav";
@@ -191,12 +185,15 @@ void () item_pkplus_tomb =
 	self.pk_items = PKPLUS_IT_TOMB;
 	setsize (self,'-16 -16 -24','16 16 32');
 	StartItem ();
-	if (self.class_select == "") self.class_select = "pkplus_item";
-	if (!PK_ART) pkplus_item_control(self);
 };
 
 void () item_pkplus_actor =
 {
+	if (!PK_ART)
+	{
+		remove(self);
+		return;
+	}
 	self.touch = pkplus_touch;
 	precache_model ("progs/actor.mdl");
 	setmodel (self,"progs/actor.mdl");
@@ -204,12 +201,15 @@ void () item_pkplus_actor =
 	self.pk_items = PKPLUS_IT_ACTOR;
 	setsize (self,'-16 -16 -24','16 16 32');
 	StartItem ();
-	if (self.class_select == "") self.class_select = "pkplus_item";
-	if (!PK_ART) pkplus_item_control(self);
 };
 
 void () item_pkplus_phone =
 {
+	if (!PK_ART)
+	{
+		remove(self);
+		return;
+	}
 	self.touch = pkplus_touch;
 	precache_model ("progs/phone.mdl");
 	setmodel (self,"progs/phone.mdl");
@@ -217,8 +217,52 @@ void () item_pkplus_phone =
 	self.pk_items = PKPLUS_IT_PHONE;
 	setsize (self,'-16 -16 -24','16 16 32');
 	StartItem ();
-	if (self.class_select == "") self.class_select = "pkplus_item";
-	if (!PK_ART) pkplus_item_control(self);
 };
 
+// fn (pk_art_ammo_by_bit) - pk artifacts ammo for a given wep 
 
+string (float bt) pk_art_ammo_by_bit =
+{
+// pk art item subs by special bits
+	if (bt == WEP_EGO) return("item_pkplus_ego");
+	if (bt == WEP_TOMB) return("item_pkplus_tomb");
+	if (bt == WEP_ACTOR) return("item_pkplus_actor");
+	if (bt == WEP_PHONE) return("item_pkplus_phone");
+
+	return("");
+};
+
+// fn (pk_art_item_call) - pk artifacts call to create item
+
+// return TRUE if attemp was made
+// NOTE: must be called with proper self ent!
+
+float(string cls) pk_art_item_call =
+{
+	local float ev;
+
+	ev = FALSE;
+
+	if (cls == "item_pkplus_ego")
+	{
+		item_pkplus_ego();
+		ev = TRUE;
+	}
+	else if (cls == "item_pkplus_tomb")
+	{
+		item_pkplus_tomb();
+		ev = TRUE;
+	}
+	else if (cls == "item_pkplus_actor")
+	{
+		item_pkplus_actor();
+		ev = TRUE;
+	}
+	else if (cls == "item_pkplus_phone")
+	{
+		item_pkplus_phone();
+		ev = TRUE;
+	}
+
+	return(ev);
+};

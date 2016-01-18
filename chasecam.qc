@@ -53,7 +53,7 @@ void( float opt ) Remove_chase_cam;
 // Resets weapon model after changing view
 // called by chase cam or player entities
 // hack - handles cl_bob deal - Cataboligne 1.8.8
-// IDEA: save bob value
+// IDEA - save bob value
 
 // fn(cam_setbob) - handle bob settings
 
@@ -88,7 +88,7 @@ void( entity player_ent ) Chase_cam_setweapon =
 	}
 	else
 	{
-		PK_SetCurrentAmmo();
+		W_SetCurrentAmmo();
 		cam_setbob(CL_BOBSET);
 	}
 	self = e;
@@ -282,13 +282,10 @@ void () cam_deathmove =
 		self.owner.effects = self.owner.items = 0; // self.owner.frame = 
 //		self.owner.items = self.owner.items - (self.owner.items & (IT_QUAD | IT_SUIT | IT_INVISIBILITY | IT_INVULNERABILITY));
 		self.owner.weapon = self.owner.currentammo = self.owner.ammo_shells = self.owner.ammo_nails = self.owner.ammo_rockets = self.owner.ammo_cells = 0;
-		self.owner.eweapon = world;
 		self.owner.pkprevweapon = self.owner.pklastweapon = self.owner.prevweapon = self.owner.lastweapon = 0;
 // remove pk items & ammos
 		self.owner.pkplus_egoammo = self.owner.pkplus_tombammo = self.owner.pkplus_actorammo = self.owner.pkplus_phoneammo = 0;
 		self.owner.pk_gravitywellammo = self.owner.pk_turretammo = self.owner.pk_canpabammo = self.owner.pk_beartrapammo = self.owner.pk_explode_ammo = 0;
-// remove x items & ammos
-		self.owner.x_items = self.owner.ammo_bullet = self.owner.ammo_slug = self.owner.ammo_gaspr = self.owner.ammo_hgrenade = 0;
 	}
 
 	if (self.owner.model != "progs/null.mdl")
@@ -308,7 +305,8 @@ void () cam_deathmove =
 	}
 	if (cvar("fov") != DCAM_FOV) stuffcmd( self.owner, DCAM_SET_FOV ); // I see short dead dudes - enforce crow vision
 
-	PK_SetCurrentAmmoOnly();
+	self.owner.weaponmodel = "";
+	self.owner.weapon = 0;
 	self.owner.flags = self.owner.flags | FL_ONGROUND;
 };
 
@@ -334,15 +332,15 @@ void () cam_deathview =
 	if (self.owner.solid != SOLID_NOT)
 	{
 
-// FIXED - viewport restore here
+// FIX - viewport restore here
 		set_viewport(self.owner, self.owner); // test this
 
 		remove( self);
 		return;
 	}
 
+//	if (self.owner.classname != "pk*bot") // deprecated - bots will not come here
 	self.owner.classname = OBSERVER;
-	PK_SetCurrentAmmoOnly();
 
 	traceline( self.owner.origin, self.origin, TRUE, self.owner);
 
@@ -361,6 +359,7 @@ void () cam_deathview =
 	}
 
 	self.owner.health = 1;
+	self.owner.weaponmodel = "";
 };
 
 // fn(cam_startdeathview) - died and didnt have chasecam on
@@ -843,7 +842,7 @@ void(float sel) cam_parms =
 	if (IROBOT(self)) return; // no cam for bots
 
 	CAM_DEF = 1; // compiled default for non dp engines
-	if (DARKPLACES || chaos) // IDEA: move to live upd
+	if (DARKPLACES || chaos)
 	{
 		CAM_DEF = cvar("sv_cam_def"); // dp var disables default cam
 		if (chaos)
@@ -920,14 +919,6 @@ void () dead_cam_set =
 //	}
 
 	if (Q_100 || PK_100) return; // || NO_CAM) return; // Cataboligne - 8.16.9 - quake compatability mode
-
-// limit on frags from fire & forget implementation
-
-	if (self.flags & FL_CLIENT || IROBOT(self))
-	if (FFW_LIMIT > 0)
-	{
-		self.search_time = time + FFW_LIMIT;
-	}
 
 	if (IROBOT(self))  // no deadcam for bots
 	{

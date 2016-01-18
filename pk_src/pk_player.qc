@@ -74,44 +74,18 @@ $frame deathd8 deathd9
 $frame deathe1 deathe2 deathe3 deathe4 deathe5 deathe6 deathe7
 $frame deathe8 deathe9
 
-// viswep stuff - not found in player mdl -  player animation frame data should not go past frame deathe9
+// viswep stuff - not found in player mdl - should not go past frame deathe9
 
 $frame dthrow1 dthrow2 dthrow3 dthrow4 dthrow5
 
 
-void(float ab, float gb, float amx, float gmx) wk_frames =
-{
-	if (self.eweapon && FL_MELEE(self.eweapon, 0, 0)) //self.weapon, self.pk_currentitem ))
-	{
-		if (self.walkframe >= amx)
-			self.walkframe = 0;
-		self.frame = ab + self.walkframe;
-	}
-	else
-	if (self.weapon == IT_AXE && FL_MELEE(self.eweapon, self.weapon, self.pk_currentitem ))
-	{
-		if (self.walkframe >= amx)
-			self.walkframe = 0;
-		self.frame = ab + self.walkframe;
-	}
-	else
-	{
-		if (self.walkframe >= gmx)
-			self.walkframe = 0;
-		self.frame = gb + self.walkframe;
-	}
-	
-};
 
 // pk player code moved here for adaptive code 
 
 void() pk_stand_frames =
 {
-	wk_frames($axstnd1, $stand1, 12, 5);
-	return;
 //	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
-	if (self.weapon == IT_AXE && FL_MELEE(self.eweapon, self.weapon, self.pk_currentitem ))
-//	if (FL_MELEE(self.eweapon, self.weapon, self.pk_currentitem ))
+	if (self.weapon == IT_AXE && FL_MELEE(self.weapon, self.pk_currentitem ))
 	{
 		if (self.walkframe >= 12)
 			self.walkframe = 0;
@@ -127,11 +101,8 @@ void() pk_stand_frames =
 
 void() pk_run_frames =
 {
-	wk_frames($axrun1, $rockrun1, 6, 6);
-	return;
 //	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
-	if (self.weapon == IT_AXE && FL_MELEE(self.eweapon, self.weapon, self.pk_currentitem ))
-//	if (FL_MELEE(self.eweapon, self.weapon, self.pk_currentitem ))
+	if (self.weapon == IT_AXE && FL_MELEE(self.weapon, self.pk_currentitem ))
 	{
 		if (self.walkframe == 6)
 			self.walkframe = 0;
@@ -200,7 +171,6 @@ void(float ox) pulse_fire =
 		self.weaponframe = 1;
 	SuperDamageSound();
 	W_FireSpikes (ox);
-	if (rune_haste(0.3))
 	self.attack_finished = time + 0.6;
 };
 
@@ -318,40 +288,6 @@ void() player_grapfire4 = [$lightfatt2, player_grapfire5 ] {self.weaponframe = 4
 void() player_grapfire5 = [$lightfatt1, player_grapfire6 ] {self.weaponframe = 5;};
 void() player_grapfire6 = [$lightfatt1, player_grapfire7 ] {self.weaponframe = 6;};
 void() player_grapfire7 = [$lightfatt2, player_run ] {self.weaponframe = 7;};
-
-//============================================================================
-// hipnotic weapon support
-
-// mjolnir
-void()   player_hammer1 =  [$axatt1, player_hammer2   ] {self.weaponframe=1;}; // melee hit
-void()   player_hammer2 =  [$axatt2, player_hammer3   ] {self.weaponframe=2;};
-void()   player_hammer3 =  [$axatt3, player_hammer4   ] {self.weaponframe=3;};
-void()   player_hammer4 =  [$axatt4, player_hammer5   ] {self.weaponframe=4;HIP_FireMjolnir();};
-void()   player_hammer5 =  [$axatt5, player_hammer6   ] {self.weaponframe=4;};
-void()   player_hammer6 =  [$axatt6, player_run ] {self.weaponframe=4;};
-
-void()   player_mjolnir1b =  [$axattc1, player_mjolnir2   ] {self.weaponframe=1;}; // lightning fire
-void()   player_mjolnir2 =  [$axattc2, player_mjolnir3   ] {self.weaponframe=2;};
-void()   player_mjolnir3 =  [$axattc3, player_mjolnir4   ] {self.weaponframe=3;};
-void()   player_mjolnir4 =  [$axattc4, player_mjolnir5   ] {self.weaponframe=4;HIP_FireMjolnir();};
-void()   player_mjolnir5 =  [$axattc5, player_mjolnir6   ] {self.weaponframe=4;};
-void()   player_mjolnir6 =  [$axattc6, player_run ] {self.weaponframe=4;};
-
-// laser cannon
-void() player_laser1   =[$lightfatt1, player_laser3  ] {self.attack_finished = time + 0.1;self.weaponframe=1;self.nextthink = time + 0.1;HIP_FireLaser(0);};
-void() player_laser2   =[$lightfatt2, player_laser3  ] {self.attack_finished = time + 0.1;self.weaponframe=2;self.nextthink = time + 0.1;};
-void() player_laser3   =[$lightfatt2, player_laser1  ] {self.attack_finished = time + 0.1;self.weaponframe=4;self.nextthink = time + 0.1;HIP_FireLaser(1);};
-void() player_laser4   =[$lightfatt1, player_laser1  ] {self.attack_finished = time + 0.1;self.weaponframe=5;self.nextthink = time + 0.1;};
-
-//============================================================================
-// q2 animations
-
-void()	player_q2hgr1 =	[$axattd1, player_q2hgr2	] {};
-void()	player_q2hgr2 =	[$axattd2, player_q2hgr3	] {};
-void()	player_q2hgr3 =	[$axattd3, player_q2hgr4	] {};
-void()	player_q2hgr4 =	[$axattd4, player_run	] {};
-
-//============================================================================
 
 // player sound code - mostly unused - put this on a sv_ var - these are now setup to override the default sounds if active, just to simplify the coding
 // sec indicates section of player code sound is played from - NOTE: these are all commented out in player.qc
@@ -575,7 +511,7 @@ void() PK_GibPlayer =
 		sound (self, CHAN_VOICE, "player/gib.wav", 1, ATTN_NONE);
 	else
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NONE);
-	if (pk_xsound) pk_player_sound(6); // NOTE: only functional extra sound because the files exist for this
+	if (pk_xsound) pk_player_sound(6); // NOTE --- only functional extra sound because the files exist for this
 };
 
 // called from player die
@@ -642,7 +578,7 @@ void() PK_PlayerDie =
 	if (self.velocity_z < 10)
 		self.velocity_z = self.velocity_z + random()*300;
 
-	if (self.health < -40 || (!XENV && pointcontents(self.origin) == CONTENT_LAVA)) // TEST - new feature, need full height test
+	if (self.health < -40 || (!PK_100 && !PK_99 && !Q_100 && pointcontents(self.origin) == CONTENT_LAVA)) // TEST - new feature, need full height test
 	{
 		GibPlayer();
 		return;

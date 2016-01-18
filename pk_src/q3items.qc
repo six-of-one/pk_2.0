@@ -42,24 +42,6 @@ item_quad				item_artifact_super_damage
 item_regen				item_artifact_invulnerability
 item_invis				item_artifact_invisibility
 item_enviro				item_artifact_envirosuit
-------------------------------------------
-holdable_medkit		item_painkeep_can
-holdable_teleporter	item_pkplus_phone
-
-FIX FIX FIX
-
-- precache needed !
-
-SV_ModelIndex("progs/v_reggun.mdl"): not precached (fix your code), precaching anyway
-SV_ModelIndex("progs/v_q3_mgun.mdl"): not precached (fix your code), precaching anyway
-
-SV_SoundIndex("sound/misc/w_pkup.wav"): not precached (fix your code), precaching anyway
-SV_SoundIndex("sound/misc/am_pkup.wav"): not precached (fix your code), precaching anyway
-SV_SoundIndex("sound/items/respawn1.wav"): not precached (fix your code), precaching anyway
-SV_SoundIndex("reggun/fire4.wav"): not precached (fix your code), precaching anyway
-SV_SoundIndex("sound/weapons/machinegun/machgf1b.wav"): not precached (fix your code), precaching anyway
-SV_SoundIndex("sound/weapons/rocket/rocklf1a.wav"): not precached (fix your code), precaching anyway
-
 
 */
 
@@ -189,7 +171,6 @@ void() ammo_bullets =
 
 	self.spawnflags = self.spawnflags | 1;
 //	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_spikes";
 	item_spikes();
 }
 
@@ -199,7 +180,6 @@ void() ammo_grenades =
 
 	self.spawnflags = self.spawnflags | 1; // big
 //	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_rockets";
 	item_rockets();
 }
 
@@ -216,7 +196,6 @@ void() ammo_lightning =
 	e.spawnflags = self.spawnflags;
 	self = e;
 //	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_cells";
 	item_cells();
 }
 
@@ -226,7 +205,6 @@ void() ammo_bfg =
 
 	self.spawnflags = self.spawnflags | 1;
 //	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_cells";
 	item_cells();
 }
 
@@ -241,7 +219,6 @@ void() spawnfunc_ammo_shells =
 {
 //	self.spawnflags = self.spawnflags | 1;
 //	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_shells";
 	item_shells();
 
 	if (self.spawnflags & SUSPENDED) q3_suspend();
@@ -253,7 +230,6 @@ void() spawnfunc_ammo_rockets =
 
 	self.spawnflags = self.spawnflags | 1; // q3 rockets are 10 pk
 //	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_rockets";
 	item_rockets();
 };
 
@@ -263,7 +239,6 @@ void() spawnfunc_ammo_cells =
 
 	self.spawnflags = self.spawnflags | 1; // big - note conflicts with suspend
 //	setorigin(self, self.origin + ' 0 0 16');
-	self.classname = "item_cells";
 	item_cells();
 };
 
@@ -372,24 +347,6 @@ void() item_enviro =
 {
 	self.classname = "item_artifact_envirosuit";
 	item_artifact_envirosuit();
-
-	if (self.spawnflags & SUSPENDED) q3_suspend();
-};
-
-// holdables
-
-void() holdable_medkit =
-{
-	self.classname = "item_painkeep_can";
-	item_painkeep_can();
-
-	if (self.spawnflags & SUSPENDED) q3_suspend();
-};
-
-void() holdable_teleporter =
-{
-	self.classname = "item_pkplus_phone";
-	item_pkplus_phone();
 
 	if (self.spawnflags & SUSPENDED) q3_suspend();
 };

@@ -115,7 +115,7 @@ void(float shots) W_FireShotgunExploder =
 
 	self.punchangle_x = -2 * shots;
 
-	self.currentammo = self.pk_explode_ammo = self.pk_explode_ammo - shots; // no inf for this! ammo_con(shots, self, "");
+	self.currentammo = self.pk_explode_ammo = self.pk_explode_ammo - shots;
 
 	if (self.classname == "pk*bot")
 		dir = botaim ();
@@ -219,7 +219,7 @@ void(float ox) W_FirePulseSpikes =
 	makevectors(self.v_angle);
 	sound (self, CHAN_WEAPON, "weapons/pulse/pulse_1.wav", 1, ATTN_NORM);
 	//self.attack_finished = time + 0.4;
-	self.currentammo = self.ammo_nails = self.ammo_nails - ammo_con(1, self, "");
+	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
 	if (self.classname == "pk*bot")
 		dir = botaim ();
 	else
@@ -232,8 +232,6 @@ void(float ox) W_FirePulseSpikes =
 	newmis.theowner = self;
 	setmodel (newmis, "progs/pnail.mdl");
 	newmis.angles = vectoangles(dir);
-	newmis.weapon = IT_NAILGUN; // Cataboligne - 2.19.11 - correct obit in pk_clientobit
-
 	setsize (newmis, ' 0 0 0', ' 0 0 0');
 	self.punchangle_x = -2;
 	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
@@ -256,13 +254,12 @@ void() PK_SetCurrentAmmo =
 
 	self.items = self.items - (self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS));
 
-	if (self.classname == OBSERVER)
+	if (self.classname == OBSERVER) // PK 2.x - clear observers
 	{
 		self.currentammo = 0;
 		self.weapon = 0;
 		self.weaponframe = 0;
 		self.weaponmodel = "";
-		self.eweapon = world;
 		return;
 	}
 
@@ -276,7 +273,6 @@ void() PK_SetCurrentAmmo =
 		self.forcewchange = FALSE;
 
 		wchanged = TRUE;
-		ominous_hum("", 1);
 	}
 
 	wchanged = wchanged & ((self.items & IT_INVISIBILITY) || (self.cam_x & CHSCAM_ON));
@@ -284,21 +280,6 @@ void() PK_SetCurrentAmmo =
 
 	if (wchanged)
 		sprint(self, "You have selected the ");
-
-	if (self.eweapon) // display got first
-	{
-		if (self.eweapon.mdl == "progs/vw_q2_hgr.mdl")
-			self.eweapon.noise2 = "";
-		self.eweapon.fly_sound = 0; // hum local deal
-		self.tomb_time = 0; // rng weps use this
-
-		if (wchanged)
-		{
-			sprint(self, self.eweapon.netname);
-			sprint(self, "\n");
-		}
-		wchanged = FALSE;
-	}
 
 	if (self.weapon == IT_AXE)
 	{
@@ -388,48 +369,7 @@ void() PK_SetCurrentAmmo =
 				sprint(self, "Chain Thunderbolt\n");
 		}
 
-// Cataboligne 8.12.9 purify - pk artifacts
-		if (self.pk_currentitem == PKPLUS_IT_EGO)
-		{
-			self.currentammo = self.pkplus_egoammo;
-			self.weaponmodel = "progs/v_ego.mdl";
-			self.weaponframe = 0;
-			if (wchanged)
-				sprint (self,"Ego\n");
-		}
-		else if (self.pk_currentitem == PKPLUS_IT_TOMB)
-		{
-			self.currentammo = self.pkplus_tombammo;
-			self.weaponmodel = "progs/v_tomb.mdl";
-			self.weaponframe = 0;
-			if (wchanged)
-				sprint (self,"Tomb\n");
-		}
-		else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
-		{
-			if (self.pkplus_actorskin == PKPLUS_ACTORQUAD)
-			{
-				self.weaponmodel = "progs/v_actorb.mdl";
-			}
-			else
-//		if (self.pkplus_actorskin == PKPLUS_ACTORPENT)
-			{	
-					self.weaponmodel = "progs/v_actorr.mdl";
-			}
-			self.currentammo = self.pkplus_actorammo;
-			self.weaponframe = 0;
-			if (wchanged)
-				sprint (self,"Actor\n");
-		}
-		else if (self.pk_currentitem == PKPLUS_IT_PHONE)
-		{
-			self.currentammo = self.pkplus_phoneammo;
-			self.weaponmodel = "progs/v_phone.mdl";
-			self.weaponframe = 0;
-			if (wchanged)
-				sprint (self,"Cellular Phone\n");
-		}
-// end pk_art
+		pk_art_setcurrentammo(wchanged); // Cataboligne 8.12.9 purify - pk artifacts
 	}
 	else if (self.weapon == IT_SHOTGUN)
 	{
@@ -440,10 +380,7 @@ void() PK_SetCurrentAmmo =
 
 		} else {
 			self.currentammo = self.ammo_shells;
-			if (PK_100 || Q_100)
 			self.weaponmodel = "progs/v_shot.mdl";
-			else
-			self.weaponmodel = "progs/v2_shot.mdl";
 		}
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
@@ -459,10 +396,7 @@ void() PK_SetCurrentAmmo =
 
 		} else {
 			self.currentammo = self.ammo_shells;
-			if (PK_100 || Q_100)
 			self.weaponmodel = "progs/v_shot2.mdl";
-			else
-			self.weaponmodel = "progs/v2_shot2.mdl";
 		}
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
@@ -474,7 +408,7 @@ void() PK_SetCurrentAmmo =
 		self.currentammo = self.ammo_nails;
 // PULSE_GUN_START
 		if (PK)
-		{
+		{			
 			if (PK_100 || Q_100)
 				self.weaponmodel = "progs/v_fnail.mdl";
 			else
@@ -546,259 +480,12 @@ void() PK_SetCurrentAmmo =
 			sprint(self, "An Unknown Weapon???\n");
 	}
 
-	if (self.eweapon) // set model / ammo
-	{
-		if (self.eweapon.lip)
-		{
-			if (self.eweapon.lip == AMMO_BULLETS)
-				self.currentammo = self.ammo_bullet;
-			else if (self.eweapon.lip == AMMO_SHELLS)
-				self.currentammo = self.ammo_shells;
-			else if (self.eweapon.lip == AMMO_CELLS)
-				self.currentammo = self.ammo_cells;
-			else if (self.eweapon.lip == AMMO_NAILS)
-				self.currentammo = self.ammo_nails;
-			else if (self.eweapon.lip == AMMO_ROCKETS)
-				self.currentammo = self.ammo_rockets;
-			else if (self.eweapon.lip == AMMO_GRENADES)
-				self.currentammo = self.ammo_rockets;
-			else if (self.eweapon.lip == AMMO_SLUGS)
-				self.currentammo = self.ammo_slug;
-			else if (self.eweapon.lip == AMMO_GAS)
-				self.currentammo = self.ammo_gaspr;
-			else if (self.eweapon.lip == AMMO_NONE)
-				self.currentammo = 1;
-		}
-		self.weaponframe = 0;
-		self.weaponmodel = self.eweapon.weaponmodel;
-	}
-
 // Cataboligne 8.8.9 purify - chase cam
 	// disable model in chase view
 		if ( (self.cam_x & CHSCAM_ON) || self.classname == OBSERVER)
 		{
 			self.weaponmodel = "";
 		}
-};
-
-// just to update ammo counts since viswep controls "you have selected" & weaponmodel changes now
-
-void() PK_SetCurrentAmmoOnly =
-{
-	if (self.classname == "player") // *bot - dont set run frames
-	player_run ();		// get out of any weapon firing states
-
-	self.items = self.items - (self.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS));
-
-	if (self.classname == OBSERVER)
-	{
-		self.currentammo = 0;
-		self.weapon = 0;
-		self.weaponframe = 0;
-		self.weaponmodel = "";
-		self.eweapon = world;
-		return;
-	}
-
-	if (self.weapon == IT_AXE)
-	{
-		if (self.pk_currentitem == PK_IT_AXE)
-		{
-			self.currentammo = 0;
-			self.weaponframe = 0;
-		}
-		else if (self.pk_currentitem == PK_IT_GRAVITYWELL)
-		{
-			self.currentammo = self.pk_gravitywellammo;
-			self.weaponframe = 0;
-		}
-		else if (self.pk_currentitem == PK_IT_TURRET)
-		{
-			self.currentammo = self.pk_turretammo;
-			self.weaponframe = 0;
-		}
-		else if (self.pk_currentitem == PK_IT_CANPAB)
-		{
-			self.currentammo = self.pk_canpabammo;
-			self.weaponframe = 0;
-		}
-		else if (self.pk_currentitem == PK_IT_GRAPGUN)
-		{
-// GRAPPLING_START
-			self.currentammo = 1;
-
-			if (self.grap_cornerchainNext != world)
-			{
-				self.weaponframe = 8;
-			}
-			else
-			{
-				self.weaponframe = 0;
-			}
-		}
-		else if (self.pk_currentitem == PK_IT_BEARTRAP)
-		{
-			self.currentammo = self.pk_beartrapammo;
-			self.weaponframe = 0;
-		}
-		else if (self.pk_currentitem == PK_IT_AIRGUN)
-		{
-			self.currentammo = 1;
-			self.weaponframe = 0;
-		}
-// BOLT_START
-		else if (self.pk_currentitem == PK_IT_CLIGHT)
-		{
-			self.currentammo = self.ammo_cells;
-			self.weaponframe = 0;
-			if (self.bolt_changeModelTimeout < time)
-			{
-				self.weaponmodel = "progs/v_cl_off.mdl";
-			}
-			else
-			{
-				self.weaponmodel = "progs/v_cl_on.mdl";
-			}
-			self.items = self.items | IT_CELLS;
-		}
-
-// Cataboligne 8.12.9 purify - pk artifacts
-		if (self.pk_currentitem == PKPLUS_IT_EGO)
-		{
-			self.currentammo = self.pkplus_egoammo;
-			self.weaponframe = 0;
-		}
-		else if (self.pk_currentitem == PKPLUS_IT_TOMB)
-		{
-			self.currentammo = self.pkplus_tombammo;
-			self.weaponframe = 0;
-		}
-		else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
-		{
-			if (self.pkplus_actorskin == PKPLUS_ACTORQUAD)
-			{
-				self.weaponmodel = "progs/v_actorb.mdl";
-			}
-			else
-//		if (self.pkplus_actorskin == PKPLUS_ACTORPENT)
-			{	
-				self.weaponmodel = "progs/v_actorr.mdl";
-			}
-			self.currentammo = self.pkplus_actorammo;
-			self.weaponframe = 0;
-			}
-		else if (self.pk_currentitem == PKPLUS_IT_PHONE)
-		{
-			self.currentammo = self.pkplus_phoneammo;
-			self.weaponframe = 0;
-		}
-// end pk_art
-	}
-	else if (self.weapon == IT_SHOTGUN)
-	{
-// EXPLODESHELLS_START
-		if (self.pk_explode_ammo) {
-			self.currentammo = self.pk_explode_ammo;
-			if (!self.eweapon) self.weaponmodel = "progs/v_eshot.mdl";
-
-		} else {
-			self.currentammo = self.ammo_shells;
-			if (!self.eweapon)
-			if (PK_100 || Q_100)
-			self.weaponmodel = "progs/v_shot.mdl";
-			else
-			self.weaponmodel = "progs/v2_shot.mdl";
-		}
-		self.weaponframe = 0;
-		self.items = self.items | IT_SHELLS;
-	}
-	else if (self.weapon == IT_SUPER_SHOTGUN)
-	{
-// EXPLODESHELLS_START
-		if (self.pk_explode_ammo) {
-			self.currentammo = self.pk_explode_ammo;
-			if (!self.eweapon) self.weaponmodel = "progs/v_eshot2.mdl";
-
-		} else {
-			self.currentammo = self.ammo_shells;
-			if (!self.eweapon)
-			if (PK_100 || Q_100)
-			self.weaponmodel = "progs/v_shot2.mdl";
-			else
-			self.weaponmodel = "progs/v2_shot2.mdl";
-		}
-		self.weaponframe = 0;
-		self.items = self.items | IT_SHELLS;
-	}
-	else if (self.weapon == IT_NAILGUN)
-	{
-		self.currentammo = self.ammo_nails;
-		self.weaponframe = 0;
-		self.items = self.items | IT_NAILS;
-	}
-	else if (self.weapon == IT_SUPER_NAILGUN)
-	{
-		self.currentammo = self.ammo_nails;
-		self.items = self.items | IT_NAILS;
-		self.weaponframe = 0;
-		}
-	else if (self.weapon == IT_GRENADE_LAUNCHER)
-	{
-		self.currentammo = self.ammo_rockets;
-		self.weaponframe = 0;
-		self.items = self.items | IT_ROCKETS;
-	}
-	else if (self.weapon == IT_ROCKET_LAUNCHER)
-	{
-		self.currentammo = self.ammo_rockets;
-		self.weaponframe = 0;
-		self.items = self.items | IT_ROCKETS;
-	}
-	else if (self.weapon == IT_LIGHTNING)
-	{
-		self.currentammo = self.ammo_cells;
-		self.weaponframe = 0;
-		self.items = self.items | IT_CELLS;
-	}
-	else
-	{
-		self.currentammo = 0;
-		self.weaponmodel = "";
-		self.weaponframe = 0;
-	}
-
-	if (self.eweapon)
-	{
-		if (self.eweapon.lip)
-		{
-			if (self.eweapon.lip == AMMO_BULLETS)
-				self.currentammo = self.ammo_bullet;
-			else if (self.eweapon.lip == AMMO_SHELLS)
-				self.currentammo = self.ammo_shells;
-			else if (self.eweapon.lip == AMMO_CELLS)
-				self.currentammo = self.ammo_cells;
-			else if (self.eweapon.lip == AMMO_NAILS)
-				self.currentammo = self.ammo_nails;
-			else if (self.eweapon.lip == AMMO_ROCKETS)
-				self.currentammo = self.ammo_rockets;
-			else if (self.eweapon.lip == AMMO_GRENADES)
-				self.currentammo = self.ammo_rockets;
-			else if (self.eweapon.lip == AMMO_SLUGS)
-				self.currentammo = self.ammo_slug;
-			else if (self.eweapon.lip == AMMO_GAS)
-				self.currentammo = self.ammo_gaspr;
-			else if (self.eweapon.lip == AMMO_NONE)
-				self.currentammo = 1;
-		}
-		self.weaponframe = 0;
-	}
-// Cataboligne 8.8.9 purify - chase cam
-	// disable model in chase view
-		if ( (self.cam_x & CHSCAM_ON) || self.classname == OBSERVER)
-		{
-			self.weaponmodel = "";
-		}
-
 };
 
 // called from many places
@@ -807,7 +494,7 @@ float() W_BestPKWeapon =
 {
 	if (self.weapon == IT_AXE)
 	{
-		if (self.waterlevel <= 1 && (self.ammo_cells >= 2 || ammo_con(PK_IT_CLIGHT, self, "wpck")) && (self.pk_items & PK_IT_CLIGHT))
+		if (self.waterlevel <= 1 && self.ammo_cells >= 2 && (self.pk_items & PK_IT_CLIGHT))
 			return PK_IT_CLIGHT;
 		if (self.pk_items & PK_IT_AIRGUN)
 			return PK_IT_AIRGUN;
@@ -827,13 +514,10 @@ New for PainKeep, makes things a whole lot simplier
 
 float(float weaponnum, float pknum) HasAmmo =
 {
-	local entity e;
-
 	if (weaponnum == IT_AXE)
 	{
 		if (pknum == PK_IT_CLIGHT)
 		{
-			if (!ammo_con(pknum, self, "wpck"))
 			if (self.ammo_cells < 2)
 				return FALSE;
 		}
@@ -858,133 +542,43 @@ float(float weaponnum, float pknum) HasAmmo =
 				return FALSE;
 		}
 
-// Cataboligne 8.12.9 purify - pk artifacts
-		else if (pknum == PKPLUS_IT_EGO)
-		{
-			if (self.pkplus_egoammo < 1)
-				return FALSE;
-		}
-		else if (pknum == PKPLUS_IT_TOMB)
-		{
-			if (self.pkplus_tombammo < 1)
-				return FALSE;
-		}
-		else if (pknum == PKPLUS_IT_ACTOR)
-		{
-			if (self.pkplus_actorammo < 1)
-				return FALSE;
-		}
-		else if (pknum == PKPLUS_IT_PHONE)
-		{
-			if (self.pkplus_phoneammo < 1)
-				return FALSE;
-		}
-// end pk_art
+		if (pk_art_hasammo(pknum)) // Cataboligne 8.12.9 purify - pk artifacts
+			return FALSE;															// fn return TRUE indicates false code for pk artifacts
 	}
-	else	if (!ammo_con(weaponnum, self, "wpck"))
+	else if (weaponnum == IT_SHOTGUN)
 	{
-		e = vchk(weaponnum, 0, self.vwepent);
-		if (e.eweapon) // the selection has eweap code
-		{
-			if (e.eweapon.lip == AMMO_NONE)
-				return TRUE;
-			else if (e.eweapon.lip == AMMO_SHELLS)
-			{
-				if (self.ammo_shells >= e.eweapon.dmg_save)
-					return TRUE;
-				else
-					return FALSE;
-			}
-			else if (e.eweapon.lip == AMMO_NAILS)
-			{
-				if (self.ammo_nails >= e.eweapon.dmg_save)
-					return TRUE;
-				else
-					return FALSE;
-			}
-			else if (e.eweapon.lip == AMMO_BULLETS)
-			{
-				if (self.ammo_bullet >= e.eweapon.dmg_save)
-					return TRUE;
-				else
-					return FALSE;
-			}
-			else if (e.eweapon.lip == AMMO_SLUGS)
-			{
-				if (self.ammo_slug >= e.eweapon.dmg_save)
-					return TRUE;
-				else
-					return FALSE;
-			}
-			else if (e.eweapon.lip == AMMO_GAS)
-			{
-				if (self.ammo_gaspr >= e.eweapon.dmg_save)
-					return TRUE;
-				else
-					return FALSE;
-			}
-			else if (e.eweapon.lip == AMMO_CELLS)
-			{
-				if (self.ammo_cells >= e.eweapon.dmg_save)
-					return TRUE;
-				else
-					return FALSE;
-			}
-			else if (e.eweapon.lip == AMMO_ROCKETS)
-			{
-				if (self.ammo_rockets >= e.eweapon.dmg_save)
-					return TRUE;
-				else
-					return FALSE;
-			}
-			else if (e.eweapon.lip == AMMO_GRENADES)
-			{
-				if (self.ammo_rockets >= e.eweapon.dmg_save)
-					return TRUE;
-				else
-					return FALSE;
-			}
-			else if (e.eweapon.lip)
-			{
-				if (WARNING) bprint(" *** Warning: eweapon ammo type not recognized.\n");
-				return FALSE;
-			}
-		}
-		if (weaponnum == IT_SHOTGUN)
-		{
-			if (self.ammo_shells < 1 && self.pk_explode_ammo < 1)
-				return FALSE;
-		}
-		else if (weaponnum == IT_SUPER_SHOTGUN)
-		{
-			if (self.ammo_shells < 2 && self.pk_explode_ammo < 2)
-				return FALSE;
-		}
-		else if (weaponnum == IT_NAILGUN)
-		{
-			if (self.ammo_nails < 1)
-				return FALSE;
-		}
-		else if (weaponnum == IT_SUPER_NAILGUN)
-		{
-			if (self.ammo_nails < 2)
-				return FALSE;
-		}
-		else if (weaponnum == IT_GRENADE_LAUNCHER)
-		{
-			if (self.ammo_rockets < 1)
-				return FALSE;
-		}
-		else if (weaponnum == IT_ROCKET_LAUNCHER)
-		{
-			if (self.ammo_rockets < 1)
-				return FALSE;
-		}
-		else if (weaponnum == IT_LIGHTNING)
-		{
-			if (self.ammo_cells < 1)
-				return FALSE;
-		}
+		if (self.ammo_shells < 1 && self.pk_explode_ammo < 1)
+			return FALSE;
+	}
+	else if (weaponnum == IT_SUPER_SHOTGUN)
+	{
+		if (self.ammo_shells < 2 && self.pk_explode_ammo < 2)
+			return FALSE;
+	}
+	else if (weaponnum == IT_NAILGUN)
+	{
+		if (self.ammo_nails < 1)
+			return FALSE;
+	}
+	else if (weaponnum == IT_SUPER_NAILGUN)
+	{
+		if (self.ammo_nails < 2)
+			return FALSE;
+	}
+	else if (weaponnum == IT_GRENADE_LAUNCHER)
+	{
+		if (self.ammo_rockets < 1)
+			return FALSE;
+	}
+	else if (weaponnum == IT_ROCKET_LAUNCHER)
+	{
+		if (self.ammo_rockets < 1)
+			return FALSE;
+	}
+	else if (weaponnum == IT_LIGHTNING)
+	{
+		if (self.ammo_cells < 1)
+			return FALSE;
 	}
 
 	return TRUE;
@@ -1032,9 +626,7 @@ void() pk_special_impulse =
 	}
 	else if (self.impulse == 32)
 	{
-//		if (!ammo_con(PK_IT_CLIGHT, self, "wpck"))
-//		if (self.ammo_cells < 2 || !(self.pk_items & PK_IT_CLIGHT))
-		if (!HasAmmo(IT_AXE, PK_IT_CLIGHT) || !(self.pk_items & PK_IT_CLIGHT))
+		if (self.ammo_cells < 2 || !(self.pk_items & PK_IT_CLIGHT))
 			return;
 
 		self.pk_currentitem = PK_IT_CLIGHT;
@@ -1263,24 +855,22 @@ float() PK_BestWeapon =
 
 	it = self.items;
 
-//	if (self.waterlevel <= 1 && (self.ammo_cells >= 2 || ammo_con(PK_IT_CLIGHT, self, "wpck")) && (self.pk_items & PK_IT_CLIGHT))
-	if (self.waterlevel <= 1 && HasAmmo(IT_AXE, PK_IT_CLIGHT) && (self.pk_items & PK_IT_CLIGHT))
+	if (self.waterlevel <= 1 && self.ammo_cells >= 2 && (self.pk_items & PK_IT_CLIGHT))
 		return IT_AXE;
 
-//	if (self.waterlevel <= 1 && (self.ammo_cells >= 1 || ammo_con(IT_LIGHTNING, self, "wpck")) && (it & IT_LIGHTNING))
-	if (self.waterlevel <= 1 && HasAmmo(IT_LIGHTNING, 0) && (it & IT_LIGHTNING))
+	if (self.waterlevel <= 1 && self.ammo_cells >= 1 && (it & IT_LIGHTNING))
 			return IT_LIGHTNING;
 
-	if (HasAmmo(IT_SUPER_NAILGUN, 0) && (it & IT_SUPER_NAILGUN))
+	if (self.ammo_nails >= 2 && (it & IT_SUPER_NAILGUN))
 		return IT_SUPER_NAILGUN;
 
-	if ((self.ammo_shells >= 2 || self.pk_explode_ammo >= 2 || ammo_con(IT_SUPER_SHOTGUN, self, "wpck")) && (it & IT_SUPER_SHOTGUN))
+	if ((self.ammo_shells >= 2 || self.pk_explode_ammo >= 2) && (it & IT_SUPER_SHOTGUN))
 		return IT_SUPER_SHOTGUN;
 
-	if ((self.ammo_nails >= 1 || ammo_con(IT_NAILGUN, self, "wpck")) && (it & IT_NAILGUN))
+	if (self.ammo_nails >= 1 && (it & IT_NAILGUN))
 		return IT_NAILGUN;
 
-	if ((self.ammo_shells >= 1 || self.pk_explode_ammo >= 1 || ammo_con(IT_SHOTGUN, self, "wpck")) && (it & IT_SHOTGUN))
+	if ((self.ammo_shells >= 1 || self.pk_explode_ammo >= 1) && (it & IT_SHOTGUN))
 		return IT_SHOTGUN;
 
 	if (self.pk_items & PK_IT_AIRGUN)
@@ -1299,9 +889,6 @@ float() PK_CheckNoAmmo =
 	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
 		return TRUE;
 
-	if (ammo_con(self.weapon, self, "wpck")) // see if its inf ammo wep
-		return TRUE;
-	
 	self.weapon = W_BestWeapon ();
 	self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
 
@@ -1309,48 +896,6 @@ float() PK_CheckNoAmmo =
 
 // drop the weapon down
 	return FALSE;
-};
-
-void() pk_cycleObjects;
-
-// fn(PK_CheckLivEnt) - check live ents for throwing fire & forget
-
-// return false if we cant fire
-
-float(float rot) PK_CheckLivEnt =
-{
-	if (self.weapon != IT_AXE || PK_100) return(TRUE);
-
-	pk_livent = cnt_ent(world, "classname", "turret") + cnt_ent(world, "classname", "beartrap") + cnt_ent(world, "classname", "gravity") + cnt_ent(world, "classname", "tomb");
-	
-	if (self.pk_currentitem == PK_IT_GRAVITYWELL ||
-		  self.pk_currentitem == PK_IT_TURRET ||
-		  self.pk_currentitem == PK_IT_BEARTRAP ||
-		  self.pk_currentitem == PKPLUS_IT_TOMB)
-	{
-		if (pk_livent < PK_MAX_LIVENT) return(TRUE);
-	}
-	else return(TRUE);
-
-	if (WARNING)
-	{
-	bprint(" *** warning: too many live ents to fire selected weapon = ");
-	bprint(ftos(pk_livent));
-	bprint(".\n");
-	}
-	else
-	{
-	sprint(self, " *** warning: too many live ents to fire selected weapon = ");
-	sprint(self, ftos(pk_livent));
-	sprint(self, ".\n");
-	}
-
-	if (rot) // rotate weapons if we cant fire
-	if (self.weapon == IT_AXE)
-	{
-		pk_cycleObjects();
-	}
-	return(FALSE);
 };
 
 // called from below
@@ -1362,17 +907,8 @@ void() PK_Attack =
 	if (!W_CheckNoAmmo ())
 		return;
 
-	if (!PK_CheckLivEnt (TRUE))
-	return;
-
 	makevectors	(self.v_angle);			// calculate forward angle for velocity
 	self.show_hostile = time + 1;	// wake monsters up
-
-	if (self.eweapon)
-	{
-		e_weap_Attack();
-		return;
-	}
 
 	if (self.weapon == IT_AXE)
 	{
@@ -1388,7 +924,6 @@ void() PK_Attack =
 				player_axec1 ();
 			else
 				player_axed1 ();
-			if (rune_haste(0.25))
 			self.attack_finished = time + 0.5;
 		}
 		else if (self.pk_currentitem == PK_IT_GRAVITYWELL)
@@ -1488,89 +1023,19 @@ void() PK_Attack =
 			player_bolt1();
 			self.attack_finished = time + 0.1;
 		}
-// Cataboligne 8.12.9 purify - pk artifacts
-		else if (self.pk_currentitem == PKPLUS_IT_EGO)
-		{
-			ego_activate ();
-			self.pkplus_egoammo = (self.pkplus_egoammo - 1);
-			self.attack_finished = (time + 0.5);
-			if (self.pkplus_egoammo < 1)
-			{
-				self.pk_currentInventory = PK_IT_AXE;
-				self.weapon = W_BestWeapon ();
-				self.pk_currentitem = W_BestPKWeapon ();
-				W_SetCurrentAmmo ();
-
-				vwep_firecary(self, PKPLUS_IT_EGO); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
-			}
-		}
-		else	if (self.pk_currentitem == PKPLUS_IT_TOMB)
-		{
-			tomb_launch ();
-			self.pkplus_tombammo = (self.pkplus_tombammo - 1);
-			self.attack_finished = (time + 0.5);
-			if (self.pkplus_tombammo < 1)
-			{
-				self.pk_currentInventory = PK_IT_AXE;
-				self.weapon = W_BestWeapon ();
-				self.pk_currentitem = W_BestPKWeapon ();
-				W_SetCurrentAmmo ();
-
-				vwep_firecary(self, PKPLUS_IT_TOMB); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
-			}
-		}
-		else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
-		{
-			if (self.pkplus_actorskin == PKPLUS_ACTORQUAD)
-			{
-				actor_quad_activate ();
-			}
-			else
-			{
-				actor_pent_activate ();
-			}
-			self.pkplus_actorammo = (self.pkplus_actorammo - 1);
-			self.attack_finished = (time + 0.5);
-			if (self.pkplus_actorammo < 1)
-			{
-				self.pk_currentInventory = PK_IT_AXE;
-				self.weapon = W_BestWeapon ();
-				self.pk_currentitem = W_BestPKWeapon ();
-				W_SetCurrentAmmo ();
-
-				vwep_firecary(self, PKPLUS_IT_ACTOR); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
-			}
-		}
-		else if (self.pk_currentitem == PKPLUS_IT_PHONE)
-		{
-			phone_activate ();
-			self.pkplus_phoneammo = (self.pkplus_phoneammo - 1);
-			self.attack_finished = (time + 0.5);
-			if (self.pkplus_phoneammo < 1)
-			{
-				self.pk_currentInventory = PK_IT_AXE;
-				self.weapon = W_BestWeapon ();
-				self.pk_currentitem = W_BestPKWeapon ();
-				W_SetCurrentAmmo ();
-
-				vwep_firecary(self, PKPLUS_IT_PHONE); // Cataboligne - 4.29.10 - when throwing a carryable check for viswep remove - glquake deal
-			}
-		}
-// end pk_art
-
+		
+		pk_art_attack(); // Cataboligne 8.12.9 purify - pk artifacts
 	}
 	else if (self.weapon == IT_SHOTGUN)
 	{
 		player_shot1();
 		W_FireShotgun ();
-		if (rune_haste(0.28))
 		self.attack_finished = time + 0.5;
 	}
 	else if (self.weapon == IT_SUPER_SHOTGUN)
 	{
 		player_shot1();
 		W_FireSuperShotgun ();
-		if (rune_haste(0.38))
 		self.attack_finished = time + 0.7;
 	}
 	else if (self.weapon == IT_NAILGUN)
@@ -1586,14 +1051,12 @@ void() PK_Attack =
 	{
 		player_rocket1();
 		W_FireGrenade();
-		if (rune_haste(0.3))
 		self.attack_finished = time + 0.6;
 	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
 		player_rocket1();
 		W_FireRocket();
-		if (rune_haste(0.4))
 		self.attack_finished = time + 0.8;
 	}
 	else if (self.weapon == IT_LIGHTNING)
@@ -1610,6 +1073,12 @@ void() PK_Attack =
 
 void() pk_cycleObjects =
 {
+	if (!PK_100)
+	{
+		pk_art_cycleobjects(); // Cataboligne 8.12.9 purify - pk artifacts
+		return;
+	}
+
 	while (1)
 	{
 		if (self.pk_currentitem == PK_IT_AXE)
@@ -1621,29 +1090,6 @@ void() pk_cycleObjects =
 		else if (self.pk_currentitem == PK_IT_BEARTRAP)
 			self.pk_currentitem = PK_IT_CANPAB;
 		else if (self.pk_currentitem == PK_IT_CANPAB)
-// Cataboligne 8.12.9 purify - pk artifacts
-			self.pk_currentitem = PKPLUS_IT_EGO;
-		else if (self.pk_currentitem == PKPLUS_IT_EGO)
-			self.pk_currentitem = PKPLUS_IT_TOMB;
-		else if (self.pk_currentitem == PKPLUS_IT_TOMB)
-		{
-			self.pkplus_actorskin = PKPLUS_ACTORQUAD;
-			self.pk_currentitem = PKPLUS_IT_ACTOR;
-		}
-		else if (self.pk_currentitem == PKPLUS_IT_ACTOR)
-		{
-			if (self.pkplus_actorskin == PKPLUS_ACTORQUAD)
-			{
-				self.pkplus_actorskin = PKPLUS_ACTORPENT;
-			}
-			else
-			{
-			self.pkplus_actorskin = 0;
-			self.pk_currentitem = PKPLUS_IT_PHONE;
-			}
-		}
-		else if (self.pk_currentitem == PKPLUS_IT_PHONE)
-// end pk_art
 			self.pk_currentitem = PK_IT_AXE;
 		else
 			return;		// get's here when the currentitem == a normal pk weapon
@@ -1663,7 +1109,7 @@ void() PK_ChangeWeapon =
 		local float am, fl, fl2;
 
 	am = 0;
-	fl2 = 0;
+		fl2 = 0;
 
 	if (self.impulse == 1)
 	{
@@ -1698,10 +1144,8 @@ void() PK_ChangeWeapon =
 				fl = IT_AXE;
 				fl2 = PK_IT_CLIGHT;
 	}
-	else if (self.impulse == 9) // Cataboligne - 2.13.11 - hipnotic support special wep
-		fl = IT_MJOLNIR;
 
-	am = !HasAmmo(fl, fl2);
+		am = !HasAmmo(fl, fl2);
 
 // PAINKEEP_START
 	// if already have the weapon or if you don't have the weapon, try the
@@ -1741,9 +1185,9 @@ void() PK_ChangeWeapon =
 
 	self.weapon = fl;
 // PAINKEEP_START
-	self.pk_currentitem = fl2;
+		self.pk_currentitem = fl2;
 // PAINKEEP_END
-	self.forcewchange = TRUE;
+		self.forcewchange = TRUE;
 
 	W_SetCurrentAmmo ();
 };
@@ -1756,9 +1200,7 @@ void() PK_CycleWeaponCommand =
 	sf = 50;
 	while (1)
 	{
-		if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_CLIGHT) // Cataboligne - 2.13.11 - hipnotic support special wep
-			self.weapon = IT_MJOLNIR;
-		else if (self.weapon == IT_MJOLNIR)
+		if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_CLIGHT)
 		{
 			self.weapon = IT_AXE;
 			self.pk_currentitem = self.pk_currentInventory;
@@ -1847,9 +1289,7 @@ void() PK_CycleWeaponReverseCommand =
 			self.weapon = IT_AXE;
 			self.pk_currentitem = self.pk_currentInventory;
 		}
-		else if (self.weapon == IT_AXE && self.pk_currentitem == self.pk_currentInventory) // Cataboligne - 2.13.11 - hipnotic support special wep
-			self.weapon = IT_MJOLNIR;
-		else if (self.weapon == IT_MJOLNIR)
+		else if (self.weapon == IT_AXE && self.pk_currentitem == self.pk_currentInventory)
 		{
 			self.weapon = IT_AXE;
 			self.pk_currentitem = PK_IT_CLIGHT;
@@ -1907,15 +1347,7 @@ void() PK_CheatCommand =
 
 	self.pk_items = self.pk_items | PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT;
 
-// Cataboligne 8.12.9 purify - pk artifacts
-	if (PK_ART)
-	{
-	self.pkplus_egoammo = PKPLUS_EGOAMMO_MAX;
-	self.pkplus_tombammo = PKPLUS_TOMBAMMO_MAX;
-	self.pkplus_actorammo = PKPLUS_ACTORAMMO_MAX;
-	self.pkplus_phoneammo = PKPLUS_PHONEAMMO_MAX;
-	}
-// end pk_art
+	if (PK_ART) pk_art_cheat(); // Cataboligne 8.12.9 purify - pk artifacts
 
 	self.weapon = IT_ROCKET_LAUNCHER;
 	self.impulse = 0;
@@ -1928,21 +1360,10 @@ void() PK_ImpulseCommands =
 {
 	local entity sv;
 
-
-
-
-// DEV - TESTING
-	vw_config(); // call config check viswep
-
-
-
-
-
 	if (self.impulse >= 1 && self.impulse <= 8)
 		W_ChangeWeapon ();
 	else if (self.impulse == 9)
-		W_ChangeWeapon (); // mjolnir
-//		PK_CheatCommand ();
+		PK_CheatCommand ();
 	else if (self.impulse == 10)
 		CycleWeaponCommand ();
 	else if (self.impulse == 11)
@@ -1991,12 +1412,13 @@ void() PK_ImpulseCommands =
 		if (pk_flags & PK_TP_SPARKSFLASH)
 		{
 			bprint("SFX Enabled.\n");
-			pk_bas_flags(PK_TP_SPARKSFLASH, 1);
+
+			pk_flags = pk_flags - PK_TP_SPARKSFLASH;
 		}
 		else
 		{
 			bprint("SFX Disabled.\n");
-			pk_bas_flags(PK_TP_SPARKSFLASH, 0);
+			pk_flags = pk_flags | PK_TP_SPARKSFLASH;
 		}
 		admin_sv_cfg();
 	}
@@ -2007,12 +1429,12 @@ void() PK_ImpulseCommands =
 		if (pk_flags & PK_SF_HUB)
 		{
 			bprint("Hub mode OFF\n");
-			pk_bas_flags(PK_SF_HUB, 0);
+			pk_flags = pk_flags - PK_SF_HUB;
 		}
 		else
 		{
 			bprint("Hub mode ON\n");
-			pk_bas_flags(PK_SF_HUB, 1);
+			pk_flags = pk_flags | PK_SF_HUB;
 		}
 		if (pk_admintime > 0) admin_resettimeout();
 	}
@@ -2038,12 +1460,12 @@ void() PK_ImpulseCommands =
 		if (pk_flags & PK_TP_DUTYON)
 		{
 			bprint("Duty Checking OFF\n");
-			pk_bas_flags(PK_TP_DUTYON, 0);
+			pk_flags = pk_flags - PK_TP_DUTYON;
 		}
 		else
 		{
 			bprint("Duty Checking ON\n");
-			pk_bas_flags(PK_TP_DUTYON, 1);
+			pk_flags = pk_flags | PK_TP_DUTYON;
 		}
 		admin_sv_cfg();
 	}
@@ -2072,9 +1494,8 @@ void() PK_ImpulseCommands =
 		if (pk_admintime > 0) admin_resettimeout();
 	}
 
-	else if (self.impulse == 255){
+	else if (self.impulse == 255)
 		QuadCheat ();
-}
 
 	self.impulse = 0;
 };
@@ -2084,5 +1505,5 @@ void() PK_ImpulseCommands =
 void(entity e) pk_missile_splash =
 {
 		AddToSplash(e); // *pk - Make this entity splash
-		e.weapon = self.weapon; // *pk - Correct death message info - CHECK: see grenade kill issue
+		e.weapon = self.weapon; // *pk - Correct death message info
 }

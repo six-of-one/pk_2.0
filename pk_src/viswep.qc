@@ -8,6 +8,8 @@ Cataboligne 9.26.9
 .float viswframe; // special framing - drop / pull [not used yet]
 .entity exteriormodeltoclient; // dp var -- viswep deal - good fix for dp
 
+vector vv_o_000, vv_a_000, vv_x_000;
+
 string VW_DEFGUN = "progs/vw_qgun.mdl";
 
 // fn(viswep_pre) - precache
@@ -188,7 +190,6 @@ entity(entity e, float fl) vload =
 
 	tr.vwepent.weapon = fl;
 	tr.vwepent.pk_currentitem = 0;
-	tr.vwepent.eweapon = world;
 
 	if (fl == IT_AXE) md = "progs/vw_axe.mdl";
 	else if (fl == IT_SHOTGUN) md = "progs/vw_shot.mdl";
@@ -267,7 +268,7 @@ entity(float qw, float pkw, entity vh) vchk =
 	f = vh;
 	while (f)
 	{
-		if (f.weapon == qw && (f.pk_currentitem == pkw || pkw == 0)) return (f);
+		if (f.weapon == qw && f.pk_currentitem == pkw) return (f);
 		f = f.vwepent;
 	}
 	return(world);
@@ -441,21 +442,9 @@ void(entity e, float cd) viswep_ld =
 
 };
 
+// fn(viswep_pkbot) - load / unload pkbots
 
-// verify this for new weps that use eweapon
-
-float (string wpm) ver_weaponmodel =
-{
-	string wmr;
-
-	if (wpm == "progs/v_w_mortar.mdl") return(TRUE);
-	else if (wpm == "progs/v_d_rock.mdl") return(TRUE);
-//	else if (wpm == "") return(TRUE);
-
-	return(FALSE);
-};
-
-// fn(viswep_pkbot) - viswep set for pk*bots
+float vw_bot_frame; // handle pk*bots
 
 void() viswep_pkbot =
 {
@@ -489,6 +478,9 @@ void() viswep_post =
 //	if (!self.flags & FL_CLIENT) return;
 
 	vw_chain(self);
+
+	if (vw_bot_frame != framecount)
+	if (self.classname != "pk*bot" && self.ishuman) viswep_pkbot();
 
 														// NOTE - check this vs. invisibility for norm & morphs
 	if (self.deadflag || self.classname == OBSERVER || self.view_ofs == '0 0 0' || self.model == "") //(self.admin && self.admin != USER_MENU)) //intermission_running)
@@ -572,7 +564,6 @@ void() viswep_post =
 //		makevectors(vang);
 		}
 
-//	vhead.owner.eweapon = world;
 	dwep = vhead.owner.weapon; // active wep, or pulled
 	pkdwep = vhead.owner.pk_currentitem;
 //	if (vhead.owner.flags & FL_DROP) dwep = vhead.owner.prev_weapon; // drop this down first
@@ -582,28 +573,7 @@ void() viswep_post =
 		qld = grap_frame_adjust = gremlin_frame_adjust = vadd = 0;
 //		vofs = vhead.finaldest_x * normalize(vang) + vhead.finaldest_y * normalize(v_right);
 	//	vofs_z = vhead.finaldest_z;
-		if (dwep > 0)
-		if (vhead.weapon == dwep)
-		{
-			vhead.owner.eweapon = vhead.eweapon;
-
-			if (self.ishuman)
-			if ( !(self.cam_x & CHSCAM_ON))
-			{
-				if (vhead.owner.eweapon)
-				{
-					if (vhead.owner.eweapon.weaponmodel != vhead.owner.weaponmodel) PK_SetCurrentAmmo();
-				}
-				else
-					if (ver_weaponmodel(vhead.owner.weaponmodel)) PK_SetCurrentAmmo();
-//							if (wm != vhead.owner.weaponmodel) vhead.owner.weaponmodel = wm;
-				if ((vhead.owner.prevweapon != vhead.owner.weapon) || (vhead.owner.pkprevweapon != vhead.owner.pk_currentitem) || (vhead.owner.forcewchange == 1)) PK_SetCurrentAmmo();
-			}
-			else	if ((vhead.owner.prevweapon != vhead.owner.weapon) || (vhead.owner.pkprevweapon != vhead.owner.pk_currentitem) || (vhead.owner.forcewchange == 1)) PK_SetCurrentAmmo();
-		}
-
 		if (vhead.owner.items & IT_INVISIBILITY) vhead.model = ""; // heh heh, player invisible
-		else if (vhead.owner.eweapon.model == "progs/vw_w_2chaing.mdl" && vhead.mdl == "progs/vw_w_chaing.mdl") vhead.model = "";
 		else
 		if (vhead.model == "" || (vhead.origin + vofs) != vhead.owner.origin || vhead.angles != vhead.owner.angles || vhead.weaponframe != vhead.owner.frame) // update track
 			{
@@ -622,7 +592,6 @@ void() viswep_post =
 				if (vhead.weapon != IT_AXE && dwep != IT_AXE) qld = TRUE;
 				else if (vhead.pk_currentitem != PK_IT_AXE && pkdwep != PK_IT_AXE) qld = TRUE;
 				else if (vhead.weapon == IT_AXE && dwep == IT_AXE || pkdwep == PK_IT_AXE) qld = TRUE;
-// TDO: set eweapon by code
 			}
 			else if (dwep > 0)
 			{
@@ -634,7 +603,22 @@ void() viswep_post =
 				{
 																		// grap hook out - adjust run / stand frameset
 				if (vhead.mdl == "progs/vw_harp.mdl" && vhead.owner.grap_cornerchainNext != world && (vhead.owner.frame - gremlin_frame_adjust)< 11) // $pain1
-					grap_frame_adjust = VW_HARP_FRADJ;
+					{
+						local vector v1, v2;
+
+						grap_frame_adjust = VW_HARP_FRADJ; // point into vw model for gun with released 'poon
+						local entity e;
+						e = vhead.owner.grap_cornerchainNext; // harpoon itself - animate an exact rope lead from gun end
+						v1 = normalize(e.origin - vhead.owner.origin); // dir to move rope piece
+						if (!e.enemy)
+						{
+							e.enemy = spawn();
+							setmodel(e.enemy, "progs/harprope.mdl");
+						}
+						v2 = vhead.owner.origin + grap_vw_adj(vhead.owner);
+						setorigin(e.enemy, v2 + (v1 * 18));
+						e.enemy.angles = e.grap_ropechainPrev.angles; // angles of rope segs
+					}
 				vofs = ' 0 0 0';
 				if (vhead.owner.viswframe > -1) vframe = vhead.owner.viswframe;
 				if (FL_MELEE(vhead.weapon, vhead.pk_currentitem)) {
@@ -653,13 +637,91 @@ void() viswep_post =
 
 };
 
+// run full viswep frames for super nailgun / nailgun
+
+void() player_nail3   =[$lightfatt3, player_nail4  ] 
+{
+	self.effects = self.effects | EF_MUZZLEFLASH;
+
+	if (!self.button0)
+		{player_run ();return;}
+	self.weaponframe = self.weaponframe + 1;
+	if (self.weaponframe == 9)
+		self.weaponframe = 1;
+	SuperDamageSound();
+	W_FireSpikes (4);
+	self.attack_finished = time + 0.2;
+};
+void() player_nail4   =[$lightfatt4, player_nail1  ] // *pk - viswep - Cataboligne - 9.29.9
+{
+	self.effects = self.effects | EF_MUZZLEFLASH;
+
+	if (!self.button0)
+		{player_run ();return;}
+	self.weaponframe = self.weaponframe + 1;
+	if (self.weaponframe == 9)
+		self.weaponframe = 1;
+	SuperDamageSound();
+	W_FireSpikes (-4);
+	self.attack_finished = time + 0.2;
+};
+
+// run full viswep frames for chain thunderbolt
+
+void() player_bolt3	 =[$lightfatt3, player_bolt4  ]
+{
+	self.effects = self.effects | EF_MUZZLEFLASH;
+
+	if (!self.button0)
+		{player_run ();return;}
+	self.weaponframe = self.weaponframe + 1;
+	if (self.weaponframe == 5)
+		self.weaponframe = 1;
+	SuperDamageSound();
+	bolt_fire();
+	self.attack_finished = time + 0.2;
+};
+
+void() player_bolt4	 =[$lightfatt4, player_bolt1  ]
+{
+	self.effects = self.effects | EF_MUZZLEFLASH;
+
+	if (!self.button0)
+		{player_run ();return;}
+	self.weaponframe = self.weaponframe + 1;
+	if (self.weaponframe == 5)
+		self.weaponframe = 1;
+	SuperDamageSound();
+	bolt_fire();
+	self.attack_finished = time + 0.2;
+};
 
 // fn(grap_vw_adj) - adjust start position for viswep location
 
 vector(entity hent) grap_vw_adj =
 {
 	local vector vwa;
+	local vector v1, v2, v3, v4;
 
+	vwa = v0;
+	if (!hent) return (vwa);
+
+	vw_harpoon_pnt(hent.frame);
+
+	v1 = hent.angles;
+	v1_x = 0 - v1_x; // must reverse pitch for proper position from v_fwd calc
+	makevectors( v1 );
+
+	v2 = (vv_o_000_x) * v_forward;
+	v3 = (0 - (vv_o_000_y)) * v_right;
+	v4 = (vv_o_000_z) * v_up;
+
+//	vwa = hent.origin  + v2 + v3 + v4;
+	vwa = v2 + v3 + v4;
+
+	return(vwa);
+
+/*
 	vwa = v0;
 	if (!hent) return (vwa);
 //	if (hent.flags & FL_CLIENT)
@@ -673,5 +735,5 @@ vector(entity hent) grap_vw_adj =
 		vwa = VWX_HARP_IDLE * v_forward + VWY_HARP_IDLE * v_right + VWZ_HARP_IDLE * v_up;
 	}
 	return(vwa);
+	*/
 };
-

@@ -16,12 +16,14 @@ BE .8 .3 .4 IN COLOR */
 
 void () W_SetCurrentAmmo;
 
-void () q100_SUB_regen =
+void () SUB_regen =
 {
 	self.model = self.mdl;		// restore original model
 	self.solid = SOLID_TRIGGER;	// allow it to be touched again
 	sound (self, CHAN_VOICE, "items/itembk2.wav", 1, ATTN_NORM);	// play respawn sound
-	setorigin (self, self.origin);
+	if (!Q_100) pk_item_position();  // *pk - reposition moved items (horn & harp effects) on respawn
+	else
+		setorigin (self, self.origin);
 };
 
 
@@ -46,7 +48,7 @@ PlaceItem
 plants the object on the floor
 ============
 */
-void () q100_PlaceItem =
+void () PlaceItem =
 {
 	local float oldz;
 
@@ -57,7 +59,7 @@ void () q100_PlaceItem =
 	self.velocity = '0 0 0';
 	self.origin_z = self.origin_z + 6;
 	oldz = self.origin_z;
-	if (!droptofloor(0,0)) // Cataboligne 9.17.3 - fixed this compiler warning
+	if (!droptofloor(0,0)) // Cataboligne 9.17.3 - fix compiler warning
 	{
 		dprint ("Bonus item fell out of level at ");
 		dprint (vtos (self.origin));
@@ -65,6 +67,8 @@ void () q100_PlaceItem =
 		remove (self);
 		return ;
 	}
+	if (!Q_100) pk_placeitem(); // *pk - set item details, handle custom hub - non pk levels deal
+	bot_item_linx(self); // *bot - item tie in
 };
 
 /*
@@ -103,9 +107,8 @@ float (entity e, float healamount, float ignore) T_Heal =
 	if ((!ignore) && (e.health >= other.max_health))
 		e.health = other.max_health;
 
-// Cant hard cap here because of q2 bottles
-//	if (e.health > 250)
-//		e.health = 250;
+	if (e.health > 250)
+		e.health = 250;
 
 	if (!Q_100) pk_setDamageSkin(e); // *pk damage skins code
 	return 1;
@@ -125,7 +128,7 @@ float H_MEGA	 = 2;
 void () health_touch;
 void () item_megahealth_rot;
 
-void () q100_item_health =
+void () item_health =
 {
 	self.touch = health_touch;
 
@@ -163,7 +166,7 @@ void () q100_item_health =
 };
 
 
-void () q100_health_touch =
+void () health_touch =
 {
 	local float amount;
 	local string s;
@@ -207,9 +210,10 @@ void () q100_health_touch =
 	}
 	else
 	{
-		if (deathmatch == 1)		// deathmatch 2 is the silly old rules
+		if (deathmatch != 2)		// deathmatch 2 is the silly old rules
 		{
-			self.nextthink = time + 20;
+			if (deathmatch)
+				self.nextthink = time + 20;
 			self.think = SUB_regen;
 		}
 	}
@@ -224,7 +228,6 @@ void () item_megahealth_rot =
 
 	if (other.health > other.max_health)
 	{
-		if (self.noise4 != Q3_DET) // q3 already has rot fn
 		other.health = other.health - 1;
 		self.nextthink = time + 1;
 		return ;
@@ -234,7 +237,7 @@ void () item_megahealth_rot =
 // just blindly subtract the flag off
 	other.items = other.items - (other.items & IT_SUPERHEALTH);
 
-	if (deathmatch == 1 || deathmatch == 3)	// deathmatch 2 is silly old rules // *pk more dm modes
+	if (deathmatch != 2)	// deathmatch 2 is silly old rules // *pk more dm modes
 	{
 		self.nextthink = time + 20;
 		self.think = SUB_regen;
@@ -276,39 +279,6 @@ void () armor_touch =
 		value = 200;
 		bit = IT_ARMOR3;
 	}
-// IDEA: move this somehow one day in the far future - maintain q100 code
-//       move issues - snd, ck, bit values used by later q100 code
-	local string snd;
-	local float ck;
-	ck = TRUE;
-	snd = "items/armor1.wav";
-	if (self.noise4 == DOOM_DET || self.noise4 == Q2_DET || self.noise4 == Q3_DET)
-	{
-		if (self.volume != -1)
-		if (other.armorvalue >= self.volume) return; // already max
-
-		ck = FALSE;
-		snd = self.noise;
-		bit = self.items;
-		type = self.style;
-		value = self.currentammo + other.armorvalue;
-		if (self.volume > 0) // max only applies to non inf
-		{
-			if (value > self.volume) value = self.volume;
-		}
-		if (self.volume == -1 || self.classname == "q3_item_armor_shard" || self.classname == "d_item_spiritarmor") // shard specials
-		{
-			if (other.armortype > type) type = other.armortype; // shards pick best pl. has
-			bit = other.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3);
-		}
-		if (self.noise4 == Q3_DET)
-		{
-			q3_ha_rot(other, value);
-		}
-	}
-
-	if (ck)
-// end NON q100
 	if (other.armortype*other.armorvalue >= type*value)
 		return ;
 
@@ -318,18 +288,13 @@ void () armor_touch =
 
 	self.solid = SOLID_NOT;
 	self.model = string_null;
-  if (deathmatch == 1 || deathmatch == 3)
-  {
+  if (deathmatch == 1)
 		self.nextthink = time + 20;
-		self.think = SUB_regen;
-  }
+	self.think = SUB_regen;
 
-	if (self.netname != "Mega Sphere")
-	{
 	sprint(other, "You got armor\n");
-	}
 // armor touch sound
-	sound(other, CHAN_ITEM, snd, 1, ATTN_NORM);
+	sound(other, CHAN_ITEM, "items/armor1.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
 
 	activator = other;
@@ -386,18 +351,16 @@ WEAPONS
 
 void () bound_other_ammo =
 {
-	if (!Q_100) pk_bound_ammo();  // *pk bound ammo
-	else
-	{
 	if (other.ammo_shells > 100)
 		other.ammo_shells = 100;
 	if (other.ammo_nails > 200)
 		other.ammo_nails = 200;
 	if (other.ammo_rockets > 100)
 		other.ammo_rockets = 100;
+	if (!Q_100) pk_bound_ammo();  // *pk bound ammo
+	else
 	if (other.ammo_cells > 100)
 		other.ammo_cells = 100;
-	}
 };
 
 
@@ -514,21 +477,7 @@ void () weapon_touch =
 		other.ammo_cells = other.ammo_cells + 15;
 	}
 	else
-//		objerror ("weapon_touch: unknown classname");
-	{
-		if (Q_100 && Q_100_OBJERR) objerror("weapon_touch: unknown classname");
-		else
-		{
-			if (WARNING)
-			{
-			bprint("\n*** warning:\nweapon_touch: unknown classname (");
-			bprint(self.classname);
-			bprint(") - ignoring\n\n");
-			}
-			self.touch = SUB_Null;
-			return;
-		}
-	}
+		objerror ("weapon_touch: unknown classname");
 
 	sprint (other,"You got the ");
 	sprint (other,self.netname);
@@ -566,10 +515,8 @@ void () weapon_touch =
 	self.model = string_null;
 	self.solid = SOLID_NOT;
   if (deathmatch == 1)
-  {
-		self.nextthink = time + RSP_TIME;
+		self.nextthink = time + 30;
 		self.think = SUB_regen;
-  }
 
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
@@ -579,7 +526,7 @@ void () weapon_touch =
 /*QUAKED weapon_supershotgun (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void () q100_weapon_supershotgun =
+void () weapon_supershotgun =
 {
 	precache_model ("progs/g_shot.mdl");
 	setmodel (self,"progs/g_shot.mdl");
@@ -621,7 +568,7 @@ void () weapon_supernailgun =
 /*QUAKED weapon_grenadelauncher (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void () q100_weapon_grenadelauncher =
+void () weapon_grenadelauncher =
 {
 	precache_model ("progs/g_rock.mdl");
 	setmodel (self,"progs/g_rock.mdl");
@@ -635,7 +582,7 @@ void () q100_weapon_grenadelauncher =
 /*QUAKED weapon_rocketlauncher (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void () q100_weapon_rocketlauncher =
+void () weapon_rocketlauncher =
 {
 	precache_model ("progs/g_rock2.mdl");
 	setmodel (self,"progs/g_rock2.mdl");
@@ -650,7 +597,7 @@ void () q100_weapon_rocketlauncher =
 /*QUAKED weapon_lightning (0 .5 .8) (-16 -16 0) (16 16 32)
 */
 
-void () q100_weapon_lightning =
+void () weapon_lightning =
 {
 	precache_model ("progs/g_light.mdl");
 	setmodel (self,"progs/g_light.mdl");
@@ -749,7 +696,7 @@ void () ammo_touch =
 	self.model = string_null;
 	self.solid = SOLID_NOT;
   if (deathmatch == 1)
-		self.nextthink = time + RSP_TIME;
+		self.nextthink = time + 30;
 	self.think = SUB_regen;
 
 	activator = other;
@@ -1106,7 +1053,7 @@ void () sigil_touch =
 End of level sigil, pick up to end episode and return to jrstart.
 */
 
-void () q100_item_sigil =
+void () item_sigil =
 {
 	if (!self.spawnflags)
 		objerror ("no spawnflags");
@@ -1158,6 +1105,12 @@ void () powerup_touch =
 	if (other.health <= 0)
 		return ;
 
+	if (PK_ART)
+	{
+		pk_art_powerup_touch(); // Cataboligne 8.12.9 purify - pk artifacts
+		return;
+	}
+
 	sprint (other,"You got the ");
 	sprint (other,self.netname);
 	sprint (other,"\n");
@@ -1169,9 +1122,9 @@ void () powerup_touch =
 
 		if ((self.classname == "item_artifact_invulnerability") ||
 			(self.classname == "item_artifact_invisibility"))
-			self.nextthink = time + RSP_TIME * 10; // * 2 * 5
+			self.nextthink = time + 60*5;
 		else
-			self.nextthink = time + RSP_TIME * 2;
+			self.nextthink = time + 60;
 
 		self.think = SUB_regen;
 	}
@@ -1186,29 +1139,25 @@ void () powerup_touch =
 	if (self.classname == "item_artifact_envirosuit")
 	{
 		other.rad_time = 1;
-		other.radsuit_finished = time + POW_TIME;
+		other.radsuit_finished = time + 30;
 	}
 
 	if (self.classname == "item_artifact_invulnerability")
 	{
 		other.invincible_time = 1;
-		other.invincible_finished = time + POW_TIME;
-		if (other.pkplus_actortype == PKPLUS_ACTORPENT) // Cataboligne 8.12.9 purify - pk artifacts
-			other.pkplus_actortype = 0;
+		other.invincible_finished = time + 30;
 	}
 
 	if (self.classname == "item_artifact_invisibility")
 	{
 		other.invisible_time = 1;
-		other.invisible_finished = time + POW_TIME;
+		other.invisible_finished = time + 30;
 	}
 
 	if (self.classname == "item_artifact_super_damage")
 	{
 		other.super_time = 1;
-		other.super_damage_finished = time + POW_TIME;
-		if (other.pkplus_actortype == PKPLUS_ACTORQUAD) // Cataboligne 8.12.9 purify - pk artifacts
-			other.pkplus_actortype = 0;
+		other.super_damage_finished = time + 30;
 	}
 
 	activator = other;
@@ -1304,8 +1253,13 @@ PLAYER BACKPACKS
 ===============================================================================
 */
 
-void () q100_BackpackTouch =
+void () BackpackTouch =
 {
+	if (!Q_100)
+	{
+		PK_BackpackTouch();
+		return;
+	}
 	local string s;
 	local	float	best, old, new;
 	local entity stemp;
@@ -1407,8 +1361,14 @@ void () q100_BackpackTouch =
 DropBackpack
 ===============
 */
-void () q100_DropBackpack =
+void () DropBackpack =
 {
+	if (!Q_100)
+	{
+		PK_DropBackpack();
+		bot_BackpackSetup(newmis); // *bot - includes PK
+		return;
+	}
 	local entity item;
 
 	if (!(self.ammo_shells + self.ammo_nails + self.ammo_rockets + self.ammo_cells))
@@ -1451,7 +1411,7 @@ void () q100_DropBackpack =
 	item.movetype = MOVETYPE_TOSS;
 	setmodel (item,"progs/backpack.mdl");
 	setsize (item,'-16 -16 0','16 16 56');
-	item.touch = q100_BackpackTouch;
+	item.touch = BackpackTouch;
 
 	item.nextthink = time + 120;	// remove after 2 minutes
 	item.think = SUB_Remove;

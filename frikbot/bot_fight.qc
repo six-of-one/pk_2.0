@@ -339,6 +339,11 @@ void() bot_shoot =
 	if (fabs(g) > 30)
 		return; // not again!
 	self.button0 = TRUE;
+
+// Cataboligne 4.17.11 - saver fn tie in
+	if (self.aiment)
+	if (self.aiment.classname == "saver")
+		self.aiment.button0 = TRUE;
 };
 
 /*

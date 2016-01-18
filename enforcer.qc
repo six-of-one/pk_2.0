@@ -56,9 +56,8 @@ void() Laser_Touch =
 
 	if (other.health)
 	{
-		if (!self.dmg) self.dmg = 15; // Cataboligne - 5.24.10 - store damage here for turret lasers
-		SpawnBlood (org, self.velocity*0.2, self.dmg);
-		T_Damage (other, self, self.owner, self.dmg);
+		SpawnBlood (org, self.velocity*0.2, 15);
+		T_Damage (other, self, self.owner, 15);
 	}
 	else
 	{

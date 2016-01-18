@@ -24,8 +24,6 @@ frikbot/bot_phys.qc
 frikbot/bot_move.qc
 frikbot/bot_ed.qc
 
-precache.qc
-
 // chaos code
 chaos.qc
 
@@ -71,53 +69,18 @@ oldone.qc
 
 chasecam.qc  //Cataboligne MOD 9.11.3
 
-xwep/viswep.qc
-xwep/vw_seq.qc
-xwep/mcode.qc
-xwep/flyers.qc
-
-// hipnotic
-
-hipnotic/hipdefs.qc
-hipnotic/hiprubbl.qc
-hipnotic/rotate.qc
-hipnotic/hammer.qc
-hipnotic/laser_cannon.qc
-hipnotic/proxmine.qc
-hipnotic/hipnoticents.qc
-hipnotic/hipwater.qc
-
-// runes
-runes.qc
-
-// support for doom maps ! 
-xwep/dooments.qc
-
-// extra weapons
-
-xwep/railgun.qc
-xwep/lasers.qc
-xwep/flamer.qc
-xwep/x_firecode.qc
-
-// support for q2 converted maps
-xwep/q2ents.qc
-// support for q3 maps in darkplaces
-xwep/q3ents.qc
-xwep/chaosents.qc
-xwep/mc_disambig.qc
+pk_src/viswep.qc
+pk_src/vw_seq.qc
 
 // painkeep code
-pk_src/2dtrain.qc
 pk_src/pkitems.qc
 pk_src/pk_itm_dynamic.qc
-pk_src/pk_itm_loopcyc.qc
-pk_src/pk_itm_translate.qc
 pk_src/pk_weapons.qc
 pk_src/pk_player.qc
 pk_src/meantime.qc
 pk_src/drip.qc
 pk_src/sparks.qc
+pk_src/2dtrain.qc
 pk_src/sound.qc
 pk_src/fallaway.qc
 pk_src/turret.qc
@@ -145,7 +108,11 @@ pk_src/actor.qc
 pk_src/phone.qc
 pk_src/pk_artifacts.qc
 
+// support for q3 maps in darkplaces
+pk_src/q3items.qc
 
+// support for rotating brushes - Ariochs Heaven map
+rotate.qc
 
 bot.qc
 bot_func.qc

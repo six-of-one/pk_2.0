@@ -15,7 +15,7 @@ void() actor_pent_activate =
 {
 	sprint(self,"Entering the Pentagram Stage\n");
 	self.invincible_time = 1;
-	self.invincible_finished = time + POW_TIME;
+	self.invincible_finished = time + 30;
 	self.items = self.items | IT_INVULNERABILITY;
 	if ((random () * 100) < 5)
 		self.pkplus_actortype = 0;
@@ -30,7 +30,7 @@ void() actor_quad_activate =
 {
 	sprint(self,"Entering the Quad Stage\n");
 	self.super_time = 1;
-	self.super_damage_finished = time + POW_TIME;
+	self.super_damage_finished = time + 30;
 	self.items = self.items | IT_QUAD;
 	if ((random () * 100) < 5)
 		self.pkplus_actortype = 0;

@@ -106,7 +106,7 @@ void(entity who) UpdateClient =
 float(entity e) IROBOT =
 {
 	float c;
-	
+
 	if (!e) return(FALSE); // testing world
 	if (!e.ishuman && e.classname == "player") c = TRUE; // frikbot found
 	else if (e.classname == "pk*bot") c = TRUE; // pk*bot found
@@ -277,7 +277,7 @@ void() bot_skinParms =
 	}
 };
 
-//encode bot details for level change - allow pk*bots to work on other game engines - TEST
+//encode bot details for level change
 
 void() bot_changeParms =
 {
@@ -386,9 +386,9 @@ void() set_initBotLevel =
 		}
 		else
 		{
-			e.cnt = parm12; // should be bot skill for up to 6 bots
-			e.count = parm13;
-		}
+		e.cnt = parm12; // should be bot skill for up to 6 bots
+		e.count = parm13;
+	}
 	}
 	cvar_set("sv_bot_pkset", "0");
 
@@ -652,8 +652,6 @@ void(entity e) bot_BackpackSetup =
 
 // remove item hooks & put here - code diverts here from PlaceItem
 
-// TDO: easy ver, all x stuff
-
 void(entity e) bot_item_linx =
 {
 
@@ -844,80 +842,6 @@ void () printIntro =
 	else
 	{
 //		centerprint (self,"Server running pk*bots v1.1\nand PainKeep v1.1");
-		centerprint (self,"Server running pk*bots v2.2, frikbot 0.10.1");
-	}
-};
-
- // Cataboligne - 6.9.10 - bots get really cold now - dev code
-
-float b_frz;
-float b_ufr;
-
-void (entity e) bot_freeze =
-{
-	if (e)
-	if (BOTFREEZE)
-	{
-		e.style = e.movetype;
-		e.movetype = MOVETYPE_NONE;
-		e.attack_finished = MAXFL;
-		if (e.think != SUB_Nop) e.think1 = e.think;
-		e.think = SUB_Nop;
-		b_frz = b_frz + 1;
-	}
-	else
-	{
-		e.movetype = e.style;
-		e.attack_finished = 0;
-		e.think = e.think1; // if this is spuriously called this is not good
-		e.nextthink = time + 0.1;
-		b_ufr = b_ufr + 1;
-	}
-};
-
-void (entity e) bot_froze =
-{
-	local entity f;
-	local string srch;
-
-	if (BOTFREEZE != cvar("sv_c_botfreeze"))
-		BOTFREEZE = cvar("sv_c_botfreeze");
-
-	b_frz = b_ufr= 0;
-	if (e)
-		bot_freeze(e);
-	else
-	{
-		srch = "player";
-		f = find(world, classname, "player");
-		while (f != world)
-			{
-				if (IROBOT(f))
-					bot_freeze(f);
-
-				f = find(f, classname, srch);
-
-				if (!f)
-				if (srch != "pk*bot" )
-				{
-					srch = "pk*bot";
-					f = find(world, classname, srch);
-				}
-			}
-	}
-	if (WARNING)
-	{
-		if (b_frz)
-		{
-			bprint("*** Bot froze - ");
-			bprint(ftos(b_frz));
-			bprint(" bots \n");
-		}
-		if (b_ufr)
-		{
-			bprint("*** Bot unfroze - ");
-			bprint(ftos(b_ufr));
-			bprint(" bots \n");
-		}
+		centerprint (self,"Server running team pk*bots v2.2, frikbot 0.10.1");
 	}
 };

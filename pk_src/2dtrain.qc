@@ -27,6 +27,11 @@ path_corners need a "target1" "..." and "target2" "..." instead of the single
 
 */
 
+// mod to pk 2.1 code 7/13/10 - added WARNING tag
+
+// used by path_corners to specify the 2 possible destinations
+.string target1;
+.string target2;
 
 void(float n) func_train_2d_next;
 void() func_train_2d_find;

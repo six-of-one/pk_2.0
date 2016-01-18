@@ -13,6 +13,9 @@
 	"wait" "#" 		- hub will chose map when this time is up
 */
 
+// Cataboligne
+// fixed - math issues with observers / bots
+
 /*
 	hub_teleport
 */
@@ -194,7 +197,7 @@ float() check_custom_hub =
 // fn(hub_custom) - implement the custom hub - portal
 
 void() hub_custom =
-{
+{ 
 	local entity e;
 	local vector v;
 
@@ -218,8 +221,7 @@ void() hub_custom =
 	hub_teleport(); // init hub portal
 
 //	if (!(pk_flags & PK_MAP) && !PK) 
-//		pk_map =  // deprecated - now indicates a true (recognized) pk map
-		PK = TRUE; // *pk - in map mode, set PK for painkeep mode
+		pk_map = PK = TRUE; // *pk - in map mode, set PK for painkeep mode
 
 // set appearance - model has different frames & skins for variety
 // IDEA: set facing in cphub? - not for now, all portals should be "directionless"
@@ -260,8 +262,6 @@ void() hub_custom =
 // - bind key to impulse 35, and set saved1 = 482 or 483
 // - saved1 = 482, no comments on fields
 // - saved1 = 483, add in comments for fields that need edited to add custom maps
-
-// IDEA: turn off stat messages ("you got the shells") if  pk_chubcon == 666
 
 float pk_chubcon;
 
@@ -446,11 +446,12 @@ void() hub_control_use =
 	// error
 	if (highest == world)
 	{
-		if (PK_100)
-		{
-			remove(self);
-			return;
-		}
+// NOTE: found in wrong place - orig code has no remove here!
+//		if (PK_100)
+//		{
+//			remove(self);
+//			return;
+//		}
 		bprint("hub_control_use: highest vote not found\n");
 		return;
 	}
@@ -617,6 +618,8 @@ void() hub_control_status =
 				str2 = second.map;
 			}
 
+			if (self.classname != "pk*bot" && (!FRIKBOT ||self.ishuman))
+			{
 			if (self.map == string_null)
 			{
 				str3 = ftos(second.cnt);
@@ -626,6 +629,7 @@ void() hub_control_status =
 			{
 				str3 = ftos(second.cnt);
 				centerprint7(self, "\n\n\n\n\n\n\n\n\n\n\nYou Voted For: ", str1, "		 Second: ", str2, " [", str3, "]");
+			}
 			}
 			self.attack_state = 2;
 			return;
@@ -723,8 +727,7 @@ void() hub_control =
 	}
 	theHub = self;
 
-//	pk_map =  // deprecated - now indicates a true (recognized) pk map
-	PK = TRUE; // *pk - in case its not an official pk hub
+	pk_map = PK = TRUE; // *pk - in case its not an official pk hub
 
 // either triggered to by time
 	if (self.targetname)
@@ -734,6 +737,13 @@ void() hub_control =
 	// activated or timeout?
 	else 
 	{
+		if (PK_100 && !self.wait)
+		{
+			if (PK_100_OBJERR) objerror("hub_control without targetname OR wait");
+			if (WARNING) bprint("\n*** warning:\nhub_control without targetname OR wait - removing.\n\n");
+			remove(self);
+			return;			
+		}
 		if (!self.wait) self.wait = 120; // Cataboligne - if no self.wait, why not just pick a default?
 		self.think = hub_control_use;
 		// create timer
@@ -1220,7 +1230,7 @@ void() WaitForVotesThink =
 				self.attack_state = 0;
 			}
 
-		centerprint3(self, "You have just voted for ", self.map, ".\n\nPlease wait here while all other \nplayers finish voting.	Once all votes \nhave been cast, the winning \nlevel will start.\n");
+			centerprint3(self, "You have just voted for ", self.map, ".\n\nPlease wait here while all other \nplayers finish voting.	Once all votes \nhave been cast, the winning \nlevel will start.\n");
 
 			return;
 		}
@@ -1290,7 +1300,6 @@ void() WaitForVotesThink =
 			}
 
 			playerIntermissionVotesTimeLeft(maxplayers, votecast, timemins, timedef);
-
 // trick when 1 bot is left to vote
 			if ((maxplayers - votecast) == 1)
 			if (!e.ishuman)
@@ -1373,7 +1382,7 @@ void() bot_votereveal =
 	bprint("\n");
 };
 
-// Cataboligne - 5.12.10 - sneak in bot votes (yep, this is labor union heavy handedness - since they dont seem to be real keen on going to the polls...)
+// Cataboligne - 5.12.10 - sneak in bot votes (since they dont seem to be real keen on going to the polls...)
 
 // despite my best efforts bots dont like to jump thru vote portals - so just cheat em' in when the bot dies
 

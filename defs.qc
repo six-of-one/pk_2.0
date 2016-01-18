@@ -696,6 +696,22 @@ float (entity e, float healamount, float ignore) T_Heal; // health function
 float(entity targ, entity inflictor) CanDamage;
 
 
+// Cataboligne 9.11.3 purify - chase cam
+void() chase_cam_precache;
+void(float sel) cam_parms;
+void() Chase_cam_level_start;
+void() cam_waterjump;
+
+// message protocol defines
+float SVC_SETVIEWPORT	= 5;
+float SVC_SETVIEWANGLES	= 10;
+
+// free player entity variable
+// '.float speed'  bit-flag defines:
+//float CHSCAM_MONSTER  = ;
+float CHSCAM_ON			= 1;
+float LASERTARG_ON		= 4;
+float LASERTARG_LIT		= 32;
 
 // moved here due to v106 tones
 

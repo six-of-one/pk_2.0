@@ -441,6 +441,8 @@ Key doors are allways wait -1.
 void () func_door =
 
 {
+// Cataboligne - 4.9.11 - doors not in mod maps
+	if (notmod(self)) return;
 
 	if (world.worldtype == 0)
 	{

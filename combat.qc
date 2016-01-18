@@ -121,61 +121,44 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 {
 	local vector dir;
 	local entity oldself;
-	local float save, pwr_save;
+	local float save;
 	local float take;
 
 	if (!targ.takedamage)
 		return;
 
+	if (!Q_100)
+	{
+		pk_art_T_Damage(targ, inflictor, attacker, damage); // Cataboligne 8.12.9 purify - pk artifacts
+		return;
+	}
+
 // used by buttons and triggers to set activator for target firing
 	damage_attacker = attacker;
 
 // check for quad damage powerup on the attacker
-	if (!((RUNES > 1) && (attacker.rune_flag & RUNE_FLG_DM))) // rune overpowers quad on higher rule sets 
 	if (attacker.super_damage_finished > time)
-	if (attacker.pkplus_actortype != PKPLUS_ACTORQUAD) // pk art code here
 		damage = damage * 4;
-
-	if (attacker.rune_flag & RUNE_FLG_DM)
-		damage = damage * 2;
 
 // save damage based on the target's armor level
 
 	// PAINKEEP_START Ignore armor stuff, used for drowning
 	if (Q_100 || !ignorearmor)
 	{
-		pwr_save = power_armor(targ, inflictor, damage); // calc damage taken by power armor
-
-		if (pwr_save < damage)
-		save = ceil(targ.armortype * (damage - pwr_save));
-
+		save = ceil(targ.armortype*damage);
 		if (save >= targ.armorvalue)
+		{
 			save = targ.armorvalue;
+			targ.armortype = 0;	// lost all armor
+			targ.items = targ.items - (targ.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3));
+		}
+
+		targ.armorvalue = targ.armorvalue - save;
+		take = ceil(damage-save);
 	}
 	else
 	{
-		save = 0;
-	}
-
-	take = ceil(damage - save - pwr_save);
-
-	if (targ.rune_flag & RUNE_FLG_RS)
-	{
-		take = take / 2;
-		save = save / 2;
-		if (targ.invincible_sound < time)
-		{
-			sound (targ, CHAN_ITEM, "items/protect3.wav", 1, ATTN_NORM);
-			targ.invincible_sound = time + 2;
-		}
-	}
-
-	targ.armorvalue = targ.armorvalue - save;
-
-	if (targ.armorvalue < 1)
-	{
-		targ.armortype = 0;	// lost all armor
-		targ.items = targ.items - (targ.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3));
+		take = damage;
 	}
 
 // add to the damage total for clients, which will be sent as a single
@@ -206,7 +189,6 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 			sound (targ, CHAN_ITEM, "items/protect3.wav", 1, ATTN_NORM);
 			self.invincible_sound = time + 2;
 		}
-		if (targ.pkplus_actortype != PKPLUS_ACTORPENT) // pk art code here
 		return ;
 	}
 
@@ -217,7 +199,6 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 // do the damage
 	targ.health = targ.health - take;
 
-	if (targ.pkplus_actortype != PKPLUS_ACTORPENT) // pk art code here - fake it for pent acting
 	if (!Q_100) pk_setDamageSkin(targ); // *pk damage skin support
 	if (targ.health <= 0)
 	{
@@ -269,7 +250,6 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 		}
 	}
 
-	if (self.pkplus_actortype != PKPLUS_ACTORPENT || random() < 0.1) // pk art code here - fake it for pent acting most of the time
 	if (self.th_pain)
 	{
 		self.th_pain (attacker,take);
@@ -299,7 +279,6 @@ void (entity inflictor, entity attacker, float damage, entity ignore) T_RadiusDa
 		if (head != ignore)
 		{
 			if (head.takedamage)
-			if (head.wad != "q1" || PK_100 || Q_100) // dont damage hidden replacement stuff 2.21.11
 			{
 				org = head.origin + (head.mins + head.maxs)*0.5;
 				points = 0.5*vlen (inflictor.origin - org);

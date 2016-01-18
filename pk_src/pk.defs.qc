@@ -1,16 +1,10 @@
 // constants
 
-// base values
-vector v0						= ' 0 0 0'; // zero vector |dimension
-float MAXFL						= 16777215; // max (non mantissa) float - max bit mask
-
-float chaos;									// detect customized glquake engine - has cvars compiled
-float CHAOS_ENG				= 10100010110111; // chaos engine id
-float DARKPLACES;								// for detecting darkplaces
+vector v0						= ' 0 0 0';
+float MAXFL						= 16777215; // max float - max bit mask
+float WARNING;									// display warnings
 
 // ADMIN section
-float WARNING;									// display warnings - dev work mainly
-
 // dev - only enable this for painkeep maps or force pk mode (sv_ control) - any maps that loads a pk item / func
 float PK;									// if set true painkeep code is enabled
 float PK_MAP					= 6144;	// bit * = FALSE -- map sets painkeep mode  - PK = TRUE if: any pk*.bsp loaded, start.bsp loaded and message == "hub", a map loads any painkeep map item, PK = FALSE otherwise
@@ -22,9 +16,9 @@ float PK_SPIKER				= 16384;	// bit *	= FALSE -- allow spike traps, set to true f
 float PK_XSOUND				= 32768;	// bit * = TRUE --- use extra pk sound set
 // compatability modes for the purists out there
 float PK_100;								// painkeep compatability mode - if true run 100% true to pk v1.11, no extras (has menus)
-float XENV;									// 99% compatability mode - if true (main mod) works but extra env effects are disabled
+float PK_99						= FALSE;	// painkeep 99% compatability mode - if true pk (main mod) works as pk but extra env effects are disabled
 float Q_100;								// quake 1 compatability mode - if true run 100% true to quake 1, why? just for kicks...
-float Q_99;									// quake 1 99% compatability mode - if true pk stuff is removed, but admin, item enhancements & env remain
+float Q_99						= FALSE;	// quake 1 99% compatability mode - if true pk stuff is removed, but admin, item enhancements & env remain
 
 												// many object errors are tweaked to simply remove the offending component - if these 2 vars are set true, and objerror will be generated
 float PK_100_OBJERR;						// if true objerr that would have exited game (and have since been fixed) will cause an objerr
@@ -32,17 +26,17 @@ float Q_100_OBJERR;						// if true objerr that would have exited game (and have
 float MAP_OBSTR;							// object errors -> warnings that remove map items should set this. so map repair (tbd) can init an emergency exit
 float MAP_REPAIR;							// if true map repairs will execute
 void() q_startmap;						// fix start map issue for q single player
-.string class_select;					// allow selection by class
-//float GMODE;								// genre mode - cfg for ambig map items
 
-// q100 stuff
-void() q100_PlayerPreThink;
-void() q100_PlayerPostThink;
-float intermission_running;
 
 float PK_HUB2					= 131072; // bit if TRUE, using custom hub - only used for level transtion from hub vote
+//float PK_HUB3					= 262144; // bit if TRUE, using hub3 - reload at hub loads - deprecated
 float PK_ADHUB					= 1;		// set to 0 PK_mapmode and admin menu will ignore new maps - item load can still set PK mode for any pk map
+//float PK_HUBEXIT;							// TRUE - loading a non PK map while running a custom hub exits the hub loop, FALSE - always return to a custom hub from any map load
 float PK_ADMINMAP;						// if true this is an admin map command that overrides custom hub call from GotoNextMap
+//float PK_CUSTOMHUB;						// if TRUE, level running is a custom hub
+
+string st_hub2					= "hub2"; // map names for 2nd & 3rd hub
+string st_hub3					= "hub3";
 
 float pk_flags;							// replaces old usage of temp1, savedgamecfg stores this
 float pk_xsound;							// set to state of PK_XSOUND bit for sound code toggle
@@ -50,8 +44,12 @@ float pk_xsound;							// set to state of PK_XSOUND bit for sound code toggle
 float pk_itemovr;							// control items - admin override
 float pk_map;								// true if a painkeep map is loaded
 float pk_ditems;							// count painkeep items for dyn_items code
-float PK_DYNTO;							// timeout in 120 secs
+float PK_DYNTO					= 120;	// timeout in 120 secs
 float PK_DYNRAD				= 8000;	// dynamic radius search 8000 units
+float DARKPLACES;							// for detecting darkplaces - modded engine sets cvar("chaos") to this value
+
+float CHAOS_ENG			= 10100010110111; // chaos engine id
+float chaos;
 
 float PK_ADMIN;							// allow admin - set this to 0 to completely disable all admin
 float pk_adminimp;						// impulse set in admin.cfg to access admin commands, defaults to 255
@@ -61,7 +59,6 @@ float pk_admintime;						// if > 0 - inactivity timer for admin mode
 float pk_adminframe;						// only do once per frame
 float LIVE_ADMIN				= 100;	// for being in game with admin privs - previous painkeep admin mode
 float ADMIN_LOGIN				= -2;		// .admin value for login
-float ADMINLOCK;							// polled from sv_c_adminlock
 float USER_MENU				= -1;		// .admin value that handles user menu - admin code set runs user menus
 float USER_TIMEOUT			= 5;		// timeout user menu in 5 secs
 float USER_IMPULSE			= 39;		// user menu impulse
@@ -71,153 +68,14 @@ string ADMINCODE				= "float1\n"; // local command that loads admin security pas
 string ADMINIMPULSE			= "float2\n"; // load the impulse
 string ADMINTIME				= "float3\n"; // load the time out
 string ADMINMAPCMD			= "_mapcmd\n"; // append to mapname for alias cmd
-float BOTFREEZE;							// if true stop bots cold
-void (entity e) bot_froze;
-
-string() build_itemmenu;
-void() Admin_itembits;
-float(float msk) rnd_bit_mask;
-void(float msk, float bt) bit_print;
-
-float pk_mapcmd;
-float pk_mapcfg;
+float pk_mapcmd				= 1; // TOD: admin option later
+float pk_mapcfg				= 1; // TOD: admin option later
 //string ADMINSRVCMD			= "_srvcmd\n"; // server vars alias cmd
-//float pk_srvcmd				= 1; 		// TOD: admin option later
-float pk_srvcfg;
+//float pk_srvcmd				= 1; // TOD: admin option later
+float pk_srvcfg				= 1; // TOD: admin option later
+void(float tm) th_bot_changeParms; // save bot parms to cvar or parm*
 
 void() pk_srvcmd_set;
-void() mcode_load;
-// end main admin
-
-
-
-// env
-
-/// *** DUMMY SECTION - IDEA: move to better location later on
-
-//float FL_NOPART		= 8192; //no particles when melting
-
-float RMIN_SKY					= -60;	// removed from values returned
-float RMIN_LAVA				= -50;
-float RMIN_SLIME				= -40;
-float RMIN_WATER				= -30;
-
-float RM_SKY					= 1; // dummy(s) - just so we dont have to recode later
-//float RM_SKY					= 1;		// remove imm. if CONTENT_SKY
-float RM_WATER 				= 2;		// remove imm. if CONTENT_WATER
-float RM_SLIME 				= 4;		// remove imm. if CONTENT_SLIME
-float RM_LAVA					= 8;		// remove imm. if CONTENT_LAVA
-float CKO						= 16; 	// only check content, take no action - should not be used in cycle - negates timer
-float FLT_WATER				= 32; 	// float when in water
-float FLT_SLIME				= 64; 	// float in slime
-float FLT_LAVA					= 128;	// float in lava
-//float FLT_BOB					= 256;	// bob cycle while floating
-float FLT_IMM					= 512;	// no lift, just blink it there
-float MLT_SLIME				= 1024;	// melt in slime, ** time prior to melt in .wait
-float MLT_LAVA					= 2048;	// melt in lava
-//float MLT_WATER				= 4096;	// melt in water (what the hey, made of sugar?)
-//float MLT_IMM				= 8192;	// melt with no wait time - *** ISSUE: FL_NOPART code borks this, but its not implemented yet
-//float MLT_BLOW				= 16384;	// try to blow up explosives, dmg based on currentammo and mode_x - subflare spot
-//float FLT_SINK				= 32768;	// eventually sink the floaty, ** time in .delay
-
-/* deprecated - not used, ever
-float FRC_RESP					= 65536;	// force a respawn after .pausetime, if MLT_IMM, this will be instant
-float CLR_TOUCH				= 131072;// clear touch fn when first event occurs
-*/
-
-float CK_EARTHQUAKE			= 131072;// check if ent in earthquake range
-
-float PF_WATER					= 262144;// call .th_stand() every time in content
-float PF_SLIME					= 524288;
-float PF_LAVA					= 1048576;
-float PF_EMPTY					= 2097152;
-float SF_CHK					= 4194304;// call .th_walk() on sched above also
-float PF_SOLID		 			= 8388608;// solid check, for stopping things?
-
-float CTI_LAVA					= 1050776;// Lava flag indicated - RM_LAVA | CKO | FLT_LAVA | MLT_LAVA | PF_LAVA
-float CTI_WATER				= 262194;// Water flag indicated
-float CTI_SLIME				= 525396;// Slime flag indicated
-
-.float content_flag;
-
-.string quakeset // string search link all quakeable ents
-string EARTHQUAKE				= "earthquake"; // select things we want to shake up
-
-float QUAKE_RUBBLE			= 0.17; // chance of rubble when skaking loose debris
-float QUAKE_RUBBLE_PER		= 0.04; // chance of rubble percent per richter
-float RUBBLE_DMGDEF			= 10; // default damage from hot rubble
-float RUBBLE_TIME				= 15; // TEST 45; // time for rubble to hang around
-float RUBBLE_TDEV				= 15; // dev time on rubble
-float RUBBLE_BLASTRAD		= 48; // distance from explosion to look for rubble to blast
-float EXPLODE_RUBBLE			= 0.6; // chance of rubble from explosion
-float RUBBLE_SHOT				= 0.07; // % chance a bullet hitting solid will release a mini rubble
-
-void(vector rorg, vector vel, float vibe, float rskn) rubble_debris;
-
-
-// DARKPLACES specials
-// wrap - fix fte broke ass shit
-
-float(entity e, float s) getsurfacenumpoints_wrap = #434;
-vector(entity e, float s, float n) getsurfacepoint_wrap = #435;
-vector(entity e, float s) getsurfacenormal_wrap = #436;
-string(entity e, float s) getsurfacetexture_wrap = #437;
-float(entity e, vector p) getsurfacenearpoint_wrap = #438;
-vector(entity e, float s, vector p) getsurfaceclippedpoint_wrap = #439;
-
-
-float(entity e, float s) getsurfacenumpoints;
-vector(entity e, float s, float n) getsurfacepoint;
-vector(entity e, float s) getsurfacenormal;
-string(entity e, float s) getsurfacetexture;
-float(entity e, vector p) getsurfacenearpoint;
-vector(entity e, float s, vector p) getsurfaceclippedpoint;
-// end specials
-
-
-// runes
-.float rune_flag;
-float RUNE_3_ACM; // amount to accumulate under rule 3
-.float rune_3_dmg; // rule 3 - these are cumulative effects
-.float rune_3_resist;
-.float rune_3_haste;
-.float rune_3_rgn;
-float rune_set;
-void() run_runes;
-void(entity e, entity p) rune_id;
-void() rune_regen;
-float(float atf) rune_haste;
-void () rune_touch;
-
-float RUNES;
-float RUNE_CNT;
-float RUNE_MASK;
-float RUNE_RANDOM;
-float RUNE_AR1M;
-float RUNE_R1SFX;
-float RUNE_MOVE; // move a rune after this many min regardless of other cnts
-
-float rune_count; // total # on map
-void() rune_maker;
-
-float R_EARTH; // allow power mix
-float R_HELL;
-float R_BLACK;
-float R_ELDER;
-
-float RUNE_FLG_RS				= 1;
-float RUNE_FLG_DM				= 2;
-float RUNE_FLG_HS				= 4;
-float RUNE_FLG_RG				= 8;
-float RUNE_MASK_ALL			= 15; // because manual config must have mask off for bad bits
-
-float RUNE_AMMO				= 16; // no rune code yet - for packs
-float RUNE_FLG_FLY			= 32; // no rune code yet - for q3
-
-void() flyer_move; // fly rune for now
-
-// end runes
-
 
 // item override admin
 float DYN_OVR;
@@ -227,44 +85,6 @@ float DYN_ARTFR;
 float DYN_ARTFR_ONLY; // if set true dynamic only adds artifacts to map
 float DYN_FORCE_CNT; // max forced items to load
 float DYN_START_TIME			= 5;	// seconds till dynamic spawner starts its thing - precache must cutoff before this, leave a couple secs for map load
-string (float mc) item_by_mcode;
-void(string cls) item_call;
-string(entity e) item_ident;
-void() dtf_handle;
-entity() dyn_rndloc;
-vector(vector v1, float d1, float r1) stdv_rndloc
-void() start_loopcyc;
-void(float mc, vector vo) fn_make;
-float(string sc, entity e) pk_mcode;
-void() place_item_control;
-void() pic_test;
-float(float mcv, entity e) bit_mcode;
-
-.float mcode;								// map item code - handle sub lists
-.float scode;								// save item code - for restore
-.string sscode;							// map item code string - for find
-string sid_code;							// list of all codes as string, access = (code - 100) * 4;
-///float item_op;								// item operation currently in progress
-///float IT_CALL					= 16;		// op is item call
-///float IT_MAP					= 8;		// op is map call
-
-// respawn times
-//float RSP_AMMO; // these are dm 3 rules
-//float RSP_ARMOR;
-//float RSP_ITEM;
-//float RSP_WEP;
-//float RSP_ART;
-
-float EXPLBOX_RESP;			// explode box respawn if true
-void() d_barrel;
-
-float RE_LOC					= -666; // relocate restore point if .delay = this - pk_item_position_init
-float RSP_TIME; // respawn time
-float POW_TIME; // power time
-float CFM_TIME					= 60; // check for move time out
-float PIC_TO					= 5; // place_item_control time out
-float pic_tsk;
-void() place_item_control_loop;
 
 float WEP_SSHOT				= 1; 	 // admin of super shotgun
 float WEP_NAILGUN				= 2; 	 // admin of nailgun
@@ -315,358 +135,17 @@ float CON_NONE					= 262144;  // none of the selected items will be loaded
 float CON_SUBS					= 524288;  // substitute something for removed items
 float CON_INF					= 1048576; // infinite ammo to all weps with bit set above - except carryables
 float CON_CYC					= 2097152; // cycle selected bits in thier group
-
 float CON_CHAOS				= 2490368; // item chaos it all 3 control bits set
-// excluding inf_ammo from run bits
-float CON_RUN					= 3014656; //4063232; // any control bit CON_* entries above - used by autorun
+float CON_RUN					= 4063232; // any control bit CON_* entries above - used by autorun
 float CYC_TIME					= 60; // TEST - 240; // seconds for cycle base - 4 mins +|- 2 mins
 
 void() item_loop;
-void() item_control_menu;
 float ammo_frame;
-float(float cn, entity e, string op) ammo_con;
-void () PlaceItem;
-// end item overrides
-
-
-// map translations
-
-void() check_translate;
-
-float TR_Q1DEF;					// default non q1 stuff to q1 in some sits
-float TR_Q1QRY;					// query status - only need to do this once
-float TR_WOLF;
-float TR_DOOM;
-float TR_QUAKE;
-float TR_Q2;
-float TR_Q3;
-float TR_ALL;
-float TR_NOT;						// 0 = no change, 1 = remove, 2 = best guess, 3 = randomize in genre, 4 = randomize to any
-
-float FL_NOTRN_LEAVE			= 0;
-float FL_NOTRN_RMV			= 1;
-float FL_NOTRN_BG				= 2;
-float FL_NOTRN_RNDIN			= 3;
-float FL_NOTRN_RNDANY		= 4;
-
-float FL_TR_RESTORE			= -1; //	restore to original - should only be set by code
-float FL_TR_WOLF				= 1; //	tranlate these items to wolf items
-float FL_TR_DOOM				= 2; // 	"			"		"		doom	"
-float FL_TR_QUAKE				= 4; //		"			"		"		quake	"
-float FL_TR_Q2					= 8; //		"			"		"		q2		"
-float FL_TR_Q3					= 16; //	"			"		"		q3		"
-float FL_TR_RANDIN			= 32; // randomize in gen
-float FL_TR_RANDOM			= 64; // total random
-float FL_TR_REMOVE			= 128; // remove these items
-
-float NO_PI;					// dont let item_call call place_item
-
-// end translations
-
-
-// TEST remove
-entity fts; // fire test
-
-
-// missile code flags
-float FL_PUNCH					= 2;				// use punchangle for weapon fire
-float FL_2PUNCH				= 4;				// double punch
-float FL_MPUNCH				= 6;				// mega punch?
-float FL_MSL					= 8;				// set missile velocity
-float FL_GRN					= 16;				// set grenade type velocitys
-float FL_USEAMMO				= 32;				// for generic fire fns
-float FL_CTHONF				= 64;				// cthon fire balls
-float FL_SNDMIS				= 128				// sound on missile wep channel
-float FL_RUNEHST				= 256				// missile gets runehaste check
-float FL_AIM1K					= 131072;		// aim fn, val 1000
-float FL_AIM10K				= 262144;		// aim fn, val 10000
-float FL_AIM100K				= 524288;		// aim fn, val 100000
-float FL_MORPHSHOT			= 2097152;			// builtin weapon damage
-/*
-be aware...also used as missile code flags
-
-float RM_SKY					= 1;		// remove imm. if CONTENT_SKY
-float FLT_LAVA					= 128;	// float in lava
-float FLT_IMM					= 512;	// no lift, just blink it there
-float MLT_LAVA					= 2048;	// melt in lava
-float PF_LAVA					= 1048576;
-*/
-
-float DROP_ALLOW; // inv bits player is allowed to drop
-
-float IGN_INV 					= 66600;
-float FL_MELEE_WEP			= 66601;
-float SND_OVER					= 66602; // play eweapon sound over after fire call
-
-
-void() chaos_precache;
-
-// CHECK: placement of this section
-float FL_REMOVE				= 64;
-float FL_HELD					= 128;
-float NO_BUBBLES				= -1; // this ent wont make bubbles
-float FL_VANM					= 131072; // vmodel animation in progress
-
-float EF_FULLBRIGHT			= 512;
-
-
-//DP_SV_MODELFLAGS_AS_EFFECTS
-//this extension allows model flags to be specified on entities so you can add a rocket trail and glow to any entity, etc.
-//setting any of these will override the flags the model already has, to disable the model's flags without supplying any of your own you must use EF_NOMODELFLAGS.
-//idea: LordHavoc, Dresk - darkplaces implementation: LordHavoc
-
-// not used yet - chaos will want this
-
-.float modelflags;
-
-float EF_NOMODELFLAGS		= 8388608; // ignore any effects in a model file and substitute your own
-float MF_ROCKET  				= 1; // leave a trail
-float MF_GRENADE 				= 2; // leave a trail
-float MF_GIB     				= 4; // leave a trail
-float MF_ROTATE  				= 8; // rotate (bonus items)
-float MF_TRACER  				= 16; // green split trail
-float MF_ZOMGIB  				= 32; // small blood trail
-float MF_TRACER2 				= 64; // orange split trail
-float MF_TRACER3 				= 128; // purple trail
-
-
-float HEAL_ROT					= 1;
-float HEAL_NORM				= 2;
-float HEAL_MEGA				= 3;
-float HEAL_BOT					= 4; // doom health bottle - ignore normal max, no rot
-float HEAL_SOUL				= 5; // doom health: soul, mega spheres - 200 max, no rot
-
-
-// defaults
-
-void(entity e) set_defaults;
-
-float DEF_HEALTH;
-float DEF_ARMOR;
-float DEF_ATYPE = 0.3; // default armor is always lowest protection ?
-float DEF_ITEMS; // q1 standard bit flags
-float DEF_PK_ITEMS; // pk bit flags
-float DEF_WEAPON; // bit for wep slot - per genre char default action
-float DEF_REMWEP				= 256; // bit set in def_weap - if normal defaults are set - remove them NOTE: axe doesnt remove because of pk item code!
-float DEF_REMAMMO				= 512; // bit set in def_weap - if normal ammo set - remove it
-
-
-float PK_ITEM_MASK = 4094; // mask off non items bits
-float WEP_MASK = 4351; // mask off other items bits for def weap bits 1 + ... + 128 + 4096
-
-float DEF_AMMO_BULLETS; // initial ammo defaults if set
-float DEF_AMMO_SHELLS;
-float DEF_AMMO_CELLS;
-float DEF_AMMO_ROCKETS;
-float DEF_AMMO_NAILS;
-float DEF_AMMO_SLUGS;
-float DEF_AMMO_GAS;
-
-float DEF_AMMO_BASE = 25; // if no ammo given for a default wep, this is it
-
-// X (extra) weapon stuff
-
-string MAP_MODE; // genre of loaded map (if detected) Q quake (default), Q2 quake 2, Q3 quake 3, D doom, W wolf, PK painkeep
-//.string CHR_MODE; // genre of player - to be based on morph code
-
-float DEF_X_ITEMS; // x bit flags
-
-float INIT_CON; // control flag
-
-float INIT_0_W;
-float INIT_1_D;
-float INIT_2_Q;
-float INIT_3_PK;
-float INIT_4_Q2;
-float INIT_5_Q3;
-float INIT_6_HP;
-float INIT_7;
-
-float FL_INIT_CGEN_BIT		= 1; // genre by char - bits per genre
-float FL_INIT_CGEN_MC		= 2; // genre by char - 1 map code per genre
-float FL_INIT_MGEN_BIT		= 4; // genre by map - bits per genre
-float FL_INIT_MGEN_MC		= 8; // genre by map - 1 map code per genre
-float FL_INIT_ARB_MC			= 16; // arbitrary map codes - 8 total, everyone gets this set
-float FL_INIT_PKO				= 32; // pk items added only when genre is pk
-//float FL_INIT_ADD				= 32; // add to initial weaps -- deprecated, happens when DEF_REMWEP is false
-//float FL_INIT_REP				= 64; // replaces initial weaps -- handled by DEF_REMWEP now
-
-.float ammo_bullet;
-.float ammo_slug;
-.float ammo_gaspr;
-.float ammo_hgrenade;
-
-float PK_BULLETAMMO_MAX;
-float PK_SLUGAMMO_MAX;
-float PK_GASAMMO_MAX;
-
-.float x_items; // extra weapon item control - pwr armors / extended keys / etc
-void() x_item_touch;
-void(entity e, float camct, float mcd, string spf) xwep_fakeload;
-
-float(entity e, entity f, float dm) power_armor;
-void() power_armor_impulse;
-.float armorsave; // save armor value for power armor flipping value
-void(entity e) armorsave_rev;
-
-float X_PWR_ARMOR				= 1;
-float X_PWR_SCREEN			= 2;
-float X_PWR_ARMOR_ON			= 4;
-float X_PWR_SCREEN_ON		= 8;
-
-float X_PWR_ARM_INV			= 3; // pwr armor bits
-float X_PWR_ARM_MASK			= 12; // pwr armor on bits
-
-float X_BASE_KEY				= 48; // first two keys (bits 16 & 32 call key_touch) for translated items
-
-float X_D_KEY_BIT				= 1008; // any doom key bit - 1111110000
-
-float X_D_KEY_CRED			= 16; // TDO: special door code compares x_items, closeable key doors too
-float X_D_KEY_CBLUE			= 32;
-float X_D_KEY_CYEL			= 64;
-float X_D_KEY_SKRED			= 128;
-float X_D_KEY_SKBLUE			= 256;
-float X_D_KEY_SKYEL			= 512;
-
-float X_Q2_KEY_BIT			= 8176; // any q2 key bit - 1111111110000
-
-float X_Q2_KEY_RED			= 16; // q2 has lots of keys.  good for tech runes / etc
-float X_Q2_KEY_BLUE			= 32;
-float X_Q2_KEY_PYRAMID		= 64;
-float X_Q2_KEY_CUBE			= 128;
-float X_Q2_KEY_PASS			= 256;
-float X_Q2_KEY_AIRSTRK		= 512;
-float X_Q2_KEY_DATACD		= 1024;
-float X_Q2_KEY_CDSPIN		= 2048;
-float X_Q2_KEY_CHEAD			= 4096;
-// 8192
-
-float X_D_MAP					= 16384;
-float X_D_VIS					= 32768;
-
-float X_INV						= 57331; ///  1101111111110011
-
-// q3 goodies
-
-//float X_Q3_HTEL				= 65536;
-//float X_Q3_HMED				= 131072;
-
-//float X_INV						= 253939; ///  111101111111110011    --- 57331; //  1101111111110011
-
-void(entity e, float trv) master_item_control;
-void(string tri, float trv) master_item_control_loop;
-void() x_pwr_touch;
-void() x_pack_touch;
-void(float velmul, float mvt, float flg, float ct, vector fmorg, vector vdr, string cname, string md, string sd, void() tch, float tht, void() thk, void() thd) fire_missile;
-void() melee_hit;
-void() player_plasma1;
-void() X_FireHitscan;
-void() X_FireRailgun;
-void() player_mgchg1;
-void() player_pistol1;
-
-float LASERCAN_VEL;
-float LASER_VEL;
-float PLASMA_VEL;
-float HGREN_VEL;
-float GRENADE_VEL;
-float ROCKET_FUSE;
-float WEPHUM; // weapons hum
-float HUMLOCAL					= -41200855;    // taking local control, dont override by auto
-
-
-// from chaos mod - flamer & flame stuff
-
-float FL_FLARE					= 8192; //entity is a flare starter
-float FL_SUBFLARE				= 16384; // flare up flow
-float MAX_FLAME_CYC			= 64; // max cycles flame will burn
-float MAX_FLARE_CHANCE		= 0.33; // max % of flare in slime
-float MAX_FLARE				= 220; // max flares total per level
-float MAX_AREA_FLARE			= 40; // max fires in one area
-float FLARE_CK_RAD			= 1000; // area to check for flares
-
-float FL_ONFIRE				= 8192;
-
-.float firecontrol;
-void() V_FlamerAnim;
-void() W_FireFlamer;
-void () player_flamer1;
-void () FlameTouch;
-void() flame_check;
-void() slime_flare;
-void() flamer_precache;
-
-// hip
-
-float IT_MJOLNIR				= 128;
-
-void() hip_precache;
-
-// wolf
-
-void() wchg2_weapon_touch;
-
-// doom
-
-string DOOM_DET				= "doom/dsitembk.wav"; // against	self.noise4
-float D_POWER_WAIT; // seconds major doom powers need to respawn - norm 30
-float D_POWER_TIME; // seconds of power supply
-
-float DOOM_ALPHA;
-void(entity e, float mc) doom_alpha_tran;
-
-void() doom_precache;
-
-float d_reps_base				= 57005000; // heh heh - DEAD+
-void() d_rep_set;
-void() x_weapon_touch;
-void() player_saw1;
-void() player_bfg1;
-
-float DOOM_BFG 				= 66603;
-float DOOM_BFG_TRACE			= 1024; // IDEA: adjust by doom to quake dist adjust for maps ?
-
-// q2
-
-string Q2_DET					= "q2_snd/respawn1.wav"; // against	self.noise4
-float Q2_POWER_WAIT; // norm = 30
-float Q2_POWER_TIME; // norm = 30
-
-void() q2_precache;
-void() q2_weapon_shotgun;
-void() q2_item_health;
-void() X_FireHandGrenade;
-void() X_FireBlaster;
-void()	player_q2hgr1;
-
-float q2_bfg_shot; // indicates damage from q2 bfg shot - may not get used, radius is already 1/2 dmg
-float Q2_BFG 					= 66604;
-float Q2_BFG_TRACE			= 1000;
-float Q2_BFG_LASER			= 256;
-float Q2_BFG_LASER_DMG		= 5; // 5 pts every 10th sec
-
-.float silencer_finished; // q2 silencer
-float Q2_SILENCE; // value of silence as percentage of original volume
-
-// q3
-
-string Q3_DET					= "q3_snd/respawn1.wav"; // against	self.noise4 - NOTE: artifacts are different
-string Q3_BOBHOFF				= "cl_itembobheight 0\n"; // q3 item bob height off setting
-float Q3_POWER_WAIT; // norm = 120
-float Q3_POWER_TIME; // norm = 30
-
-void() q3_precache;
-void() q3_suspend;
-void() q3_weapon_shotgun;
-void() q3_item_health;
-void(entity e, float v) q3_ha_rot;
-void() q3_bob_height;
-
-// hipnotic
-
-.float wetsuit_finished; // used by hip wetsuit & q2 rebreather
-
-void() inventory;
+void() infinite_ammo;
+// **************************************
+// painkeep protos
+
+// **************************************
 
 // so we can make new sv_ console vars
 //DP_REGISTERCVAR - adds a new console cvar to the server console (in singleplayer this is the player's console), the cvar exists until the mod is unloaded or the game quits.
@@ -677,237 +156,7 @@ float(string name, string value) registercvar = #93;
 //idea: id Software, LordHavoc (redesigned)
 //darkplaces implementation: LordHavoc
 //movetype definitions:
-float MOVETYPE_FOLLOW		= 12;
-
-float SV_AMMO_MAX; // if true server maxes override genre limits
-float DEF_AMMO					= 100; // in case something is wrong in ammo code
-float MAX_AMMO					= 1023; // 2 per float this way once parms are combined
-
-float AMMO_NONE				= 100; // mostly melee weps
-float AMMO_SHELLS				= 101; // ranged gun uses this ammo type
-float AMMO_NAILS				= 103;
-float AMMO_ROCKETS			= 105;
-float AMMO_CELLS				= 107;
-float AMMO_LIGHTNING			= 107; // q3 ammo - just cells for now
-float AMMO_BFG					= 107; // q3 ammo - just cells for now
-float AMMO_BULLETS			= 109;
-float AMMO_SLUGS				= 111;
-float AMMO_GRENADES			= 113; // q2 / q3 - handled as rockets in touch
-float AMMO_GAS					= 115;
-
-float EXPLOSIVE				= 114688; // for things that explode - chaos mod
-
-// **************************************
-// viswep
-
-// **************************************
-float qweps, pkweps; // inventory bit masks for weps
-.entity vwepent; // vis wep entity pointers
-.entity eweapon; // vis wep pointer
-.string vwepmdl; // visible weapon model load
-.void() _attack; // fires weapon - null if fire from frames
-.void() _fr_attack; // starts frame set
-void() e_weap_Attack;
-entity EWEAP; // current firing pointer - dont use with thinks!
-
-void() viswep_pkbot;
-void() viswep_post;
-void() viswep_togl;
-void() viswep_pre;
-void(entity vh, float cd) viswep_ld;
-float(string wpm) ver_weaponmodel;
-void vw_range_base(float v_frm);
-void vw_melee_base(float v_frm);
-void vw_harpoon_pnt(float v_frm); // harpoon rope point
-vector(entity hent) grap_vw_adj;
-.void(float v_frm) vv_draw; // viswep code - weapon drawn
-.void(float v_frm) vv_holster; // viswep code -weapon hosltered
-void() player_nail3;
-float VW; // viswep support - set to 0 to return to generic gun / axe
-float VW_ARMOR; // viswep armor support - eventually admin controlled & cvar
-float VW_HOLSTER; // viswep - show holstered weps when true
-
-// config new vw by code
-void() vw_config;
-
-// Cataboligne - projectile / cartridge fire(d) positioning - 9.30.9
-
-// really needed by viswep & chasecam which shows how bad original positioning looks
-
-float FL_NDISMDL				= 8388608; // flag to prevent display of viswep models
-
-// q weps
-// shotguns - cart eject - just an extra
-float VWX_SHOTGUN				= 11;
-float VWY_SHOTGUN				= 9;
-float VWZ_SHOTGUN				= 9;
-
-float VWX_VEL_SHOTGUN		= 8;	// cart eject velocity
-float VWY_VEL_SHOTGUN		= 48;
-float VWZ_VEL_SHOTGUN		= 16;
-
-// nails
-float VWX_NAILG				= 16;	// 12		v_forward *
-float VWY_NAILG				= 9;	//			v_right *
-float VWZ_NAILG				= 15;	// 16		v_up *
-
-float VWX_SNAILG				= 22;	// 14
-float VWY_SNAILG				= 9;
-float VWZ_SNAILG				= 15;	// 16
-
-float VWX_PNAILG				= 31;	// 15
-float VWY_PNAILG				= 9.5;// 8
-float VWZ_PNAILG				= 14;	// 15
-
-// rockets
-float VWX_ROCKETL				= 20;
-float VWY_ROCKETL				= 11;
-float VWZ_ROCKETL				= 16;
-
-float VWX_GRENADEL			= 18;	// 10
-float VWY_GRENADEL			= 11;
-float VWZ_GRENADEL			= 16;
-
-// cell guns
-float VWX_THUNDER				= 12;
-float VWY_THUNDER				= 8;
-float VWZ_THUNDER				= 16;
-
-float VWX_PLASMA				= 32;
-float VWY_PLASMA				= 8;
-float VWZ_PLASMA				= 16;
-
-float VWX_LASER				= 32;
-float VWY_LASER				= 8.5;
-float VWZ_LASER				= 16;
-
-// pk weps
-// cell guns
-float VWX_CHTHUNDER			= 20;	// 18
-float VWY_CHTHUNDER			= 8;
-float VWZ_CHTHUNDER			= 16;
-
-float VWX_HARP_IDLE			= 4;	// harpoon is fired, player standing idle
-float VWY_HARP_IDLE			= -10;
-float VWZ_HARP_IDLE			= -6;
-
-float VWX_HARP_RETR			= 8;	// harpoon being retracted
-float VWY_HARP_RETR			= 8;
-float VWZ_HARP_RETR			= 0;
-
-// slug weps
-
-float VWX_RAILGUN				= 26;
-float VWY_RAILGUN				= 14;
-float VWZ_RAILGUN				= 15;
-
-// burner
-
-float VWX_FLAMER				= 22;
-float VWY_FLAMER				= 2;
-float VWZ_FLAMER				= 16;
-
-// hip
-
-// rockets
-float VWX_PROXMINE			= 18;
-float VWY_PROXMINE			= 11;
-float VWZ_PROXMINE			= 16;
-
-// cells
-float VWX_LASERCAN			= 22;
-float VWY_LASERCAN			= 9;
-float VWZ_LASERCAN			= 12;
-
-
-// **************************************
-// Cataboligne 9.11.3 purify - chase cam
-
-// **************************************
-void() chase_cam_precache;
-void(float sel) cam_parms;
-void() Chase_cam_level_start;
-void() cam_waterjump;
-
-// message protocol defines
-float SVC_SETVIEWPORT		= 5;
-float SVC_SETVIEWANGLES		= 10;
-
-// free player entity variable
-// '.float speed'  bit-flag defines:
-//float CHSCAM_MONSTER  = ;
-float CHSCAM_ON				= 1;
-float LASERTARG_ON			= 4;
-float LASERTARG_LIT			= 32;
-
-.vector cam; // all chase cam data
-void() cam_punch;						// return punchangle if passed parm - otherwise set self. var
-void() dead_cam_set;					// Cataboligne 9.11.3 purify proto - chase cam
-float DCAMTO;							// timeout for death cam 2 mins
-float DCAMTOACT;						// action after timeout 0 = respawn, 1 = disconnect
-float FFW_LIMIT;						// time limit on how long players get frags from fire & forget weaps after dead
-float NOCIDE;							// dont cound suicide frags for idiom of var
-float NOENVCIDE;
-float NOPKCIDE;
-float(entity e) frag_minus_cide;
-
-// cam vision field settings
-float DCAM_FOV					= 130; // dead cam crow vision
-string DCAM_SET_FOV			= "fov 130\n"; // set it if not set or changed
-string STD_FOV					= "fov 90\n";
-string CAM_FOV					= "fov 80\n"; // field for cam view
-
-
-// **************************************
-// Rotation - Hip
-
-// **************************************
-.vector neworigin;
-.vector rotate;
-.float endtime;
-.float rotate_type;
-.string path;
-.string group;
-.string event;
-.float duration;
-
-
-// **************************************
-// painkeep protos
-
-// **************************************
-
-
-// admin code
-.float admin;
-float(string mp) PK_mapmode;
-void() PK_SetAdmin;
-void() PK_AdminImpulse;
-void() admin_sv_cfg;
-void() Admin_mainmenu;
-float() admin_postthink;
-void() admin_resettimeout;
-void() observer; // *bot
-void() observer_off;
-string OBSERVER = "jafo"; // nod to Blue Thunder : "just another fucking observer"
-float pk_flags_ck;
-float pk_itemovr_ck;
-float (float rl) AdminBitFlag;
-void() dyn_item;
-void() pk_cphub;
-void(entity e) pk_admincfg;
-void () tfragadmin_touch;
-
-float PK_TP_STATUSON			= 256;
-.float hubstartupmessage;
-.float messagetimeout;
-
-.float revotemsg;
-
-// For the level sequences, if the exec file has been run yet.
-float execed;
-float PK_TP_USERMAPON		= 512;
-
+float MOVETYPE_FOLLOW = 12;
 
 // relocated from defs.qc
 
@@ -936,21 +185,30 @@ void(entity client, string s, string s1, string s2, string s3, string s4) center
 //void(entity client, string s, string s1, string s2, string s3, string s4, string s5) centerprint6 = #73;	// sprint, but in middle
 void(entity client, string s, string s1, string s2, string s3, string s4, string s5, string s6) centerprint7 = #73;	// sprint, but in middle
 
-// 2d trains
-
-// used by path_corners to specify the 2 possible destinations
-.string target1;
-.string target2;
+// auto turrets
+.float turret_timeout;
+.float turret_soundtimeout;
+.float turret_ownertimeout;
+.entity turret_base;
 
 // items
 .float pk_items;	// Items used for impulse 1
 .float pk_currentitem;
 float pk_attack;		// bit 1 = can make a pk attack on any map, bit 2 = pk_artifacts attack
 void() use_pkitem; // bots using pk items
-void(entity e, vector v1) item_eject;
 
+// viswep
+float qweps, pkweps; // inventory bit masks for weps
+.entity vwepent; // vis wep entity pointers
+void() viswep_post;
+void() viswep_pre;
+void(entity vh, float cd) viswep_ld;
+void vw_harpoon_pnt(float v_frm); // harpoon rope point
+vector(entity hent) grap_vw_adj;
 
-float PK_INV = 1; // if true show pk items in inventory list
+void() player_nail3;
+float VW; // viswep support - set to 0 to return to generic gun / axe
+float VW_ARMOR; // viswep armor support - eventually admin controlled & cvar
 
 // Items used in impulse 1
 float PK_IT_AXE				= 1;
@@ -980,30 +238,20 @@ Impulse 36 - AutoSentry
 Impulse 37 - Can of Pork and Beans
 Impulse 38 - Axe (just to do complete)
 */
-// pk ammo
+// turret ammo
 .float pk_gravitywellammo, pk_turretammo, pk_canpabammo, pk_beartrapammo;
 
 // Ammo Max'S
-// q1 standard
-float Q1_SHELLAMMO_MAX;
-float Q1_NAILAMMO_MAX;
-float Q1_ROCKETAMMO_MAX;
-float Q1_CELLAMMO_MAX;
-
-float PK_GRAVITYWELLAMMO_MAX;
-float PK_TURRETAMMO_MAX;
-float PK_CANPABAMMO_MAX;
-float PK_BEARTRAPAMMO_MAX;
-
-float PK_MAX_LIVENT; // max live ents (fire & forget) weapons a server allows
-float pk_livent; // current count
+float PK_GRAVITYWELLAMMO_MAX	= 1;
+float PK_TURRETAMMO_MAX			= 3;
+float PK_CANPABAMMO_MAX			= 1;
+float PK_BEARTRAPAMMO_MAX		= 3;
 
 // The current inventory item
 .float pk_currentInventory;
 
 // new gibs
 entity damage_inflictor;	// set by T_Damage
-
 
 // Variables used for the air gun.
 
@@ -1082,46 +330,9 @@ float GRAP_ROPE				= 9;
 
 float VW_HARP_FRADJ        = 20; // frame adjust from run / stand for a fired harp
 
-
 // can o p&b
 .float copb_timeout;
 .float copb_nextFartTimeout;
-
-
-// auto turrets
-.float turret_timeout;
-.float turret_soundtimeout;
-.float turret_ownertimeout;
-.entity turret_base;
-void(entity e, float tm) turret_KillStraker;
-
-float PK_TUR_AMMO; // base cells to fire, 0 = infinite
-float PK_TUR_TIME; // time to live, after which explode, 0 = no timeout
-float PK_TUR_HEAL; // health we get - base = 2/3 this, < 0 = no limit
-float PK_TUR_TARGOWN; // time after which turret shoots owner, 0 = dont target owner
-float PK_TUR_VARIETY; // a variety of turrets - 
-float PK_TUR_QUADCON;
-float PK_TUR_SET; // set non 0 when vars loaded
-
-// b traps
-float PK_BT_SET;
-float PK_BT_TIMETOFOLLOW;
-float PK_BT_DMG;
-float PK_BT_TIME;
-
-.float beartrap_time;
-.float bt_immune_time;
-float BT_BUFFER				= 2;	  	// The nuber of secs people are immune to beartraps after spawning
-
-// grav
-
-float PK_GRV_TIME;
-float PK_GRV_SET;
-
-
-// exploding ammo for shotgun
-.float pk_explode_ammo;
-float PK_EXPLODEAMMO_MAX;
 
 // item repositions
 .vector ip_orgOrigin;
@@ -1130,9 +341,12 @@ float PK_EXPLODEAMMO_MAX;
 float ip_timeout				= 2;
 
 
+// exploding ammo for shotgun
+.float pk_explode_ammo;
+float PK_EXPLODEAMMO_MAX	= 10;
+
 // For Drowning Ignoring armor
 float ignorearmor;
-
 
 // hub ops
 //float PK_SF_HUB = 16;
@@ -1156,6 +370,11 @@ float DONTALLOWBOTS			= 1;		// If we want to show anti bots messages at startup
 void() updateStatusDisplay;
 
 .float laststattime;					// time of last status update
+
+
+.float beartrap_time;
+.float bt_immune_time;
+float BT_BUFFER				= 2;	  	// The nuber of secs people are immune to beartraps after spawning
 
 // Quake Packet Message
 float	SVC_CENTERPRINT		= 26;
@@ -1182,6 +401,35 @@ void(float to, float f) WriteBFloat;
 .float pk_dutychecking;
 float PK_TP_DUTYON			= 128;
 
+// admin code
+.float admin;
+float(string mp) PK_mapmode;
+void() PK_SetAdmin;
+void() PK_AdminImpulse;
+void() admin_sv_cfg;
+void() Admin_mainmenu;
+float() admin_postthink;
+void() admin_resettimeout;
+void() observer; // *bot
+void() observer_off;
+string OBSERVER = "jafo"; // nod to Blue Thunder : "just another fucking observer"
+float pk_flags_ck;
+float pk_itemovr_ck;
+float (float rl) AdminBitFlag;
+void() dyn_item;
+void() pk_cphub;
+void(entity e) pk_admincfg;
+void () tfragadmin_touch;
+
+float PK_TP_STATUSON			= 256;
+.float hubstartupmessage;
+.float messagetimeout;
+
+.float revotemsg;
+
+// For the level sequences, if the exec file has been run yet.
+float execed;
+float PK_TP_USERMAPON		= 512;
 
 // **************************************
 // Cataboligne relocated from many places
@@ -1190,9 +438,6 @@ float PK_TP_DUTYON			= 128;
 void() grap_releaseHarpoon;
 void() SUB_regen;
 void(entity e) AddToSplashBig;
-float(entity e) frag_plus;
-float(entity e) frag_minus;
-
 // pk_prethink
 void() WaterMove;
 void() CheckRules;
@@ -1201,9 +446,7 @@ void() PlayerDeathThink;
 void() PlayerJump;
 float() W_BestWeapon;
 void() W_SetCurrentAmmo;
-void() PK_SetCurrentAmmoOnly;
 void() CheckWaterLevels;
-float cc_frame;
 // pk_postthink
 void () W_WeaponFrame;
 void() CheckPowerups;
@@ -1224,14 +467,13 @@ float() W_BestPKWeapon;
 void(entity targ) pk_setDamageSkin;
 // added
 void() painkeep_touch;
-void() pk_ammo_touch;
 void() pk_bound_ammo;
 void() pk_item_position;
 void() pk_item_position_init;
 float(float w, float w2) PK_RankForWeapon;
 void(float new, float new2) PK_Deathmatch_Weapon;
-void() DropBackpack;
-void() BackpackTouch;
+void() PK_DropBackpack;
+void() PK_BackpackTouch;
 //void(entity e) PK_BackpackSetup;
 
 // player code
@@ -1280,8 +522,86 @@ void(entity e) pk_missile_splash;
 // new features
 .void() pk_touch; 						// group all touch code mods here
 void() pk_placeitem;
-void () pkplus_touch;
 
+// Rotation
+.vector neworigin;
+.vector rotate;
+.float endtime;
+.float rotate_type;
+.string path;
+.string group;
+.string event;
+.float duration;
+
+
+.vector cam; // all chase cam data
+void() cam_punch;						// return punchangle if passed parm - otherwise set self. var
+void() dead_cam_set;					// Cataboligne 9.11.3 purify proto - chase cam
+float DCAMTO					= 0;	// testing 120; // timeout for death cam 2 mins
+float DCAMTOACT				= 0;	// action after timeout 0 = respawn, 1 = disconnect
+
+// cam vision field settings
+float DCAM_FOV					= 130; // dead cam crow vision
+string DCAM_SET_FOV			= "fov 130\n"; // set it if not set or changed
+string STD_FOV					= "fov 90\n";
+string CAM_FOV					= "fov 80\n"; // field for cam view
+
+// Cataboligne - projectile / cartridge fire(d) positioning - 9.30.9
+
+// really needed by viswep & chasecam which shows how bad original positioning looks
+
+float FL_NDISMDL				= 8388608; // flag to prevent display of viswep models
+
+// q weps
+// shotguns - cart eject - just an extra
+float VWX_SHOTGUN				= 11;
+float VWY_SHOTGUN				= 9;
+float VWZ_SHOTGUN				= 9;
+
+float VWX_VEL_SHOTGUN		= 8;	// cart eject velocity
+float VWY_VEL_SHOTGUN		= 48;
+float VWZ_VEL_SHOTGUN		= 16;
+
+// nails
+float VWX_NAILG				= 16;	// 12		v_forward *
+float VWY_NAILG				= 9;	//			v_right *
+float VWZ_NAILG				= 15;	// 16		v_up *
+
+float VWX_SNAILG				= 22;	// 14
+float VWY_SNAILG				= 9;
+float VWZ_SNAILG				= 15;	// 16
+
+float VWX_PNAILG				= 31;	// 15
+float VWY_PNAILG				= 9.5;// 8
+float VWZ_PNAILG				= 14;	// 15
+
+// rockets
+float VWX_ROCKETL				= 20;
+float VWY_ROCKETL				= 11;
+float VWZ_ROCKETL				= 16;
+
+float VWX_GRENADEL			= 18;	// 10
+float VWY_GRENADEL			= 11;
+float VWZ_GRENADEL			= 16;
+
+// cell guns
+float VWX_THUNDER				= 12;
+float VWY_THUNDER				= 8;
+float VWZ_THUNDER				= 16;
+
+// pk weps
+// cell guns
+float VWX_CHTHUNDER			= 20;	// 18
+float VWY_CHTHUNDER			= 8;
+float VWZ_CHTHUNDER			= 16;
+
+float VWX_HARP_IDLE			= 4;	// harpoon is fired, player standing idle
+float VWY_HARP_IDLE			= -10;
+float VWZ_HARP_IDLE			= -6;
+
+float VWX_HARP_RETR			= 8;	// harpoon being retracted
+float VWY_HARP_RETR			= 8;
+float VWZ_HARP_RETR			= 0;
 
 
 // testing

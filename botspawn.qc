@@ -12,6 +12,7 @@
 
 // darkplaces / chaos only
 // thinking - because if we call it straight up it missed the bots
+// Cataboligne 3.31.11 - code back from generations base
 
 void(float tm) th_bot_changeParms =
 {
@@ -39,6 +40,7 @@ void(float tm) th_bot_changeParms =
 
 float NOSAVE; // init bots on level change - dont re-save old data, only admin & script control of bots should do that
 
+// Cataboligne - 3.3.11 - added init removes
 void () initBotLevel =
 {
 	local float num;
@@ -52,8 +54,6 @@ void () initBotLevel =
 
 
 
-// TESTING
-if (0)
 if (WARNING)
 {
 bprint("Entry: initBotLevel: ");
@@ -89,29 +89,9 @@ bprint("\n");
 //			c_skill = ((0.1 * (parm12 & (offset * 31))) / offset);
 			f = c_skill = ((self.cnt & (offset * 3)) / offset);
 		}
-
-
-
-// TESTING
-if (WARNING)
-{
-bprint(" --- adding - skill: ");
-bprint(ftos(c_skill));
-bprint(" - f: ");
-bprint(ftos(f));
-bprint(" - I: ");
-bprint(ftos(i));
-bprint("  - num:  ");
-bprint(ftos(num));
-bprint(" - make test: ");
-bprint(ftos(num || (i && f > 0)));
-bprint("\n");
-}
-
-
 		offset = (offset * 4);
 		if (num || (i && f > 0))
-			AddAnotherBot(c_skill);
+		AddAnotherBot(c_skill);
 		if (num > 0) num = (num - 1);
 		if (i > 0) i = (i - 1);
 	}
@@ -351,51 +331,21 @@ void () PutBotInServer =
 	local vector spot;
 	local string tmp;
 	local float aimvar;
-
-	SetNewParms ();
-	PutClientInServer(); // Cataboligne - 6.20.10 - does all commented stuff below
-	// sets FL_CLIENT - might be ok
-
-	self.classname = "pk*bot"; // NOTE: decided to fix vw issue and not change this to player now as pk*bot work quite well
-	self.class_select = "pk*bot";
+	self.classname = "pk*bot";
+	self.health = 100;
+	self.takedamage = DAMAGE_AIM;
+	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
+	self.show_hostile = 0;
+	self.max_health = 100;
 	self.air_finished = (time + 30);
 	self.dmg = 1;
-
-//	self.health = 100;
-//	self.takedamage = DAMAGE_AIM;
-//	self.solid = SOLID_SLIDEBOX;
-//	self.show_hostile = 0;
-//	self.max_health = 100;
-//	self.super_damage_finished = 0;
-//	self.radsuit_finished = 0;
-//	self.invisible_finished = 0;
-//	self.invincible_finished = 0;
-//	self.effects = 0;
-//	self.invincible_time = 0;
-
-//	DecodeLevelParms ();
-//	W_SetCurrentAmmo ();
-//	self.attack_finished = time;
-//	if (PK) spwn = PK_SelectSpawnPoint (); // *pk - get a spawn point, pk style
-//	else
-//	spwn = SelectSpawnPoint ();
-//	spot = (spwn.origin + '0 0 1');
-//	self.origin = spot;
-//	setorigin (self,spot);
-//	self.angles = spwn.angles;
-//	self.fixangle = 1;
-//	setmodel (self,"progs/eyes.mdl");
-//	modelindex_eyes = self.modelindex;
-//	setmodel (self,"progs/player.mdl");
-//	modelindex_player = self.modelindex;
-//	setsize (self,VEC_HULL_MIN,VEC_HULL_MAX);
-//	self.deadflag = DEAD_NO;
-//	self.pausetime = 0;
-//	self.view_ofs = '0 0 22';
-//	makevectors (self.angles);
-//	spawn_tfog (self.origin + (v_forward * KINDA_WANT));
-//	spawn_tdeath (self.origin,self);
+	self.super_damage_finished = 0;
+	self.radsuit_finished = 0;
+	self.invisible_finished = 0;
+	self.invincible_finished = 0;
+	self.effects = 0;
+	self.invincible_time = 0;
 	self.yaw_speed = (45 + (25 * self.skil));
 	self.lefty = STRAFE_DIR;
 	if (self.goalentity == world)
@@ -403,7 +353,11 @@ void () PutBotInServer =
 		self.goalentity = botmovetarget ();
 	}
 	self.goalentity.goalentity = world;
+	SetNewParms ();
+	DecodeLevelParms ();
+	W_SetCurrentAmmo ();
 	self.search_time = time;
+	self.attack_finished = time;
 	self.th_pain = bot_pain;
 	self.th_die = BotDie;
 	self.th_stand = bot_stand1;
@@ -416,6 +370,21 @@ void () PutBotInServer =
 	self.nextthink = (time + 0.1);
 	self.enemy = world;
 	self.pathtype = NEVERTARGET;
+	self.deadflag = DEAD_NO;
+	self.pausetime = 0;
+	if (PK) spwn = PK_SelectSpawnPoint (); // *pk - get a spawn point, pk style
+	else
+	spwn = SelectSpawnPoint ();
+	spot = (spwn.origin + '0 0 1');
+	self.origin = spot;
+	setorigin (self,spot);
+	self.angles = spwn.angles;
+	self.fixangle = 1;
+	setmodel (self,"progs/eyes.mdl");
+	modelindex_eyes = self.modelindex;
+	setmodel (self,"progs/player.mdl");
+	modelindex_player = self.modelindex;
+	setsize (self,VEC_HULL_MIN,VEC_HULL_MAX);
 	if (self.movetarget == world)
 	{
 		NewCarriedPath ();
@@ -436,7 +405,10 @@ void () PutBotInServer =
 		self.pather = 1;
 		NUMPATHERS = (NUMPATHERS + 1);
 	}
-
+	self.view_ofs = '0 0 22';
+	makevectors (self.angles);
+	spawn_tfog (self.origin + (v_forward * KINDA_WANT));
+	spawn_tdeath (self.origin,self);
 	if (BOTSPEED < 32)
 	{
 		dprint ("Feeling kind of slow today (SV_MAXSPEED = ");
@@ -449,6 +421,7 @@ void () PutBotInServer =
 	{
 		dprint ("Seems like sv_aim isn't 0.93\n");
 	}
+	if (!Q_100 && !Q_99) PK_CIS(); // *pk - set client pk elements
 };
 
 void () SpawnNewBot =
@@ -619,132 +592,132 @@ void (float skl) AddAnotherBot =
 	{
 		sf = sf - 1;
 
-		if (n == 1)
+	if (n == 1)
+	{
+		top = 1;
+		bottom = 6;
+		if (c_skill > 2)
 		{
-			top = 1;
-			bottom = 6;
-			if (c_skill > 2)
-			{
-				top = c_skill;
-				bottom = 13;
-				st = "Pain [stinger]";
-			}
-			else
-				st = "Pain [bringer]";
-		}
-		else if (n == 2)
-		{
-			top = 2;
+			top = c_skill;
 			bottom = 13;
-			if (c_skill > 2)
-			{
-				top = c_skill + 1 + random();
-				st = "Pain [special delivery]";
-			}
-			else
-				st = "Pain [giver]";
+			st = "Pain [stinger]";
 		}
-		else if (n == 3)
+		else
+			st = "Pain [bringer]";
+	}
+	else if (n == 2)
+	{
+		top = 2;
+		bottom = 13;
+		if (c_skill > 2)
 		{
-			top = 4;
-			bottom = 13;
-			if (c_skill > 2)
-			{
-				top = c_skill * 2;
-				st = "Pain [master]";
-			}
-			else
-				st = "Pain [disciple]";
+			top = c_skill + 1 + random();
+			st = "Pain [special delivery]";
 		}
-		else if (n == 4)
+		else
+			st = "Pain [giver]";
+	}
+	else if (n == 3)
+	{
+		top = 4;
+		bottom = 13;
+		if (c_skill > 2)
 		{
-			top = 3;
-			bottom = 12;
-			if (c_skill > 2)
-			{
-				top = c_skill * 2 * random();
-				st = "Clan LOLZ [|<e |<e]";
-			}
-			else
-				st = "Clan LOLZ [w00ps]";
+			top = c_skill * 2;
+			st = "Pain [master]";
 		}
-		else if (n == 5)
+		else
+			st = "Pain [disciple]";
+	}
+	else if (n == 4)
+	{
+		top = 3;
+		bottom = 12;
+		if (c_skill > 2)
 		{
-			top = 13;
-			bottom = 12;
-			if (c_skill > 2)
-			{
-				top = c_skill * 3 * random();
+			top = c_skill * 2 * random();
+			st = "Clan LOLZ [|<e |<e]";
+		}
+		else
+			st = "Clan LOLZ [w00ps]";
+	}
+	else if (n == 5)
+	{
+		top = 13;
+		bottom = 12;
+		if (c_skill > 2)
+		{
+			top = c_skill * 3 * random();
 				st = "Clan LOLZ [u-r-ded]";
-			}
-			else
-				st = "Clan LOLZ [d(_)(_)fy]";
 		}
-		else if (n == 6)
+		else
+			st = "Clan LOLZ [d(_)(_)fy]";
+	}
+	else if (n == 6)
+	{
+		st = "Codename: blizzard";
+		top = 0 + random() + random();
+		bottom = 4 + random() + random();
+	}
+	else if (n == 7)
+	{
+		st = "Rex Felis";
+		top = 1;
+		bottom = 3 * c_skill * random();
+	}
+	else if (n == 8)
+	{
+		st = "r00ST3R";
+		top = 4 + random() + random() + random();
+		bottom = 9 + random();
+	}
+	else if (n == 9)
+	{
+		st = "M*nstAr";
+		top = 3;
+		bottom = 6 + random() + random() + random() + random();
+	}
+	else if (n == 10)
+	{
+		st = "Yesman";
+		top = n;
+		bottom = n;
+	}
+	else if (n == 11)
+	{
+		st = "Hard_ware";
+		top = 0 + random();
+		bottom = 13 + random() + random();
+	}
+	else if (n == 12)
+	{
+		st = "Ray ---=>";
+		top = 13;
+		bottom = 11;
+	}
+	else if (n == 13)
+	{
+		st = "Kill=death+die-dead";
+		top = 12 + random() + random() + random();
+		bottom = 11 + random() + random() + random();
+	}
+	else if (n == 14)
+	{
+		top = 9 + random() + random();
+		bottom = 13;
+		if (c_skill > 2)
 		{
-			st = "Codename: blizzard";
-			top = 0 + random() + random();
-			bottom = 4 + random() + random();
+			top = c_skill * 2.2 * random() + random() + random();
+			st = "Tweedle-dweeb";
 		}
-		else if (n == 7)
-		{
-			st = "Rex Felis";
-			top = 1;
-			bottom = 3 * c_skill * random();
-		}
-		else if (n == 8)
-		{
-			st = "r00ST3R";
-			top = 4 + random() + random() + random();
-			bottom = 9 + random();
-		}
-		else if (n == 9)
-		{
-			st = "M*nstAr";
-			top = 3;
-			bottom = 6 + random() + random() + random() + random();
-		}
-		else if (n == 10)
-		{
-			st = "Yesman";
-			top = n;
-			bottom = n;
-		}
-		else if (n == 11)
-		{
-			st = "Hard_ware";
-			top = 0 + random();
-			bottom = 13 + random() + random();
-		}
-		else if (n == 12)
-		{
-			st = "Ray ---=>";
-			top = 13;
-			bottom = 11;
-		}
-		else if (n == 13)
-		{
-			st = "Kill=death+die-dead";
-			top = 12 + random() + random() + random();
-			bottom = 11 + random() + random() + random();
-		}
-		else if (n == 14)
-		{
-			top = 9 + random() + random();
-			bottom = 13;
-			if (c_skill > 2)
-			{
-				top = c_skill * 2.2 * random() + random() + random();
-				st = "Tweedle-dweeb";
-			}
-				st = "Tweedle-dumb";
-		}
-		else if (n >= 15)
-		{
-			st = "Pain (*) ----";
-			top = 15 * random();
-			bottom = 15 * random();
-		}
+			st = "Tweedle-dumb";
+	}
+	else if (n >= 15)
+	{
+		st = "Pain (*) ----";
+		top = 15 * random();
+		bottom = 15 * random();
+	}
 
 		if (find(world, netname, st)) // see if name is taken
 		{
@@ -753,7 +726,7 @@ void (float skl) AddAnotherBot =
 			if (sf < 17)
 				n = n + 1; // random no worky - brute force
 			else
-				n = 1 + floor(random() * 14.4);
+			n = 1 + floor(random() * 14.4);
 		}
 		else
 			sf = 0;
@@ -779,7 +752,6 @@ void (float skl) AddAnotherBot =
 */
 	if (!NOSAVE)
 	if (DARKPLACES || chaos) th_bot_changeParms(12.5);
-	if (BOTFREEZE) bot_froze(newbot); // Cataboligne - 6.9.10 - bots get really cold now - dev code
 };
 
 void (entity ply, float n) addTeamBots =
@@ -844,8 +816,7 @@ void(entity e) removeBot =
 		f.b_shirt = 0;
 		f.ammo_shells = f.ammo_nails = f.ammo_rockets = f.ammo_cells = 0;
 		f.pkprevweapon = f.pklastweapon = f.prevweapon = f.lastweapon = 0; // pk
-		f.weapon = f.currentammo = f.x_items = f.ammo_bullet = f.ammo_slug = f.ammo_gaspr = f.ammo_hgrenade = 0; // x stuff
-		f.eweapon = world;
+		f.weapon = f.currentammo = 0;
 		UpdateClient(f);
 		active_clients = active_clients - (active_clients & ClientBitFlag(f.b_clientno));
 		f.id = f.b_clientno = -1;

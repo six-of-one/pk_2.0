@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Cataboligne - common compile
+
+# frikqcc compiler, rename to your flavor
+
+fqcc /O2
+
+# move to prog dir
+# mprg painkeep
+
+# does this - duplicate for your install
+# 'cp' ./progs.dat /home/Quake/quake/painkeep

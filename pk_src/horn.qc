@@ -129,7 +129,7 @@ void() launch_horn =
 	horn_airblast(TRUE);
 
 	if (self.super_damage_finished > time)
-	if (self.pkplus_actortype != PKPLUS_ACTORQUAD) // Cataboligne 8.12.9 purify - pk artifacts
+	if (pk_art_actor_ck(self)) // Cataboligne 8.12.9 purify - pk artifacts - removed from chaos mod mkII code
 	{ // if supercharged, increase the recoil strength...
 	  recoil = recoil * 1.5;
 	}
@@ -233,7 +233,7 @@ void(float firstBlast) horn_airblast =
 	local float numBubbles = 3; // number of bubbles generated in the water
 
 	if (self.super_damage_finished > time)
-	if (self.pkplus_actortype != PKPLUS_ACTORQUAD) // Cataboligne 8.12.9 purify - pk artifacts
+	if (pk_art_actor_ck(self)) // Cataboligne 8.12.9 purify - pk artifacts
 	{ // if supercharged, double the range
 	  inRange = inRange * 2;
 	}
@@ -262,7 +262,7 @@ void(float firstBlast) horn_airblast =
 
 	  // only affect monsters and projectiles
 	  if (hornVisible(e)) // must be visible AND
-	  if (self.waterlevel > 2 || (self.super_damage_finished > time && (self.pkplus_actortype != PKPLUS_ACTORQUAD)) // Cataboligne 8.12.9 purify - pk artifacts
+	  if (self.waterlevel > 2 || (self.super_damage_finished > time && 	pk_art_actor_ck(self)) // Cataboligne 8.12.9 purify - pk artifacts
 	  			|| hornInfront(e)) // infront of self or anywhere in the water or supercharged AND
 	  if (e.movetype != MOVETYPE_NONE) // anything that can move
 	  if (e.movetype != MOVETYPE_PUSH)

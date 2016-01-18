@@ -238,7 +238,7 @@ void () ego_activate =
 	ent.weapon = 0;
 	ent.dmg = (250 + (50 * random ()));
 	ent.egosoundtime = (time - 1);
-	ent.delay = (time + POW_TIME);
+	ent.delay = (time + 30);
 	ent.avelocity = '30 30 30';
 	setmodel (ent,"progs/v_ego.mdl");
 	setorigin (ent,(self.origin + '0 0 8'));

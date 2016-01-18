@@ -12,7 +12,7 @@ void() connectmessage =
 	local string Line3,Line5,Line7;
 
 // web site promo & id
-	Line3 = "\\/ersion \b2\b.\b0\b\n\n";
+	Line3 = "\\/ersion \b2\b.\b2\b\n\n";
 	Line5 = "\nsee:           \nhttp://www.moddb.com/mods/";
 	Line7 = "\n              for details";
 //	\b_-=\b* \bC\bataboligne\n
@@ -27,7 +27,7 @@ if (self.classname != "pk*bot" && (!FRIKBOT ||self.ishuman))
 	}
 	else if (self.msgcount == 1)
 	{
-	  // Anti bots messges.
+	  // Anti client side bots messges.
 	  if (DONTALLOWBOTS == 1)
 	  {
 	    sprint(self,"No Bots\n");
@@ -152,7 +152,7 @@ void() updateStatusDisplay =
 	if (self.hubstartupmessage > time)
 	{
 // web site promo
-		Line3 = "\n\n[\\/\b2\b.\b0\b] \b_-=\b* \bC\bataboligne\n\nhttp://www.moddb.com/mods/\bpainkeep-source-update\n\n";
+		Line3 = "\n\n[\\/\b2\b.\b2\b] \b_-=\b* \bC\bataboligne\n\nhttp://www.moddb.com/mods/\bpainkeep-source-update\n\n";
 // heh heh - scroll wheel of pain!
 		if ((time & 3) == 0) Line5 = "|";
 		else if ((time & 3) == 1) Line5 = "\\";

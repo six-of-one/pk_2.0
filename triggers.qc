@@ -325,13 +325,13 @@ void () play_teleport =
 	else
 		tmpstr = "misc/r_tele5.wav";
 
-	if (PK || (world.wad == "q2.wad")) // NOTE:
+	if (PK)
 	{
 	if (!SOUND_GOT)
-		get_teleport_sounds();
+		get_teleport_sounds ();
 	else
 		SOUND_GOT = FALSE;	// So we get new sounds the next time
-	tmpstr = normalsound;
+		tmpstr = normalsound;
 	}
 	sound (self, CHAN_VOICE, tmpstr, 1, ATTN_NORM);
 	remove (self);
@@ -450,7 +450,7 @@ void () teleport_touch =
 	SUB_UseTargets ();
 
 // put a tfog where the player was
-	if (PK || (world.wad == "q2.wad")) spawn_tfog2(other.origin); // *pk - new teleport sounds
+	if (PK) spawn_tfog2(other.origin); // *pk - new teleport sounds
 	else
 	spawn_tfog (other.origin);
 

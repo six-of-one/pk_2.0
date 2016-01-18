@@ -264,7 +264,7 @@ entity(vector org) make_waypoint =
 	{
 		self.cnt = self.cnt + 1;
 
-			if (WARNING)
+		if (WARNING)
 		if (self.cnt < 5)
 		{
 			bprint("*** Warning - ent tried to make way point in solid: ");
