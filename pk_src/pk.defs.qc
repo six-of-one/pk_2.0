@@ -204,7 +204,8 @@ float CYC_TIME					= 60; // TEST - 240; // seconds for cycle base - 4 mins +|- 2
 
 void() item_loop;
 float ammo_frame;
-void() infinite_ammo;
+float(float cn, entity e, string op) ammo_con;
+
 // **************************************
 // painkeep protos
 

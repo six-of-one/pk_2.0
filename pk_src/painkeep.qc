@@ -974,7 +974,7 @@ void() pk_srvcmd_set =
 // runes
 	RUNES = 0;
 	RUNE_CNT = 4;
-	RUNE_MOVE = 12;
+	RUNE_MOVE = 10 + rint(random() * 5);
 	RUNE_MASK = 15;
 	RUNE_3_ACM = 0.2;
 	RUNE_AR1M = 0;

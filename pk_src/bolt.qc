@@ -57,7 +57,7 @@ void() bolt_fire =
 	  // fire as normal..
 	  local vector org, endpos;
 
-		self.currentammo = self.ammo_cells = self.ammo_cells - 2;
+		self.currentammo = self.ammo_cells = self.ammo_cells - ammo_con(2, self, "");
 
 		self.punchangle_x = -2;
 		cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view

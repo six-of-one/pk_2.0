@@ -78,6 +78,8 @@ runes.qc
 // painkeep code
 pk_src/2dtrain.qc
 pk_src/pkitems.qc
+pk_src/pk_itm_dynamic.qc
+pk_src/pk_itm_loopcyc.qc
 pk_src/pk_weapons.qc
 pk_src/pk_player.qc
 pk_src/meantime.qc

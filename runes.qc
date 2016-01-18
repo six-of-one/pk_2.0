@@ -37,7 +37,7 @@ void(entity e, float f, float r) rune_print =
 	else bprint("Rune not identified - unknown power!\n");
 };
 
-// return a rune bit mask for given map code
+// return a rune bit mask for given map code or a map code for given rune bit mask
 
 float(float mc, float bc) rune_bit_code =
 {
@@ -57,6 +57,9 @@ float(float mc, float bc) rune_bit_code =
 };
 
 // one cvar implementation of manual rune cfg
+
+// 1 - set sv_c_rune_set to a valid rune map code
+// 2 - set sv_c_rune_set to a valid rune power bit code
 
 void() mk_rune_set =
 {
@@ -79,6 +82,7 @@ void() mk_rune_set =
 			else if (rune_set == MC_SIGIL4) R_HELL = cvar("sv_c_rune_set") & RUNE_MASK_ALL;
 			else if (rune_set == MC_SIGIL8) R_ELDER = cvar("sv_c_rune_set") & RUNE_MASK_ALL;
 			cvar_set("sv_c_rune_set", "0");
+			rune_set = 0;
 		}
 		if (!R_EARTH) R_EARTH = RUNE_FLG_RS; // any fail get assigned std. powers
 		else if (!R_BLACK) R_BLACK = RUNE_FLG_DM;
@@ -180,7 +184,7 @@ void () rune_touch =
 // remove it in single player, or setup for respawning in deathmatch
 	self.model = string_null;
 	self.solid = SOLID_NOT;
-	self.delay = self.cnt = 0;
+	self.cnt = 0;
 	self.count = self.count + 0.13; // increment for each grab - more activity = less chance of rune moving
 
 	if (RUNES == 1 || RUNES == 3)
@@ -197,6 +201,7 @@ void () rune_touch =
 };
 
 // make runes for runeserver
+
 float rune_map; // runes on level
 
 void() rune_maker =
@@ -277,7 +282,7 @@ void() rune_maker =
 
 			rune_map = rune_map | self.spawnflags;
 			self.count = 2 + random() * 3.8; // controls no-touch reposition code in check movement deal
-			self.cnt = 0;
+			self.delay = self.cnt = 0;
 
 			bprint("\b*** RUNE spawned: ");
 			bprint(self.netname);
@@ -295,7 +300,7 @@ void() rune_maker =
 	}
 };
 
-// count chg - remove a rune
+// count chg - remove rune(s)
 
 void(float r1, float p) remove_rune =
 {
@@ -447,7 +452,7 @@ void() run_runes =
 		bit_print(RUNE_MASK_ALL, RUNE_MASK);
 		bprint(", of total : ");
 		bit_print(RUNE_MASK_ALL, RUNE_MASK_ALL);
-		bprint("\nwhere 0 indicates an forbidden rune\n\n");
+		bprint("\nwhere 0 indicates a forbidden rune\n\n");
 
 		bprint("earth magic | (mc:121 bit:");
 		bit_print(RUNE_MASK_ALL, R_EARTH);

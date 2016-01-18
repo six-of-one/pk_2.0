@@ -1262,9 +1262,6 @@ void () PlayerPostThink =
 	if (pk_adminframe != framecount)
 	if (admin_postthink()) return;
 
-	if (pk_itemovr & CON_INF)
-	if (ammo_frame < framecount)
-		infinite_ammo();
 
 // runes
 	if (self.rune_flag & RUNE_FLG_RG) rune_regen();

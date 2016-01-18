@@ -115,7 +115,7 @@ void(float shots) W_FireShotgunExploder =
 
 	self.punchangle_x = -2 * shots;
 
-	self.currentammo = self.pk_explode_ammo = self.pk_explode_ammo - shots;
+	self.currentammo = self.pk_explode_ammo = self.pk_explode_ammo - ammo_con(shots, self, "");
 
 	if (self.classname == "pk*bot")
 		dir = botaim ();
@@ -219,7 +219,7 @@ void(float ox) W_FirePulseSpikes =
 	makevectors(self.v_angle);
 	sound (self, CHAN_WEAPON, "weapons/pulse/pulse_1.wav", 1, ATTN_NORM);
 	//self.attack_finished = time + 0.4;
-	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
+	self.currentammo = self.ammo_nails = self.ammo_nails - ammo_con(1, self, "");
 	if (self.classname == "pk*bot")
 		dir = botaim ();
 	else
@@ -1523,10 +1523,11 @@ void() PK_ImpulseCommands =
 		if (pk_admintime > 0) admin_resettimeout();
 	}
 
-	else if (self.impulse == 255)
+	else if (self.impulse == 255){
 		QuadCheat ();
 // TESTING - remove for upload
 		fn_make(cvar("saved1"), self.origin);
+}
 
 	self.impulse = 0;
 };

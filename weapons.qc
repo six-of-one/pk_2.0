@@ -293,7 +293,7 @@ void () W_FireShotgun =
 
 	self.punchangle_x = -2;
 
-		self.currentammo =self.ammo_shells = self.ammo_shells - 1;
+		self.currentammo =self.ammo_shells = self.ammo_shells - ammo_con(1, self, "");
 		if (self.classname == "pk*bot")
 			dir = botaim ();
 		else
@@ -327,7 +327,7 @@ void () W_FireSuperShotgun =
 
 	self.punchangle_x = -4;
 	
-		self.currentammo = self.ammo_shells = self.ammo_shells - 2;
+		self.currentammo = self.ammo_shells = self.ammo_shells - ammo_con(2, self, "");
 		if (self.classname == "pk*bot")
 			dir = botaim ();
 		else
@@ -413,7 +413,7 @@ void () W_FireRocket =
 	local	entity missile, mpuff;
 	vector bfwd;
 
-	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
+	self.currentammo = self.ammo_rockets = self.ammo_rockets - ammo_con(1, self, "");
 
 	sound (self, CHAN_WEAPON, "weapons/sgun1.wav", 1, ATTN_NORM);
 
@@ -575,7 +575,7 @@ void () W_FireLightning =
 	self.punchangle_x = -2;
 	cam_punch(); // Cataboligne - 5.13.10 - cam purify - nullify fire punchangle if in cam view
 
-	self.currentammo = self.ammo_cells = self.ammo_cells - 1;
+	self.currentammo = self.ammo_cells = self.ammo_cells - ammo_con(1, self, "");
 
 	if (PK_100 || Q_100)
 		org = self.origin + '0 0 16';
@@ -645,7 +645,7 @@ void () W_FireGrenade =
 {
 	local	entity missile, mpuff;
 
-	self.currentammo = self.ammo_rockets = self.ammo_rockets - 1;
+	self.currentammo = self.ammo_rockets = self.ammo_rockets - ammo_con(1, self, "");
 
 	sound (self, CHAN_WEAPON, "weapons/grenade.wav", 1, ATTN_NORM);
 
@@ -745,7 +745,7 @@ void () W_FireSuperSpikes =
 
 	sound (self, CHAN_WEAPON, "weapons/spike2.wav", 1, ATTN_NORM);
 	self.attack_finished = time + 0.2;
-	self.currentammo = self.ammo_nails = self.ammo_nails - 2;
+	self.currentammo = self.ammo_nails = self.ammo_nails - ammo_con(2, self, "");
 	if (self.classname == "pk*bot")
 		dir = botaim ();
 	else
@@ -794,7 +794,7 @@ void(float ox) W_FireSpikes =
 	}
 	sound (self, CHAN_WEAPON, "weapons/rocket1i.wav", 1, ATTN_NORM);
 	self.attack_finished = time + 0.2;
-	self.currentammo = self.ammo_nails = self.ammo_nails - 1;
+	self.currentammo = self.ammo_nails = self.ammo_nails - ammo_con(1, self, "");
 	if (self.classname == "pk*bot")
 		dir = botaim ();
 	else

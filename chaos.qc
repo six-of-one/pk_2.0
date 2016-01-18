@@ -49,3 +49,39 @@ float(entity hent, string match, string srch) cnt_ent =
 	return(rc);
 }
 
+
+// fn(bit_cnt) - count available bits for random selection
+
+// fb - bits to count
+// rb - return a random bit from set
+
+float(float fb, float rb) bit_cnt =
+{
+	local float rs,f;
+
+	if (fb > 0)
+	{
+		f = 1;
+		while (f <= 8388608) // max float bits
+		{
+			if (f & fb) rs = rs + 1;
+			f = f * 2;
+		}
+	}
+	else
+		return(0); // error cond - no bits set!
+
+	if (!rb) return(rs);
+// pick a random bit
+	f = floor(random() * rs);
+	rs = f;
+
+	f = 1;
+	while (f <= 8388608 && rs > -1) // max float bits
+	{
+		if (f & fb) rs = rs - 1;
+		if (rs > -1) f = f * 2;
+	}
+
+	return(f);
+};
