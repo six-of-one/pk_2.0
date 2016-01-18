@@ -207,10 +207,9 @@ void () q100_health_touch =
 	}
 	else
 	{
-		if (deathmatch != 2)		// deathmatch 2 is the silly old rules
+		if (deathmatch == 1)		// deathmatch 2 is the silly old rules
 		{
-			if (deathmatch)
-				self.nextthink = time + 20;
+			self.nextthink = time + 20;
 			self.think = SUB_regen;
 		}
 	}
@@ -235,7 +234,7 @@ void () item_megahealth_rot =
 // just blindly subtract the flag off
 	other.items = other.items - (other.items & IT_SUPERHEALTH);
 
-	if (deathmatch != 2)	// deathmatch 2 is silly old rules // *pk more dm modes
+	if (deathmatch == 1 || deathmatch == 3)	// deathmatch 2 is silly old rules // *pk more dm modes
 	{
 		self.nextthink = time + 20;
 		self.think = SUB_regen;
@@ -318,9 +317,11 @@ void () armor_touch =
 
 	self.solid = SOLID_NOT;
 	self.model = string_null;
-  if (deathmatch == 1)
+  if (deathmatch == 1 || deathmatch == 3)
+  {
 		self.nextthink = time + 20;
-	self.think = SUB_regen;
+		self.think = SUB_regen;
+  }
 
 	if (self.netname != "Mega Sphere")
 	{
@@ -564,8 +565,10 @@ void () weapon_touch =
 	self.model = string_null;
 	self.solid = SOLID_NOT;
   if (deathmatch == 1)
+  {
 		self.nextthink = time + RSP_TIME;
 		self.think = SUB_regen;
+  }
 
 	activator = other;
 	SUB_UseTargets();				// fire all targets / killtargets
@@ -1158,7 +1161,7 @@ void () powerup_touch =
 	sprint (other,self.netname);
 	sprint (other,"\n");
 
-	if (Q_100 || Q_99 || (deathmatch != 4)) // *pk - my new rule, logical extrapolation
+	if (Q_100 || Q_99 || (deathmatch != 4)) // *pk - my new rule, logical extrapolation - everything goes away, none comes back
 	if (deathmatch)
 	{
 		self.mdl = self.model;

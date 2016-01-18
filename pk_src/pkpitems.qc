@@ -43,18 +43,23 @@ void () pkplus_touch =
 		if (other.pkplus_phoneammo >= PKPLUS_PHONEAMMO_MAX) return ;
 		other.pkplus_phoneammo = (other.pkplus_phoneammo + 1);
 	}
+
 	sprint (other,"You got the ");
 	sprint (other,self.netname);
 	sprint (other,"\n");
+
 	sound (other,CHAN_ITEM,"misc/pickup/tone2.wav",1,ATTN_NORM);
 	stuffcmd (other,"bf\n");
+
 	stemp = self;
 	self = other;
 	W_SetCurrentAmmo ();
 	self = stemp;
+
 	self.solid = SOLID_NOT;
 	self.model = string_null;
-	if (deathmatch != 2) // PK ART FIX ***
+
+	if (deathmatch == 1 || deathmatch == 3) // PK ART FIX ***
 	{
 		if ((self.pk_items == PKPLUS_IT_EGO) || (self.pk_items == PKPLUS_IT_PHONE))
 		{
@@ -64,8 +69,9 @@ void () pkplus_touch =
 		{
 			self.nextthink = (time + RSP_TIME * 2);
 		}
+		self.think = SUB_regen;
 	}
-	self.think = SUB_regen;
+
 	activator = other;
 	SUB_UseTargets ();
 };

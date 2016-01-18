@@ -134,6 +134,8 @@ void(string cls) item_call =
 		self.wait = 0; // RSP_TIME; // damn q3 respawn time rules - hope this doesnt fxk rndize
 		self.dmgtime = POW_TIME;
 
+		self.frame = 0;
+		self.skin = 0;
 		self.noise4 = ""; // respawn sound
 	}
 

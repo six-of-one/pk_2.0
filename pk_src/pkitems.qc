@@ -199,9 +199,6 @@ void () painkeep_weapon_touch =
 	self.solid = SOLID_NOT;
 	if (deathmatch == 1)
 	{
-		if (self.wait)
-			self.nextthink = time + self.wait;
-		else
 		self.nextthink = time + RSP_TIME;
 		self.think = SUB_regen;
 	}
@@ -304,7 +301,7 @@ void() pk_dyn_touch =
 void() pk_ammo_touch =
 {
 	local entity	sv;
-	local float best, bestpk, sk; // *pk - best pk wep
+	local float best, bestpk, sk, MAX; // *pk - best pk wep
 
 	if (other.classname != "player")
 		return;
@@ -320,9 +317,12 @@ void() pk_ammo_touch =
 
 	sk = TRUE; // skip old method if false
 
+// Cataboligne - 7.19.10 - pack & ammo runes mod
+	MAX = bound_ammo_pack(self.lip);
+
 	if (self.lip == AMMO_SLUGS) // slugs
 	{
-		if (other.ammo_slug >= PK_SLUGAMMO_MAX)
+		if (other.ammo_slug >= MAX) //PK_SLUGAMMO_MAX)
 			return;
 		other.ammo_slug = other.ammo_slug + self.currentammo;
 		sk = FALSE;
@@ -330,7 +330,7 @@ void() pk_ammo_touch =
 
 	if (self.lip == AMMO_BULLETS) // any bullets
 	{
-		if (other.ammo_bullet >= PK_BULLETAMMO_MAX)
+		if (other.ammo_bullet >= MAX) // PK_BULLETAMMO_MAX)
 			return;
 		other.ammo_bullet = other.ammo_bullet + self.currentammo;
 		sk = FALSE;
@@ -338,15 +338,23 @@ void() pk_ammo_touch =
 
 	if (self.lip == AMMO_CELLS)
 	{
-		if (other.ammo_cells >= Q1_CELLAMMO_MAX)
+		if (other.ammo_cells >= MAX) // Q1_CELLAMMO_MAX)
 			return;
 		other.ammo_cells = other.ammo_cells + self.currentammo;
 		sk = FALSE;
 	}	
 
+	if (self.lip == AMMO_NAILS)
+	{
+		if (other.ammo_cells >= MAX) // Q1_NAILAMMO_MAX)
+			return;
+		other.ammo_nails = other.ammo_nails + self.currentammo;
+		sk = FALSE;
+	}	
+
 	if (self.lip == AMMO_ROCKETS)
 	{
-		if (other.ammo_rockets >= Q1_ROCKETAMMO_MAX)
+		if (other.ammo_rockets >= MAX) // Q1_ROCKETAMMO_MAX)
 			return;
 		other.ammo_rockets = other.ammo_rockets + self.currentammo;
 		sk = FALSE;
@@ -354,7 +362,7 @@ void() pk_ammo_touch =
 
 	if (self.lip == AMMO_GRENADES) // FIX: decide if this will be separate for q2 & q3 - add max & cvar
 	{
-		if (other.ammo_rockets >= Q1_ROCKETAMMO_MAX)
+		if (other.ammo_rockets >= MAX) // Q1_ROCKETAMMO_MAX)
 			return;
 		other.ammo_rockets = other.ammo_rockets + self.currentammo;
 		sk = FALSE;
@@ -362,7 +370,7 @@ void() pk_ammo_touch =
 
 	if (self.lip == AMMO_SHELLS)
 	{
-		if (other.ammo_shells >= Q1_SHELLAMMO_MAX)
+		if (other.ammo_shells >= MAX) // Q1_SHELLAMMO_MAX)
 			return;
 		other.ammo_shells = other.ammo_shells + self.currentammo;
 		sk = FALSE;
@@ -370,7 +378,7 @@ void() pk_ammo_touch =
 
 	if (self.lip == AMMO_GAS)
 	{
-		if (other.ammo_gaspr >= Q1_SHELLAMMO_MAX)
+		if (other.ammo_gaspr >= MAX) // Q1_GASAMMO_MAX)
 			return;
 		other.ammo_gaspr = other.ammo_gaspr + self.currentammo;
 		sk = FALSE;
@@ -452,11 +460,11 @@ void() pk_ammo_touch =
 // remove it in single player, or setup for respawning in deathmatch
 	self.model = string_null;
 	self.solid = SOLID_NOT;
-	if (deathmatch == 1)
+	if (deathmatch == 1 || deathmatch == 3)
 	{
-		if (self.wait)
-			self.nextthink = time + self.wait;
-		else
+//		if (self.wait)
+//			self.nextthink = time + self.wait;
+//		else
 	  self.nextthink = time + RSP_TIME;
 		self.think = SUB_regen;
 	}
@@ -528,16 +536,35 @@ void() painkeep_touch =
 		if (self.pk_touch == ammo_touch) self.pk_touch = pk_ammo_touch; // new fn for ammo collections
 
 		self.pk_touch();
+
 		if (self.solid == SOLID_NOT)
-		if (deathmatch == 3) // *pk - new dm mode settings
+		if (self.think == SUB_regen)
+		if (deathmatch == 1 || deathmatch == 3)
 		{
 			if (self.wait)
 				self.nextthink = time + self.wait;
-			else
-			if (self.pk_touch == ammo_touch)
-				self.nextthink = time + RSP_TIME * 0.5; //15;
-			else if (self.pk_touch == armor_touch)
-				self.nextthink = time + RSP_TIME * 0.666; //20;
+
+			if (deathmatch == 3) // *pk - new dm mode settings - NOTE: this overrides genre ".wait" respawn times on all ents routed via armor & ammo touch listed below
+			{
+				if (self.pk_touch == pk_ammo_touch)
+					self.nextthink = time + RSP_TIME * 0.5; //15;
+				else if (self.pk_touch == armor_touch)
+					self.nextthink = time + RSP_TIME * 0.666; //20;
+			}
+
+
+
+if (WARNING)
+{
+bprint("\b *** respawn: time set in painkeep_touch for: ");
+bprint(item_ident(self));
+bprint(", time = (");
+bprint(ftos(self.nextthink - time));
+bprint(")\n");
+}
+
+
+
 		}
 
 		if (e)
@@ -615,9 +642,9 @@ void() painkeep_touch =
 	self.solid = SOLID_NOT;
 	self.model = string_null;
 	if (deathmatch)
-	if (deathmatch != 2)
+	if (deathmatch == 1 || deathmatch == 3)
 	{
-		if (self.wait)
+		if (self.wait) // IDEA: this prob. never happens
 			self.nextthink = time + self.wait;
 		else
 		if (self.pk_items == PK_IT_GRAVITYWELL)
@@ -770,8 +797,19 @@ void () item_painkeep_expshells =
 
 // called from bound_ammo - bounds for pk ammo
 
+// Cataboligne - 7.19.10 - added ammo pack bounding
+
 void() pk_bound_ammo =
 {
+// st ammo pack code
+	if (other.rune_flag & RUNE_AMMO) // ammo packs & ammo rune increase carry capy
+	{
+		bound_ammo_pack(0);
+	}
+	else
+	{
+// end ammo pack code
+
 	if (other.ammo_shells > Q1_SHELLAMMO_MAX)
 		other.ammo_shells = Q1_SHELLAMMO_MAX;
 	if (other.ammo_nails > Q1_NAILAMMO_MAX)
@@ -787,6 +825,7 @@ void() pk_bound_ammo =
 		other.ammo_slug = PK_SLUGAMMO_MAX;
 	if (other.ammo_gaspr > PK_GASAMMO_MAX)
 		other.ammo_gaspr = PK_GASAMMO_MAX;
+	}
 
 	if (other.pk_gravitywellammo > PK_GRAVITYWELLAMMO_MAX)
 		other.pk_gravitywellammo = PK_GRAVITYWELLAMMO_MAX;
@@ -891,7 +930,13 @@ void() BackpackTouch =
 	acount = 0;
 	sprint (other, "You get ");
 
+// st ammo pack code
+	if (self.netname == "Ammo Pack") sprint (other, "an Ammo Pack with ");
+	else
+// end ammo pack code
+
 	if (self.items)
+	{
 // PAINKEEP_START
 		if ((other.items & self.items) == 0 || (self.items == IT_AXE && (other.pk_items & self.pk_items) == 0))
 // PAINKEEP_END
@@ -906,6 +951,7 @@ void() BackpackTouch =
 	self = other;
 	best = W_BestWeapon();
 	self = st1;
+	}
 
 // change weapons
 	other.ammo_shells = other.ammo_shells + self.ammo_shells;
@@ -913,7 +959,7 @@ void() BackpackTouch =
 	other.ammo_rockets = other.ammo_rockets + self.ammo_rockets;
 	other.ammo_cells = other.ammo_cells + self.ammo_cells;
 // new ammo
-	other.ammo_bullet = other.ammo_bullet + self.ammo_bullet; // TDO: note below
+	other.ammo_bullet = other.ammo_bullet + self.ammo_bullet;
 	other.ammo_slug = other.ammo_slug + self.ammo_slug;
 	other.ammo_gaspr = other.ammo_gaspr + self.ammo_gaspr;
 
@@ -1012,6 +1058,35 @@ void() BackpackTouch =
 		sprint (other, bs);
 		sprint (other, " cells");
 	}
+// st x weap ammo annc
+	if (self.ammo_bullet)
+	{
+		if (acount)
+			sprint(other, ", ");
+		acount = 1;
+		bs = ftos(self.ammo_bullet);
+		sprint (other, bs);
+		sprint (other, " bullets");
+	}
+	if (self.ammo_slug)
+	{
+		if (acount)
+			sprint(other, ", ");
+		acount = 1;
+		bs = ftos(self.ammo_slug);
+		sprint (other, bs);
+		sprint (other, " slugs");
+	}
+	if (self.ammo_gaspr)
+	{
+		if (acount)
+			sprint(other, ", ");
+		acount = 1;
+		bs = ftos(self.ammo_gaspr);
+		sprint (other, bs);
+		sprint (other, " lbs gas pressure");
+	}
+// end x weap ammo
 	if (self.pk_gravitywellammo)
 	{
 		if (acount)
@@ -1063,9 +1138,28 @@ void() BackpackTouch =
 	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
 
+// st ammo pack code
+	if (self.netname != "Bandolier" && self.netname != "Ammo Pack") // handled a pack load up - dont want remove or wep chg
+	{
+
+
+
+if (WARNING)
+{
+bprint("\b *** warning: pack touch q1 ret for: ");
+bprint(item_ident(self));
+bprint("\n");
+}
+
+
+
 // remove the backpack, change self to the player
 	remove(self);
 	self = other;
+	}
+	else
+		return;
+// end ammo pack code
 
 // change to the weapon
 	if (!deathmatch)

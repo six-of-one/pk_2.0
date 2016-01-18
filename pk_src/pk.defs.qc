@@ -351,21 +351,21 @@ float TR_Q3;
 float TR_ALL;
 float TR_NOT;						// 0 = no change, 1 = remove, 2 = best guess, 3 = randomize in genre, 4 = randomize to any
 
-float FL_NOTRN_LEAVE		= 0;
-float FL_NOTRN_RMV		= 1;
-float FL_NOTRN_BG			= 2;
-float FL_NOTRN_RNDIN		= 3;
-float FL_NOTRN_RNDANY	= 4;
+float FL_NOTRN_LEAVE			= 0;
+float FL_NOTRN_RMV			= 1;
+float FL_NOTRN_BG				= 2;
+float FL_NOTRN_RNDIN			= 3;
+float FL_NOTRN_RNDANY		= 4;
 
-float FL_TR_RESTORE		= -1; //	restore to original - should only be set by code
-float FL_TR_WOLF			= 1; //	tranlate these items to wolf items
-float FL_TR_DOOM			= 2; // 	"			"		"		doom	"
-float FL_TR_QUAKE			= 4; //		"			"		"		quake	"
-float FL_TR_Q2				= 8; //		"			"		"		q2		"
-float FL_TR_Q3				= 16; //	"			"		"		q3		"
-float FL_TR_RANDIN		= 32; // randomize in gen
-float FL_TR_RANDOM		= 64; // total random
-float FL_TR_REMOVE		= 128; // remove these items
+float FL_TR_RESTORE			= -1; //	restore to original - should only be set by code
+float FL_TR_WOLF				= 1; //	tranlate these items to wolf items
+float FL_TR_DOOM				= 2; // 	"			"		"		doom	"
+float FL_TR_QUAKE				= 4; //		"			"		"		quake	"
+float FL_TR_Q2					= 8; //		"			"		"		q2		"
+float FL_TR_Q3					= 16; //	"			"		"		q3		"
+float FL_TR_RANDIN			= 32; // randomize in gen
+float FL_TR_RANDOM			= 64; // total random
+float FL_TR_REMOVE			= 128; // remove these items
 
 float NO_PI;					// dont let item_call call place_item
 
@@ -383,6 +383,7 @@ float PK_GASAMMO_MAX;
 void(entity e, float trv) master_item_control;
 void(string tri, float trv) master_item_control_loop;
 void() x_pwr_touch;
+void() x_pack_touch;
 void(float velmul, float mvt, float flg, float ct, vector fmorg, vector vdr, string cname, string md, string sd, void() tch, float tht, void() thk, void() thd) fire_missile;
 void() melee_hit;
 void() player_plasma1;
@@ -398,7 +399,7 @@ float HGREN_VEL;
 float GRENADE_VEL;
 float ROCKET_FUSE;
 float WEPHUM; // weapons hum
-float HUMLOCAL						= -41200855;    // taking local control, dont override by auto
+float HUMLOCAL					= -41200855;    // taking local control, dont override by auto
 
 // TEST remove
 entity fts; // fire test
@@ -477,7 +478,7 @@ void() wchg2_weapon_touch;
 
 // doom
 
-string DOOM_DET				= "doom/dsitembk.wav"; // against	self.noise4 
+string DOOM_DET				= "doom/dsitembk.wav"; // against	self.noise4
 float D_POWER_WAIT; // seconds major doom powers need to respawn - norm 30
 float D_POWER_TIME; // seconds of power supply
 
@@ -494,7 +495,7 @@ float DOOM_BFG_TRACE			= 1024; // IDEA: adjust by doom to quake dist adjust for 
 
 // q2
 
-string Q2_DET					= "q2_snd/respawn1.wav"; // against	self.noise4 
+string Q2_DET					= "q2_snd/respawn1.wav"; // against	self.noise4
 float Q2_POWER_WAIT; // norm = 30
 float Q2_POWER_TIME; // norm = 30
 
@@ -512,7 +513,7 @@ float Q2_BFG_LASER_DMG		= 5; // 5 pts every 10th sec
 
 // q3
 
-string Q3_DET					= "q3_snd/respawn1.wav"; // against	self.noise4 
+string Q3_DET					= "q3_snd/respawn1.wav"; // against	self.noise4 - NOTE: artifacts are different
 string Q3_BOBHOFF				= "cl_itembobheight 0\n"; // q3 item bob height off setting
 float Q3_POWER_WAIT; // norm = 120
 float Q3_POWER_TIME; // norm = 30
@@ -537,15 +538,20 @@ float(string name, string value) registercvar = #93;
 //movetype definitions:
 float MOVETYPE_FOLLOW		= 12;
 
+float SV_AMMO_MAX; // if true server maxes override genre limits
+float DEF_AMMO					= 100; // in case something is wrong in ammo code
+float MAX_AMMO					= 1023; // 2 per float this way once parms are combined
 
 float AMMO_NONE				= 100; // mostly melee weps
 float AMMO_SHELLS				= 101; // ranged gun uses this ammo type
 float AMMO_NAILS				= 103;
 float AMMO_ROCKETS			= 105;
 float AMMO_CELLS				= 107;
+float AMMO_LIGHTNING			= 107; // q3 ammo - just cells for now
+float AMMO_BFG					= 107; // q3 ammo - just cells for now
 float AMMO_BULLETS			= 109;
 float AMMO_SLUGS				= 111;
-float AMMO_GRENADES			= 113;
+float AMMO_GRENADES			= 113; // q2 / q3 - handled as rockets in touch
 float AMMO_GAS					= 115;
 
 // **************************************
@@ -659,15 +665,15 @@ void() Chase_cam_level_start;
 void() cam_waterjump;
 
 // message protocol defines
-float SVC_SETVIEWPORT	= 5;
-float SVC_SETVIEWANGLES	= 10;
+float SVC_SETVIEWPORT		= 5;
+float SVC_SETVIEWANGLES		= 10;
 
 // free player entity variable
 // '.float speed'  bit-flag defines:
 //float CHSCAM_MONSTER  = ;
-float CHSCAM_ON			= 1;
-float LASERTARG_ON		= 4;
-float LASERTARG_LIT		= 32;
+float CHSCAM_ON				= 1;
+float LASERTARG_ON			= 4;
+float LASERTARG_LIT			= 32;
 
 .vector cam; // all chase cam data
 void() cam_punch;						// return punchangle if passed parm - otherwise set self. var
@@ -1058,6 +1064,7 @@ void() pk_item_position_init;
 float(float w, float w2) PK_RankForWeapon;
 void(float new, float new2) PK_Deathmatch_Weapon;
 void() DropBackpack;
+void() BackpackTouch;
 //void(entity e) PK_BackpackSetup;
 
 // player code

@@ -625,6 +625,8 @@ void() pk_liveupd =
 	PKPLUS_ACTORAMMO_MAX	= cvar("pk_max_actorammo");
 	PKPLUS_PHONEAMMO_MAX	= cvar("pk_max_phoneammo");
 
+	SV_AMMO_MAX = cvar("sv_c_ammo_max");
+
 	PK_MAX_LIVENT = cvar("pk_max_livent");
 
 // turrets
@@ -936,6 +938,8 @@ void() pk_srvcmd_set =
 	PKPLUS_ACTORAMMO_MAX	= 1;
 	PKPLUS_PHONEAMMO_MAX	= 1;
 
+	SV_AMMO_MAX = FALSE;
+
 	PK_MAX_LIVENT = 256; // guessed - need research into where slowdown starts
 
 // weps
@@ -1019,6 +1023,10 @@ void() pk_srvcmd_set =
 		registercvar("sv_c_warning", "0");
 		registercvar("sv_c_adminlock", "0"); // if true, admin menu is locked out
 		registercvar("sv_c_xenv", "0"); // if true extra env stuff stops
+		registercvar("sv_c_ammo_max", "0"); // if true server values for max ammo override all genre limits
+																						  // if false genre limits apply
+																						  // if 2 override all limit settings and use server values - this stops rune & pack increases
+
 // pk*bot server control - spawns bots on level changes
 		registercvar("sv_bot_pk", "0"); // bot count . skills non team - replaces parm12
 		registercvar("sv_bot_pktm", "0"); // bot count . skills - team - replaces parm13
