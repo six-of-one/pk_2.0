@@ -402,6 +402,13 @@ void() pk_plcfg =
 			stuffcmd(self, mapname);
 			stuffcmd(self, ".cfg\n");
 		}
+// q3 map cfg
+		if (DARKPLACES)
+		{
+			stuffcmd(self, Q3_BOBHOFF);
+			if (world.wad == "") // q3 map? - then set bob
+				q3_bob_height();
+		}
 	}
 };
 

@@ -12,8 +12,8 @@
 
 // started map pk100
 
+// TDO: finish translate codes
 // TDO: restore wad == "q1" item with doom item deactivate / pk_100 mode on (if ever allowed in map)
-// IDEA: move code to dyn & handle all translateable map items
 
 // need to hide something from players & item controls
 
@@ -38,16 +38,32 @@ string(entity e, float TR) map_trans =
 		qr = MC_AXE + floor(random() * (MC_RNDITM + 2));
 		if (RUNES) qr = MC_AXE + floor(random() * (MC_NR_RNDITM));
 
+		q2r = MC_Q2_BLASTER + rint(random() * MC_Q2_RNDITM);
+		q3r = MC_Q3_GAUNTLET + rint(random() * MC_Q3_RNDITM);
+
 		mcd = item_by_mcode(dr);
 		mcw = item_by_mcode(wr);
 		mcq = item_by_mcode(qr);
+		mcq2 = item_by_mcode(q2r);
+		mcq3 = item_by_mcode(q3r);
 
 // rnd in genre if either flag set
-		if (e.scode >= MC_W_KNIFE && e.scode <= MC_W_FLAMER) mcg = mcw;
+		if (e.scode >= MC_W_KNIFE && e.scode <= MC_W_BARREL) mcg = mcw;
 		else if (e.scode >= MC_D_SAW && e.scode <= MC_D_BARREL) mcg = mcd;
 		else if (e.scode >= MC_AXE && e.scode <= MC_SIGIL8) mcg = mcq;
+		else if (e.scode >= MC_Q2_BLASTER && e.scode <= MC_Q2_BARREL) mcg = mcq2;
+		else if (e.scode >= MC_Q3_GAUNTLET && e.scode <= MC_Q3_HOLDTELE) mcg = mcq3;
 	}
-// TDO: rnd any code
+	else if (TR == FL_TR_RANDOM || TR_NOT == FL_NOTRN_RNDANY)
+	{
+		qr = MC_AXE + floor(random() * (MC_TOT));
+		mcg = item_by_mcode(qr);
+		if (TR == FL_TR_RANDOM)
+		if (!RUNES || e.map != "rune") // ignore runes if server on
+			return(mcg);
+		mcd = mcw = mcq = mcq2 = mcq3 = mcg;
+		}
+
 
 	if (TR == FL_TR_RESTORE)
 	{
@@ -60,7 +76,7 @@ string(entity e, float TR) map_trans =
 			if (TR_NOT == FL_NOTRN_RMV) return("RMV");
 			else if (TR_NOT == FL_NOTRN_BG) return("");
 			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcg);
-			else if (TR_NOT == FL_NOTRN_RNDANY) return(""); // TDO: need master rndize
+			else if (TR_NOT == FL_NOTRN_RNDANY) return(mcg);
 			return("");
 		}
 	}
@@ -74,6 +90,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_weapon_rocketlauncher");
 		if (TR == FL_TR_Q3) return("q3_weapon_rocketlauncher");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_PLASMA || e.scode == MC_W_FLAMER || e.scode == MC_THUNDER)
@@ -84,6 +101,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("weapon_hyperblaster");
 		if (TR == FL_TR_Q3) return("weapon_plasmagun");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_CHAINGUN || e.scode == MC_W_CHAINGUN || e.scode == MC_SUPER_NAILGUN)
@@ -94,6 +112,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_weapon_chaingun"); // NOTE: has unique name
 		if (TR == FL_TR_Q3) return("q3_weapon_machinegun");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_BOOMSTICK || e.scode == MC_SUPER_SHOTGUN)
@@ -112,7 +131,7 @@ string(entity e, float TR) map_trans =
 					return("w_weapon_chaingun");
 			}
 			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
-			else if (TR_NOT == FL_NOTRN_RNDANY) return(""); // TDO: need master rndize
+			else if (TR_NOT == FL_NOTRN_RNDANY) return(mcg);
 			return("");
 		}
 		if (TR == FL_TR_DOOM) return("d_weapon_supershotgun");
@@ -120,6 +139,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_weapon_supershotgun");
 		if (TR == FL_TR_Q3) return("q3_weapon_shotgun");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_SHOTGUN || e.scode == MC_SHOTGUN)
@@ -138,7 +158,7 @@ string(entity e, float TR) map_trans =
 					return("w_weapon_chaingun");
 			}
 			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
-			else if (TR_NOT == FL_NOTRN_RNDANY) return(""); // TDO: need master rndize
+			else if (TR_NOT == FL_NOTRN_RNDANY) return(mcg);
 			return("");
 		}
 		if (TR == FL_TR_DOOM) return("d_weapon_shotgun");
@@ -146,6 +166,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_weapon_shotgun");
 		if (TR == FL_TR_Q3) return("q3_weapon_shotgun"); // IDEA: need bg code here?
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_SAW || e.scode == MC_W_KNIFE || e.scode == MC_AXE)
@@ -156,6 +177,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_weapon_blaster"); // TDO: map item
 		if (TR == FL_TR_Q3) return("weapon_gauntlet");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_ASHELLS || e.scode == MC_ASHELLS)
@@ -166,6 +188,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_ammo_shells");
 		if (TR == FL_TR_Q3) return("q3_ammo_shells");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_ASHELLS_LG || e.scode == MC_ASHELLS_LG)
@@ -176,6 +199,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_ammo_shells");
 		if (TR == FL_TR_Q3) return("q3_ammo_shells");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_ACELLS || e.scode == MC_ACELLS)
@@ -186,6 +210,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_ammo_cells");
 		if (TR == FL_TR_Q3) return("q3_ammo_cells");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_ACELLS_LG || e.scode == MC_ACELLS_LG)
@@ -196,6 +221,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_ammo_cells");
 		if (TR == FL_TR_Q3) return("q3_ammo_cells");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_AROCKET || e.scode == MC_AROCKETS)
@@ -206,6 +232,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_ammo_rockets");
 		if (TR == FL_TR_Q3) return("q3_ammo_rockets");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_AROCKETS_LG || e.scode == MC_AROCKETS_LG)
@@ -216,6 +243,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_ammo_rockets");
 		if (TR == FL_TR_Q3) return("q3_ammo_rockets");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_ABULLETS || e.scode == MC_ANAILS)
@@ -226,6 +254,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_ammo_bullets");
 		if (TR == FL_TR_Q3) return("q3_ammo_bullets");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_ABULLETS_LG || e.scode == MC_ANAILS_LG)
@@ -236,6 +265,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_ammo_bullets");
 		if (TR == FL_TR_Q3) return("q3_ammo_bullets");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_SOULSPH || e.scode == MC_HEALTHMEGA)
@@ -246,6 +276,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_item_health_mega");
 		if (TR == FL_TR_Q3) return("q3_item_health_mega");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_MEDKIT || e.scode == MC_HEALTH)
@@ -256,6 +287,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_item_health_large");
 		if (TR == FL_TR_Q3) return("q3_item_health_large");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_STIMPAK || e.scode == MC_HEALTHROT)
@@ -266,6 +298,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_item_health_large");
 		if (TR == FL_TR_Q3) return("q3_item_health_large");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_HBOTTLE)
@@ -276,6 +309,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_item_health_small");
 		if (TR == FL_TR_Q3) return("q3_item_health_small");
 		if (TR == FL_TR_RANDIN) return(mcg);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 /// doom
@@ -295,7 +329,7 @@ string(entity e, float TR) map_trans =
 					return("w_weapon_motar");
 			}
 			else if (TR_NOT == FL_NOTRN_RNDIN) return(mcw);
-			else if (TR_NOT == FL_NOTRN_RNDANY) return(""); // TDO: need master rndize
+			else if (TR_NOT == FL_NOTRN_RNDANY) return(mcg);
 			return("");
 		}
 		if (TR == FL_TR_DOOM) return("d_weapon_bfg");
@@ -303,6 +337,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_weapon_bfg");
 		if (TR == FL_TR_Q3) return("q3_weapon_bfg");
 		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_BERS)
@@ -324,6 +359,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_item_quad");
 		if (TR == FL_TR_Q3) return("q3_item_quad");
 		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_INVUL)
@@ -359,6 +395,7 @@ string(entity e, float TR) map_trans =
 			return("");
 		}
 		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_INVIS)
@@ -380,6 +417,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("item_silencer");
 		if (TR == FL_TR_Q3) return("item_invis");
 		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_RADSUIT)
@@ -401,6 +439,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_item_enviro");
 		if (TR == FL_TR_Q3) return("q3_item_enviro");
 		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_ARM_BLU)
@@ -422,6 +461,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_item_armor_body");
 		if (TR == FL_TR_Q3) return("q3_item_armor_body");
 		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_ARM_GRN)
@@ -443,6 +483,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_item_armor_combat");
 		if (TR == FL_TR_Q3) return("q3_item_armor_combat");
 		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_D_ARM_SPR)
@@ -475,6 +516,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_item_armor_shard");
 		if (TR == FL_TR_Q3) return("q3_item_armor_shard");
 		if (TR == FL_TR_RANDIN) return(mcd);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 /// wolf
@@ -486,6 +528,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_weapon_machinegun");
 		if (TR == FL_TR_Q3) return("q3_weapon_machinegun"); // IDEA: need bg code here?
 		if (TR == FL_TR_RANDIN) return(mcw);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	else if (e.scode == MC_W_PISTOL)
@@ -496,6 +539,7 @@ string(entity e, float TR) map_trans =
 		if (TR == FL_TR_Q2) return("q2_blaster");
 		if (TR == FL_TR_Q3) return("weapon_gauntlet");
 		if (TR == FL_TR_RANDIN) return(mcw);
+		if (TR == FL_TR_RANDOM) return(mcg);
 		if (TR >= FL_TR_REMOVE) return("RMV");
 	}
 	return("");

@@ -661,6 +661,7 @@ void () item_sigil =
 
 	if (!RUNES)
 	if (time < PIC_TO)
+	if (self.class_select != "q3_item")
 	{
 		if (time < 2) // delay till we can read cvar - HUH?  dont freaking get why this is necc!  if this isnt done for an initial server start map load rune has sigil_touch set and things fail
 		{

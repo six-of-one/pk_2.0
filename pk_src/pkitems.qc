@@ -1334,6 +1334,9 @@ void() pk_placeitem =
 	}
 	self.touch = painkeep_touch; // take over - route everything here
 
+// TESTING - see if we can q1 default class select
+	if (self.class_select == "") self.class_select = "quake_item";
+
 	if (!PK_100 && !Q_100)
 	{
 		if (self.wad == "q1") master_item_control(self, 0);

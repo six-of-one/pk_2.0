@@ -133,6 +133,8 @@ void(string cls) item_call =
 		self.dodmg = 0; // might give some things extra blast dmg
 		self.wait = 0; // RSP_TIME; // damn q3 respawn time rules - hope this doesnt fxk rndize
 		self.dmgtime = POW_TIME;
+
+		self.noise4 = ""; // respawn sound
 	}
 
 	scls = cls;

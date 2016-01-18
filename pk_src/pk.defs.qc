@@ -204,6 +204,8 @@ float RUNE_FLG_HS				= 4;
 float RUNE_FLG_RG				= 8;
 float RUNE_MASK_ALL			= 15; // because manual config must have mask off for bad bits
 
+float RUNE_AMMO				= 16; // no rune code yet - for packs
+
 // item override admin
 float DYN_OVR;
 float DYN_ART;
@@ -511,6 +513,7 @@ float Q2_BFG_LASER_DMG		= 5; // 5 pts every 10th sec
 // q3
 
 string Q3_DET					= "q3_snd/respawn1.wav"; // against	self.noise4 
+string Q3_BOBHOFF				= "cl_itembobheight 0\n"; // q3 item bob height off setting
 float Q3_POWER_WAIT; // norm = 120
 float Q3_POWER_TIME; // norm = 30
 
@@ -519,6 +522,7 @@ void() q3_suspend;
 void() q3_weapon_shotgun;
 void() q3_item_health;
 void(entity e, float v) q3_ha_rot;
+void() q3_bob_height;
 
 void() inventory;
 
