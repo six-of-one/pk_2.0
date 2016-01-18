@@ -237,75 +237,75 @@ float(float mcv, entity e) bit_mcode =
 
 float(string sc, entity e) pk_mcode =
 {
-	local float mc;
+//	local float mc;
 	local string tsc;
 
 	tsc = sc;
 	if (sc == "" && e) tsc = e.classname;
 	if (tsc == "") return(0);
 
-	if (tsc == "dyn_item")												mc = 0;
+	if (tsc == "dyn_item")												return(0);
 // q1
-	else if (tsc == "weapon_supershotgun")							mc = MC_SUPER_SHOTGUN;
-	else if (tsc == "weapon_nailgun")								mc = MC_NAILGUN;
-	else if (tsc == "weapon_supernailgun")							mc = MC_SUPER_NAILGUN;
-	else if (tsc == "weapon_grenadelauncher")						mc = MC_GRENADEL;
-	else if (tsc == "weapon_rocketlauncher")						mc = MC_ROCKETL;
-	else if (tsc == "weapon_lightning")								mc = MC_THUNDER;
+	else if (tsc == "weapon_supershotgun")							return(MC_SUPER_SHOTGUN);
+	else if (tsc == "weapon_nailgun")								return(MC_NAILGUN);
+	else if (tsc == "weapon_supernailgun")							return(MC_SUPER_NAILGUN);
+	else if (tsc == "weapon_grenadelauncher")						return(MC_GRENADEL);
+	else if (tsc == "weapon_rocketlauncher")						return(MC_ROCKETL);
+	else if (tsc == "weapon_lightning")								return(MC_THUNDER);
 // ammo
-	else if (tsc == "item_shells")									mc = MC_ASHELLS;
-	else if (tsc == "item_spikes")									mc = MC_ANAILS;
-	else if (tsc == "item_rockets")									mc = MC_AROCKETS;
-	else if (tsc == "item_cells")										mc = MC_ACELLS;
+	else if (tsc == "item_shells")									return(MC_ASHELLS);
+	else if (tsc == "item_spikes")									return(MC_ANAILS);
+	else if (tsc == "item_rockets")									return(MC_AROCKETS);
+	else if (tsc == "item_cells")										return(MC_ACELLS);
 
-	else if (tsc == "item_artifact_invulnerability")			mc = MC_PENT;
-	else if (tsc == "item_artifact_super_damage")				mc = MC_QUAD;
-	else if (tsc == "item_artifact_invisibility")				mc = MC_RING;
-	else if (tsc == "item_artifact_envirosuit")					mc = MC_SUIT;
+	else if (tsc == "item_artifact_invulnerability")			return(MC_PENT);
+	else if (tsc == "item_artifact_super_damage")				return(MC_QUAD);
+	else if (tsc == "item_artifact_invisibility")				return(MC_RING);
+	else if (tsc == "item_artifact_envirosuit")					return(MC_SUIT);
 
-	else if (tsc == "item_health")									mc = MC_HEALTH;
-	else if (tsc == "item_armor1")									mc = MC_ARMOR1;
-	else if (tsc == "item_armor2")									mc = MC_ARMOR2;
-	else if (tsc == "item_armorInv")									mc = MC_ARMOR3;
-	else if (tsc == "item_key1")										mc = MC_KEY1;
-	else if (tsc == "item_key2")										mc = MC_KEY2;
-	else if (tsc == "item_sigil")										mc = MC_SIGIL;
-	else if (tsc == "misc_explobox")									mc = MC_EXPLOD1;
-	else if (tsc == "misc_explobox2")								mc = MC_EXPLOD2;
+	else if (tsc == "item_health")									return(MC_HEALTH);
+	else if (tsc == "item_armor1")									return(MC_ARMOR1);
+	else if (tsc == "item_armor2")									return(MC_ARMOR2);
+	else if (tsc == "item_armorInv")									return(MC_ARMOR3);
+	else if (tsc == "item_key1")										return(MC_KEY1);
+	else if (tsc == "item_key2")										return(MC_KEY2);
+	else if (tsc == "item_sigil")										return(MC_SIGIL);
+	else if (tsc == "misc_explobox")									return(MC_EXPLOD1);
+	else if (tsc == "misc_explobox2")								return(MC_EXPLOD2);
 // pk
-	else if (tsc == "weapon_airfist")								mc = MC_AIRGUN;
-	else if (tsc == "weapon_chainlg")								mc = MC_CHTHUNDR;
-	else if (tsc == "weapon_grapgun")								mc = MC_GRAP;
-	else if (tsc == "weapon_pulsenail")								mc = MC_PULSE_NAILGUN;
-	else if (tsc == "item_painkeep_gwell")							mc = MC_GRAVITY;
-	else if (tsc == "item_painkeep_turret")						mc = MC_SENTRY;
-	else if (tsc == "item_painkeep_beartrap")						mc = MC_BEARTRAP;
-	else if (tsc == "item_painkeep_expshells")					mc = MC_AEXPLSH;
-	else if (tsc == "item_painkeep_can")							mc = MC_CANOBEANS;
-	else if (tsc == "item_pkplus_ego")								mc = MC_EGO;
-	else if (tsc == "item_pkplus_tomb")								mc = MC_TOMB;
-	else if (tsc == "item_pkplus_actor")							mc = MC_MASK;
-	else if (tsc == "item_pkplus_phone")							mc = MC_PHONE;
+	else if (tsc == "weapon_airfist")								return(MC_AIRGUN);
+	else if (tsc == "weapon_chainlg")								return(MC_CHTHUNDR);
+	else if (tsc == "weapon_grapgun")								return(MC_GRAP);
+	else if (tsc == "weapon_pulsenail")								return(MC_PULSE_NAILGUN);
+	else if (tsc == "item_painkeep_gwell")							return(MC_GRAVITY);
+	else if (tsc == "item_painkeep_turret")						return(MC_SENTRY);
+	else if (tsc == "item_painkeep_beartrap")						return(MC_BEARTRAP);
+	else if (tsc == "item_painkeep_expshells")					return(MC_AEXPLSH);
+	else if (tsc == "item_painkeep_can")							return(MC_CANOBEANS);
+	else if (tsc == "item_pkplus_ego")								return(MC_EGO);
+	else if (tsc == "item_pkplus_tomb")								return(MC_TOMB);
+	else if (tsc == "item_pkplus_actor")							return(MC_MASK);
+	else if (tsc == "item_pkplus_phone")							return(MC_PHONE);
 
 // q3 - translates classname for now
-//	else if (tsc == "")								mc = MC_;
+//	else if (tsc == "")								return(MC_);
 
 	if (e) // qualify ent
 	{
-	if ((tsc == "item_shells") && (e.spawnflags & 1))			mc = MC_ASHELLS_LG;
-	else if ((tsc == "item_spikes") && (e.spawnflags & 1))	mc = MC_ANAILS_LG;
-	else if ((tsc == "item_rockets") && (e.spawnflags & 1))	mc = MC_AROCKETS_LG;
-	else if ((tsc == "item_cells") && (e.spawnflags & 1))		mc = MC_ACELLS_LG;
-	else if ((tsc == "item_health") && (e.spawnflags & 1))	mc = MC_HEALTHROT;
-	else if ((tsc == "item_health") && (e.spawnflags & 2))	mc = MC_HEALTHMEGA;
+	if ((tsc == "item_shells") && (e.spawnflags & 1))			return(MC_ASHELLS_LG);
+	else if ((tsc == "item_spikes") && (e.spawnflags & 1))	return(MC_ANAILS_LG);
+	else if ((tsc == "item_rockets") && (e.spawnflags & 1))	return(MC_AROCKETS_LG);
+	else if ((tsc == "item_cells") && (e.spawnflags & 1))		return(MC_ACELLS_LG);
+	else if ((tsc == "item_health") && (e.spawnflags & 1))	return(MC_HEALTHROT);
+	else if ((tsc == "item_health") && (e.spawnflags & 2))	return(MC_HEALTHMEGA);
 
-	else if ((tsc == "item_sigil") && (e.spawnflags & R_EARTH))		mc = MC_SIGIL1;
-	else if ((tsc == "item_sigil") && (e.spawnflags & R_BLACK))		mc = MC_SIGIL2;
-	else if ((tsc == "item_sigil") && (e.spawnflags & R_HELL))		mc = MC_SIGIL4;
-	else if ((tsc == "item_sigil") && (e.spawnflags & R_ELDER))		mc = MC_SIGIL8;
+	else if ((tsc == "item_sigil") && (e.spawnflags & R_EARTH))		return(MC_SIGIL1);
+	else if ((tsc == "item_sigil") && (e.spawnflags & R_BLACK))		return(MC_SIGIL2);
+	else if ((tsc == "item_sigil") && (e.spawnflags & R_HELL))		return(MC_SIGIL4);
+	else if ((tsc == "item_sigil") && (e.spawnflags & R_ELDER))		return(MC_SIGIL8);
 	}
 
-	if (tsc != "dyn_item" && mc == 0)
+	if (tsc != "dyn_item") // && mc == 0)
 	{
 		bprint("\b *** item with no map code translation:\n");
 		bprint(" -------------->  ");
@@ -313,7 +313,7 @@ float(string sc, entity e) pk_mcode =
 		bprint("\n");
 	}
 
-	return(mc); 
+	return(0); 
 
 };
 

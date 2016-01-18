@@ -115,7 +115,7 @@ void(float shots) W_FireShotgunExploder =
 
 	self.punchangle_x = -2 * shots;
 
-	self.currentammo = self.pk_explode_ammo = self.pk_explode_ammo - ammo_con(shots, self, "");
+	self.currentammo = self.pk_explode_ammo = self.pk_explode_ammo - shots; // no inf for this! ammo_con(shots, self, "");
 
 	if (self.classname == "pk*bot")
 		dir = botaim ();
@@ -719,7 +719,7 @@ float() W_BestPKWeapon =
 {
 	if (self.weapon == IT_AXE)
 	{
-		if (self.waterlevel <= 1 && self.ammo_cells >= 2 && (self.pk_items & PK_IT_CLIGHT))
+		if (self.waterlevel <= 1 && (self.ammo_cells >= 2 || ammo_con(PK_IT_CLIGHT, self, "wpck")) && (self.pk_items & PK_IT_CLIGHT))
 			return PK_IT_CLIGHT;
 		if (self.pk_items & PK_IT_AIRGUN)
 			return PK_IT_AIRGUN;
@@ -743,6 +743,7 @@ float(float weaponnum, float pknum) HasAmmo =
 	{
 		if (pknum == PK_IT_CLIGHT)
 		{
+			if (!ammo_con(pknum, self, "wpck"))
 			if (self.ammo_cells < 2)
 				return FALSE;
 		}
@@ -790,7 +791,8 @@ float(float weaponnum, float pknum) HasAmmo =
 		}
 // end pk_art
 	}
-	else if (weaponnum == IT_SHOTGUN)
+	else	if (!ammo_con(weaponnum, self, "wpck"))
+	if (weaponnum == IT_SHOTGUN)
 	{
 		if (self.ammo_shells < 1 && self.pk_explode_ammo < 1)
 			return FALSE;
@@ -871,7 +873,9 @@ void() pk_special_impulse =
 	}
 	else if (self.impulse == 32)
 	{
-		if (self.ammo_cells < 2 || !(self.pk_items & PK_IT_CLIGHT))
+//		if (!ammo_con(PK_IT_CLIGHT, self, "wpck"))
+//		if (self.ammo_cells < 2 || !(self.pk_items & PK_IT_CLIGHT))
+		if (!HasAmmo(IT_AXE, PK_IT_CLIGHT) || !(self.pk_items & PK_IT_CLIGHT))
 			return;
 
 		self.pk_currentitem = PK_IT_CLIGHT;
@@ -1100,22 +1104,24 @@ float() PK_BestWeapon =
 
 	it = self.items;
 
-	if (self.waterlevel <= 1 && self.ammo_cells >= 2 && (self.pk_items & PK_IT_CLIGHT))
+//	if (self.waterlevel <= 1 && (self.ammo_cells >= 2 || ammo_con(PK_IT_CLIGHT, self, "wpck")) && (self.pk_items & PK_IT_CLIGHT))
+	if (self.waterlevel <= 1 && HasAmmo(IT_AXE, PK_IT_CLIGHT) && (self.pk_items & PK_IT_CLIGHT))
 		return IT_AXE;
 
-	if (self.waterlevel <= 1 && self.ammo_cells >= 1 && (it & IT_LIGHTNING))
+//	if (self.waterlevel <= 1 && (self.ammo_cells >= 1 || ammo_con(IT_LIGHTNING, self, "wpck")) && (it & IT_LIGHTNING))
+	if (self.waterlevel <= 1 && HasAmmo(IT_LIGHTNING, 0) && (it & IT_LIGHTNING))
 			return IT_LIGHTNING;
 
-	if (self.ammo_nails >= 2 && (it & IT_SUPER_NAILGUN))
+	if (HasAmmo(IT_SUPER_NAILGUN, 0) && (it & IT_SUPER_NAILGUN))
 		return IT_SUPER_NAILGUN;
 
-	if ((self.ammo_shells >= 2 || self.pk_explode_ammo >= 2) && (it & IT_SUPER_SHOTGUN))
+	if ((self.ammo_shells >= 2 || self.pk_explode_ammo >= 2 || ammo_con(IT_SUPER_SHOTGUN, self, "wpck")) && (it & IT_SUPER_SHOTGUN))
 		return IT_SUPER_SHOTGUN;
 
-	if (self.ammo_nails >= 1 && (it & IT_NAILGUN))
+	if ((self.ammo_nails >= 1 || ammo_con(IT_NAILGUN, self, "wpck")) && (it & IT_NAILGUN))
 		return IT_NAILGUN;
 
-	if ((self.ammo_shells >= 1 || self.pk_explode_ammo >= 1) && (it & IT_SHOTGUN))
+	if ((self.ammo_shells >= 1 || self.pk_explode_ammo >= 1 || ammo_con(IT_SHOTGUN, self, "wpck")) && (it & IT_SHOTGUN))
 		return IT_SHOTGUN;
 
 	if (self.pk_items & PK_IT_AIRGUN)
@@ -1134,6 +1140,9 @@ float() PK_CheckNoAmmo =
 	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
 		return TRUE;
 
+	if (ammo_con(self.weapon, self, "wpck")) // see if its inf ammo wep
+		return TRUE;
+	
 	self.weapon = W_BestWeapon ();
 	self.pk_currentitem = W_BestPKWeapon(); // *pk - set best wep
 
@@ -1570,9 +1579,10 @@ void() PK_ChangeWeapon =
 //
 	self.weapon = fl;
 // PAINKEEP_START
-		self.pk_currentitem = fl2;
+	self.pk_currentitem = fl2;
 // PAINKEEP_END
-		self.forcewchange = TRUE;
+	self.forcewchange = TRUE;
+
 	W_SetCurrentAmmo ();
 };
 

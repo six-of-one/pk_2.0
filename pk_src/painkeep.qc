@@ -765,6 +765,10 @@ void() pk_liveupd =
 	PKPLUS_PHONEAMMO_MAX	= cvar("pk_max_phoneammo");
 
 	PK_MAX_LIVENT = cvar("pk_max_livent");
+
+// map translations
+	check_translate();
+
 // respawn times
 	RSP_TIME = cvar("sv_c_rsp_time");
 	POW_TIME = cvar("sv_c_pow_time");
@@ -1051,6 +1055,18 @@ void() pk_srvcmd_set =
 	PK_DYNTO = 120;
 	pic_tsk = 0;
 
+// map translations
+
+	TR_WOLF = 0;
+	TR_DOOM = 0;
+	TR_QUAKE = 0;
+	TR_Q2 = 0;
+	TR_Q3 = 0;
+	TR_ALL = 0;
+	TR_NOT = 0;
+
+	NO_PI = 0;
+
 // respawn times
 	RSP_TIME = 30;
 	POW_TIME = 30;
@@ -1191,6 +1207,17 @@ void() pk_srvcmd_set =
 		registercvar("pk_dyn_func_stop", "0"); // stop func_dynitem operation
 
 		registercvar("pk_explbox_resp", "1"); // respawn boom boxes / barrels
+
+// map translations
+
+		registercvar("pk_tr_wolf", "0");
+		registercvar("pk_tr_doom", "0");
+		registercvar("pk_tr_quake", "0");
+		registercvar("pk_tr_q2", "0");
+		registercvar("pk_tr_q3", "0");
+		registercvar("pk_tr_all", "0");
+		registercvar("pk_tr_not", "0"); // 0 - remove items with no translation, 1 - randomize
+		registercvar("pk_translate", "0");
 
 // pk items
 		registercvar("pk_bt_time", "90"); // time for beartraps to live
@@ -1963,6 +1990,7 @@ void () PlayerPreThink =
 // PAINKEEP_START
 	if (time > self.attack_finished)
 	if (self.currentammo == 0)
+	if (!ammo_con(self.weapon, self, "wpck"))
 	if (self.weapon != IT_AXE || self.pk_currentitem != PK_IT_AXE)
 	{
 		self.weapon = W_BestWeapon ();

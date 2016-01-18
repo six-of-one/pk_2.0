@@ -1167,6 +1167,19 @@ void() pk_placeitem =
 	}
 	self.touch = painkeep_touch; // take over - route everything here
 
+	if (!PK_100 && !Q_100)
+	{
+		if (self.wad == "q1") doom_item_control(self, 0);
+		else if ((TR_ALL || TR_DOOM) && self.class_select == "doom_item")  doom_item_control(self, TR_DOOM);
+		else if ((TR_ALL || TR_WOLF) && self.class_select == "wolf_item")  doom_item_control(self, TR_WOLF);
+	}
+	else
+	{
+//		if (PK_100 || Q_100)
+		if (self.class_select == "doom_item") doom_item_control(self, 0);
+	}
+
+
 // Cataboligne - added check here because new mode (not permanently PK & loaded a PK map can set PK mode after nailguns get loaded on map
 	if (PK)
 	if (self.wad == "")

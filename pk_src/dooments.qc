@@ -40,7 +40,7 @@ float D_BARREL_BLAST			= 128;
 float D_POWER_WAIT			= 60; // seconds major doom powers need to respawn
 
 float d_reps_base				= 57005000; // heh heh - DEAD+
-void () d_thk_reps;
+void() d_rep_set;
 float() mega_touch;
 void() d_weapon_touch;
 
@@ -140,6 +140,7 @@ void() doom_precache =
 	precache_sound ("wolf/w_pistol.wav");
 	precache_sound ("wolf/w_mg.wav");
 	precache_sound ("wolf/w_chg.wav");
+	precache_sound ("wolf/w_mortar.wav");
 	precache_sound ("wolf/pickup_am.wav");
 	precache_sound ("wolf/pickup_gn.wav");
 	precache_sound ("wolf/pickup_gdy.wav");
@@ -147,6 +148,153 @@ void() doom_precache =
 	precache_sound ("wolf/door_cls.wav");
 
 
+};
+
+// started map pk100
+
+// TDO: restore wad == "q1" item with doom item deactivate / pk_100 mode on (if ever allowed in map)
+// IDEA: move code to dyn & handle all translateable map items
+
+// need to hide something from players & item controls
+
+void(entity e) hide_item =
+{
+	setmodel (e,"");
+	e.th_stand = e.touch;
+	e.touch = SUB_Null;
+	e.path = e.map;
+	e.map = ""; // hide from pic
+
+};
+
+string(entity e, float TR) map_trans =
+{
+	if (e.classname == "d_weapon_rocketlauncher") // TDO: use scode - this only works one way!
+	{
+		if (TR == FL_TR_WOLF) return("w_weapon_mortar");
+		if (TR == FL_TR_QUAKE) return("weapon_rocketlauncher");
+		if (TR == FL_TR_Q2) return("q2_weapon_rocketlauncher");
+		if (TR == FL_TR_Q3) return("q3_weapon_rocketlauncher");
+		if (TR == FL_TR_RESTORE || TR == FL_TR_DOOM) return("d_weapon_rocketlauncher");
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	else if (e.classname == "w_weapon_mortar") // TDO: use scode - this only works one way!
+	{
+		if (TR == FL_TR_RESTORE || FL_TR_WOLF) return("w_weapon_mortar");
+		if (TR == FL_TR_QUAKE) return("weapon_rocketlauncher");
+		if (TR == FL_TR_Q2) return("q2_weapon_rocketlauncher");
+		if (TR == FL_TR_Q3) return("q3_weapon_rocketlauncher");
+		if (TR == TR == FL_TR_DOOM) return("d_weapon_rocketlauncher");
+		if (TR >= FL_TR_REMOVE) return("RMV");
+	}
+	return("");
+};
+
+void(entity e) item_translate =
+{
+	local string mcc;
+	local entity f;
+	local float k;
+
+	f = self;
+	k = TR_DOOM;
+	if (TR_ALL) k = TR_ALL;
+	mcc = map_trans(e, k);
+	if (mcc == "RMV") // no translation - removed
+	{
+		hide_item (e);
+	}
+	if (mcc != "")
+	{
+		NO_PI = 3.1415;
+		self = e;
+		item_call(mcc);
+		self = f;
+	}
+};
+
+void(entity e, float trv) doom_item_control =
+{
+	if (e.classname == "func_make") return; // override
+
+//	if (e.class_select == "") e.class_select = "doom";
+
+	if (!PK_100 && !Q_100) // turned back on - come here from loop
+	{
+		if (trv)
+		{
+			item_translate(e);
+			return;
+		}
+		else if (e.wad == "q1")
+		{
+			setmodel (e,"");
+			e.th_stand = e.touch;
+			e.touch = SUB_Null;
+			e.path = e.map;
+			e.map = ""; // hide from pic
+			return;
+		}
+		setmodel (e,e.mdl);
+		e.touch = painkeep_touch;
+		if (e.th_stand != SUB_Null) e.pk_touch = e.th_stand;
+		e.th_stand = SUB_Null;
+		e.map = e.path;
+		return;
+	}
+/*
+	else
+		if (e.wad == "q1")
+		{
+			setmodel (e,e.mdl);
+			e.touch = painkeep_touch;
+			e.pk_touch = e.th_stand;
+			e.th_stand = SUB_Null;
+			e.map = e.path;
+			return;
+		}
+*/
+
+	if (time < PIC_TO)
+//	if (cvar("pk_place_item") != 0) // pic - just block appearance, rnd does rest - not needed
+	{
+// TDO: doom item translate if map has no wad = "q1" items
+		hide_item (e);
+	}
+	else // IDEA: option to turn into rnd regular pk items
+	{
+		if (e.classname == "dyn_item")
+		{
+			if (WARNING) bprint("*** Warning - dynamic items: pk_100 and dynamic made a doom - hiding\n");
+		}
+		else
+		if (WARNING) bprint("*** Warning - pk_100 and code made a doom item - hiding\n");
+		hide_item (e);
+	}
+
+};
+
+// allow live translate of doom items - later
+// twiddled after map load
+
+void(string tri, float trv) doom_item_control_loop =
+{
+	local entity e, sv;
+	local string sr;
+
+
+	sr = tri;
+	e = find(world,class_select,sr);
+	while (e)
+	{
+		doom_item_control(e, trv);
+		e = find(e,class_select,sr);
+//		if (!e)
+//		{
+//		if (sr == "doom") sr = "wolf";
+//		e = find(e,class_select,sr);
+//		}
+	}
 };
 
 /*
@@ -166,7 +314,6 @@ NOTE: this code assumes the translation of doom map entites to quake style defin
 
 void() d_item_healthbottle =
 {
-
 	item_health();
 	setmodel(self, "progs/heal_bottle.mdl");
 	self.noise = "doom/dsitemup.wav";
@@ -176,11 +323,11 @@ void() d_item_healthbottle =
 	self.healtype = HEAL_BOT;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
 	self.alpha = 0.8;
+	self.class_select = "doom_item";
 };
 
 void() d_item_healthmedkit =
 {
-
 	item_health();
 	setmodel(self, "progs/heal_medkit.mdl");
 	self.noise = "doom/dsitemup.wav";
@@ -189,11 +336,11 @@ void() d_item_healthmedkit =
 	self.healamount = D_DEF_HMEDKIT;
 //	self.healtype = HEAL_NORM;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_item_healthstimpak =
 {
-
 	item_health();
 	setmodel(self, "progs/heal_stimpak.mdl");
 	self.noise = "doom/dsitemup.wav";
@@ -202,13 +349,12 @@ void() d_item_healthstimpak =
 	self.healamount = D_DEF_HSTIMPAK;
 //	self.healtype = HEAL_NORM;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_item_spiritarmor =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_ARMOR2);
-	item_call(mcc);
+	item_armor2();
 	setmodel (self, "progs/spiritarmor.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
@@ -217,29 +363,25 @@ void() d_item_spiritarmor =
 	self.state = D_ARM_TBLU;
 	self.currentammo = ARM_SPIRIT;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 // FIX - different damage handling than q1 armors
 void() d_item_armorgreen =
 {
-
-	local string mcc;
-	mcc = item_by_mcode(MC_ARMOR1);
-	item_call(mcc);
+	item_armor1();
 	setmodel (self, "progs/d_armor.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Security armor";
 	self.state = D_ARM_TGRN;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_item_armorblue =
 {
-
-	local string mcc;
-	mcc = item_by_mcode(MC_ARMOR2);
-	item_call(mcc);
+	item_armor2();
 	setmodel (self, "progs/d_armor.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
@@ -247,13 +389,12 @@ void() d_item_armorblue =
 	self.state = D_ARM_TBLU;
 	self.currentammo = D_ARM_BLUE; // 200 units
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_ammo_ammobox =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_ANAILS_LG);
-	item_call(mcc);
+	item_spikes();
 
 	setmodel (self, "progs/d_ammobox.mdl");
 	self.noise = "doom/dsitemup.wav";
@@ -261,97 +402,91 @@ void() d_ammo_ammobox =
 	self.netname = "Box of bullets";
 	self.currentammo = D_DEF_BULLETS_BOX;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_ammo_clip =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_ANAILS);
-	item_call(mcc);
+	item_spikes();
 	setmodel (self, "progs/d_clip.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "A clip";
 	self.currentammo = D_DEF_BULLETS_CLIP;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_ammo_1rocket =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_AROCKETS);
-	item_call(mcc);
+	item_rockets();
 	setmodel (self, "progs/d_1rocket.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Rocket";
 	self.currentammo = D_DEF_ROCKETS_SM;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_ammo_rockbox =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_AROCKETS_LG);
-	item_call(mcc);
+	item_rockets();
 	setmodel (self, "progs/d_rockbox.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Box of Rockets";
 	self.currentammo = D_DEF_ROCKETS_LG;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_ammo_4shell =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_ASHELLS);
-	item_call(mcc);
+	item_shells();
 	setmodel (self, "progs/d_4shell.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "4 shells";
 	self.currentammo = D_DEF_SHELLS;
 //	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_ammo_shellbox =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_ASHELLS_LG);
-	item_call(mcc);
+	item_shells();
 	setmodel (self, "progs/d_shellbox.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Box of Shells";
 	self.currentammo = D_DEF_SHELLBOX;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_ammo_cellbox =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_ACELLS);
-	item_call(mcc);
+	item_cells();
 	setmodel (self, "progs/d_cellbox.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Box of cells";
 	self.currentammo = D_DEF_CELLBOX;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_ammo_cellpack =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_ACELLS);
-	item_call(mcc);
+	item_cells();
 	setmodel (self, "progs/d_cellpack.mdl");
 	self.noise = "doom/dsitemup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.netname = "Cells";
 	self.currentammo = D_DEF_CELLPAK;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_barrel =
@@ -361,14 +496,12 @@ void() d_barrel =
 	self.netname = "Barrel";
 	misc_explodbox_set(self, "progs/barrel.mdl", D_BARREL_BLAST + random() * 8, 20 + random() * 15, MOVETYPE_NONE);
 //	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_weapon_bfg =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_THUNDER);
-	item_call(mcc);
-
+	weapon_lightning();
 	self.netname = "BFG 9000";
 
 	setmodel (self, "progs/d_bfg.mdl");
@@ -377,13 +510,12 @@ void() d_weapon_bfg =
 	self.noise = "doom/dswpnup.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.currentammo = D_DEF_BFG;
+	self.class_select = "doom_item";
 };
 
 void() d_weapon_rocketlauncher =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_ROCKETL);
-	item_call(mcc);
+	weapon_rocketlauncher();
 
 // fn
 	self.touch = d_weapon_touch;
@@ -404,23 +536,13 @@ void() d_weapon_rocketlauncher =
 	self.noise = "doom/dswpnup.wav";
 	self.noise3 = "doom/dsrlaunc.wav";
 	self.noise4 = "doom/dsitembk.wav";
+	self.class_select = "doom_item";
 };
 
 void() d_weapon_chaingun =
 {
-	if (self.delay == d_reps_base)
-	{
-		local entity e;
-		e = spawn();
-		e.think = d_thk_reps;
-		e.nextthink = time + 2;
-		e.classname = "d_reps";
-		e.owner = self;
-	}
-
-	local string mcc;
-	mcc = item_by_mcode(MC_SUPER_NAILGUN);
-	item_call(mcc);
+	d_rep_set();
+	weapon_supernailgun();
 	self.netname = "Chain Gun";
 
 //TEST
@@ -442,23 +564,13 @@ void() d_weapon_chaingun =
 	self.attack_finished = 0.11;
 	self.punchangle = ' 0.065 0.065 0'; // bullet spread out
 //	self.mask_x = CB_HUMAN | CB_GREMLIN | CB_SPEC;
+	self.class_select = "doom_item";
 };
 
 void() d_weapon_shotgun =
 {
-	if (self.delay == d_reps_base)
-	{
-		local entity e;
-		e = spawn();
-		e.think = d_thk_reps;
-		e.nextthink = time + 2;
-		e.classname = "d_reps";
-		e.owner = self;
-	}
-
-	local string mcc;
-	mcc = item_by_mcode(MC_SUPER_SHOTGUN);
-	item_call(mcc);
+	d_rep_set();
+	weapon_supershotgun();
 	setmodel (self, "progs/d_shotgun.mdl");
 	self.weaponmodel = "progs/v_d_shot.mdl";
 //	self.vwep = "progs/vw_d_shot.mdl";
@@ -467,16 +579,13 @@ void() d_weapon_shotgun =
 	self.noise4 = "doom/dsitembk.wav";
 	self.currentammo = D_DEF_SHOTG;
 	self.effects = self.effects | EF_FULLBRIGHT;
+	self.class_select = "doom_item";
 };
 
 void() d_weapon_supershotgun =
 {
-
-	local string mcc;
-	mcc = item_by_mcode(MC_SUPER_SHOTGUN);
-	item_call(mcc);
+	weapon_supershotgun();
 	self.netname = "Super shotgun";
-
 
 	setmodel (self, "progs/d_dblshot.mdl");
 	self.weaponmodel = "progs/v_d_dblshot.mdl";
@@ -489,15 +598,13 @@ void() d_weapon_supershotgun =
 	self.noise4 = "doom/dsitembk.wav";
 	self.currentammo = D_DEF_SHOTG;
 	self.effects = self.effects | EF_FULLBRIGHT;
+	self.class_select = "doom_item";
 };
 
 
 void() d_weapon_plasma =
 {
-
-	local string mcc;
-	mcc = item_by_mcode(MC_THUNDER);
-	item_call(mcc);
+	weapon_lightning();
 	self.netname = "Plasma Gun";
 
 	setmodel (self, "progs/d_plasma.mdl");
@@ -521,13 +628,13 @@ void() d_weapon_plasma =
 
 	self.currentammo = D_DEF_PLASMAG;
 	self.effects = self.effects | EF_FULLBRIGHT;
+	self.class_select = "doom_item";
 };
 
 // FIX - need correct sphere sounds
 
 void() d_art_soulsphere =
 {
-
 	item_health();
 	setmodel(self, "progs/d_spheres.mdl");
 	self.noise = "doom/dsgetpow.wav";
@@ -537,6 +644,7 @@ void() d_art_soulsphere =
 	self.healtype = HEAL_SOUL;
 	self.wait = D_POWER_WAIT;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_art_megapower =
@@ -554,14 +662,12 @@ void() d_art_megapower =
 	self.healtype = HEAL_SOUL;
 	self.wait = D_POWER_WAIT;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_art_invulnerable =
 {
-
-	local string mcc;
-	mcc = item_by_mcode(MC_PENT);
-	item_call(mcc);
+	item_artifact_invulnerability();
 	self.noise = "doom/dsgetpow.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	setmodel (self, "progs/d_spheres.mdl");
@@ -569,14 +675,12 @@ void() d_art_invulnerable =
 	self.netname = "Invulnerability";
 	self.wait = D_POWER_WAIT;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_art_invisible =
 {
-
-	local string mcc;
-	mcc = item_by_mcode(MC_RING);
-	item_call(mcc);
+	item_artifact_invisibility();
 	self.noise = "doom/dsgetpow.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	setmodel (self, "progs/d_spheres.mdl");
@@ -584,60 +688,56 @@ void() d_art_invisible =
 	self.netname = "Invisibilty";
 	self.wait = D_POWER_WAIT;
 	self.delay = POW_TIME; // usage time
+	self.class_select = "doom_item";
 };
 
 void() d_art_radsuit =
 {
-
-	local string mcc;
-	mcc = item_by_mcode(MC_SUIT);
-	item_call(mcc);
+	item_artifact_envirosuit();
 	self.noise = "doom/dsitemup.wav"; // radsuit finish sounds, proper op
 	setmodel (self, "progs/d_radsuit.mdl");
 	self.delay = POW_TIME;
 	self.netname = "Radiation Suit";
 	self.wait = D_POWER_WAIT;
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 // use spawnflags to make one of 6 keys...
 void() d_key_redskull =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_KEY1);
-	item_call(mcc);
+	item_key1();
 
 	self.noise = "doom/dsitemup.wav";
 	setmodel (self, "progs/d_skullkey.mdl");
 //	self.skin = 0;
 	self.netname = "Red Skull key";
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_key_blueskull =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_KEY2);
-	item_call(mcc);
+	item_key2();
 
 	self.noise = "doom/dsitemup.wav";
 	setmodel (self, "progs/d_skullkey.mdl");
 	self.skin = 1;
 	self.netname = "Blue Skull key";
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 void() d_key_yellowskull =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_KEY1);
-	item_call(mcc);
+	item_key2();
 
 	self.noise = "doom/dsitemup.wav";
 	setmodel (self, "progs/d_skullkey.mdl");
 	self.skin = 2;
 	self.netname = "Yellow Skull key";
 	self.effects = self.effects | EF_FULLBRIGHT; // FIX - only for testing in darkplaces!
+	self.class_select = "doom_item";
 };
 
 
@@ -655,9 +755,7 @@ NOTE: there is no entites file for wolf in the style of QUAKED
 
 void() w_weapon_machinegun =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_NAILGUN);
-	item_call(mcc);
+	weapon_nailgun();
 
 	self.netname = "Machine Gun";
 
@@ -676,23 +774,13 @@ void() w_weapon_machinegun =
 //	self.mode_x = IV_NAILGUN;
 //	self.mask_x = CB_HUMAN | CB_GREMLIN | CB_SPEC;
 
+	self.class_select = "wolf_item";
 };
 
 void() w_weapon_chaingun =
 {
-	if (self.delay == d_reps_base)
-	{
-		local entity e;
-		e = spawn();
-		e.think = d_thk_reps;
-		e.nextthink = time + 2;
-		e.classname = "d_reps";
-		e.owner = self;
-	}
-
-	local string mcc;
-	mcc = item_by_mcode(MC_SUPER_NAILGUN);
-	item_call(mcc);
+	d_rep_set();
+	weapon_nailgun();
 
 	self.netname = "Chain Gun";
 
@@ -706,6 +794,7 @@ void() w_weapon_chaingun =
 	self.effects = self.effects | EF_FULLBRIGHT;
 	self.attack_finished = 0.087;
 	self.punchangle = ' 0.065 0.065 0'; // bullet spread out
+	self.class_select = "wolf_item";
 };
 
 void() w_fire_motar =
@@ -718,9 +807,7 @@ void() w_fire_motar =
 
 void() w_weapon_mortar =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_ROCKETL);
-	item_call(mcc);
+	weapon_rocketlauncher();
 
 // fn
 	self.touch = d_weapon_touch;
@@ -739,18 +826,16 @@ void() w_weapon_mortar =
 	self.weaponmodel = "progs/v_w_mortar.mdl";
 	self.vwepmdl = "progs/vw_w_mortar.mdl";
 	self.noise = "wolf/pickup_gn.wav";
-//	self.noise3 = "wolf/w_mg.wav";
-	self.noise3 = "doom/dsrlaunc.wav";
+	self.noise3 = "wolf/w_mortar.wav";
 	self.noise4 = "doom/dsitembk.wav";
 
 	self.effects = self.effects | EF_FULLBRIGHT;
+	self.class_select = "wolf_item";
 };
 
 void() w_weapon_flamer =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_GRENADEL);
-	item_call(mcc);
+	weapon_grenadelauncher();
 
 	setmodel (self, "progs/w_flamer.mdl");
 	self.weaponmodel = "progs/v_w_flamer.mdl";
@@ -760,13 +845,12 @@ void() w_weapon_flamer =
 	self.noise3 = "doom/dsrlaunc.wav";
 	self.noise4 = "doom/dsitembk.wav";
 	self.effects = self.effects | EF_FULLBRIGHT;
+	self.class_select = "wolf_item";
 };
 
 void() w_weapon_pistol =
 {
-	local string mcc;
-	mcc = item_by_mcode(MC_NAILGUN);
-	item_call(mcc);
+	weapon_nailgun();
 
 	setmodel (self, "progs/w_pistol.mdl");
 	self.weaponmodel = "progs/v_w_pistol.mdl";
@@ -777,6 +861,7 @@ void() w_weapon_pistol =
 	self.currentammo = 25;
 	self.attack_finished = 0.465; // 2.15 per
 	self.effects = self.effects | EF_FULLBRIGHT;
+	self.class_select = "wolf_item";
 };
 
 // code to run doom ents
@@ -793,6 +878,21 @@ void () d_thk_reps =
 	{
 		setorigin(self.owner, t.origin);
 		self.owner.oldorigin = t.origin;
+		self.owner.ip_orgOrigin = t.origin;
+	}
+	remove(self);
+};
+
+void() d_rep_set =
+{
+	if (self.delay == d_reps_base)
+	{
+		local entity e;
+		e = spawn();
+		e.think = d_thk_reps;
+		e.nextthink = time + 2;
+		e.classname = "d_reps";
+		e.owner = self;
 	}
 };
 
@@ -853,7 +953,7 @@ void() d_weapon_touch =
 	if (leave && (other.items & self.items))	return ;
 	new = self.items;
 
-	if (self.classname == "weapon_rocketlauncher")
+	if (self.classname == "d_weapon_rocketlauncher" || self.classname == "w_weapon_mortar" )
 	{
 	other.ammo_rockets = other.ammo_rockets + self.currentammo; // TDO: ammo type fn
 	camc = other.ammo_rockets;
@@ -891,7 +991,9 @@ void() d_weapon_touch =
 		e.aflag = camc;
 
 		e.netname = self.netname;
+//		e.mdl = self.mdl; - invisible
 		setmodel (e, self.vwepmdl);
+		e.mdl = e.model;
 		e.weaponmodel = self.weaponmodel;
 		e.noise3 = self.noise3;
 		e.noise = self.noise;
@@ -916,7 +1018,6 @@ void() d_weapon_touch =
 	e = self;
 	self = other;
 
-// PK-NOTE: "old" variable above does nothing...what was iD's plan for it?
 	if (!Q_100)
 		PK_Deathmatch_Weapon (new, 0); // *pk - new wep switch rule for higher risk weps
 	else

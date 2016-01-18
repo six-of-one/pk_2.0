@@ -214,7 +214,7 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	targ.health = targ.health - take;
 
 	if (targ.pkplus_actortype != PKPLUS_ACTORPENT) // pk art code here - fake it for pent acting
-	if (PK) pk_setDamageSkin(targ); // *pk damage skin support
+	if (!Q_100) pk_setDamageSkin(targ); // *pk damage skin support
 	if (targ.health <= 0)
 	{
 		damage_inflictor = inflictor; // *pk used by the player gib functions to calculate the direction of the gib to go in.

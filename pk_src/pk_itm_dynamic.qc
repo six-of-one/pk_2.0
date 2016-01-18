@@ -204,13 +204,14 @@ void(string cls) item_call =
 	if (self.classname != "dyn_item") // dont do these for dyn items
 	{
 		self.classname = scls;
-		pk_placeitem();
+		if (!NO_PI) pk_placeitem();
 		self.think = SUB_regen; // dont go thru place_item - use regen method
 		self.nextthink = time + 1 + 3 * random(); // spread em out
 		self.model = string_null;
 		if (self.wait <= -888) self.wait = 0;
 	}
 	self.solid = SOLID_NOT;
+	NO_PI = 0;
 //	bot_item_linx(self); // *bot - item tie in - needs checked for use here -- FIX
 };
 
@@ -256,7 +257,6 @@ void(string cls, string rep, string am, string ram) item_repm =
 			item_call(rep);
 			if (ram != "")
 			{
-bprint("repm: item_repm internal - rest -- rem | pki replace or restore\n");
 				if (pam == "rem" || pam == "pki") item_repm(pam, ram, "", "");
 				else item_repm("rest", ram, "", "");
 			}
@@ -271,14 +271,12 @@ bprint("repm: item_repm internal - rest -- rem | pki replace or restore\n");
 			}
 			else
 				item_down();
-bprint("repm: restore on -:-, pki or rem --- ram != pam\n");
 			if (ram != "")
 			if (ram != pam) item_repm(pam, ram, "", "");
 		}
 		else
 		{
 			item_call(cls);
-bprint("repm: restore on end else --- ram != pam\n");
 			if (ram != "")
 			if (ram != pam) item_repm(pam, ram, "", "");
 		}
@@ -342,7 +340,6 @@ void() item_loop =
 	{
 		if (! (pko & CON_RUN))
 		{
-bprint("repm: restore on no con_run\n");
 			item_repm("rest", item_by_bit(f), "", ammo_by_bit(f)); // restore
 //			return;
 		}
@@ -354,7 +351,6 @@ bprint("repm: restore on no con_run\n");
 				{
 					cl = item_by_bit(f);
 //					if (e != f)//{
-bprint("repm: restore on con_only\n");
 					item_repm(cl, item_by_bit(e), ammo_by_bit(f), ammo_by_bit(e));
 
 				}
@@ -362,7 +358,6 @@ bprint("repm: restore on con_only\n");
 			else if (pko & CON_NONE)
 			{
 				cl = item_by_bit(e);
-	bprint("repm: restore on con_none - con_subs or else\n");
 			if (pko & CON_SUBS) item_repm(cl, item_by_bit(f), ammo_by_bit(e), ammo_by_bit(f));
 				else item_repm("", item_by_bit(f), "", ammo_by_bit(f));
 			}
@@ -427,85 +422,54 @@ float(float cn, entity e, string op) ammo_con =
 	{
 		if (pk_itemovr & CON_INF)
 		{
-if (WARNING)
-{
-bprint("*** ammo_con: wep:");
-bprint(ftos(e.weapon));
-bprint(" - ");
-}
+		if (e.weapon == IT_AXE && e.pk_currentitem == PK_IT_CLIGHT)
+		if (pk_itemovr & WEP_THUNDER) return(0);
 
-		if (e.weapon == IT_SUPER_SHOTGUN)
-		if (pk_itemovr & WEP_SSHOT) f = 0;
-if (WARNING)
-{
-bprint(" - ss:");
-bprint(ftos(pk_itemovr & WEP_SSHOT));
-}
-
-		if (e.weapon == IT_NAILGUN)
-		if (pk_itemovr & WEP_NAILGUN) f = 0;
-if (WARNING)
-{
-bprint(" - ng:");
-bprint(ftos(pk_itemovr & WEP_NAILGUN));
-}
-
-		if (e.weapon == IT_SUPER_NAILGUN)
-		if (pk_itemovr & WEP_PERF) f = 0;
-if (WARNING)
-{
-bprint(" - sng:");
-bprint(ftos(pk_itemovr & WEP_PERF));
-}
-
-		if (e.weapon == IT_GRENADE_LAUNCHER)
-		if (pk_itemovr & WEP_GREN) f = 0;
-if (WARNING)
-{
-bprint(" - gl:");
-bprint(ftos(pk_itemovr & WEP_GREN));
-}
+		if (e.weapon == IT_LIGHTNING)
+		if (pk_itemovr & WEP_THUNDER) return(0);
 
 		if (e.weapon == IT_ROCKET_LAUNCHER)
-		if (pk_itemovr & WEP_ROCKET) f = 0;
-if (WARNING)
-{
-bprint(" - rl:");
-bprint(ftos(pk_itemovr & WEP_ROCKET));
-}
+		if (pk_itemovr & WEP_ROCKET) return(0);
 
-		if (e.weapon == IT_LIGHTNING || e.pk_currentitem == PK_IT_CLIGHT)
-		if (pk_itemovr & WEP_THUNDER) f = 0;
-if (WARNING)
-{
-bprint(" - lt:");
-bprint(ftos(pk_itemovr & WEP_THUNDER));
-bprint("\n");
-}
+		if (e.weapon == IT_GRENADE_LAUNCHER)
+		if (pk_itemovr & WEP_GREN) return(0);
+
+		if (e.weapon == IT_SUPER_NAILGUN)
+		if (pk_itemovr & WEP_PERF) return(0);
+
+		if (e.weapon == IT_NAILGUN)
+		if (pk_itemovr & WEP_NAILGUN) return(0);
+
+		if (e.weapon == IT_SUPER_SHOTGUN)
+		if (pk_itemovr & WEP_SSHOT) return(0);
 		}
 	}
-	else if (op == "ldck") // load check - allow sw to inf ammo wep
+	else if (op == "wpck") // wep check - allow auto sw to inf ammo wep
 	{
+		f = 0;
 		if (e)
 		if (pk_itemovr & CON_INF)
 		{
-		if (pk_itemovr & WEP_SSHOT)
-		if (e.ammo_shells < 2) e.ammo_shells = 2;
+		if (cn == PK_IT_CLIGHT)
+		if (pk_itemovr & WEP_THUNDER) return(1);
 
-		if (pk_itemovr & WEP_NAILGUN)
-		if (e.ammo_nails < 1) e.ammo_nails = 1;
+		if (cn == IT_LIGHTNING)
+		if (pk_itemovr & WEP_THUNDER) return(1);
 
-		if (pk_itemovr & WEP_PERF)
-		if (e.ammo_nails < 2) e.ammo_nails = 2;
+		if (cn == IT_ROCKET_LAUNCHER)
+		if (pk_itemovr & WEP_ROCKET) return(1);
 
-		if (pk_itemovr & WEP_GREN)
-		if (e.ammo_rockets < 1) e.ammo_rockets = 1;
+		if (cn == IT_GRENADE_LAUNCHER)
+		if (pk_itemovr & WEP_GREN) return(1);
 
-		if (pk_itemovr & WEP_ROCKET)
-		if (e.ammo_rockets < 1) e.ammo_rockets = 1;
+		if (cn == IT_SUPER_NAILGUN)
+		if (pk_itemovr & WEP_PERF) return(1);
 
-		if (pk_itemovr & WEP_THUNDER)
-		if (e.ammo_cells < 2) e.ammo_cells = 2;
+		if (cn == IT_NAILGUN)
+		if (pk_itemovr & WEP_NAILGUN) return(1);
+
+		if (cn == IT_SUPER_SHOTGUN)
+		if (pk_itemovr & WEP_SSHOT) return(1);
 		}
 	}
 
@@ -1002,4 +966,286 @@ void() pic_test =
 	if (time < PIC_TO)
 	if (self.map != "nopic")
 		place_item_control();
+};
+
+void() set_translate =
+{
+	TR_WOLF = fabs(cvar("pk_tr_wolf" ));
+	TR_DOOM = fabs(cvar("pk_tr_doom" ));
+	TR_QUAKE = fabs(cvar("pk_tr_quake" ));
+	TR_Q2 = fabs(cvar("pk_tr_q2" ));
+	TR_Q3 = fabs(cvar("pk_tr_q3" ));
+	TR_ALL = fabs(cvar("pk_tr_all" ));
+};
+
+string(float tr) tran_str =
+{
+	if (tr == FL_TR_WOLF) return("Wolfenstien");
+	else if (tr == FL_TR_DOOM) return("DooM");
+	else if (tr == FL_TR_QUAKE) return("Quake");
+	else if (tr == FL_TR_Q2) return("Quake 2");
+	else if (tr == FL_TR_Q3) return("Quake 3");
+	else if (tr == FL_TR_RESTORE) return("Restoring");
+	else if (tr == FL_TR_RANDIN) return("Random genre");
+	else if (tr == FL_TR_RANDOM) return("any Random item");
+//	if (tr == FL_TR_REMOVE) 
+		return("null - removing");
+};
+
+// map translations
+
+void() check_translate =
+{
+	TR_NOT = cvar("pk_tr_not");
+
+	if (TR_DOOM != cvar("pk_tr_doom" ) || TR_ALL != cvar("pk_tr_all" ))
+	{
+		if (TR_ALL != cvar("pk_tr_all" )) 
+			TR_DOOM = cvar("pk_tr_all" );
+		else
+			TR_DOOM = fabs(cvar("pk_tr_doom" ));
+		if (!TR_DOOM) TR_DOOM = FL_TR_RESTORE; // turned off & we need restore controls
+
+		if (WARNING && !TR_ALL)
+		{
+		bprint("*** Translate: DooM to ");
+		bprint(tran_str(TR_DOOM));
+		bprint("\n");
+		}
+
+		doom_item_control_loop("doom_item");
+	}
+
+	if (TR_WOLF != cvar("pk_tr_wolf" ) || TR_ALL != cvar("pk_tr_all" ))
+	{
+		if (TR_ALL != cvar("pk_tr_all" )) 
+			TR_WOLF = cvar("pk_tr_all" );
+		else
+			TR_WOLF = fabs(cvar("pk_tr_wolf" ));
+		if (!TR_WOLF) TR_WOLF = FL_TR_RESTORE; // turned off & we need restore controls
+
+		if (WARNING && !TR_ALL)
+		{
+		bprint("*** Translate: Wolf to ");
+		bprint(tran_str(TR_WOLF));
+		bprint("\n");
+		}
+
+		doom_item_control_loop("wolf_item");
+	}
+
+	if (TR_QUAKE != cvar("pk_tr_quake" ) || TR_ALL != cvar("pk_tr_all" ))
+	{
+		if (TR_ALL != cvar("pk_tr_all" )) 
+			TR_QUAKE = cvar("pk_tr_all" );
+		else
+			TR_QUAKE = fabs(cvar("pk_tr_quake" ));
+		if (!TR_QUAKE) TR_QUAKE = FL_TR_RESTORE; // turned off & we need restore controls
+
+		if (WARNING && !TR_ALL)
+		{
+		bprint("*** Translate: Quake to ");
+		bprint(tran_str(TR_QUAKE));
+		bprint("\n");
+		}
+
+		doom_item_control_loop("quake_item");
+	}
+
+	if (TR_Q2 != cvar("pk_tr_q2" ) || TR_ALL != cvar("pk_tr_all" ))
+	{
+		if (TR_ALL != cvar("pk_tr_all" )) 
+			TR_Q2 = cvar("pk_tr_all" );
+		else
+			TR_Q2 = fabs(cvar("pk_tr_q2" ));
+		if (!TR_Q2) TR_Q2 = FL_TR_RESTORE; // turned off & we need restore controls
+
+		if (WARNING && !TR_ALL)
+		{
+		bprint("*** Translate: Quake 2 to ");
+		bprint(tran_str(TR_Q2));
+		bprint("\n");
+		}
+
+		doom_item_control_loop("q2_item");
+	}
+
+	if (TR_Q3 != cvar("pk_tr_q3" ) || TR_ALL != cvar("pk_tr_all" ))
+	{
+		if (TR_ALL != cvar("pk_tr_all" )) 
+			TR_Q3 = cvar("pk_tr_all" );
+		else
+			TR_Q3 = fabs(cvar("pk_tr_q2" ));
+		if (!TR_Q3) TR_Q3 = FL_TR_RESTORE; // turned off & we need restore controls
+
+		if (WARNING && !TR_ALL)
+		{
+		bprint("*** Translate: Quake 3 to ");
+		bprint(tran_str(TR_Q3));
+		bprint("\n");
+		}
+
+		doom_item_control_loop("q3_item");
+	}
+
+	if (TR_ALL != cvar("pk_tr_all" ))
+	{
+//		set_translate();
+//		if (!TR_ALL) TR_ALL = FL_TR_RESTORE; // turned off & we need restore controls
+
+		if (WARNING)
+		{
+		bprint("*** Translate: ALL to ");
+		bprint(tran_str(TR_ALL));
+		bprint("\n");
+		}
+
+//		doom_item_control_loop();
+	}
+	set_translate();
+
+	if (cvar("pk_translate"))
+	{
+		bprint("\nMap translation bits\n{\n");
+		bprint(ftos(FL_TR_WOLF));
+		bprint("  - translate item to Wolf\n");
+		bprint(ftos(FL_TR_DOOM));
+		bprint("  - translate item to Doom\n");
+		bprint(ftos(FL_TR_QUAKE));
+		bprint("  - translate item to Quake\n");
+		bprint(ftos(FL_TR_Q2));
+		bprint("  - translate item to Quake 2\n");
+		bprint(ftos(FL_TR_Q3));
+		bprint("  - translate item to Quake 3\n");
+		bprint(ftos(FL_TR_RANDIN));
+		bprint("  - randomize these items in genre\n");
+		bprint(ftos(FL_TR_RANDOM));
+		bprint("  - randomize these items totally\n");
+		bprint(ftos(FL_TR_REMOVE));
+		bprint("  - remove these items\n");
+		bprint(ftos(-1));
+		bprint("  - internal restore - not selectable\n");
+		bprint("}\n\n");
+
+		bprint("Map translation vars\n{\n");
+		bprint("var: pk_tr_all = ");
+		bprint(ftos(TR_ALL));
+		bprint(" - overrides all other settings\n");
+		bprint("var: pk_tr_wolf = ");
+		bprint(ftos(TR_WOLF));
+		bprint("\n");
+		bprint("var: pk_tr_doom = ");
+		bprint(ftos(TR_DOOM));
+		bprint("\n");
+		bprint("var: pk_tr_quake = ");
+		bprint(ftos(TR_QUAKE));
+		bprint("\n");
+		bprint("var: pk_tr_q2 = ");
+		bprint(ftos(TR_Q2));
+		bprint("\n");
+		bprint("var: pk_tr_q3 = ");
+		bprint(ftos(TR_Q3));
+		bprint("\n");
+		bprint("var: pk_tr_not = ");
+		bprint(ftos(TR_NOT));
+		bprint(" - 0 = remove no translation, 1 = randomize in genre, 2 = randomize to any \n");
+		bprint("}\n\n");
+
+		if (TR_ALL || TR_Q3 || TR_Q2 || TR_QUAKE || TR_DOOM || TR_WOLF)
+		{
+			if (TR_ALL)
+			{
+				bprint("ALL: translating every item to: ");
+				if (TR_ALL == FL_TR_WOLF) bprint("Wolfenstien\n");
+				if (TR_ALL == FL_TR_DOOM) bprint("Doom\n");
+				if (TR_ALL == FL_TR_QUAKE) bprint("Quake\n");
+				if (TR_ALL == FL_TR_Q2) bprint("Quake 2\n");
+				if (TR_ALL == FL_TR_Q3) bprint("Quake 3\n");
+				if (TR_ALL == FL_TR_RANDIN) bprint("in genre random item!\n");
+				if (TR_ALL == FL_TR_RANDOM) bprint("any random item!\n");
+				if (TR_ALL == FL_TR_REMOVE) bprint("Nothing! - all items are removed, uh have fun!\n");
+				if (TR_Q3 || TR_Q2 || TR_QUAKE || TR_DOOM || TR_WOLF)
+					bprint("\n *** Warning: all other translations are overridden by ALL\n\n");
+			}
+			if (TR_WOLF)
+			{
+				if (TR_ALL) bprint("ALL overrides - ");
+				bprint("Translating wolf items to: ");
+				if (TR_WOLF == FL_TR_WOLF) bprint("Wolfenstien - DOH!\n");
+				if (TR_WOLF == FL_TR_DOOM) bprint("Doom\n");
+				if (TR_WOLF == FL_TR_QUAKE) bprint("Quake\n");
+				if (TR_WOLF == FL_TR_Q2) bprint("Quake 2\n");
+				if (TR_WOLF == FL_TR_Q3) bprint("Quake 3\n");
+				if (TR_WOLF == FL_TR_RANDIN) bprint("Random Wolfenstien\n");
+				if (TR_WOLF == FL_TR_RANDOM) bprint("any random item\n");
+				if (TR_WOLF == FL_TR_REMOVE) bprint("Nothing! - all wolf items are removed!\n");
+			}
+			if (TR_DOOM)
+			{
+				if (TR_ALL) bprint("ALL overrides - ");
+				bprint("Translating doom items to: ");
+				if (TR_DOOM == FL_TR_WOLF) bprint("Wolfenstien\n");
+				if (TR_DOOM == FL_TR_DOOM) bprint("Doom - DOH!\n");
+				if (TR_DOOM == FL_TR_QUAKE) bprint("Quake\n");
+				if (TR_DOOM == FL_TR_Q2) bprint("Quake 2\n");
+				if (TR_DOOM == FL_TR_Q3) bprint("Quake 3\n");
+				if (TR_DOOM == FL_TR_RANDIN) bprint("Random Doom\n");
+				if (TR_DOOM == FL_TR_RANDOM) bprint("any random item\n");
+				if (TR_DOOM == FL_TR_REMOVE) bprint("Nothing! - all doom items are removed!\n");
+			}
+			if (TR_QUAKE)
+			{
+				if (TR_ALL) bprint("ALL overrides - ");
+				bprint("Translating quake items to: ");
+				if (TR_QUAKE == FL_TR_WOLF) bprint("Wolfenstien\n");
+				if (TR_QUAKE == FL_TR_DOOM) bprint("Doom\n");
+				if (TR_QUAKE == FL_TR_QUAKE) bprint("Quake - DOH!\n");
+				if (TR_QUAKE == FL_TR_Q2) bprint("Quake 2\n");
+				if (TR_QUAKE == FL_TR_Q3) bprint("Quake 3\n");
+				if (TR_QUAKE == FL_TR_RANDIN) bprint("Random Quake\n");
+				if (TR_QUAKE == FL_TR_RANDOM) bprint("any random item\n");
+				if (TR_QUAKE == FL_TR_REMOVE) bprint("Nothing! - all quake items are removed!\n");
+			}
+			if (TR_Q2)
+			{
+				if (TR_ALL) bprint("ALL overrides - ");
+				bprint("Translating quake 2 items to: ");
+				if (TR_Q2 == FL_TR_WOLF) bprint("Wolfenstien\n");
+				if (TR_Q2 == FL_TR_DOOM) bprint("Doom\n");
+				if (TR_Q2 == FL_TR_QUAKE) bprint("Quake\n");
+				if (TR_Q2 == FL_TR_Q2) bprint("Quake 2 - DOH!\n");
+				if (TR_Q2 == FL_TR_Q3) bprint("Quake 3\n");
+				if (TR_Q2 == FL_TR_RANDIN) bprint("Random Quake 2\n");
+				if (TR_Q2 == FL_TR_RANDOM) bprint("any random item\n");
+				if (TR_Q2 == FL_TR_REMOVE) bprint("Nothing! - all quake 2 items are removed!\n");
+			}
+			if (TR_Q3)
+			{
+				if (TR_ALL) bprint("ALL overrides - ");
+				bprint("Translating quake 3 items to: ");
+				if (TR_Q3 == FL_TR_WOLF) bprint("Wolfenstien\n");
+				if (TR_Q3 == FL_TR_DOOM) bprint("Doom\n");
+				if (TR_Q3 == FL_TR_QUAKE) bprint("Quake\n");
+				if (TR_Q3 == FL_TR_Q2) bprint("Quake 2\n");
+				if (TR_Q3 == FL_TR_Q3) bprint("Quake 3 - DOH!\n");
+				if (TR_Q3 == FL_TR_RANDIN) bprint("Random Quake 3\n");
+				if (TR_Q3 == FL_TR_RANDOM) bprint("any random item\n");
+				if (TR_Q3 == FL_TR_REMOVE) bprint("Nothing! - all quake 3 items are removed!\n");
+			}
+			if (TR_WOLF == FL_TR_WOLF ||
+				TR_DOOM == FL_TR_DOOM ||
+				TR_QUAKE == FL_TR_QUAKE ||
+				TR_Q2 == FL_TR_Q2 ||
+				TR_Q3 == FL_TR_Q3
+				)	bprint(" *** Warning: Translatng one or more sets to themselves - this is feeble and pointless.\n");
+
+			if (RUNES) bprint(" *** Warning: Translate will not affect or create runes.\n");
+		}
+		else
+			bprint("No translations set\n");
+	bprint("\n");
+	}
+
+	cvar_set("pk_translate", "0");
+
 };

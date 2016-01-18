@@ -372,6 +372,10 @@ void(entity e, string md, float dm, float hl, float mt) misc_explodbox_set =
 //	map_load_flg = map_load_flg - (map_load_flg | FL_MAPITEM);
 //	}
 	pic_test();
+
+	if (!PK_100 && !Q_100)
+	if (self.wad == "q1")
+		doom_item_control(self);
 };
 
 

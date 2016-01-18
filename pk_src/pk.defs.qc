@@ -30,6 +30,7 @@ float Q_100_OBJERR;						// if true objerr that would have exited game (and have
 float MAP_OBSTR;							// object errors -> warnings that remove map items should set this. so map repair (tbd) can init an emergency exit
 float MAP_REPAIR;							// if true map repairs will execute
 void() q_startmap;						// fix start map issue for q single player
+.string class_select;					// allow selection by class
 
 // q100 stuff
 void() q100_PlayerPreThink;
@@ -227,9 +228,35 @@ void() item_loop;
 float ammo_frame;
 float(float cn, entity e, string op) ammo_con;
 
+// map translations
+
+void() check_translate;
+void() doom_item_control_loop;
+
+float TR_WOLF;
+float TR_DOOM;
+float TR_QUAKE;
+float TR_Q2;
+float TR_Q3;
+float TR_ALL;
+float TR_NOT;
+
+float FL_TR_RESTORE		= -1; //	restore to original - should only be set by code
+float FL_TR_WOLF			= 1; //	tranlate these items to wolf items
+float FL_TR_DOOM			= 2; // 	"			"		"		doom	"
+float FL_TR_QUAKE			= 4; //		"			"		"		quake	"
+float FL_TR_Q2				= 8; //		"			"		"		q2		"
+float FL_TR_Q3				= 16; //	"			"		"		q3		"
+float FL_TR_RANDIN		= 32; // randomize in gen
+float FL_TR_RANDOM		= 64; // total random
+float FL_TR_REMOVE		= 128; // remove these items
+
+float NO_PI;					// dont let item_call call place_item
+
 // doom
 
 void() doom_precache;
+void(entity e, float trv) doom_item_control;
 
 // **************************************
 // painkeep protos

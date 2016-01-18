@@ -546,6 +546,8 @@ void() rune_regen =
 			RegenerationSound();
 		if (self.armorvalue>250) self.armorvalue=200;
 	}
+
+	pk_setDamageSkin(self);
 	self.rg_time = time + 0.5;
 };
 
