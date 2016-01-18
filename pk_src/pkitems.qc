@@ -367,16 +367,6 @@ bprint(" )\n");}
 		return;
 	}
 
-if (1) {
-bprint("hi, code base here, item pk_touch != painkeep_touch ( ");
-bprint(ftos(self.pk_touch != painkeep_touch));
-bprint(" , ");
-bprint(self.classname);
-bprint(" , ");
-bprint(self.netname);
-bprint(" )\n");}
-
-
 	if (self.pk_touch != painkeep_touch) // all items route through here - handle special cases, other touch fns & return
 	{
 		if (self.pk_touch == ammo_touch) self.pk_touch = pk_ammo_touch; // new fn for ammo collections
@@ -397,7 +387,9 @@ bprint(" )\n");}
 			if (e.think == player_run) e.think = e.th_run;
 			if (e.think == player_stand1) e.think = e.th_stand;
 if (1) {
-bprint("hi, code base here, in PK bot touched item ( ");
+bprint("hi, code base here, in PK - bot ( ");
+bprint(e.netname);
+bprint(" )	touched item ( ");
 bprint(self.classname);
 bprint(" , ");
 bprint(self.netname);
@@ -1013,57 +1005,12 @@ void() pk_placeitem =
 		self.velocity_y = -170 + (random() * 340);
 	}
 
-if (1) 
-if (self.touch == painkeep_touch)
-{
-dprint("hi, code base here, at pk_placeitem, self.touch == painkeep_touch ( ");
-dprint(self.classname);
-dprint(" , ");
-dprint(self.netname);
-dprint(" , ");
-dprint(vtos(self.origin));
-dprint(" )\n");}
-
-if (1) 
-if (self.pk_touch == painkeep_touch)
-{
-dprint("hi, code base here, at pk_placeitem, self.pk_touch == painkeep_touch ( ");
-dprint(self.classname);
-dprint(" , ");
-dprint(self.netname);
-dprint(" , ");
-dprint(vtos(self.origin));
-dprint(" )\n");}
-
-if (1) 
-if (self.touch == (void()) 0)
-{
-dprint("hi, code base here, at pk_placeitem, self.touch == NULL ( ");
-dprint(self.classname);
-dprint(" , ");
-dprint(self.netname);
-dprint(" , ");
-dprint(vtos(self.origin));
-dprint(" )\n");}
-
-if (1) 
-if (self.pk_touch != (void()) 0)
-{
-dprint("hi, code base here, at pk_placeitem, self.pk_touch != NULL ( ");
-dprint(self.classname);
-dprint(" , ");
-dprint(self.netname);
-dprint(" , ");
-dprint(vtos(self.origin));
-dprint(" )\n");}
-
-
 // handle extra item stuff
 	if (self.pk_touch == (void()) 0) // dont swamp pointers
 	{
 		self.pk_touch = self.touch;
-		self.touch = painkeep_touch; // route everything here
 	}
+	self.touch = painkeep_touch; // take over - route everything here
 
 // Cataboligne - added check here because new mode (not permanently PK & loaded a PK map can set PK mode after nailguns get loaded on map
 	if (PK)

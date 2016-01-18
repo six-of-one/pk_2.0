@@ -1,5 +1,6 @@
 // constants
 
+vector v0						= ' 0 0 0';
 // ADMIN section
 // dev - only enable this for painkeep maps or force pk mode (sv_ control) - any maps that loads a pk item / func
 float PK;									// if set true painkeep code is enabled
@@ -159,6 +160,14 @@ void(entity client, string s, string s1, string s2, string s3, string s4, string
 .float pk_currentitem;
 float pk_attack;		// bit 1 = can make a pk attack on any map, bit 2 = pk_artifacts attack
 
+// viswep
+float qweps, pkweps; // inventory bit masks for weps
+.entity vwepent; // vis wep entity pointers
+void() viswep_post;
+void() viswep_pre;
+void(entity vh, float cd) viswep_ld;
+void() player_nail3;
+
 // Items used in impulse 1
 float PK_IT_AXE				= 1;
 float PK_IT_GRAVITYWELL		= 2;
@@ -277,6 +286,7 @@ float GRAP_HARPOON			= 7;
 float GRAP_CORNER				= 8;
 float GRAP_ROPE				= 9;
 
+float VW_HARP_FRADJ        = 20; // frame adjust from run / stand for a fired harp
 
 // can o p&b
 .float copb_timeout;

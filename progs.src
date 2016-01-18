@@ -68,6 +68,8 @@ oldone.qc
 
 chasecam.qc  //Cataboligne MOD 9.11.3
 
+pk_src/viswep.qc
+
 // painkeep code
 pk_src/pkitems.qc
 pk_src/pk_weapons.qc
@@ -105,6 +107,7 @@ pk_src/pk_artifacts.qc
 
 // support for q3 maps in darkplaces
 pk_src/q3items.qc
+
 // support for rotating brushes - Ariochs Heaven map
 rotate.qc
 

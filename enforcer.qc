@@ -73,7 +73,7 @@ void() Laser_Touch =
 
 void(vector org, vector vec) LaunchLaser =
 {
-	local	vector vec2; // Cataboligne 9.17.3 - fixed this compiler warning
+	local	vector vec2; // Cataboligne 9.17.3 - fix compiler warning
 		
 	if (self.classname == "monster_enforcer")
 		sound (self, CHAN_WEAPON, "enforcer/enfire.wav", 1, ATTN_NORM);

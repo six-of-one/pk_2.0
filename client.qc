@@ -174,7 +174,7 @@ void () GotoNextMap =
 {
 	bot_changelevel(); // *bot - reload bots on next level, handle intermission
 
-	if (PK &&  !PK_ADMINMAP)
+	if (PK && !PK_ADMINMAP)
 	if (pk_flags & PK_TP_USERMAPON) // *pk - user supplied map loop deal
 	{
 		if (!execed)
@@ -607,6 +607,7 @@ void () PutClientInServer =
 
 	spawn_tdeath (self.origin,self);
 	if (!Q_100 && !Q_99) PK_CIS(); // *pk - set client pk elements
+	if (self.vwepent) viswep_ld(self.vwepent, -2);
 	self.admin = 0;
 	set_initBotLevel(); // *bot
 
@@ -1251,6 +1252,8 @@ void () PlayerPostThink =
 	if (ammo_frame < framecount)
 		infinite_ammo();
 
+	if (self.weapon || self.vwepent) viswep_post(); // Cataboligne - 9.26.9 - viswep code link
+
 	if (PK || custom_hub_loaded)
 	{
 		pk_post_think();
@@ -1259,7 +1262,7 @@ void () PlayerPostThink =
 
 	if (self.deadflag)
 		return;
-		
+
 // do weapon stuff
 
 	W_WeaponFrame ();

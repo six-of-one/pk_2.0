@@ -993,7 +993,8 @@ void() PK_Attack =
 	}
 	else if (self.weapon == IT_NAILGUN)
 	{
-		player_pnail1(); // *pk - pulse nailgun fire frames
+		if (PK) player_pnail1(); // *pk - pulse nailgun fire frames
+		else player_nail1();
 	}
 	else if (self.weapon == IT_SUPER_NAILGUN)
 	{

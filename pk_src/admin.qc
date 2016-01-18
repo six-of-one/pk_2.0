@@ -891,7 +891,7 @@ void() Admin_itemmenu =
 							"  04: Grenade launcher      \n" // 8
 							"  05: Rocket launcher       \n" // 16
 							"  06: Lightning gun         \n" // 32
-							"  07: Painkeep items        \n" // 64
+//							"  07: Painkeep items        \n" // 64
 							"  +------ \bartifacts\b -----+  \n" 
 							"  08: Quad damage           \n" // 128
 							"  09: Invulnerability       \n" // 256
@@ -931,7 +931,7 @@ void() Admin_itemmenu =
 							"  04: Grenade launcher      \n" // 8
 							"  05: Rocket launcher       \n" // 16
 							"  06: Lightning gun         \n" // 32
-//							"  07: Painkeep items        \n" // 64
+							"  07: Painkeep items        \n" // 64
 							"  +------ \bartifacts\b -----+  \n" 
 							"  08: Quad damage           \n" // 128
 							"  09: Invulnerability       \n" // 256

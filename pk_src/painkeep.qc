@@ -163,6 +163,15 @@ void() PK_precache =
 
 	precache_model ("progs/null.mdl"); // Cataboligne 8.8.9 purify - chase cam
 
+// visible weapon support - bit masks for inventory
+
+	viswep_pre();
+
+	qweps = IT_AXE | IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN | IT_SUPER_NAILGUN | IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER | IT_LIGHTNING;
+	pkweps = PK_IT_AXE | PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT	| PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB
+							 | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // pk plus weps
+
+
 // PK_100 - fix - needs to be admin toggle
 
 	PK_100 = FALSE; // if true run 100% true to pk v1.11

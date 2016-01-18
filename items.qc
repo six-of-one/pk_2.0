@@ -59,7 +59,7 @@ void () PlaceItem =
 	self.velocity = '0 0 0';
 	self.origin_z = self.origin_z + 6;
 	oldz = self.origin_z;
-	if (!droptofloor(0,0)) // Cataboligne 9.17.3 - fixed this compiler warning
+	if (!droptofloor(0,0)) // Cataboligne 9.17.3 - fix compiler warning
 	{
 		dprint ("Bonus item fell out of level at ");
 		dprint (vtos (self.origin));
@@ -69,18 +69,6 @@ void () PlaceItem =
 	}
 	if (PK || custom_hub_loaded) pk_placeitem(); // *pk - set item details, handle custom hub - non pk levels deal
 	bot_item_linx(self); // *bot - item tie in
-
-if (1) 
-if (self.pk_touch == painkeep_touch)
-{
-dprint("hi, code base here, placeitem pk_touch == painkeep_touch ( ");
-dprint(ftos(self.pk_touch == painkeep_touch));
-dprint(" , ");
-dprint(self.classname);
-dprint(" , ");
-dprint(self.netname);
-dprint(" )\n");}
-
 };
 
 /*
@@ -324,7 +312,6 @@ void () item_armor1 =
 	setmodel (self,"progs/armor.mdl");
 	self.skin = 0;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.armorvalue = 100; // * bot
 	StartItem ();
 };
 
@@ -338,7 +325,6 @@ void () item_armor2 =
 	setmodel (self,"progs/armor.mdl");
 	self.skin = 1;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.armorvalue = 150; // * bot
 	StartItem ();
 };
 
@@ -352,7 +338,6 @@ void () item_armorInv =
 	setmodel (self,"progs/armor.mdl");
 	self.skin = 2;
 	setsize (self,'-16 -16 0','16 16 56');
-	self.armorvalue = 200; // * bot
 	StartItem ();
 };
 

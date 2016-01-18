@@ -1,27 +1,61 @@
 // frame sequence for animating pk items
 
-//
+// Cataboligne - 9.26.9 - visible weapons model (player has no gun!)
+
 // running
-//
-$frame axrun1 axrun2 axrun3 axrun4 axrun5 axrun6
 $frame rockrun1 rockrun2 rockrun3 rockrun4 rockrun5 rockrun6
 
-//
 // standing
-//
 $frame stand1 stand2 stand3 stand4 stand5
-$frame axstnd1 axstnd2 axstnd3 axstnd4 axstnd5 axstnd6
-$frame axstnd7 axstnd8 axstnd9 axstnd10 axstnd11 axstnd12
+
+// pain
+$frame pain1 pain2 pain3 pain4 pain5 pain6
 
 //
-// pain
+// fire wep attacks
 //
+//$frame nailatt1 nailatt2 nailatt3 nailatt4
+// light fire frames
+$frame lightfatt1 lightfatt2 lightfatt3 lightfatt4
+
+// *** duplicate of player.mdl frames above - not really necc... in fact dont use, some vw_ were not animated here
+$frame dont_use1 dont_use2 dont_use3 dont_use4
+
+$frame rockatt1 rockatt2 rockatt3 rockatt4 rockatt5 rockatt6
+
+$frame shotatt1 shotatt2 shotatt3 shotatt4 shotatt5 shotatt6
+
+// crouching & prone frames
+
+$frame crouchdown1 crouchdown2 crouchdown3
+$frame crouch1 crouch2 crouch3 crouch4 crouch5
+$frame prone1 prone2 prone3 prone4 prone5 prone6 prone7
+
+// weapon access
+
+$frame dropull1 dropull2 dropull3 dropull4 dropull5 dropull6 dropull7
+
+// axe animation
+
+$frame axrun1 axrun2 axrun3 axrun4 axrun5 axrun6
+$frame axstnd1 axstnd2 axstnd3 axstnd4 axstnd5 axstnd6
+$frame axstnd7 axstnd8 axstnd9 axstnd10 axstnd11 axstnd12
 $frame axpain1 axpain2 axpain3 axpain4 axpain5 axpain6
-$frame pain1 pain2 pain3 pain4 pain5 pain6
+
+// axe attacks
+
+$frame axatt1 axatt2 axatt3 axatt4 axatt5 axatt6
+
+$frame axattb1 axattb2 axattb3 axattb4 axattb5 axattb6
+
+$frame axattc1 axattc2 axattc3 axattc4 axattc5 axattc6
+
+$frame axattd1 axattd2 axattd3 axattd4 axattd5 axattd6
 
 //
 // death
 //
+
 $frame axdeth1 axdeth2 axdeth3 axdeth4 axdeth5 axdeth6
 $frame axdeth7 axdeth8 axdeth9
 
@@ -40,25 +74,18 @@ $frame deathd8 deathd9
 $frame deathe1 deathe2 deathe3 deathe4 deathe5 deathe6 deathe7
 $frame deathe8 deathe9
 
-//
-// attacks
-//
-$frame nailatt1 nailatt2
-$frame light1 light2
-$frame rockatt1 rockatt2 rockatt3 rockatt4 rockatt5 rockatt6
-$frame shotatt1 shotatt2 shotatt3 shotatt4 shotatt5 shotatt6
+// viswep stuff - not found in player mdl - should not go past frame deathe9
 
-$frame axatt1 axatt2 axatt3 axatt4 axatt5 axatt6
-$frame axattb1 axattb2 axattb3 axattb4 axattb5 axattb6
-$frame axattc1 axattc2 axattc3 axattc4 axattc5 axattc6
-$frame axattd1 axattd2 axattd3 axattd4 axattd5 axattd6
+$frame dthrow1 dthrow2 dthrow3 dthrow4 dthrow5
+
 
 
 // pk player code moved here for adaptive code 
 
 void() pk_stand_frames =
 {
-	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
+//	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
+	if (self.weapon == IT_AXE && FL_MELEE(self.weapon, self.pk_currentitem ))
 	{
 		if (self.walkframe >= 12)
 			self.walkframe = 0;
@@ -74,7 +101,8 @@ void() pk_stand_frames =
 
 void() pk_run_frames =
 {
-	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
+//	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
+	if (self.weapon == IT_AXE && FL_MELEE(self.weapon, self.pk_currentitem ))
 	{
 		if (self.walkframe == 6)
 			self.walkframe = 0;
@@ -151,32 +179,32 @@ void() pulse_idle =
 		self.weaponframe = 1;
 };
 
-void() player_pnail1	 =[$nailatt1, player_pnail2]
+void() player_pnail1	 =[$lightfatt1, player_pnail2]
 {
 	pulse_fire(4);
 	self.nextthink = time + 0.1;
 };
 
-void() player_pnail2	 =[$nailatt2, player_pnail3]
+void() player_pnail2	 =[$lightfatt2, player_pnail3]
 {
 	pulse_idle();
 	self.nextthink = time + 0.2;
 };
 
-void() player_pnail3	 =[$nailatt1, player_pnail4]
+void() player_pnail3	 =[$lightfatt3, player_pnail4]
 {
 	pulse_fire(-4);
 	self.nextthink = time + 0.1;
 };
 
-void() player_pnail4	 =[$nailatt2, player_pnail1]
+void() player_pnail4	 =[$lightfatt4, player_pnail1]
 {
 	pulse_idle();
 	self.nextthink = time + 0.2;
 };
 
 /*
-void() player_supernail1	 =[$nailatt1, player_supernail2  ]
+void() player_supernail1	 =[$lightfatt1, player_supernail2  ]
 {
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
@@ -191,7 +219,7 @@ void() player_supernail1	 =[$nailatt1, player_supernail2  ]
 	self.attack_finished = time + 0.2;
 };
 
-void() player_supernail2	 =[$nailatt2, player_supernail1  ]
+void() player_supernail2	 =[$lightfatt2, player_supernail1  ]
 {
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
@@ -209,7 +237,7 @@ void() player_supernail2	 =[$nailatt2, player_supernail1  ]
 
 // chain thunderbolt code & frames
 
-void() player_bolt1	 =[$light1, player_bolt2  ]
+void() player_bolt1	 =[$lightfatt1, player_bolt2  ]
 {
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
@@ -223,7 +251,7 @@ void() player_bolt1	 =[$light1, player_bolt2  ]
 	self.attack_finished = time + 0.2;
 };
 
-void() player_bolt2	 =[$light2, player_bolt2  ]
+void() player_bolt2	 =[$lightfatt2, player_bolt3  ] // *pk - viswep - Cataboligne - 9.29.9
 {
 	self.effects = self.effects | EF_MUZZLEFLASH;
 
@@ -271,19 +299,19 @@ void() player_airgun8	 =[$rockatt6, player_run  ] {self.weaponframe = 8;};
 // AirFist failed fire animation.
 //	For the external view we use the nail gun fire animation.
 
-void() player_failedairgun1	 =[$nailatt1, player_failedairgun2  ] {self.weaponframe=6;};
-void() player_failedairgun2	 =[$nailatt2, player_failedairgun3  ] {self.weaponframe=7;};
-void() player_failedairgun3	 =[$nailatt2, player_run  ] {self.weaponframe=8;};
+void() player_failedairgun1	 =[$lightfatt1, player_failedairgun2  ] {self.weaponframe=6;};
+void() player_failedairgun2	 =[$lightfatt2, player_failedairgun3  ] {self.weaponframe=7;};
+void() player_failedairgun3	 =[$lightfatt2, player_run  ] {self.weaponframe=8;};
 
 // GRAPPLING_START
 
-void() player_grapfire1 = [$nailatt1, player_grapfire2 ] {self.weaponframe = 1;};
-void() player_grapfire2 = [$nailatt1, player_grapfire3 ] {self.weaponframe = 2;};
-void() player_grapfire3 = [$nailatt2, player_grapfire4 ] {self.weaponframe = 3;};
-void() player_grapfire4 = [$nailatt2, player_grapfire5 ] {self.weaponframe = 4;};
-void() player_grapfire5 = [$nailatt1, player_grapfire6 ] {self.weaponframe = 5;};
-void() player_grapfire6 = [$nailatt1, player_grapfire7 ] {self.weaponframe = 6;};
-void() player_grapfire7 = [$nailatt2, player_run ] {self.weaponframe = 7;};
+void() player_grapfire1 = [$lightfatt1, player_grapfire2 ] {self.weaponframe = 1;};
+void() player_grapfire2 = [$lightfatt1, player_grapfire3 ] {self.weaponframe = 2;};
+void() player_grapfire3 = [$lightfatt2, player_grapfire4 ] {self.weaponframe = 3;};
+void() player_grapfire4 = [$lightfatt2, player_grapfire5 ] {self.weaponframe = 4;};
+void() player_grapfire5 = [$lightfatt1, player_grapfire6 ] {self.weaponframe = 5;};
+void() player_grapfire6 = [$lightfatt1, player_grapfire7 ] {self.weaponframe = 6;};
+void() player_grapfire7 = [$lightfatt2, player_run ] {self.weaponframe = 7;};
 
 // player sound code - mostly unused - put this on a sv_ var - these are now setup to override the default sounds if active, just to simplify the coding
 // sec indicates section of player code sound is played from - NOTE: these are all commented out in player.qc

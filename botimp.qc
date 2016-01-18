@@ -94,7 +94,7 @@ void() end_observer =
 
 // Cataboligne - 8.16.9 - observer fix - move fast while flying - using cam_deathmove
 
-// FIX - do something with body so it doesnt just "vanish"
+// FIX - do something with body so it doesnt just "vanish", maybe a trance, or kibble it down or some such
 
 void () observer =
 {

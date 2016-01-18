@@ -475,7 +475,7 @@ void(entity	client, string s) centerprint =
 */
 
 // bot touch - do bot stuff for some items - removed touch hooks
-
+/* using pk fn instead
 void() bot_touch =
 {
 	local entity e;
@@ -520,7 +520,9 @@ bprint(" )\n");}
 		if (e.think == player_stand1) e.think = e.th_stand;
 		e.classname = "pk*bot";
 if (0) {
-bprint("hi, code base here, bot touched item ( ");
+bprint("hi, code base here, in PK - bot ( ");
+bprint(e.netname);
+bprint(" )	touched item ( ");
 bprint(self.classname);
 bprint(" , ");
 bprint(self.netname);
@@ -528,14 +530,16 @@ if (self.solid == SOLID_NOT) bprint(") and collected it.\n");
 else bprint(" )\n");}
 	}
 };
+*/
 
 // backpack setup special 
 void(entity e) bot_BackpackSetup =
 {
-//	e.bot_item_touch = e.touch;
 	if (!e) return;
 	e.pk_touch = e.touch; // *pk
-	e.touch = bot_touch;
+	e.touch = painkeep_touch; // using this while installed with pk
+//	e.bot_item_touch = e.touch;
+//	e.touch = bot_touch;
 	e.classname = "Backpack"; // *bot backpack code follows
 	e.th_weight = backpackweight;
 	e.state = BOT_TOUCHED;
@@ -558,12 +562,22 @@ bprint(" ) - already has .state set?\n");
 // clear state for cacheRoute calls
 	e.state = 0;
 // set bot item master touch
-	if (!PK)
+	if (e.touch != painkeep_touch) // *pk handles this function if it got set by PK mode
 	{
-//		e.bot_item_touch = e.touch;
 		e.pk_touch = e.touch; // *pk
-		e.touch = bot_touch;
+		e.touch = painkeep_touch; // using this while installed with pk
+//		e.bot_item_touch = e.touch; // pk_touch does this
+//		e.touch = bot_touch;
 	}
+// armor items
+
+	if (e.touch == armor_touch || e.pk_touch == armor_touch) // do here instead of item setup - Cataboligne - 9.25.9
+	{
+		if (!e.skin) e.armorvalue = 100;
+		else if (e.skin == 1) e.armorvalue = 150;
+		else if (e.skin == 2) e.armorvalue = 200;
+	}
+
 // health items
 	if (e.classname == "item_health") // || e.model == "maps/b_bh10.bsp" / "maps/b_bh25.bsp / maps/b_bh100.bsp
 	{

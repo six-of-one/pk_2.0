@@ -105,7 +105,7 @@ SpawnMeatSpray
 void (vector org, vector vel) SpawnMeatSpray =
 {
 	local	entity missile, mpuff;
-//	local	vector	org; // Cataboligne 9.17.3 - fixed this compiler warning
+//	local	vector	org; // Cataboligne 9.17.3 - fix compiler warning
 
 	missile = spawn ();
 	missile.owner = self;
