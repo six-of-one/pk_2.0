@@ -502,8 +502,11 @@ void() q2_item_health;
 void() X_FireHandGrenade;
 void() X_FireBlaster;
 
+float q2_bfg_shot; // indicates damage from q2 bfg shot - may not get used, radius is already 1/2 dmg
 float Q2_BFG 					= 66604;
-float Q2_BFG_TRACE			= 2048; // TDO: find real q2 trace limit
+float Q2_BFG_TRACE			= 1000;
+float Q2_BFG_LASER			= 256;
+float Q2_BFG_LASER_DMG		= 5; // 5 pts every 10th sec
 
 // q3
 
