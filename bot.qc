@@ -148,7 +148,7 @@ float () getrandombotskin =
 	}
 	if ((botskin > 0.330) && (botskin <= 0.396))
 	{
-		return(TE_LIGHTNING1);
+		return(5);
 	}
 	if ((botskin > 0.396) && (botskin <= 0.462))
 	{

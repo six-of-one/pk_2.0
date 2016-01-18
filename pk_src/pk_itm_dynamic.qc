@@ -208,6 +208,7 @@ void(string cls) item_call =
 		self.think = SUB_regen; // dont go thru place_item - use regen method
 		self.nextthink = time + 1 + 3 * random(); // spread em out
 		self.model = string_null;
+		if (self.wait <= -888) self.wait = 0;
 	}
 	self.solid = SOLID_NOT;
 //	bot_item_linx(self); // *bot - item tie in - needs checked for use here -- FIX

@@ -191,6 +191,9 @@ void() PK_precache =
 	precache_sound ("items/r_item2.wav");
 	precache_model ("maps/b_bh25.bsp");
 	precache_sound ("items/health1.wav");
+	precache_model ("maps/b_explob.bsp");
+	precache_model ("maps/b_exbox2.bsp");
+	precache_sound ("weapons/r_exp3.wav");
 // armor
 	precache_model ("progs/armor.mdl");
 // weps

@@ -562,6 +562,7 @@ void() viswep_post =
 
 	local float vadd, vframe, dwep, gremlin_frame_adjust, grap_frame_adjust, pkdwep;
 	local vector vofs, vang; // gremlin vwep offsets
+	local string wm;
 
 	if (vhead)
 		{
@@ -609,9 +610,18 @@ void() viswep_post =
 // TDO: set eweapon by vw
 				if (vhead.weapon == dwep)
 				{
-					if (vhead.owner.eweapon && !vhead.eweapon) PK_SetCurrentAmmo();
-					if (!vhead.owner.eweapon && vhead.eweapon) PK_SetCurrentAmmo();
 					vhead.owner.eweapon = vhead.eweapon;
+
+					if ( !(self.cam_x & CHSCAM_ON))
+					{
+						if (vhead.owner.eweapon)
+						{
+							if (vhead.owner.eweapon.weaponmodel != vhead.owner.weaponmodel) wm = vhead.owner.weaponmodel = vhead.owner.eweapon.weaponmodel;
+						}
+						else
+							if (ver_weaponmodel(vhead.owner.weaponmodel)) PK_SetCurrentAmmo();
+//							if (wm != vhead.owner.weaponmodel) vhead.owner.weaponmodel = wm;
+					}
 				}
 			}
 

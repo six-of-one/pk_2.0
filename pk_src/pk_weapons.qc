@@ -528,6 +528,74 @@ void() PK_SetCurrentAmmo =
 		}
 };
 
+// verify this for new weps that use eweapon
+
+string(float dw, string wpm) ver_weaponmodel =
+{
+	string wmr;
+
+	wmr = wpm;
+	if (dw == IT_AXE)
+	{
+		if (self.pk_currentitem == PK_IT_AXE)
+		if (wpm != "progs/v_axe.mdl")
+			wmr = "progs/v_axe.mdl";
+		}
+	else if (dw == IT_SHOTGUN)
+	{
+		if (wpm != "progs/v_eshot.mdl" && wpm != "progs/v_shot.mdl")
+			wmr = "progs/v_shot.mdl";
+	}
+	else if (dw == IT_SUPER_SHOTGUN)
+	{
+		if (wpm != "progs/v_eshot2.mdl" && wpm != "progs/v_shot2.mdl")
+			wmr = "progs/v_shot2.mdl";
+	}
+	else if (dw == IT_NAILGUN)
+	{
+		if (wpm != "progs/v_nail.mdl" && wpm != "progs/v2_nail.mdl" && wpm != "progs/v_fnail.mdl" && wpm != "progs/v2_pulsenail.mdl")
+		if (PK_100)
+			wmr = "progs/v_fnail.mdl";
+		else if (Q_100)
+			wmr = "progs/v_nail.mdl";
+		else if (PK)
+			wmr = "progs/v2_pulsenail.mdl";
+		else
+			wmr = "progs/v2_nail.mdl";
+	}
+	else if (dw == IT_SUPER_NAILGUN)
+	{
+		if (wpm != "progs/v_nail2.mdl" && wpm != "progs/v2_nail2.mdl")
+		if (PK_100 || Q_100)
+			wmr = "progs/v_nail2.mdl";
+		else
+			wmr = "progs/v2_nail2.mdl";
+	}
+	else if (dw == IT_GRENADE_LAUNCHER)
+	{
+		if (wpm != "progs/v_rock.mdl" && wpm != "progs/v2_rock.mdl")
+		if (PK_100 || Q_100)
+			wmr = "progs/v_rock.mdl";
+		else
+			wmr = "progs/v2_rock.mdl";
+	}
+	else if (dw == IT_ROCKET_LAUNCHER)
+	{
+		if (wpm != "progs/v_rock2.mdl" && wpm != "progs/v2_rock2.mdl")
+		if (PK_100 || Q_100)
+			wmr = "progs/v_rock2.mdl";
+		else
+			wmr = "progs/v2_rock2.mdl";
+	}
+	else if (dw == IT_LIGHTNING)
+	{
+		if (wpm != "progs/v_light.mdl")
+			wmr = "progs/v_light.mdl";
+	}
+
+	return(wmr);
+};
+
 // called from many places
 
 float() W_BestPKWeapon =

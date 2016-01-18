@@ -68,7 +68,7 @@ void() gravity_pull =
 		if (pk_art_movshot_ck(e, "grav")) // Cataboligne 8.12.9 purify - pk artifacts
 		if (e.classname != "chase_cam")
 		//if (e != self.owner)
-		if ((e.classname == OBSERVER && random() < 0.01666) || e.classname != OBSERVER)
+		if ((e.classname == OBSERVER && random() < 0.001666) || e.classname != OBSERVER)
 		if (e.movetype != MOVETYPE_NONE) // anything that can move
 		if (e.movetype != MOVETYPE_PUSH)
 		if (e.movetype != MOVETYPE_NOCLIP)

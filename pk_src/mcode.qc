@@ -155,7 +155,11 @@ float MC_D_AROCKETS_LG		= 192;
 float MC_D_ACELLS				= 193;
 float MC_D_ACELLS_LG			= 194;
 
-float MC_D_BARREL				= 195;
+float MC_D_PACK				= 195;
+float MC_D_NIGHTVS			= 196;
+float MC_D_AUTOMAP			= 197;
+
+float MC_D_BARREL				= 19;
 
 // fn(bit_mcode) - item bit assoc with given mcode
 
