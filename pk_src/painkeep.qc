@@ -974,9 +974,11 @@ void() pk_srvcmd_set =
 // runes
 	RUNES = 0;
 	RUNE_CNT = 4;
+	RUNE_MOVE = 12;
 	RUNE_MASK = 15;
 	RUNE_3_ACM = 0.2;
 	RUNE_AR1M = 0;
+	RUNE_R1SFX = 0;
 
 	RUNE_RANDOM = 0;
 	R_EARTH = RUNE_FLG_RS; // allow power mix
@@ -1053,6 +1055,7 @@ void() pk_srvcmd_set =
 		registercvar("sv_c_rune_random", "0"); // runes will have random powers
 		registercvar("sv_c_rune_set", "0");
 		registercvar("sv_c_rune_allowrule1multi", "0"); // if true more than 1 rune can be gotten in rule 1
+		registercvar("sv_c_rune_rule1sfx", "1"); // if true and multi 3 & 4 runes in 1 player have side effects
 
 		registercvar("sv_c_rsp_time", "30");
 		registercvar("sv_c_pow_time", "30"); // artifact power time

@@ -136,14 +136,9 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	if (attacker.pkplus_actortype != PKPLUS_ACTORQUAD) // pk art code here
 		damage = damage * 4;
 
-	if (attacker.rune_flag & RUNE_FLG_DM){
+	if (attacker.rune_flag & RUNE_FLG_DM)
 		damage = damage * 2;
-if (time & 2 == 2)
-{
-bprint("   ------    dmg used by: ");
-bprint(attacker.netname);
-bprint("\n");
-}}
+
 // save damage based on the target's armor level
 
 	// PAINKEEP_START Ignore armor stuff, used for drowning
@@ -162,12 +157,6 @@ bprint("\n");
 
 	if (targ.rune_flag & RUNE_FLG_RS)
 	{
-if (time & 2 == 2)
-{
-bprint("   ------    resist used by: ");
-bprint(targ.netname);
-bprint("\n");
-}
 		take = take / 2;
 		save = save / 2;
 		if (targ.invincible_sound < time)

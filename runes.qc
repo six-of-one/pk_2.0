@@ -127,6 +127,8 @@ void () rune_1_expire =
 	remove(self);
 };
 
+// TDO: rule 1 sfx here, 3 runes - 10+ secs, 4 runes - 1+ min or till death
+
 void () rune_touch =
 {
 	local entity e;
@@ -178,7 +180,7 @@ void () rune_touch =
 // remove it in single player, or setup for respawning in deathmatch
 	self.model = string_null;
 	self.solid = SOLID_NOT;
-	self.cnt = 0;
+	self.delay = self.cnt = 0;
 	self.count = self.count + 0.13; // increment for each grab - more activity = less chance of rune moving
 
 	if (RUNES == 1 || RUNES == 3)
@@ -262,12 +264,15 @@ void() rune_maker =
 				remove(self);
 				return; // crap - no location
 			}
-			self.origin = e.origin + ' 0 0 8';
+			setorigin(self, e.origin + ' 0 0 8');
 			if (e.flags & FL_ITEM) // randomize away from other map items
+			{
 				self.origin = stdv_rndloc(e.origin + ' 0 0 8', 50, 100);
+				setorigin(self, self.origin);
+			}
 
 			item_call(self.wad);
-//			self.pk_touch = rune_touch;
+
 			AddToSplash(self); // splash code kills lava immersed runes
 
 			rune_map = rune_map | self.spawnflags;
@@ -326,6 +331,10 @@ void() run_runes =
 	local float f, k, sf;
 
 	RUNE_AR1M = cvar("sv_c_rune_allowrule1multi");
+	RUNE_R1SFX = 0;
+	if (RUNE_AR1M)
+		RUNE_R1SFX = cvar("sv_c_rune_rule1sfx"); // if true and multi -  3 | 4 runes in 1 player have side effects
+
 	RUNE_3_ACM = cvar("sv_c_rune_3acm");
 	RUNE_MASK = cvar("sv_c_rune_mask") & RUNE_MASK_ALL;
 	if (RUNE_MASK < 1 || RUNE_MASK > RUNE_MASK_ALL) RUNE_MASK = RUNE_MASK_ALL;
@@ -504,12 +513,6 @@ void() rune_regen =
 			RegenerationSound();
 		if (self.armorvalue>250) self.armorvalue=200;
 	}
-if (time & 2 == 2)
-{
-bprint("   ------    regen used by: ");
-bprint(self.netname);
-bprint("\n");
-}
 	self.rg_time = time + 0.5;
 };
 
@@ -531,11 +534,5 @@ float(float atf) rune_haste =
 
 	self.attack_finished = time + atf;
 	HasteSound();
-if (time & 2 == 2)
-{
-bprint("   ------    haste used by: ");
-bprint(self.netname);
-bprint("\n");
-}
 	return(FALSE);
 };

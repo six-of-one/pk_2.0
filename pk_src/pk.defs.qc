@@ -98,6 +98,9 @@ float RUNE_CNT;
 float RUNE_MASK;
 float RUNE_RANDOM;
 float RUNE_AR1M;
+float RUNE_R1SFX;
+float RUNE_MOVE; // move a rune after this many min regardless of other cnts
+
 float rune_count; // total # on map
 void() rune_maker;
 
