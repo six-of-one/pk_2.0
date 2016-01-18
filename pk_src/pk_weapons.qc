@@ -285,6 +285,11 @@ void() PK_SetCurrentAmmo =
 
 	if (self.eweapon) // display got first
 	{
+		if (self.eweapon.mdl == "progs/vw_q2_hgr.mdl")
+			self.eweapon.noise2 = "";
+		self.eweapon.fly_sound = 0; // hum local deal
+		self.tomb_time = 0; // rng weps use this
+
 		if (wchanged)
 		{
 			sprint(self, self.eweapon.netname);
@@ -557,6 +562,8 @@ void() PK_SetCurrentAmmo =
 				self.currentammo = self.ammo_rockets;
 			else if (self.eweapon.lip == AMMO_SLUGS)
 				self.currentammo = self.ammo_slug;
+			else if (self.eweapon.lip == AMMO_GAS)
+				self.currentammo = self.ammo_gaspr;
 			else if (self.eweapon.lip == AMMO_NONE)
 				self.currentammo = 1;
 		}
@@ -776,6 +783,8 @@ void() PK_SetCurrentAmmoOnly =
 				self.currentammo = self.ammo_rockets;
 			else if (self.eweapon.lip == AMMO_SLUGS)
 				self.currentammo = self.ammo_slug;
+			else if (self.eweapon.lip == AMMO_GAS)
+				self.currentammo = self.ammo_gaspr;
 			else if (self.eweapon.lip == AMMO_NONE)
 				self.currentammo = 1;
 		}
@@ -901,6 +910,13 @@ float(float weaponnum, float pknum) HasAmmo =
 			else if (e.eweapon.lip == AMMO_SLUGS)
 			{
 				if (self.ammo_slug >= e.eweapon.dmg_save)
+					return TRUE;
+				else
+					return FALSE;
+			}
+			else if (e.eweapon.lip == AMMO_GAS)
+			{
+				if (self.ammo_gaspr >= e.eweapon.dmg_save)
 					return TRUE;
 				else
 					return FALSE;

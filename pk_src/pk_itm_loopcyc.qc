@@ -133,7 +133,7 @@ void() loopcyc_think =
 		else
 		{
 			f = loop_next(self, 0); // check all 0's
-			if (!f) // keep these ents gone
+			if (!f) // keep these ents gone, code0 = -666 goes here
 			{
 				e.model = "";
 				e.nextthink = -1;
@@ -141,8 +141,14 @@ void() loopcyc_think =
 			}
 			else // cycle according to rules
 			{
+
+// TDO: mass replace here for all loop x.theowner, else below
+
 				self.delay = f = loop_next(self, e.mcode);
 				e.pk_touch = (void()) 0;
+				if (self.killtarget != "")
+					item_call_save(e, self.killtarget);
+				else
 				if (!f)
 				{
 					if (WARNING) bprint("\b*** warning: loop code changed on live item loop - restoring item.\n");
@@ -194,7 +200,7 @@ void(entity e) init_loopcyc =
 {
 	local entity sr, s2;
 	local string cl;
-	local float f0, f1;
+	local float f0, f1, fr, sf;
 	local vector v1;
 
 	e.theowner = world;
@@ -213,8 +219,23 @@ void(entity e) init_loopcyc =
 	}
 	if (cl == "")
 	{
+		if (f0 < 0) // detect mass replace
+		{
+			cl = item_by_mcode(fabs(f0));
+			if (cl != "")
+			{
+				e.killtarget = cl;
+				fr = f1;
+				e.wait = -666; // so we dont master server these!
+bprint("switch list to: ");
+bprint(cl);
+bprint("\n");
+			}
+		}
 		e.delay = f1;
 		cl = item_by_mcode(f1);
+bprint("first item: ");
+bprint(cl);
 	}
 	if (cl == "")
 	{
@@ -224,30 +245,57 @@ void(entity e) init_loopcyc =
 
 	if (!cvar(e.target)) cvar_set(e.target, "-60"); // default timer
 
-	if (f0 > -1)
+
+// TDO: mass replace here for all listed items - wait must be -666, check all levels
+// have to set cl for each listed mc & ignore f1 not finding a sr
+	sf = 1;
+
+	if (f0 > -1 || f0 == -666 || fr)
 	{
-		if (!cvar("pk_cyc_master"))
+		while (sf > 0 || fr)
 		{
-			e.theowner = sr = find( world, classname, cl);
-			if (!sr)
+			if (!cvar("pk_cyc_master") || fr)
 			{
-				remove(e);
-				return; // none on map right now
-			}
+				if (!e.theowner)
+				{
+					if (cl != "")
+						e.theowner = s2 = sr = find( world, classname, cl);
+				}
+				if (!sr && !fr)
+				{
+					remove(e);
+					return; // none on map right now
+				}
 
-		  while (sr) // chain em up
-			{
-			sr.theowner = find( sr, classname, cl);
-	//		if (cl != "dyn_item")
-	//			sr = sr.theowner;
-			if (sr.mcode == f0 || sr.mcode == f1)
-				sr = sr.theowner;
-			else
-				sr = find( sr, classname, cl);
+			  while (s2) // chain em up
+				{
+				s2 = sr.theowner = find( sr, classname, cl);
+		//		if (cl != "dyn_item")
+		//			sr = sr.theowner;
+				if (s2)
+				if (s2.mcode == f0 || s2.mcode == f1)
+					sr = sr.theowner;
+				else
+					s2 = sr.theowner = find( sr, classname, cl);
 
-	//		if (cvar("pk_cyc_dyn") && !sr) cl = "dyn_item"; // include dynamics - must have 1 reg item to start loop.
+		//		if (cvar("pk_cyc_dyn") && !sr) cl = "dyn_item"; // include dynamics - must have 1 reg item to start loop.
+				}
+				if (fr)
+				{
+					f1 = loop_next(e, f1);
+					cl = item_by_mcode(f1);
+if (f1 != fr)
+{
+bprint(", next item: ");
+bprint(cl);
+}
+					if (f1 == fr) fr = 0; // done drop out
+					else s2 = sr;
+				}
 			}
+			sf = sf - 1;
 		}
+bprint("\n");
 	}
 	else // create a series of random cycle items
 	{

@@ -103,8 +103,9 @@ float (entity e, float healamount, float ignore) T_Heal =
 	if ((!ignore) && (e.health >= other.max_health))
 		e.health = other.max_health;
 
-	if (e.health > 250)
-		e.health = 250;
+// Cant hard cap here because of q2 bottles
+//	if (e.health > 250)
+//		e.health = 250;
 
 	if (!Q_100) pk_setDamageSkin(e); // *pk damage skins code
 	return 1;
@@ -124,7 +125,7 @@ float H_MEGA	 = 2;
 void () health_touch;
 void () item_megahealth_rot;
 
-void () item_health =
+void () q100_item_health =
 {
 	self.touch = health_touch;
 
@@ -162,7 +163,7 @@ void () item_health =
 };
 
 
-void () health_touch =
+void () q100_health_touch =
 {
 	local float amount;
 	local string s;
@@ -224,6 +225,7 @@ void () item_megahealth_rot =
 
 	if (other.health > other.max_health)
 	{
+		if (self.noise4 != Q3_DET) // q3 already has rot fn
 		other.health = other.health - 1;
 		self.nextthink = time + 1;
 		return ;
@@ -275,6 +277,38 @@ void () armor_touch =
 		value = 200;
 		bit = IT_ARMOR3;
 	}
+// TDO: move these - maintain q100 code
+	local string snd;
+	local float ck;
+	ck = TRUE;
+	snd = "items/armor1.wav";
+	if (self.noise4 == DOOM_DET || self.noise4 == Q2_DET || self.noise4 == Q3_DET)
+	{
+		if (self.volume != -1)
+		if (other.armorvalue >= self.volume) return; // already max
+
+		ck = FALSE;
+		snd = self.noise;
+		bit = self.items;
+		type = self.style;
+		value = self.currentammo + other.armorvalue;
+		if (self.volume > 0) // max only applies to non inf
+		{
+			if (value > self.volume) value = self.volume;
+		}
+		if (self.volume == -1 || self.classname == "q3_item_armor_shard" || self.classname == "d_item_spiritarmor") // shard specials
+		{
+			if (other.armortype > type) type = other.armortype; // shards pick best pl. has
+			bit = other.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3);
+		}
+		if (self.noise4 == Q3_DET)
+		{
+			q3_ha_rot(other, value);
+		}
+	}
+
+	if (ck)
+// end NON q100
 	if (other.armortype*other.armorvalue >= type*value)
 		return ;
 
@@ -290,7 +324,7 @@ void () armor_touch =
 
 	sprint(other, "You got armor\n");
 // armor touch sound
-	sound(other, CHAN_ITEM, "items/armor1.wav", 1, ATTN_NORM);
+	sound(other, CHAN_ITEM, snd, 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
 
 	activator = other;

@@ -78,7 +78,7 @@ void(entity e) pkplus_item_control =
 
 // no sense in working removed items or constantly rndize items
 	if (cvar("pk_place_item") == 1) return;
-	if (cvar("pk_place_item") == 2)
+	if (cvar("pk_place_item") == 2 || cvar("pk_place_item") == 3)
 	{
 		if (cvar("pk_place_item_reload"))
 		if (cvar("pk_place_item_reload") < 60) return;
@@ -125,7 +125,7 @@ void(entity e) pkplus_item_control =
 			local float f;
 			f = MC_PK_RNDITM;
 //			if (e.mcode > 149 && e.mcode < MC_PK)
-			e.mcode = 141 + rint(random() * f);
+			e.mcode = MC_PULSE_NAILGUN + rint(random() * f); // NOTE: starts with pulse gun - this could change if item order in mcode is changed!
 			e.wad = item_by_mcode(e.mcode);
 			if (e.wad != "")
 			{

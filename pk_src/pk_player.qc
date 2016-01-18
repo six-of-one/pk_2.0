@@ -79,13 +79,39 @@ $frame deathe8 deathe9
 $frame dthrow1 dthrow2 dthrow3 dthrow4 dthrow5
 
 
+void(float ab, float gb, float amx, float gmx) wk_frames =
+{
+	if (self.eweapon && FL_MELEE(self.eweapon, 0, 0)) //self.weapon, self.pk_currentitem ))
+	{
+		if (self.walkframe >= amx)
+			self.walkframe = 0;
+		self.frame = ab + self.walkframe;
+	}
+	else
+	if (self.weapon == IT_AXE && FL_MELEE(self.eweapon, self.weapon, self.pk_currentitem ))
+	{
+		if (self.walkframe >= amx)
+			self.walkframe = 0;
+		self.frame = ab + self.walkframe;
+	}
+	else
+	{
+		if (self.walkframe >= gmx)
+			self.walkframe = 0;
+		self.frame = gb + self.walkframe;
+	}
+	
+};
 
 // pk player code moved here for adaptive code 
 
 void() pk_stand_frames =
 {
+	wk_frames($axstnd1, $stand1, 12, 5);
+	return;
 //	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
-	if (self.weapon == IT_AXE && FL_MELEE(self.weapon, self.pk_currentitem ))
+	if (self.weapon == IT_AXE && FL_MELEE(self.eweapon, self.weapon, self.pk_currentitem ))
+//	if (FL_MELEE(self.eweapon, self.weapon, self.pk_currentitem ))
 	{
 		if (self.walkframe >= 12)
 			self.walkframe = 0;
@@ -101,8 +127,11 @@ void() pk_stand_frames =
 
 void() pk_run_frames =
 {
+	wk_frames($axrun1, $rockrun1, 6, 6);
+	return;
 //	if (self.weapon == IT_AXE && self.pk_currentitem == PK_IT_AXE)
-	if (self.weapon == IT_AXE && FL_MELEE(self.weapon, self.pk_currentitem ))
+	if (self.weapon == IT_AXE && FL_MELEE(self.eweapon, self.weapon, self.pk_currentitem ))
+//	if (FL_MELEE(self.eweapon, self.weapon, self.pk_currentitem ))
 	{
 		if (self.walkframe == 6)
 			self.walkframe = 0;

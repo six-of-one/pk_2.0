@@ -201,7 +201,7 @@ void () worldspawn =
 
 // player precaches
 	W_Precache ();			// get weapon precaches
-	PK_precache(); // *pk precache code - cant be conditional in case PK mode gets set
+	PK_init(); // *pk init & precache code - cant be conditional in case PK mode gets set
 
 // sounds used from C physics code
 	precache_sound ("demon/dland2.wav");		// landing thud

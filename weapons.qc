@@ -609,6 +609,9 @@ void () W_FireLightning =
 
 void () GrenadeExplode =
 {
+	if (self.dodmg)
+		T_RadiusDamage (self,self.owner,self.dodmg,world);
+	else
 	T_RadiusDamage (self,self.owner,120,world);
 
 	WriteByte (MSG_BROADCAST,SVC_TEMPENTITY);
@@ -629,6 +632,9 @@ void () GrenadeTouch =
 		GrenadeExplode ();
 		return ;
 	}
+	if (self.noise != "")
+		sound (self, CHAN_WEAPON, self.noise, 1, ATTN_NORM);	// bounce sound
+	else
 	sound (self, CHAN_WEAPON, "weapons/bounce.wav", 1, ATTN_NORM);	// bounce sound
 	if (self.velocity == '0 0 0')
 		self.avelocity = '0 0 0';

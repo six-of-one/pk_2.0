@@ -282,27 +282,29 @@ entity(entity p, float chan, string sd, float vl, float attn, float tm, vector o
 // ws - weapon sound
 // rtime - time to loop - if zero play ws once
 .float chaosweptime;
+float hum_chan; // channel for hum - must be set prior to call, always reset to CHAN_WEAPON
 
 void(string ws, float rtime) ominous_hum =
 {
 	if (WEPHUM)
 	{
-	if (!rtime)
+		if (!rtime)
 		{
-		self.chaosweptime = MAXFL;
-		sound (self, CHAN_WEAPON, ws, 1, ATTN_NORM);
+			self.chaosweptime = MAXFL;
+			sound (self, hum_chan, ws, 1, ATTN_NORM);
 		}
-	else if (self.chaosweptime < time)
+		else if (self.chaosweptime < time)
 		{
-		sound (self, CHAN_WEAPON, "misc/null.wav", 1, ATTN_NORM);
-		if (intermission_running)
-			return;
-		else if (ws != "")
+			sound (self, hum_chan, "misc/null.wav", 1, ATTN_NORM);
+			if (intermission_running)
+				return;
+			else if (ws != "")
 			{
-			sound (self, CHAN_WEAPON, ws, 1, ATTN_NORM);
-			self.chaosweptime = time + rtime;
+				sound (self, hum_chan, ws, 1, ATTN_NORM);
+				self.chaosweptime = time + rtime;
 			}
 		}
+		hum_chan = CHAN_WEAPON;
 	}
 };
 
@@ -424,4 +426,47 @@ void() sky_touch_pointer =
 //		SUB_Remove();
 
 // IDEA - rethink code here if called as a think fn, till timeout
+};
+
+
+// fn(rnd_string) - randomly select one of 5 strings - great for sounds
+// wt - weight seq. 1-100, if '0 0 0' chances are equal, example - for 50% rs1, 25% rs2, 12% rs3, 7% rs4, 3% rs5
+//		  % for rs4 and rs5 are interpolated - w4 = z * (z / x)		 '50 25 12'
+/*
+		between 51 - 100 = rs1, 26 - 50 = rs2, 13 - 25 = rs3, 4 - 12 = rs4, < 4 = rs5
+		THESE MUST BE IN ORDER WITH X THE LARGEST! - x > y > z AND x CANNOT be 0!
+		rs1-5 strings, will return NULL if rs1 is NULL, other NULL string will not be selected
+		i.e. if rs1 is the only non NULL string, it will always be the outcome
+
+for 2 strings in rs1, rs5 
+for 50/50 wt = '50 50 50'
+for 75/25 wt = '75 75 75', string rs1 will be 25%
+*/
+
+string(vector wt, string rs1, string rs2, string rs3, string rs4, string rs5) rnd_string =
+{
+	local float w1,w2,w3,w4,rstr,cv;
+	local string sl;
+
+	sl = "";
+	cv = 1;
+
+	if (wt == ' 0 0 0') wt = ' 80.0 60.0 40.0';
+	w1 = wt_x;
+	w2 = wt_y;
+	w3 = wt_z;
+	w4 = ceil(wt_z * (wt_z / wt_x)); // gives 20 if chances eq. - 80 60 40 20
+
+	if (rs1 != "")
+	while (sl == "") 
+		{
+		rstr = rint(random() * 100); // 1-100
+		sl = rs5;
+		if (rstr > w4) sl = rs4;
+		if (rstr > w3) sl = rs3;
+		if (rstr > w2) sl = rs2;
+		if (rstr > w1 || cv > 10) sl = rs1; // dont go past 10 iterations
+		cv = cv + 1;
+		}
+	return sl;
 };

@@ -552,6 +552,8 @@ void() PutClientInServer =
 
 	// PAINKEEP SPLASH Make this entity splash
 	AddToSplashBig(self);
+	
+	ominous_hum("", 1); // clear any stray hum
 
 	// PAINKEEP Fix the velocity on respawn bug
 	self.velocity = '0 0 0';
@@ -903,7 +905,6 @@ void () PlayerPreThink =
 	}
 };
 
-
 float vw_bot_frame; // handle pk*bots
 
 //void() pk_post_think =
@@ -986,11 +987,13 @@ void () PlayerPostThink =
 	if (!XENV)
 	if (WEPHUM)
 	if (self.eweapon)
+	if (self.eweapon.fly_sound != HUMLOCAL)
 	if (self.eweapon.noise2 != "")
 	if (self.chaosweptime < time)
-//		if (self.chaosattnoise != HUMLOCAL) 
 //		if (self.eweapon.weapon != MC_AIRGUN)
 		ominous_hum(self.eweapon.noise2, self.eweapon.chaosweptime);
+
+	if (self.ammo_rockets < self.ammo_hgrenade) self.ammo_hgrenade = self.ammo_rockets; // NOTE: while rockets & grenades are the same ammo q1 style
 
 	if (time < self.attack_finished)
 		return;

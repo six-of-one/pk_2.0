@@ -84,6 +84,7 @@ float pk_mapcfg;
 float pk_srvcfg;
 
 void() pk_srvcmd_set;
+void() mcode_load;
 
 // env
 
@@ -373,26 +374,36 @@ float NO_PI;					// dont let item_call call place_item
 
 .float ammo_bullet;
 .float ammo_slug;
+.float ammo_gaspr;
+.float ammo_hgrenade;
 
 float PK_BULLETAMMO_MAX;
 float PK_SLUGAMMO_MAX;
+float PK_GASAMMO_MAX;
 
 // X fire
 
 void(entity e, float trv) master_item_control;
 void(string tri, float trv) master_item_control_loop;
 void(float velmul, float mvt, float flg, float ct, vector fmorg, vector vdr, string cname, string md, string sd, void() tch, float tht, void() thk, void() thd) fire_missile;
+void() melee_hit;
 void() player_plasma1;
 void() X_FireHitscan;
 void() X_FireRailgun;
 void() player_mgchg1;
+void() player_pistol1;
 
 float LASERCAN_VEL;
 float LASER_VEL;
 float PLASMA_VEL;
+float HGREN_VEL;
+float GRENADE_VEL;
 float ROCKET_FUSE;
 float WEPHUM; // weapons hum
+float HUMLOCAL						= -41200855;    // taking local control, dont override by auto
 
+// TEST remove
+entity fts; // fire test
 
 
 // missile code flags
@@ -419,29 +430,82 @@ float MLT_LAVA					= 2048;	// melt in lava
 float PF_LAVA					= 1048576;
 */
 
+float IGN_INV 					= 66600;
+float FL_MELEE_WEP			= 66601;
+float SND_OVER					= 66602; // play eweapon sound over after fire call
+
+
+void() chaos_precache;
+
+// TDO: place
+float FL_REMOVE				= 64;
+float FL_HELD					= 128;
+float NO_BUBBLES				= -1; // this ent wont make bubbles
+float FL_VANM					= 131072; // vmodel animation in progress
+
+float HEAL_ROT					= 1;
+float HEAL_NORM				= 2;
+float HEAL_MEGA				= 3;
+float HEAL_BOT					= 4; // doom health bottle - ignore normal max, no rot
+float HEAL_SOUL				= 5; // doom health: soul, mega spheres - 200 max, no rot
+
+
+// from chaos mod - flamer & flame stuff
+
+float FL_FLARE					= 8192; //entity is a flare starter
+float FL_SUBFLARE				= 16384; // flare up flow
+float MAX_FLAME_CYC			= 64; // max cycles flame will burn
+float MAX_FLARE_CHANCE		= 0.33; // max % of flare in slime
+float MAX_FLARE				= 220; // max flares total per level
+float MAX_AREA_FLARE			= 40; // max fires in one area
+float FLARE_CK_RAD			= 1000; // area to check for flares
+
+float FL_ONFIRE				= 8192;
+
+.float firecontrol;
+void() V_FlamerAnim;
+void() W_FireFlamer;
+void () player_flamer1;
+void () FlameTouch;
+void() flame_check;
+void() slime_flare;
+void() flamer_precache;
+
 // wolf
 
 void() wchg2_weapon_touch;
 
 // doom
 
+string DOOM_DET				= "doom/dsitembk.wav"; // against	self.noise4 
 void() doom_precache;
 
 float d_reps_base				= 57005000; // heh heh - DEAD+
 void() d_rep_set;
 float() mega_touch;
 void() d_weapon_touch;
+void() player_saw1;
+void() player_bfg1;
 
 // q2
 
+string Q2_DET					= "q2_snd/respawn1.wav"; // against	self.noise4 
+
 void() q2_precache;
 void() q2_weapon_shotgun;
+void() q2_item_health;
+void() X_FireHandGrenade;
+void() X_FireBlaster;
 
 // q3
+
+string Q3_DET					= "q3_snd/respawn1.wav"; // against	self.noise4 
 
 void() q3_precache;
 void() q3_suspend;
 void() q3_weapon_shotgun;
+void() q3_item_health;
+void(entity e, float v) q3_ha_rot;
 
 
 // so we can make new sv_ console vars
@@ -535,7 +599,7 @@ float VWX_PLASMA				= 32;
 float VWY_PLASMA				= 8;
 float VWZ_PLASMA				= 16;
 
-float VWX_LASER				= 28;
+float VWX_LASER				= 32;
 float VWY_LASER				= 8.5;
 float VWZ_LASER				= 16;
 
@@ -558,6 +622,12 @@ float VWZ_HARP_RETR			= 0;
 float VWX_RAILGUN				= 26;
 float VWY_RAILGUN				= 14;
 float VWZ_RAILGUN				= 15;
+
+// burner
+
+float VWX_FLAMER				= 22;
+float VWY_FLAMER				= 2;
+float VWZ_FLAMER				= 16;
 
 
 
@@ -686,6 +756,7 @@ void(entity client, string s, string s1, string s2, string s3, string s4, string
 .float pk_currentitem;
 float pk_attack;		// bit 1 = can make a pk attack on any map, bit 2 = pk_artifacts attack
 void() use_pkitem; // bots using pk items
+void(entity e, vector v1) item_eject;
 
 
 // Items used in impulse 1

@@ -365,6 +365,14 @@ void() pk_ammo_touch =
 		sk = FALSE;
 	}	
 
+	if (self.lip == AMMO_GAS)
+	{
+		if (other.ammo_gaspr >= Q1_SHELLAMMO_MAX)
+			return;
+		other.ammo_gaspr = other.ammo_gaspr + self.currentammo;
+		sk = FALSE;
+	}	
+
 	if (sk)
 	{
 // shotgun
@@ -762,6 +770,8 @@ void() pk_bound_ammo =
 		other.ammo_bullet = PK_BULLETAMMO_MAX;
 	if (other.ammo_slug > PK_SLUGAMMO_MAX)
 		other.ammo_slug = PK_SLUGAMMO_MAX;
+	if (other.ammo_gaspr > PK_GASAMMO_MAX)
+		other.ammo_gaspr = PK_GASAMMO_MAX;
 
 	if (other.pk_gravitywellammo > PK_GRAVITYWELLAMMO_MAX)
 		other.pk_gravitywellammo = PK_GRAVITYWELLAMMO_MAX;
@@ -790,27 +800,29 @@ void() pk_bound_ammo =
 
 // called from below - replacement for RankForWeapon - provides rank for some pk stuff
 
+/// Cataboligne - 7.10.10 - expanded range for xweap ranking system
+
 float(float w, float w2) PK_RankForWeapon =
 {
 	if (w == IT_AXE && w2 == PK_IT_CLIGHT)
-		return 1;
+		return 10;
 	if (w == IT_LIGHTNING)
-		return 2;
+		return 20;
 	if (w == IT_ROCKET_LAUNCHER)
-		return 3;
+		return 30;
 	if (w == IT_SUPER_NAILGUN)
-		return 4;
+		return 40;
 	if (w == IT_GRENADE_LAUNCHER)
-		return 5;
+		return 50;
 	if (w == IT_SUPER_SHOTGUN)
-		return 6;
+		return 60;
 	if (w == IT_NAILGUN)
-		return 7;
+		return 70;
 	if (w == IT_SHOTGUN)
-		return 8;
+		return 80;
 	if (w == IT_AXE && w2 == PK_IT_AIRGUN)
-		return 9;
-	return 10;
+		return 90;
+	return 100;
 };
 
 // replacement for Deathmatch_Weapon - handles high risk wep switch
@@ -888,6 +900,7 @@ void() BackpackTouch =
 // new ammo
 	other.ammo_bullet = other.ammo_bullet + self.ammo_bullet; // TDO: note below
 	other.ammo_slug = other.ammo_slug + self.ammo_slug;
+	other.ammo_gaspr = other.ammo_gaspr + self.ammo_gaspr;
 
 	other.pk_gravitywellammo = other.pk_gravitywellammo + self.pk_gravitywellammo;
 	other.pk_turretammo = other.pk_turretammo + self.pk_turretammo;
@@ -1060,7 +1073,7 @@ void() DropBackpack =
 
 	newmis = world;
 	if (!(self.ammo_shells + self.ammo_nails + self.ammo_rockets + self.ammo_cells + self.pk_explode_ammo))
-		return;	// nothing in it
+		return;	// nothing in it - FIX
 
 	newmis = spawn();
 	newmis.origin = self.origin - '0 0 24';
@@ -1109,12 +1122,17 @@ void() DropBackpack =
 	else if (newmis.items == IT_LIGHTNING)
 		newmis.netname = "Thunderbolt";
 	else
-		newmis.netname = "";
+		newmis.netname = "Pack of ammo";
 
 	newmis.ammo_shells = self.ammo_shells;
 	newmis.ammo_nails = self.ammo_nails;
 	newmis.ammo_rockets = self.ammo_rockets;
 	newmis.ammo_cells = self.ammo_cells;
+
+// new ammo
+	newmis.ammo_bullet = self.ammo_bullet;
+	newmis.ammo_slug = self.ammo_slug;
+	newmis.ammo_gaspr = self.ammo_gaspr;
 
 	newmis.pk_gravitywellammo = self.pk_gravitywellammo;
 	newmis.pk_turretammo = self.pk_turretammo;
@@ -1140,7 +1158,7 @@ void() DropBackpack =
 	setsize (newmis, '-16 -16 0', '16 16 56');
 	newmis.touch = BackpackTouch;
 
-	newmis.nextthink = time + 120;	// remove after 2 minutes
+	newmis.nextthink = time + 120;	// remove after 2 minutes - TDO: cvar + stdev
 	newmis.think = SUB_Remove;
 	AddToSplash(newmis); // *pk - splash tossed items
 
@@ -1364,3 +1382,4 @@ void() dtf_handle =
 		v1 = stdv_rndloc(e.origin + ' 0 0 8', 50, 100);
 	setorigin(self, v1);
 };
+

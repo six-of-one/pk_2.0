@@ -24,6 +24,8 @@ frikbot/bot_phys.qc
 frikbot/bot_move.qc
 frikbot/bot_ed.qc
 
+precache.qc
+
 // chaos code
 chaos.qc
 
@@ -87,7 +89,14 @@ xwep/dooments.qc
 
 xwep/railgun.qc
 xwep/lasers.qc
+xwep/flamer.qc
 xwep/x_firecode.qc
+
+// support for q2 converted maps
+xwep/q2ents.qc
+// support for q3 maps in darkplaces
+xwep/q3ents.qc
+xwep/chaosents.qc
 
 // painkeep code
 pk_src/2dtrain.qc
@@ -127,10 +136,6 @@ pk_src/actor.qc
 pk_src/phone.qc
 pk_src/pk_artifacts.qc
 
-// support for q2 converted maps
-xwep/q2ents.qc
-// support for q3 maps in darkplaces
-xwep/q3ents.qc
 
 
 bot.qc

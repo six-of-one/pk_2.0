@@ -9,266 +9,25 @@ Cataboligne 3.29.8
 
 // precache all PK items here - relocated from world.qc
 
-void() PK_precache =
+void() PK_init =
 {
-// old ambient sounds for pk_mode not set to PK
-
-	precache_sound ("alt_ambience/windfly.wav");
-	precache_sound ("alt_ambience/hum1.wav");
-	precache_sound ("alt_sounds/items/r_item2.wav");
-	precache_sound ("alt_sounds/misc/secret.wav");
-
-// New teleport sounds
-	precache_sound ("misc/teleport/tele_1.wav");
-	precache_sound ("misc/teleport/tele_2.wav");
-	precache_sound ("misc/teleport/tele_3.wav");
-	precache_sound ("misc/teleport/tele_4.wav");
-	precache_sound ("misc/teleport/tele_1a.wav");
-	precache_sound ("misc/teleport/tele_2a.wav");
-	precache_sound ("misc/teleport/tele_3a.wav");
-	precache_sound ("misc/teleport/tele_4a.wav");
-
-// SPLASH
-	precache_model ("progs/s_splash.spr");
-	precache_model ("progs/s_splava.spr");
-
-
-// extra gibs ...
-	precache_model ("progs/g_arm.mdl");
-	precache_model ("progs/g_boot.mdl");
-	precache_model ("progs/g_eye.mdl");
-	precache_model ("progs/g_fore.mdl");
-	precache_model ("progs/g_leg.mdl");
-
-// Gib1 alternative
-	precache_model ("progs/qtgib1.mdl");
-
-// Gib2 alternatives
-	precache_model ("progs/qtgib2.mdl");
-
-// h_player alternative
-	precache_model ("progs/qtgib3.mdl");
-
-// Painkeep item pickup sound
-	precache_sound("misc/pickup/tone2.wav");
-
-// view models
-	precache_model ("progs/v_bear.mdl");
-	precache_model ("progs/v_turret.mdl");
-	precache_model ("progs/v_harp.mdl");
-	precache_model ("progs/v_cube.mdl");
-	precache_model ("progs/v_beans.mdl");
-
-// files used in the AirFist.
-	precache_model ("progs/v_airgun.mdl");	// Player view of airgun
-	precache_model ("progs/s_ablast.spr");	// Air Gun Fire sprite
-
-// weapon precache
-
-
-	// TURRET_START
-	precache_model ("progs/nail.mdl");
-	precache_model ("progs/turgib1.mdl");
-	precache_model ("progs/turgib2.mdl");
-	precache_model ("progs/turgib3.mdl");
-	precache_model ("progs/turstand.mdl");
-	precache_model ("progs/turtop.mdl");
-	precache_model ("progs/turtop2.mdl");
-	precache_sound ("weapons/sentry/turrt_3.wav");
-	precache_sound ("weapons/sentry/turcl_2b.wav");
-		// new modes
-	precache_model ("progs/laser.mdl");
-	precache_sound ("enforcer/enfire.wav");
-	precache_sound ("enforcer/enfstop.wav");
-
-	// GRAVITY Moved to here so the cheat command would work correctly
-	precache_model ("progs/cubsmall.mdl");
-	precache_model ("progs/cube.mdl");
-	precache_model ("progs/cubel.mdl");
-	precache_sound ("misc/grav/grav_new.wav");
-	precache_sound ("items/protect.wav");
-
-	// AIRG_MAIN_START
-	// prechache the AirFist fire sounds.
-	precache_sound ("weapons/airfist/agfire.wav");		// Air gunfire
-	precache_sound ("weapons/airfist/agfail.wav");		// Air gunfailed fire
-	precache_sound ("weapons/airfist/agwater.wav");	 // Air gun	under water shot
-	precache_sound ("weapons/airfist/agwfail.wav");	 // Air gun fail water shot
-
-	// GRAPPLING_START
-	precache_sound ("weapons/grapple/graph_2b.wav");	// Hit solid
-	precache_sound ("weapons/grapple/grapf_1.wav");	 // Hit fresh
-	precache_sound ("weapons/grapple/grapl_2.wav");	 // Launch
-	precache_sound ("weapons/grapple/grapr_2.wav");	 // Rope going out
-	precache_sound ("weapons/grapple/graps_2.wav");	 // Rope coming back
-	precache_model ("progs/harpoon.mdl");
-	precache_model ("progs/harprope.mdl");
-	precache_model ("progs/harpcoil.mdl");
-	precache_model ("progs/g_harp.mdl");
-	precache_model ("progs/v_harp.mdl");
-	precache_sound ("misc/null.wav");
-
-	// BOLT_START
-	precache_model ("progs/v_cl_off.mdl");
-	precache_model ("progs/v_cl_on.mdl");
-	precache_sound ("weapons/clight/clight_1.wav");
-	precache_model ("progs/fryguy.mdl");
-
-	precache_model ("progs/v_fnail.mdl");
-
-	// COPB_START
-	precache_sound ("weapons/copb/copb_1.wav");	// Fart sounds...
-	precache_sound ("weapons/copb/copb_2.wav");
-	precache_sound ("weapons/copb/copb_3.wav");
-	precache_sound ("weapons/copb/copb_4.wav");
-	precache_sound ("weapons/copb/copb_5.wav");
-
-// PULSE_GUN_START
-	precache_model ("progs/g_fnail.mdl");
-	precache_model ("progs/pnail.mdl");
-	precache_model ("progs/v_fnail.mdl");
-	precache_sound ("weapons/pulse/pulse_1.wav");
-	precache_sound ("weapons/pulse/ric_1.wav");
-	precache_sound ("weapons/pulse/ric_2.wav");
-	precache_sound ("weapons/pulse/ric_3.wav");
-
-	// BEARTRAP
-	precache_sound ("weapons/btrap/btrap_1.wav");
-	precache_sound ("weapons/btrap/bdrop_1.wav");
-	precache_sound ("weapons/btrap/btrap_3.wav");
-	precache_model ("progs/beartrap.mdl");
-	precache_model ("progs/bearbld.mdl");
-	precache_model ("progs/beargib1.mdl");
-	precache_model ("progs/beargib2.mdl");
-	precache_model ("progs/beargib3.mdl");
-	precache_model ("progs/beargib4.mdl");
-
-// EXPLODESHELLS_START
-	precache_model ("progs/v_eshot.mdl");
-	precache_model ("progs/v_eshot2.mdl");
-	precache_sound ("weapons/explode/expfire1.wav");
-	precache_sound ("weapons/explode/expfire2.wav");
-	precache_model ("progs/x_explo1.spr");
-	precache_model ("progs/x_explo2.spr");
-
-// for the Hub map pop respawn
-	precache_sound ("items/protect.wav");
-	precache_sound ("items/protect2.wav");
-	precache_sound ("items/protect3.wav");
-
-// extra player sounds
-	precache_sound ("player/gib_1.wav");
-	precache_sound ("player/gib_2.wav");
-	precache_sound ("player/gib_3.wav");
-
-// admin
-	precache_model ("progs/s_light.spr");	// light up admin
-	precache_model ("progs/hub_port.mdl"); // custom hub levels
-	precache_model ("progs/shambler.mdl"); // custom hub levels
-
-	precache_model ("progs/null.mdl"); // Cataboligne 8.8.9 purify - chase cam
-
-// relocated (pkitems.qc) for dynamic items
-	precache_model ("progs/tpower.mdl");
-	precache_model ("progs/beans.mdl");
-	precache_model ("progs/bearpick.mdl");
-	precache_model ("maps/b_eshel0.bsp");
-	precache_model ("progs/g_airgun2.mdl");
-	precache_model ("progs/g_clight.mdl");
-	precache_model ("progs/g_harp.mdl");
-
-// relocated (pkpitems.qc) for dynamic items
-	precache_model ("progs/ego.mdl");
-	precache_model ("progs/tomb.mdl");
-	precache_model ("progs/actor.mdl");
-	precache_model ("progs/phone.mdl");
-
-// relocated (items.qc) for dynamic items
-// heal
-	precache_model ("maps/b_bh10.bsp");
-	precache_sound ("items/r_item1.wav");
-	precache_model ("maps/b_bh100.bsp");
-	precache_sound ("items/r_item2.wav");
-	precache_model ("maps/b_bh25.bsp");
-	precache_sound ("items/health1.wav");
-	precache_model ("maps/b_explob.bsp");
-	precache_model ("maps/b_exbox2.bsp");
-	precache_sound ("weapons/r_exp3.wav");
-// armor
-	precache_model ("progs/armor.mdl");
-// weps
-	precache_model ("progs/g_shot.mdl");
-	precache_model ("progs/g_nail.mdl");
-	precache_model ("progs/g_nail2.mdl");
-	precache_model ("progs/g_rock.mdl");
-	precache_model ("progs/g_rock2.mdl");
-	precache_model ("progs/g_light.mdl");
-// ammo
-	precache_model ("maps/b_shell1.bsp");
-	precache_model ("maps/b_shell0.bsp");
-	precache_model ("maps/b_nail1.bsp");
-	precache_model ("maps/b_nail0.bsp");
-	precache_model ("maps/b_rock1.bsp");
-	precache_model ("maps/b_rock0.bsp");
-	precache_model ("maps/b_batt1.bsp");
-	precache_model ("maps/b_batt0.bsp");
-// keys
-	precache_sound ("misc/medkey.wav");
-	precache_sound ("misc/runekey.wav");
-	precache_sound ("misc/basekey.wav");
-	precache_model ("progs/w_s_key.mdl");
-	precache_model ("progs/m_s_key.mdl");
-	precache_model ("progs/b_s_key.mdl");
-	precache_model ("progs/w_g_key.mdl");
-	precache_model ("progs/m_g_key.mdl");
-	precache_model ("progs/b_g_key.mdl");
-// sigil
-	precache_sound ("misc/runekey.wav");
-	precache_model ("progs/end1.mdl");
-	precache_model ("progs/end2.mdl");
-	precache_model ("progs/end3.mdl");
-	precache_model ("progs/end4.mdl");
-	precache_sound ("boss1/sight1.wav");
-// artifacts
-	precache_model ("progs/invulner.mdl");
-	precache_sound ("items/protect.wav");
-	precache_sound ("items/protect2.wav");
-	precache_sound ("items/protect3.wav");
-	precache_model ("progs/suit.mdl");
-	precache_sound ("items/suit.wav");
-	precache_sound ("items/suit2.wav");
-	precache_model ("progs/invisibl.mdl");
-	precache_sound ("items/inv1.wav");
-	precache_sound ("items/inv2.wav");
-	precache_sound ("items/inv3.wav");
-	precache_model ("progs/quaddama.mdl");
-	precache_sound ("items/damage.wav");
-	precache_sound ("items/damage2.wav");
-	precache_sound ("items/damage3.wav");
-
-// visible weapon support - bit masks for inventory
-
-	precache_model ("progs/v2_shot.mdl");
-	precache_model ("progs/v2_shot2.mdl");
-	precache_model ("progs/v2_nail.mdl");
-	precache_model ("progs/v2_nail2.mdl");
-	precache_model ("progs/v2_rock.mdl");
-	precache_model ("progs/v2_rock2.mdl");
-	precache_model ("progs/v2_pulsenail.mdl");
-	precache_model ("progs/v2_harp.mdl");
-
-// chaos
-	precache_model ("progs/laser_m.mdl");
-
-	doom_precache();
-	q2_precache();
-	q3_precache();
-
-	viswep_pre();
 
 	chaos = cvar("chaos"); // glquake mod engine
 	DARKPLACES = cvar("pr_checkextension"); // check for dp engine
 	
+	pk_precache();
+
+	if (!DARKPLACES) // may not use all this - dp auto precaches
+	{
+	doom_precache();
+	q1_precache();
+	q2_precache();
+	q3_precache();
+	chaos_precache();
+	}
+
+	viswep_pre();
+
 	qweps = IT_AXE | IT_SHOTGUN | IT_SUPER_SHOTGUN | IT_NAILGUN | IT_SUPER_NAILGUN | IT_GRENADE_LAUNCHER | IT_ROCKET_LAUNCHER | IT_LIGHTNING;
 	pkweps = PK_IT_AXE | PK_IT_GRAPGUN | PK_IT_AIRGUN | PK_IT_CLIGHT	| PK_IT_GRAVITYWELL | PK_IT_TURRET | PK_IT_BEARTRAP | PK_IT_CANPAB
 							 | PKPLUS_IT_EGO | PKPLUS_IT_TOMB | PKPLUS_IT_ACTOR | PKPLUS_IT_PHONE; // pk plus weps
@@ -478,106 +237,103 @@ string (string s) precache_model =
 
 float(string mp) PK_mapmode =
 {
-//	local float md;
-//	md = FALSE;
-
 	if (mp == "maps/start.bsp" && world.message == "hub") return(TRUE); // NOTE: relies on loaded map
-	else if (mp == "maps/pk0.bsp") return(TRUE);
-	else if (mp == "maps/pk1.bsp") return(TRUE);
-	else if (mp == "maps/pk2.bsp") return(TRUE);
-	else if (mp == "maps/pk3.bsp") return(TRUE);
-	else if (mp == "maps/pk4.bsp") return(TRUE);
-	else if (mp == "maps/pk5.bsp") return(TRUE);
-	else if (mp == "maps/pk6.bsp") return(TRUE);
-	else if (mp == "maps/pk7.bsp") return(TRUE);
-	else if (mp == "maps/pk8.bsp") return(TRUE);
-	else if (mp == "maps/pk9.bsp") return(TRUE);
-	else if (mp == "maps/pk10.bsp") return(TRUE);
-	else if (mp == "maps/pk11.bsp") return(TRUE);
-	else if (mp == "maps/pk12.bsp") return(TRUE);
-	else if (mp == "maps/pk13.bsp") return(TRUE);
-	else if (mp == "maps/pk14.bsp") return(TRUE);
-	else if (mp == "maps/pk15.bsp") return(TRUE);
-	else if (mp == "maps/pk16.bsp") return(TRUE);
-	else if (mp == "maps/pk17.bsp") return(TRUE);
-	else if (mp == "maps/pk18.bsp") return(TRUE);
-	else if (mp == "maps/painkeep.bsp") return(TRUE);
-	else if (PK_ADHUB)	// add on maps from painkeep updates
+	if (mp == "maps/pk0.bsp") return(TRUE);
+	if (mp == "maps/pk1.bsp") return(TRUE);
+	if (mp == "maps/pk2.bsp") return(TRUE);
+	if (mp == "maps/pk3.bsp") return(TRUE);
+	if (mp == "maps/pk4.bsp") return(TRUE);
+	if (mp == "maps/pk5.bsp") return(TRUE);
+	if (mp == "maps/pk6.bsp") return(TRUE);
+	if (mp == "maps/pk7.bsp") return(TRUE);
+	if (mp == "maps/pk8.bsp") return(TRUE);
+	if (mp == "maps/pk9.bsp") return(TRUE);
+	if (mp == "maps/pk10.bsp") return(TRUE);
+	if (mp == "maps/pk11.bsp") return(TRUE);
+	if (mp == "maps/pk12.bsp") return(TRUE);
+	if (mp == "maps/pk13.bsp") return(TRUE);
+	if (mp == "maps/pk14.bsp") return(TRUE);
+	if (mp == "maps/pk15.bsp") return(TRUE);
+	if (mp == "maps/pk16.bsp") return(TRUE);
+	if (mp == "maps/pk17.bsp") return(TRUE);
+	if (mp == "maps/pk18.bsp") return(TRUE);
+	if (mp == "maps/painkeep.bsp") return(TRUE);
+	if (PK_ADHUB)	// add on maps from painkeep updates
 	{
 		if (mp == "maps/hub2.bsp") return(TRUE);
-		else if (mp == "maps/hub3.bsp") return(TRUE); // renamed for 1.2 code to work with main hub (start.bsp)
+		if (mp == "maps/hub3.bsp") return(TRUE); // renamed for 1.2 code to work with main hub (start.bsp)
 
-		else if (mp == "maps/pkn1.bsp") return(TRUE);
-		else if (mp == "maps/pkn2.bsp") return(TRUE);
-		else if (mp == "maps/pkn3.bsp") return(TRUE);
-		else if (mp == "maps/pkn4.bsp") return(TRUE);
-		else if (mp == "maps/pkn5.bsp") return(TRUE);
-		else if (mp == "maps/pkn6.bsp") return(TRUE);
-		else if (mp == "maps/pkn7.bsp") return(TRUE);
-		else if (mp == "maps/pkn8.bsp") return(TRUE);
-		else if (mp == "maps/pkn9.bsp") return(TRUE);
-		else if (mp == "maps/pkn10.bsp") return(TRUE);
-		else if (mp == "maps/pkn11.bsp") return(TRUE);
-		else if (mp == "maps/pkn12.bsp") return(TRUE);
-		else if (mp == "maps/pkn13.bsp") return(TRUE);
-		else if (mp == "maps/pkn14.bsp") return(TRUE);
-		else if (mp == "maps/pkn15.bsp") return(TRUE);
-		else if (mp == "maps/pkn16.bsp") return(TRUE);
-		else if (mp == "maps/pkn17.bsp") return(TRUE);
-		else if (mp == "maps/pkn18.bsp") return(TRUE);
-		else if (mp == "maps/pkn19.bsp") return(TRUE);
-		else if (mp == "maps/pkn20.bsp") return(TRUE);
-		else if (mp == "maps/pkts00.bsp") return(TRUE);
-		else if (mp == "maps/pkts01.bsp") return(TRUE);
-		else if (mp == "maps/pkts02.bsp") return(TRUE);
-		else if (mp == "maps/pkts03.bsp") return(TRUE);
-		else if (mp == "maps/pkts04.bsp") return(TRUE);
-		else if (mp == "maps/pkts05.bsp") return(TRUE);
-		else if (mp == "maps/pkts06.bsp") return(TRUE);
-		else if (mp == "maps/pkts07.bsp") return(TRUE);
-		else if (mp == "maps/pkts08.bsp") return(TRUE);
-		else if (mp == "maps/pkts09.bsp") return(TRUE);
-		else if (mp == "maps/pkts10.bsp") return(TRUE);
-		else if (mp == "maps/pkts11.bsp") return(TRUE);
-		else if (mp == "maps/pkts12.bsp") return(TRUE);
-		else if (mp == "maps/pkts13.bsp") return(TRUE);
-		else if (mp == "maps/pkts14.bsp") return(TRUE);
-		else if (mp == "maps/painkeep2.bsp") return(TRUE);
+		if (mp == "maps/pkn1.bsp") return(TRUE);
+		if (mp == "maps/pkn2.bsp") return(TRUE);
+		if (mp == "maps/pkn3.bsp") return(TRUE);
+		if (mp == "maps/pkn4.bsp") return(TRUE);
+		if (mp == "maps/pkn5.bsp") return(TRUE);
+		if (mp == "maps/pkn6.bsp") return(TRUE);
+		if (mp == "maps/pkn7.bsp") return(TRUE);
+		if (mp == "maps/pkn8.bsp") return(TRUE);
+		if (mp == "maps/pkn9.bsp") return(TRUE);
+		if (mp == "maps/pkn10.bsp") return(TRUE);
+		if (mp == "maps/pkn11.bsp") return(TRUE);
+		if (mp == "maps/pkn12.bsp") return(TRUE);
+		if (mp == "maps/pkn13.bsp") return(TRUE);
+		if (mp == "maps/pkn14.bsp") return(TRUE);
+		if (mp == "maps/pkn15.bsp") return(TRUE);
+		if (mp == "maps/pkn16.bsp") return(TRUE);
+		if (mp == "maps/pkn17.bsp") return(TRUE);
+		if (mp == "maps/pkn18.bsp") return(TRUE);
+		if (mp == "maps/pkn19.bsp") return(TRUE);
+		if (mp == "maps/pkn20.bsp") return(TRUE);
+		if (mp == "maps/pkts00.bsp") return(TRUE);
+		if (mp == "maps/pkts01.bsp") return(TRUE);
+		if (mp == "maps/pkts02.bsp") return(TRUE);
+		if (mp == "maps/pkts03.bsp") return(TRUE);
+		if (mp == "maps/pkts04.bsp") return(TRUE);
+		if (mp == "maps/pkts05.bsp") return(TRUE);
+		if (mp == "maps/pkts06.bsp") return(TRUE);
+		if (mp == "maps/pkts07.bsp") return(TRUE);
+		if (mp == "maps/pkts08.bsp") return(TRUE);
+		if (mp == "maps/pkts09.bsp") return(TRUE);
+		if (mp == "maps/pkts10.bsp") return(TRUE);
+		if (mp == "maps/pkts11.bsp") return(TRUE);
+		if (mp == "maps/pkts12.bsp") return(TRUE);
+		if (mp == "maps/pkts13.bsp") return(TRUE);
+		if (mp == "maps/pkts14.bsp") return(TRUE);
+		if (mp == "maps/painkeep2.bsp") return(TRUE);
 
-		else if (mp == "maps/air2.bsp") return(TRUE);
-		else if (mp == "maps/air3.bsp") return(TRUE);
-		else if (mp == "maps/anomie.bsp") return(TRUE);
-		else if (mp == "maps/arena.bsp") return(TRUE);
-		else if (mp == "maps/bastion.bsp") return(TRUE);
-		else if (mp == "maps/blood2.bsp") return(TRUE);
-		else if (mp == "maps/blood3.bsp") return(TRUE);
-		else if (mp == "maps/campers-cove.bsp") return(TRUE);
-		else if (mp == "maps/castle2.bsp") return(TRUE);
-		else if (mp == "maps/chv_hub.bsp") return(TRUE);
-		else if (mp == "maps/city.bsp") return(TRUE);
-		else if (mp == "maps/court.bsp") return(TRUE);
-		else if (mp == "maps/crater.bsp") return(TRUE);
-		else if (mp == "maps/crater2.bsp") return(TRUE);
-		else if (mp == "maps/doom1_e1.bsp") return(TRUE);
-		else if (mp == "maps/egyptra.bsp") return(TRUE);
-		else if (mp == "maps/egyptra2.bsp") return(TRUE);
-		else if (mp == "maps/egyptra3.bsp") return(TRUE);
-		else if (mp == "maps/factory.bsp") return(TRUE);
-		else if (mp == "maps/factory2.bsp") return(TRUE);
-		else if (mp == "maps/factory3.bsp") return(TRUE);
-		else if (mp == "maps/fragtown.bsp") return(TRUE);
-		else if (mp == "maps/garden.bsp") return(TRUE);
-		else if (mp == "maps/giza2.bsp") return(TRUE);
-		else if (mp == "maps/haunted.bsp") return(TRUE);
-		else if (mp == "maps/platinum.bsp") return(TRUE);
-		else if (mp == "maps/platinum2.bsp") return(TRUE);
-		else if (mp == "maps/platinum3.bsp") return(TRUE);
-		else if (mp == "maps/q1edgepk.bsp") return(TRUE);
-		else if (mp == "maps/spine2.bsp") return(TRUE);
-		else if (mp == "maps/summerpk.bsp") return(TRUE);
-		else if (mp == "maps/toxic.bsp") return(TRUE);
-		else if (mp == "maps/toxic2.bsp") return(TRUE);
-		else if (mp == "maps/well.bsp") return(TRUE);
+		if (mp == "maps/air2.bsp") return(TRUE);
+		if (mp == "maps/air3.bsp") return(TRUE);
+		if (mp == "maps/anomie.bsp") return(TRUE);
+		if (mp == "maps/arena.bsp") return(TRUE);
+		if (mp == "maps/bastion.bsp") return(TRUE);
+		if (mp == "maps/blood2.bsp") return(TRUE);
+		if (mp == "maps/blood3.bsp") return(TRUE);
+		if (mp == "maps/campers-cove.bsp") return(TRUE);
+		if (mp == "maps/castle2.bsp") return(TRUE);
+		if (mp == "maps/chv_hub.bsp") return(TRUE);
+		if (mp == "maps/city.bsp") return(TRUE);
+		if (mp == "maps/court.bsp") return(TRUE);
+		if (mp == "maps/crater.bsp") return(TRUE);
+		if (mp == "maps/crater2.bsp") return(TRUE);
+		if (mp == "maps/doom1_e1.bsp") return(TRUE);
+		if (mp == "maps/egyptra.bsp") return(TRUE);
+		if (mp == "maps/egyptra2.bsp") return(TRUE);
+		if (mp == "maps/egyptra3.bsp") return(TRUE);
+		if (mp == "maps/factory.bsp") return(TRUE);
+		if (mp == "maps/factory2.bsp") return(TRUE);
+		if (mp == "maps/factory3.bsp") return(TRUE);
+		if (mp == "maps/fragtown.bsp") return(TRUE);
+		if (mp == "maps/garden.bsp") return(TRUE);
+		if (mp == "maps/giza2.bsp") return(TRUE);
+		if (mp == "maps/haunted.bsp") return(TRUE);
+		if (mp == "maps/platinum.bsp") return(TRUE);
+		if (mp == "maps/platinum2.bsp") return(TRUE);
+		if (mp == "maps/platinum3.bsp") return(TRUE);
+		if (mp == "maps/q1edgepk.bsp") return(TRUE);
+		if (mp == "maps/spine2.bsp") return(TRUE);
+		if (mp == "maps/summerpk.bsp") return(TRUE);
+		if (mp == "maps/toxic.bsp") return(TRUE);
+		if (mp == "maps/toxic2.bsp") return(TRUE);
+		if (mp == "maps/well.bsp") return(TRUE);
 	}
 	return(FALSE);
 };
@@ -727,6 +483,7 @@ float st_pk_hub;
 float st_pk_duty;
 
 // fn(pk_bas_flags) - set basic pk flags, handles cvar update, admin cfg
+//			reworked from old code to include cvar controls with bit flags and handle changes to both
 
 // bt - bit
 // st - state, 1 or 0
@@ -767,6 +524,8 @@ void(float bt, float st) pk_bas_flags =
 	admin_sv_cfg();
 };
 
+// fn(pk_liveupd) - detect live changes to config cvars by server admin - call up code to effect in game
+/// genius code
 
 void() pk_liveupd =
 {
@@ -974,7 +733,6 @@ void() pk_liveupd =
 
 	if (cvar("pk_mapcode")) // print list of map codes available to console
 	{
-		cvar_set("pk_mapcode", "0");
 		local string cl;
 		f = 1;
 		while (f < 1024)
@@ -993,9 +751,12 @@ void() pk_liveupd =
 				bprint("  -  (bv: ");
 				bprint(ftos(bit_mcode(f, world)));
 				bprint(")\n");
+				if (cvar("pk_mapcode") == 2) bprint("\n");			// extra visibility - harder to read on game screen, but great for bash console view
+				else if (cvar("pk_mapcode") == 4) bprint("-----------------------------------------------------------------------------\n"); 
 			}
 			f = f + 1;
 		}
+		cvar_set("pk_mapcode", "0");
 	}
 
 	if (cvar("pk_make")) // create item at random location if map code valid
@@ -1014,6 +775,8 @@ void() pk_monitor =
 {
 	pk_liveupd();
 
+// place item controls - wait for PIC_TO to do this
+// 		not done in live update because we dont want it to fire off right after a map load when things are settling down
 	if (!Q_100)
 	if (pic_tsk != cvar("pk_place_item"))
 	if (!pic_tsk)
@@ -1028,6 +791,7 @@ void() pk_srvcmd_load =
 
 	local entity e;
 
+// start the server monitor and loop cycle process after place item control time out (currently 5 secs)
 	e = spawn();
 	e.think = start_loopcyc;
 	e.nextthink = time + PIC_TO + random() * 3;
@@ -1054,15 +818,21 @@ void() pk_srvcmd_load =
 	Q_99 = cvar("sv_q99");
 	Q_100 = cvar("sv_q100");
 	
-	pk_liveupd(); // load live now
+	pk_liveupd(); // load live now, set all cfg changed vars
 };
 
 void() pk_srvcmd_set =
 {
+// set mcodes - this means they can change and things like func_make that have fixed map codes might go wrong if the code changes in the future - DOH!
+	mcode_load();
+
 // server controls, default on for full feature set
 	pk_mapcmd = 1;
 	pk_mapcfg = 1;
 	pk_srvcfg = 1;
+
+/// this section assigns vars to default values - they will rule any engine not dp registercvar able or not customized as the glquake build we release
+//				- it would be trivial to take the custom cvar section from the glquake build and add to _any_ engine...
 
 // pk control
 	PK_100 = FALSE; // if true run 100% true to pk v1.11 - i n theory, dev purposes only
@@ -1141,6 +911,7 @@ void() pk_srvcmd_set =
 
 	PK_BULLETAMMO_MAX				= 200; // TDO: cvar
 	PK_SLUGAMMO_MAX					= 50; // TDO: cvar
+	PK_GASAMMO_MAX						= 400; // TDO: cvar
 	
 // item ammo levels
 	PK_GRAVITYWELLAMMO_MAX	= 1;
@@ -1159,6 +930,8 @@ void() pk_srvcmd_set =
 
 // weps
 
+	GRENADE_VEL = 600;
+	HGREN_VEL = 200;
 	PLASMA_VEL = 600;
 	LASERCAN_VEL = 1000;
 	LASER_VEL = 600;
@@ -1168,7 +941,8 @@ void() pk_srvcmd_set =
 // pk artifacts
 	PK_ART = TRUE; // Cataboligne - 8.12.9 - pk artifacts support
 
-// sscode
+// sscode - so map codes can be entity stored and find(...) string searchable
+//			- nifty frikqcc compiler trick here - dont think this works with regular QC compilers
 
 	sid_code = 
 						"100":"101":"102":"103":"104":"105":"106":"107":"108":"109":"110":"111":"112":"113":"114":"115":"116":"117":"118":"119":
@@ -1217,10 +991,12 @@ void() pk_srvcmd_set =
 						"960":"961":"962":"963":"964":"965":"966":"967":"968":"969":"970":"971":"972":"973":"974":"975":"976":"977":"978":"979":
 						"980":"981":"982":"983":"984":"985":"986":"987":"988":"989":"990":"991":"992":"993":"994":"995":"996":"997":"998":"999";
 
+// not an enabled / wise engine - we must return now, no live server controls are possible and we are running on defaults
+
 	if (!DARKPLACES && !chaos) return;
 
 // new server controls
-// NOTE: chaos eng mod will have to make all these
+// NOTE: chaos eng mod contains all these
 
 	if (DARKPLACES) // reg under darkplaces - chaos engine has pre-reg
 	{
@@ -1341,6 +1117,7 @@ void() pk_srvcmd_set =
 // remove / replace
 /// 0 loop id set - ids 1 - 6 all 0, remove these items - 1+ set, change 0 to 1 and loop from there - 0 id never loaded again
 /// 0 loop id set to -666 - remove all items id'ed
+/// 0 loop id set to -{map code} - xfrm all items id'ed into map code
 // plain loop
 /// 0 not set, 1 set - 2 - 6 not set, exit / remove - 2+ set, loop starting with id 1
 
@@ -1481,7 +1258,7 @@ void() pk_srvcmd_set =
 		pk_mapcmd = cvar("sv_c_mapcmd");
 		pk_mapcfg = cvar("sv_c_mapcfg");
 		pk_srvcfg = cvar("sv_c_srvcfg");
-		ADMINLOCK = cvar("sv_c_adminlock");
+		ADMINLOCK = cvar("sv_c_adminlock"); // so server admin can lock out remote admins in case of abuse - local console commands will still work
 
 // NOTE: chaos eng doesnt need to store defaults this way - they will save in config.cfg
 

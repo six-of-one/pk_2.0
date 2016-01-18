@@ -96,8 +96,8 @@ void(string cls) item_call =
 			remove(self.enemy);
 
 // restore boom boxes by regen
-		if (cls == "misc_explobox" || cls == "misc_explobox2")
-		if (self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD2)
+		if (cls == "misc_explobox" || cls == "misc_explobox2" || cls == "d_barrel" || cls == "q2_misc_explobox")
+		if (self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD2 || self.scode == MC_D_BARREL || self.scode == MC_Q2_BARREL)
 		{
 			self.mcode = self.scode;
 			self.think = barrel_regen;
@@ -107,11 +107,11 @@ void(string cls) item_call =
 
 // to turn a boom box into something or something into a boom box, we need a fake item, hiding the real item with no model | touch
 		if (self.scode)
-		if (cls == "misc_explobox" || cls == "misc_explobox2")
-		if (self.scode != MC_EXPLOD1 && self.scode != MC_EXPLOD2) f = spawn();
+		if (cls == "misc_explobox" || cls == "misc_explobox2" || cls == "d_barrel" || cls == "q2_misc_explobox")
+		if (self.scode != MC_EXPLOD1 && self.scode != MC_EXPLOD2 && self.scode != MC_D_BARREL && self.scode != MC_Q2_BARREL) f = spawn();
 
-		if (cls != "misc_explobox" && cls != "misc_explobox2")
-		if (self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD2) f = spawn();
+		if (cls != "misc_explobox" && cls != "misc_explobox2" && cls != "d_barrel" && cls != "q2_misc_explobox")
+		if (self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD2 || self.scode == MC_D_BARREL || self.scode == MC_Q2_BARREL) f = spawn();
 
 		if (f)
 		{
@@ -160,18 +160,22 @@ void(string cls) item_call =
 	else if (cls == "item_armor1") item_armor1();
 	else if (cls == "item_armor2") item_armor2();
 	else if (cls == "item_armorInv") item_armorInv();
-	else if (cls == "item_health_15") { self.spawnflags = H_ROTTEN; item_health(); scls = "item_health";}
-	else if (cls == "item_health") item_health();
-	else if (cls == "item_health_mega") { self.spawnflags = H_MEGA; item_health(); scls = "item_health"; }
+	else if (cls == "item_health_15") { self.spawnflags = H_ROTTEN; q100_item_health(); scls = "item_health";}
+	else if (cls == "item_health") q100_item_health();
+	else if (cls == "item_health_mega") { self.spawnflags = H_MEGA; q100_item_health(); scls = "item_health"; }
 
 	else if (cls == "item_key1") item_key1();
 	else if (cls == "item_key2") item_key2();
-	else if (cls == "item_key1_0") item_keyX(10); // key num * 10 + wolrd num
-	else if (cls == "item_key1_1") item_keyX(11);
-	else if (cls == "item_key1_2") item_keyX(12);
-	else if (cls == "item_key2_0") item_keyX(20);
-	else if (cls == "item_key2_1") item_keyX(21);
-	else if (cls == "item_key2_2") item_keyX(22);
+// keys special
+	else if (cls == "item_key1_0") {self.cnt = 0; item_keyX(10);} // key num * 10 + wolrd num
+	else if (cls == "item_key1_1") {self.cnt = 0; item_keyX(11);}
+	else if (cls == "item_key1_2") {self.cnt = 0; item_keyX(12);}
+	else if (cls == "item_key2_0") {self.cnt = 0; item_keyX(20);}
+	else if (cls == "item_key2_1") {self.cnt = 0; item_keyX(21);}
+	else if (cls == "item_key2_2") {self.cnt = 0; item_keyX(22);}
+// random pack
+	else if (cls == "fn_backpack") fn_backpack();
+
 	else if (cls == "misc_explobox")
 	{
 		misc_explobox();
@@ -264,9 +268,107 @@ void(string cls) item_call =
 	else if (cls == "w_weapon_flamer") w_weapon_flamer();
 
 	else if (cls == "w_ammo_clip") w_ammo_clip();
+	else if (cls == "w_art_facesphere") w_art_facesphere();
 	else if (cls == "w_key_g") w_key_g();
 	else if (cls == "w_key_b") w_key_b();
 	else if (cls == "w_barrel") w_barrel();
+
+// q2
+	else if (cls == "q2_weapon_blaster") q2_weapon_blaster();
+	else if (cls == "q2_weapon_shotgun") q2_weapon_shotgun();
+	else if (cls == "q2_weapon_supershotgun") q2_weapon_supershotgun();
+	else if (cls == "q2_weapon_machinegun") q2_weapon_machinegun();
+	else if (cls == "weapon_chaingun") weapon_chaingun();
+	else if (cls == "q2_weapon_grenadelauncher") q2_weapon_grenadelauncher();
+	else if (cls == "q2_weapon_rocketlauncher") q2_weapon_rocketlauncher();
+	else if (cls == "weapon_hyperblaster") weapon_hyperblaster();
+	else if (cls == "q2_weapon_railgun") q2_weapon_railgun();
+	else if (cls == "q2_weapon_bfg") q2_weapon_bfg();
+
+	else if (cls == "q2_item_quad") q2_item_quad();
+	else if (cls == "item_invulnerability") item_invulnerability();
+	else if (cls == "q2_item_enviro") q2_item_enviro();
+	else if (cls == "item_silencer") item_silencer();
+
+	else if (cls == "q2_item_armor_shard") q2_item_armor_shard();
+	else if (cls == "item_armor_jacket") item_armor_jacket();
+	else if (cls == "q2_item_armor_combat") q2_item_armor_combat();
+	else if (cls == "q2_item_armor_body") q2_item_armor_body();
+	else if (cls == "item_power_shield") item_power_shield();
+	else if (cls == "item_power_screen") item_power_screen();
+
+	else if (cls == "q2_item_health_small") q2_item_health_small();
+	else if (cls == "q2_item_health") q2_item_health();
+	else if (cls == "q2_item_health_large") q2_item_health_large();
+	else if (cls == "q2_item_health_mega") q2_item_health_mega();
+
+	else if (cls == "key_red_key") key_red_key();
+	else if (cls == "key_blue_key") key_blue_key();
+	else if (cls == "key_commander_head") key_commander_head();
+	else if (cls == "key_airstrike_target") key_airstrike_target();
+	else if (cls == "key_data_cd") key_data_cd();
+	else if (cls == "key_data_spinner") key_data_spinner();
+	else if (cls == "key_pass") key_pass();
+	else if (cls == "key_power_cube") key_power_cube();
+	else if (cls == "key_pyramid") key_pyramid();
+
+	else if (cls == "q2_ammo_shells") q2_ammo_shells();
+	else if (cls == "q2_ammo_bullets") q2_ammo_bullets();
+	else if (cls == "q2_ammo_rockets") q2_ammo_rockets();
+	else if (cls == "q2_ammo_grenades") q2_ammo_grenades();
+	else if (cls == "q2_ammo_cells") q2_ammo_cells();
+	else if (cls == "q2_ammo_slugs") q2_ammo_slugs();
+
+	else if (cls == "item_pack") item_pack();
+	else if (cls == "item_adrenaline") item_adrenaline();
+	else if (cls == "item_bandolier") item_bandolier();
+	else if (cls == "item_breather") item_breather();
+
+	else if (cls == "q2_misc_explobox")
+	{
+		q2_misc_explobox();
+		return;
+	}
+
+// q3
+	else if (cls == "weapon_gauntlet") weapon_gauntlet();
+	else if (cls == "weapon_grapplinghook") weapon_grapplinghook();
+	else if (cls == "q3_weapon_machinegun") q3_weapon_machinegun();
+	else if (cls == "q3_weapon_shotgun") q3_weapon_shotgun();
+	else if (cls == "q3_weapon_grenadelauncher") q3_weapon_grenadelauncher();
+	else if (cls == "q3_weapon_rocketlauncher") q3_weapon_rocketlauncher();
+	else if (cls == "weapon_plasmagun") weapon_plasmagun();
+	else if (cls == "q3_weapon_lightning") q3_weapon_lightning();
+	else if (cls == "q3_weapon_railgun") q3_weapon_railgun();
+	else if (cls == "q3_weapon_bfg") q3_weapon_bfg();
+
+	else if (cls == "q3_item_quad") q3_item_quad();
+	else if (cls == "item_regen") item_regen();
+	else if (cls == "q3_item_enviro") q3_item_enviro();
+	else if (cls == "item_invis") item_invis();
+//	else if (cls == "item_haste") item_haste();
+//	else if (cls == "item_flight") item_flight();
+
+	else if (cls == "q3_item_armor_shard") q3_item_armor_shard();
+	else if (cls == "q3_item_armor_combat") q3_item_armor_combat();
+	else if (cls == "q3_item_armor_body") q3_item_armor_body();
+
+	else if (cls == "q3_item_health_small") q3_item_health_small();
+	else if (cls == "q3_item_health") q3_item_health();
+	else if (cls == "q3_item_health_large") q3_item_health_large();
+	else if (cls == "q3_item_health_mega") q3_item_health_mega();
+
+	else if (cls == "q3_ammo_shells") q3_ammo_shells();
+	else if (cls == "q3_ammo_bullets") q3_ammo_bullets();
+	else if (cls == "q3_ammo_rockets") q3_ammo_rockets();
+	else if (cls == "q3_ammo_grenades") q3_ammo_grenades();
+	else if (cls == "q3_ammo_cells") q3_ammo_cells();
+	else if (cls == "q3_ammo_slugs") q3_ammo_slugs();
+	else if (cls == "ammo_lightning") ammo_lightning();
+	else if (cls == "ammo_bfg") ammo_bfg();
+
+	else if (cls == "holdable_medkit") holdable_medkit();
+	else if (cls == "holdable_teleporter") holdable_teleporter();
 
 	else return;
 	self.mdl = self.model;
@@ -776,15 +878,74 @@ void() item_control_menu =
 	local string m;
 	local entity e;
 
-	k = cvar("pk_tog_mcode") - 101;
-	if (k < 1 || k > 17) k = cvar("pk_tog_itemmenu");
+	k = cvar("pk_tog_mcode") - MC_SHOTGUN;
+	if (k == -2) k = 7; // pki menu code = 99 or 2 less than MC_SHOTGUN (1 less than axe)
+	else if (k < 1 || k > 16) k = cvar("pk_tog_itemmenu");
+	else if (k  > 6) k = k + 1;
 
 	if (k > 0)
 	{
 		if (k > 31)
 		{
+bprint(" *** Specials:\n");
+bprint(" - last q1 item +1: ");
+bprint(ftos(MC_Q1));
+bprint("\n");
+bprint(" - q1 rnditems cnt: ");
+bprint(ftos(MC_RNDITM));
+bprint("\n");
+bprint(" - q1 no runes rnditems cnt: ");
+bprint(ftos(MC_NR_RNDITM));
+bprint("\n");
+bprint(" - last pk item: +1 ");
+bprint(ftos(MC_PK));
+bprint("\n");
+bprint(" - pk rnditems cnt: ");
+bprint(ftos(MC_PK_RNDITM));
+bprint("\n");
+bprint(" - pk+ rnditems cnt: ");
+bprint(ftos(MC_PKP_RNDITM));
+bprint("\n");
+bprint(" - tot base rnditems cnt: ");
+bprint(ftos(MC_T_RNDITM));
+bprint("\n");
+bprint("\n");
+bprint(" - last doom item +1: ");
+bprint(ftos(MC_DOOM));
+bprint("\n");
+bprint(" - doom items tot: ");
+bprint(ftos(MC_D_RNDITM));
+bprint("\n");
+bprint(" - last wolf item +1: ");
+bprint(ftos(MC_WOLF));
+bprint("\n");
+bprint(" - wolf items tot: ");
+bprint(ftos(MC_W_RNDITM));
+bprint("\n");
+bprint(" - last q2 item +1: ");
+bprint(ftos(MC_Q2));
+bprint("\n");
+bprint(" - q2 items tot: ");
+bprint(ftos(MC_Q2_RNDITM));
+bprint("\n");
+bprint(" - last q3 item +1: ");
+bprint(ftos(MC_Q3));
+bprint("\n");
+bprint(" - q3 items tot: ");
+bprint(ftos(MC_Q3_RNDITM));
+bprint("\n");
+bprint("\n");
+bprint(" - total items tot: ");
+bprint(ftos(MC_TOT));
+bprint("\n");
+bprint("\n");
+
+			bprint(" *** Use code (");
+			bprint(ftos(MC_SHOTGUN - 2));
+			bprint(") for 07 painkeep items\n");
 			m = build_itemmenu();
 			bprint(m);
+bprint("\n");
 		}
 		else if (k ==  31)
 		{
@@ -931,7 +1092,7 @@ void() place_item_control;
 void() rndize_restore =
 {
 	self.nextthink = time + 10 + random() * 10;
-	if (cvar("pk_place_item") != 2 || self.owner.classname == "") // pkplus turned off & rndize once made some pkp items
+	if (cvar("pk_place_item") < 2 || self.owner.classname == "") // pkplus turned off & rndize once made some pkp items
 	{
 		self.nextthink = time + 0.1;
 		self.think = rndize_item;
@@ -940,19 +1101,48 @@ void() rndize_restore =
 
 // IDEA: rndize once should make a better effort of providing a good set of items (rndize inside type, weps health, etc, or some kind of item counts?)
 
+// pk_place_item = 2 - rndize in genre
+// pk_place_item = 3 - rndize across all genre
+
 void() rndize_item =
 {
 	local entity e;
 	local float d, f;
 
-	f = MC_RNDITM;
-	if (RUNES) f = MC_NR_RNDITM; // dont rndize runes if server on
+	f = MC_RNDITM - 2;
+	if (RUNES) f = MC_NR_RNDITM - 2; // dont rndize runes if server on
 	d = MC_PK_RNDITM;
 	if (PK_ART) d = MC_PKP_RNDITM;
-	if (self.owner.mcode > 99 && self.owner.mcode < MC_Q1)
-		self.owner.mcode = 102 + rint(random() * f);
-	else if (self.owner.mcode > 139 && self.owner.mcode < MC_PK)
-		self.owner.mcode = 141 + rint(random() * d);
+
+	if (self.owner.mcode && cvar("pk_place_item") == 3) // total rndize across all map items! - not recommend except for total chaos
+	{
+		f = MC_TOT - 2;
+		self.owner.mcode = MC_SUPER_SHOTGUN + rint(random() * f);
+	}
+	else if (self.owner.mcode >= MC_AXE && self.owner.mcode < MC_Q1)
+	{
+		self.owner.mcode = MC_SUPER_SHOTGUN + rint(random() * f);
+	}
+	else if (self.owner.mcode >= MC_PULSE_NAILGUN && self.owner.mcode < MC_PK)
+	{
+		self.owner.mcode = MC_PULSE_NAILGUN + rint(random() * d);
+	}
+	else if (self.owner.mcode >= MC_D_SAW && self.owner.mcode < MC_DOOM)
+	{
+		self.owner.mcode = MC_D_SAW + rint(random() * MC_D_RNDITM);
+	}
+	else if (self.owner.mcode >= MC_W_KNIFE && self.owner.mcode < MC_WOLF)
+	{
+		self.owner.mcode = MC_W_KNIFE + rint(random() * MC_W_RNDITM);
+	}
+	else if (self.owner.mcode >= MC_Q2_BLASTER && self.owner.mcode < MC_Q2)
+	{
+		self.owner.mcode = MC_Q2_BLASTER + rint(random() * MC_Q2_RNDITM);
+	}
+	else if (self.owner.mcode >= MC_Q3_GAUNTLET && self.owner.mcode < MC_Q3)
+	{
+		self.owner.mcode = MC_Q3_GAUNTLET + rint(random() * MC_Q3_RNDITM);
+	}
 	else
 	{
 		if (WARNING)
@@ -961,7 +1151,7 @@ void() rndize_item =
 			bprint(ftos(self.owner.mcode));
 			bprint(" - no change\n");
 		}
-		if (cvar("pk_place_item") == 2)
+		if (cvar("pk_place_item") == 2 || cvar("pk_place_item") == 3)
 		{
 			self.nextthink = time + 10 + random() * 10;
 			self.think = rndize_restore;
@@ -1019,7 +1209,7 @@ void() pic_restore_item =
 		item_call(self.wad);
 	}
 	else
-	if (cvar("pk_place_item") == 2)
+	if (cvar("pk_place_item") == 2 || cvar("pk_place_item") == 3)
 	{
 		place_item_control();
 	}
@@ -1053,7 +1243,7 @@ void() place_item_control =
 		self.nextthink = time + 10 + random() * 10;
 		return;
 	}
-	else if (cvar("pk_place_item") == 2)
+	else if (cvar("pk_place_item") == 2 || cvar("pk_place_item") == 3)
 	{
 		local entity e;
 		e = spawn();
