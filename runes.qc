@@ -181,13 +181,16 @@ void () rune_1_expire =
 {
 	if (self.owner.rune_flag & self.rune_flag)
 	{
-	self.owner.rune_flag = self.owner.rune_flag - (self.owner.rune_flag & self.rune_flag);
-	sprint(self.owner, "The power of the ");
-	sprint(self.owner, self.netname);
-	if (self.noise4 == "q3_snd/poweruprespawn.wav")
-		sprint(self.owner, " has expired.\n");
-	else
-	sprint(self.owner, " rune has expired.\n");
+		if (self.rune_flag & RUNE_FLG_FLY)	
+			self.owner.movetype = MOVETYPE_WALK;
+		self.owner.rune_flag = self.owner.rune_flag - (self.owner.rune_flag & self.rune_flag);
+		if (self.owner.target2 == "progs/q3_art.mdl") self.owner.target2 = "";
+		sprint(self.owner, "The power of the ");
+		sprint(self.owner, self.netname);
+		if (self.noise4 == "q3_snd/poweruprespawn.wav")
+			sprint(self.owner, " has expired.\n");
+		else
+		sprint(self.owner, " rune has expired.\n");
 	}
 	remove(self);
 };
@@ -583,6 +586,8 @@ void() RegenerationSound =
 
 void() rune_regen =
 {
+	local float f;
+
 	if (self.deadflag)
 		return;
 
@@ -592,17 +597,20 @@ void() rune_regen =
 	if (self.rg_time > time)
 		return;
 
+	f = 5;
+
 	if (self.health < 100)
 	{
-		self.health = self.health + 5; // NOTE: violates T_Heal rule (implied from t_dmg rule) of only fn to add health - relates to morphs & needs morph tweak here
+		self.health = self.health + f; // NOTE: violates T_Heal rule (implied from t_dmg rule) of only fn to add health - relates to morphs & needs morph tweak here
 		if (self.health > 100)
 			self.health = 100;
 		RegenerationSound();
 	}
+	if (self.target2 != "progs/q3_art.mdl") // apparently q3 doesnt regen armor
 	if (self.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3))
 	if (self.armorvalue < 200) // q2 allows values over 200
 	{
-		self.armorvalue = self.armorvalue + 5;
+		self.armorvalue = self.armorvalue + f;
 		if ((self.items & IT_ARMOR3) && (self.armorvalue > 200)) // NOTE: increments q2 armor beyond local max limit in some cases (q2 jacket)
 			self.armorvalue = 200;
 		else if ((self.items & IT_ARMOR2) && (self.armorvalue > 150))

@@ -565,6 +565,8 @@ void() PutClientInServer =
 	// PAINKEEP Fix the velocity on respawn bug
 	self.velocity = '0 0 0';
 
+	set_defaults(self);
+
 	Chase_cam_level_start(); // Cataboligne 8.9.9 purify - chase cam
 };
 
@@ -923,6 +925,8 @@ void () PlayerPreThink =
 	}
 	else
 		self.flags = self.flags | FL_JUMPRELEASED;
+
+	if (self.rune_flag & RUNE_FLG_FLY) flyer_move(); // Cataboligne - 7.26.10 - flyer mouse-fly right code from chaos mod flight
 
 // teleporters can force a non-moving pause time
 	if (time < self.pausetime)

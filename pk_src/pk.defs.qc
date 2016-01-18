@@ -212,6 +212,10 @@ float RUNE_FLG_RG				= 8;
 float RUNE_MASK_ALL			= 15; // because manual config must have mask off for bad bits
 
 float RUNE_AMMO				= 16; // no rune code yet - for packs
+float RUNE_FLG_FLY			= 32; // no rune code yet - for q3
+
+void() flyer_move; // fly rune for now
+
 // end runes
 
 
@@ -295,7 +299,6 @@ float ARM_RED					= 8192;  // admin of red armor
 float ARM_ARMS					= 14336; // all armor bits							= 000000000000111
 float ARM_STOP					= 16384;
 
-// TDO: item admin over health requires a remap of classnames for this code to work
 float HEAL_15					= 16384;  // admin of heal 15
 float HEAL_25					= 32768;  // admin of heal 25
 float HEAL_100					= 65536;  // admin of heal 100
@@ -358,37 +361,8 @@ float FL_TR_REMOVE			= 128; // remove these items
 
 float NO_PI;					// dont let item_call call place_item
 
-.float ammo_bullet;
-.float ammo_slug;
-.float ammo_gaspr;
-.float ammo_hgrenade;
+// end translations
 
-float PK_BULLETAMMO_MAX;
-float PK_SLUGAMMO_MAX;
-float PK_GASAMMO_MAX;
-
-// X stuff
-
-void(entity e, float trv) master_item_control;
-void(string tri, float trv) master_item_control_loop;
-void() x_pwr_touch;
-void() x_pack_touch;
-void(float velmul, float mvt, float flg, float ct, vector fmorg, vector vdr, string cname, string md, string sd, void() tch, float tht, void() thk, void() thd) fire_missile;
-void() melee_hit;
-void() player_plasma1;
-void() X_FireHitscan;
-void() X_FireRailgun;
-void() player_mgchg1;
-void() player_pistol1;
-
-float LASERCAN_VEL;
-float LASER_VEL;
-float PLASMA_VEL;
-float HGREN_VEL;
-float GRENADE_VEL;
-float ROCKET_FUSE;
-float WEPHUM; // weapons hum
-float HUMLOCAL					= -41200855;    // taking local control, dont override by auto
 
 // TEST remove
 entity fts; // fire test
@@ -463,6 +437,122 @@ float HEAL_BOT					= 4; // doom health bottle - ignore normal max, no rot
 float HEAL_SOUL				= 5; // doom health: soul, mega spheres - 200 max, no rot
 
 
+// defaults
+
+void(entity e) set_defaults;
+
+float DEF_HEALTH;
+float DEF_ARMOR;
+float DEF_ATYPE = 0.3; // default armor is always lowest protection ?
+float DEF_ITEMS; // q1 standard bit flags
+float DEF_PK_ITEMS; // pk bit flags
+float DEF_WEAPON; // bit for wep slot - per genre char default action
+
+float PK_ITEM_MASK = 4094; // mask off non items bits
+float WEP_MASK = 4223; // mask off other items bits for def weap
+
+float DEF_AMMO_BULLETS; // initial ammo defaults if set
+float DEF_AMMO_SHELLS;
+float DEF_AMMO_CELLS;
+float DEF_AMMO_ROCKETS;
+float DEF_AMMO_NAILS;
+float DEF_AMMO_SLUGS;
+float DEF_AMMO_GAS;
+
+// X (extra) weapon stuff
+
+float DEF_X_ITEMS; // x bit flags
+
+float INIT_CON; // control flag
+
+float INIT_0_W;
+float INIT_1_D;
+float INIT_2_Q;
+float INIT_3_PK;
+float INIT_4_Q2;
+float INIT_5_Q3;
+float INIT_6_HP;
+float INIT_7;
+
+float FL_INIT_CGEN_BIT		= 1; // genre by char - bits per genre
+float FL_INIT_CGEN_MC		= 2; // genre by char - 1 map code per genre
+float FL_INIT_MGEN_BIT		= 4; // genre by map - bits per genre
+float FL_INIT_MGEN_MC		= 8; // genre by map - 1 map code per genre
+float FL_INIT_ARB_MC			= 16; // arbitrary map codes - 8 total, everyone gets this set
+float FL_INIT_ADD				= 32; // add to initial weaps
+float FL_INIT_REP				= 64; // replaces initial weaps
+
+.float ammo_bullet;
+.float ammo_slug;
+.float ammo_gaspr;
+.float ammo_hgrenade;
+
+float PK_BULLETAMMO_MAX;
+float PK_SLUGAMMO_MAX;
+float PK_GASAMMO_MAX;
+
+.float x_items; // extra weapon item control - pwr armors / extended keys / etc
+void() x_item_touch;
+
+float(entity e, entity f, float dm) power_armor;
+void() power_armor_impulse;
+
+float X_PWR_ARMOR				= 1;
+float X_PWR_SCREEN			= 2;
+float X_PWR_ARMOR_ON			= 4;
+float X_PWR_SCREEN_ON		= 8;
+
+float X_PWR_ARM_INV			= 3; // pwr armor bits
+float X_PWR_ARM_MASK			= 12; // pwr armor on bits
+
+float X_BASE_KEY				= 48; // first two keys (bits 16 & 32 call key_touch) for translated items
+
+float X_D_KEY_BIT				= 1008; // any doom key bit - 1111110000
+
+float X_D_KEY_CRED			= 16; // TDO: special door code compares x_items, closeable key doors too
+float X_D_KEY_CBLUE			= 32;
+float X_D_KEY_CYEL			= 64;
+float X_D_KEY_SKRED			= 128;
+float X_D_KEY_SKBLUE			= 256;
+float X_D_KEY_SKYEL			= 512;
+
+float X_Q2_KEY_BIT			= 8176; // any q2 key bit - 1111111110000
+
+float X_Q2_KEY_RED			= 16; // q2 has lots of keys.  good for tech runes / etc
+float X_Q2_KEY_BLUE			= 32;
+float X_Q2_KEY_PYRAMID		= 64;
+float X_Q2_KEY_CUBE			= 128;
+float X_Q2_KEY_PASS			= 256;
+float X_Q2_KEY_AIRSTRK		= 512;
+float X_Q2_KEY_DATACD		= 1024;
+float X_Q2_KEY_CDSPIN		= 2048;
+float X_Q2_KEY_CHEAD			= 4096;
+
+float X_D_MAP					= 16384;
+float X_D_VIS					= 32768;
+
+void(entity e, float trv) master_item_control;
+void(string tri, float trv) master_item_control_loop;
+void() x_pwr_touch;
+void() x_pack_touch;
+void(float velmul, float mvt, float flg, float ct, vector fmorg, vector vdr, string cname, string md, string sd, void() tch, float tht, void() thk, void() thd) fire_missile;
+void() melee_hit;
+void() player_plasma1;
+void() X_FireHitscan;
+void() X_FireRailgun;
+void() player_mgchg1;
+void() player_pistol1;
+
+float LASERCAN_VEL;
+float LASER_VEL;
+float PLASMA_VEL;
+float HGREN_VEL;
+float GRENADE_VEL;
+float ROCKET_FUSE;
+float WEPHUM; // weapons hum
+float HUMLOCAL					= -41200855;    // taking local control, dont override by auto
+
+
 // from chaos mod - flamer & flame stuff
 
 float FL_FLARE					= 8192; //entity is a flare starter
@@ -501,7 +591,7 @@ void() doom_precache;
 
 float d_reps_base				= 57005000; // heh heh - DEAD+
 void() d_rep_set;
-void() d_weapon_touch;
+void() x_weapon_touch;
 void() player_saw1;
 void() player_bfg1;
 

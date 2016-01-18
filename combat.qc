@@ -121,7 +121,7 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 {
 	local vector dir;
 	local entity oldself;
-	local float save;
+	local float save, pwr_save;
 	local float take;
 
 	if (!targ.takedamage)
@@ -144,7 +144,11 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 	// PAINKEEP_START Ignore armor stuff, used for drowning
 	if (Q_100 || !ignorearmor)
 	{
-		save = ceil(targ.armortype*damage);
+		pwr_save = power_armor(targ, inflictor, damage); // calc damage taken by power armor
+
+		if (pwr_save < damage)
+		save = ceil(targ.armortype * (damage - pwr_save));
+
 		if (save >= targ.armorvalue)
 			save = targ.armorvalue;
 	}
@@ -153,7 +157,7 @@ void (entity targ, entity inflictor, entity attacker, float damage) T_Damage =
 		save = 0;
 	}
 
-	take = ceil(damage-save);
+	take = ceil(damage - save - pwr_save);
 
 	if (targ.rune_flag & RUNE_FLG_RS)
 	{

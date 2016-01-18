@@ -73,6 +73,7 @@ chasecam.qc  //Cataboligne MOD 9.11.3
 
 xwep/viswep.qc
 xwep/mcode.qc
+xwep/flyers.qc
 
 // hipnotic
 
@@ -97,6 +98,7 @@ xwep/q2ents.qc
 // support for q3 maps in darkplaces
 xwep/q3ents.qc
 xwep/chaosents.qc
+xwep/mc_disambig.qc
 
 // painkeep code
 pk_src/2dtrain.qc

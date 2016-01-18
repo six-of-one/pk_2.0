@@ -603,7 +603,35 @@ void() pk_liveupd =
 
 	FFW_LIMIT = cvar("sv_pl_ffwlimit");
 
-	// q1 ammo
+// defaults
+	DEF_HEALTH = cvar("pk_def_health");
+	DEF_ARMOR = cvar("pk_def_armor");
+	DEF_ITEMS = cvar("pk_def_items");
+	DEF_PK_ITEMS = cvar("pk_def_pkitems");
+	DEF_WEAPON = cvar("pk_def_weapon");
+
+	DEF_AMMO_BULLETS = cvar("pk_def_ammo_bullets");
+	DEF_AMMO_SHELLS = cvar("pk_def_ammo_shells");
+	DEF_AMMO_CELLS = cvar("pk_def_ammo_cells");
+	DEF_AMMO_ROCKETS = cvar("pk_def_ammo_rockets");
+	DEF_AMMO_NAILS = cvar("pk_def_ammo_nails");
+	DEF_AMMO_SLUGS = cvar("pk_def_ammo_slugs");
+	DEF_AMMO_GAS = cvar("pk_def_ammo_gas");
+
+	DEF_X_ITEMS = cvar("pk_def_x_items");
+// wep inits
+	INIT_CON = cvar("pk_init_con");
+
+	INIT_0_W = cvar("pk_init_0_wolf");
+	INIT_1_D = cvar("pk_init_1_doom");
+	INIT_2_Q = cvar("pk_init_2_quake");
+	INIT_3_PK = cvar("pk_init_3_pk");
+	INIT_4_Q2 = cvar("pk_init_4_q2");
+	INIT_5_Q3 = cvar("pk_init_5_q3");
+	INIT_6_HP = cvar("pk_init_6_hip");
+	INIT_7 = cvar("pk_init_7");
+
+// q1 ammo
 	Q1_SHELLAMMO_MAX				= cvar("q1_shellammo_max");
 	Q1_NAILAMMO_MAX					= cvar("q1_nailammo_max");
 	Q1_ROCKETAMMO_MAX				= cvar("q1_rocketammo_max");
@@ -914,10 +942,48 @@ void() pk_srvcmd_set =
 	DOOM_ALPHA = 0;
 
 // respawn times
+	D_POWER_WAIT = 
+	Q2_POWER_WAIT = 
 	RSP_TIME = 30;
-	POW_TIME = 30;
+
+	Q3_POWER_WAIT = 4 * RSP_TIME;
+
+// art power supply times
+	D_POWER_TIME = 
+	Q2_POWER_TIME = 
+	Q3_POWER_TIME = 
+
+POW_TIME = 30;
 
 	EXPLBOX_RESP = 1;
+
+// defaults
+	DEF_HEALTH = 0;
+	DEF_ARMOR = 0;
+	DEF_ITEMS = 0;
+	DEF_PK_ITEMS = 0;
+	DEF_WEAPON = 0;
+
+	DEF_AMMO_BULLETS = 0;
+	DEF_AMMO_SHELLS = 0;
+	DEF_AMMO_CELLS = 0;
+	DEF_AMMO_ROCKETS = 0;
+	DEF_AMMO_NAILS = 0;
+	DEF_AMMO_SLUGS = 0;
+	DEF_AMMO_GAS = 0;
+
+	DEF_X_ITEMS = 0;
+
+	INIT_CON = 0;
+
+	INIT_0_W = 0;
+	INIT_1_D = 0;
+	INIT_2_Q = 0;
+	INIT_3_PK = 0;
+	INIT_4_Q2 = 0;
+	INIT_5_Q3 = 0;
+	INIT_6_HP = 0;
+	INIT_7 = 0;
 
 // q1 ammo
 	Q1_SHELLAMMO_MAX				= 100;
@@ -1102,7 +1168,37 @@ void() pk_srvcmd_set =
 														// 05 - doom alpha level 0.5
 														// 06 - doom alpha level pre-beta
 
+// defaults & inits
+
+		registercvar("pk_def_health", "0");
+		registercvar("pk_def_armor", "0");
+		registercvar("pk_def_items", "0"); // makes char genre specific weapons / items if set
+		registercvar("pk_def_pkitems", "0");
+		registercvar("pk_def_weapon", "0"); // char genre specific if set - initial weapon on (re)spawn, adds it if not in _items bits
+
+		registercvar("pk_def_ammo_bullets", "0");
+		registercvar("pk_def_ammo_shells", "0");
+		registercvar("pk_def_ammo_cells", "0");
+		registercvar("pk_def_ammo_rockets", "0");
+		registercvar("pk_def_ammo_nails", "0");
+		registercvar("pk_def_ammo_slugs", "0");
+		registercvar("pk_def_ammo_gas", "0");
+
+		registercvar("pk_def_x_items", "0");
+
+		registercvar("pk_init_con", "0"); // init control - see flags sect. of pk.defs.qc
+																			// these can be a bit mask or map code and replace or add to initial weapons
+		registercvar("pk_init_0_wolf", "0"); // weapons for place 0 / wolf guy | map by bit or map code
+		registercvar("pk_init_1_doom", "0"); // weapons for place 1 / doom guy | map by bit or map code
+		registercvar("pk_init_2_quake", "0");
+		registercvar("pk_init_3_pk", "0"); // not available for genre by char
+		registercvar("pk_init_4_q2", "0");
+		registercvar("pk_init_5_q3", "0");
+		registercvar("pk_init_6_hip", "0"); // not available for genre by char
+		registercvar("pk_init_7", "0");	// extra
+
 // pk items
+
 		registercvar("pk_bt_time", "90"); // time for beartraps to live
 		registercvar("pk_bt_follow", "15"); // time for beartraps to hold on & bite
 		registercvar("pk_bt_dmg", "2"); // beartrap damage per bite

@@ -96,8 +96,8 @@ void(string cls) item_call =
 			remove(self.enemy);
 
 // restore boom boxes by regen
-		if (cls == "misc_explobox" || cls == "misc_explobox2" || cls == "d_barrel" || cls == "q2_misc_explobox")
-		if (self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD2 || self.scode == MC_D_BARREL || self.scode == MC_Q2_BARREL)
+		if (cls == "misc_explobox" || cls == "misc_explobox2" || cls == "d_barrel" || cls == "q2_misc_explobox" || cls == "q3_misc_explobox")
+		if (self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD2 || self.scode == MC_D_BARREL || self.scode == MC_Q2_BARREL || self.scode == MC_Q3_BARREL)
 		{
 			self.mcode = self.scode;
 			self.think = barrel_regen;
@@ -107,11 +107,11 @@ void(string cls) item_call =
 
 // to turn a boom box into something or something into a boom box, we need a fake item, hiding the real item with no model | touch
 		if (self.scode)
-		if (cls == "misc_explobox" || cls == "misc_explobox2" || cls == "d_barrel" || cls == "q2_misc_explobox")
-		if (self.scode != MC_EXPLOD1 && self.scode != MC_EXPLOD2 && self.scode != MC_D_BARREL && self.scode != MC_Q2_BARREL) f = spawn();
+		if (cls == "misc_explobox" || cls == "misc_explobox2" || cls == "d_barrel" || cls == "q2_misc_explobox" || cls == "q3_misc_explobox")
+		if (self.scode != MC_EXPLOD1 && self.scode != MC_EXPLOD2 && self.scode != MC_D_BARREL && self.scode != MC_Q2_BARREL && self.scode != MC_Q3_BARREL) f = spawn();
 
-		if (cls != "misc_explobox" && cls != "misc_explobox2" && cls != "d_barrel" && cls != "q2_misc_explobox")
-		if (self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD2 || self.scode == MC_D_BARREL || self.scode == MC_Q2_BARREL) f = spawn();
+		if (cls != "misc_explobox" && cls != "misc_explobox2" && cls != "d_barrel" && cls != "q2_misc_explobox" && cls != "q3_misc_explobox")
+		if (self.scode == MC_EXPLOD1 || self.scode == MC_EXPLOD2 || self.scode == MC_D_BARREL || self.scode == MC_Q2_BARREL || self.scode == MC_Q3_BARREL) f = spawn();
 
 		if (f)
 		{
@@ -197,6 +197,7 @@ void(string cls) item_call =
 		return;
 	}
 
+	else if (cls == "item_sigil") { item_sigil(); } // NOTE: things can translate to this
 	else if (cls == "item_sigil1") { self.spawnflags = rune_bit_code(MC_SIGIL1, 0); item_sigil(); scls = "item_sigil"; }
 	else if (cls == "item_sigil2") { self.spawnflags = rune_bit_code(MC_SIGIL2, 0); item_sigil(); scls = "item_sigil"; }
 	else if (cls == "item_sigil4") { self.spawnflags = rune_bit_code(MC_SIGIL4, 0); item_sigil(); scls = "item_sigil"; }
@@ -218,6 +219,7 @@ void(string cls) item_call =
 	else if (cls == "item_pkplus_tomb") item_pkplus_tomb();
 	else if (cls == "item_pkplus_actor") item_pkplus_actor();
 	else if (cls == "item_pkplus_phone") item_pkplus_phone();
+
 // doom
 	else if (cls == "d_weapon_shotgun") d_weapon_shotgun();
 	else if (cls == "d_weapon_supershotgun") d_weapon_supershotgun();
@@ -361,8 +363,8 @@ void(string cls) item_call =
 	else if (cls == "item_regen") item_regen();
 	else if (cls == "q3_item_enviro") q3_item_enviro();
 	else if (cls == "item_invis") item_invis();
-//	else if (cls == "item_haste") item_haste();
-//	else if (cls == "item_flight") item_flight();
+	else if (cls == "item_haste") item_haste();
+	else if (cls == "item_flight") item_flight();
 
 	else if (cls == "q3_item_armor_shard") q3_item_armor_shard();
 	else if (cls == "q3_item_armor_combat") q3_item_armor_combat();
@@ -384,6 +386,12 @@ void(string cls) item_call =
 
 	else if (cls == "holdable_medkit") holdable_medkit();
 	else if (cls == "holdable_teleporter") holdable_teleporter();
+
+	else if (cls == "q3_misc_explobox")
+	{
+		q3_misc_explobox();
+		return;
+	}
 
 	else return;
 	self.mdl = self.model;

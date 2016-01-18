@@ -74,7 +74,7 @@ $frame deathd8 deathd9
 $frame deathe1 deathe2 deathe3 deathe4 deathe5 deathe6 deathe7
 $frame deathe8 deathe9
 
-// viswep stuff - not found in player mdl - should not go past frame deathe9
+// viswep stuff - not found in player mdl -  player animation frame data should not go past frame deathe9
 
 $frame dthrow1 dthrow2 dthrow3 dthrow4 dthrow5
 
