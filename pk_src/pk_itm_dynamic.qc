@@ -697,12 +697,6 @@ void() dyn_item =
 			bprint("***   Dynamic items will spawn on this map - keep an eye out\n");
 		}
 	}
-// deprecated for remover above
-//	else if (!DYN_FORCE && !DYN_ARTFR_ONLY)
-//	{		
-//		if (!PK || (!(pk_flags & PK_DYNAMIC) && !DYN_OVR)) // got turned off go away
-//			remove(self);
-//	}
 	else
 	{
 	if (pk_ditems < 0) pk_ditems = 0;

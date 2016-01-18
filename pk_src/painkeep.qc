@@ -779,6 +779,11 @@ void() pk_liveupd =
 	if (deathmatch || coop)
 	if (cvar("sv_botmatch") != 0) b_launch(0);
 
+	if (TR_Q1DEF != cvar("pk_tr_q1def")
+	{
+		
+	}
+	
 	if (Q_100) return;
 
 // cam stuff
@@ -1067,6 +1072,7 @@ void() pk_srvcmd_set =
 
 // map translations
 
+	TR_Q1DEF = 1;
 	TR_WOLF = 0;
 	TR_DOOM = 0;
 	TR_QUAKE = 0;
@@ -1226,6 +1232,7 @@ void() pk_srvcmd_set =
 
 // map translations
 
+		registercvar("pk_tr_q1def", "1"); // if q100 or pk100 and no wad == "q1" on map - default to translate
 		registercvar("pk_tr_wolf", "0");
 		registercvar("pk_tr_doom", "0");
 		registercvar("pk_tr_quake", "0");

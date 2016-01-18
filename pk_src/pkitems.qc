@@ -1240,14 +1240,13 @@ void() pk_placeitem =
 
 	if (!PK_100 && !Q_100)
 	{
-		if (self.wad == "q1") doom_item_control(self, 0);
-		else if ((TR_ALL || TR_DOOM) && self.class_select == "doom_item")  doom_item_control(self, TR_DOOM);
-		else if ((TR_ALL || TR_WOLF) && self.class_select == "wolf_item")  doom_item_control(self, TR_WOLF);
+		if (self.wad == "q1") master_item_control(self, 0);
+		else if ((TR_ALL || TR_DOOM) && self.class_select == "doom_item")  master_item_control(self, TR_DOOM);
+		else if ((TR_ALL || TR_WOLF) && self.class_select == "wolf_item")  master_item_control(self, TR_WOLF);
 	}
 	else
 	{
-//		if (PK_100 || Q_100)
-		if (self.class_select == "doom_item") doom_item_control(self, 0);
+		if (self.class_select == "doom_item") master_item_control(self, 0);
 	}
 
 

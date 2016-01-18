@@ -235,6 +235,7 @@ void () PlaceItem;
 
 void() check_translate;
 
+float TR_Q1DEF;
 float TR_WOLF;
 float TR_DOOM;
 float TR_QUAKE;
@@ -258,8 +259,8 @@ float NO_PI;					// dont let item_call call place_item
 // doom
 
 void() doom_precache;
-void(entity e, float trv) doom_item_control;
-void(string tri, float trv) doom_item_control_loop;
+void(entity e, float trv) master_item_control;
+void(string tri, float trv) master_item_control_loop;
 
 // **************************************
 // painkeep protos

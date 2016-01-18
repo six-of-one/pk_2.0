@@ -132,7 +132,7 @@ void(entity e, float trvs) item_translate =
 	if (WARNING) bprint("\n");
 };
 
-void(entity e, float trv) doom_item_control =
+void(entity e, float trv) master_item_control =
 {
 	if (e.classname == "func_make") return; // override
 
@@ -161,33 +161,35 @@ void(entity e, float trv) doom_item_control =
 		e.map = e.path;
 		return;
 	}
-/*
-	else
-		if (e.wad == "q1")
-		{
-			setmodel (e,e.mdl);
-			e.touch = painkeep_touch;
-			e.pk_touch = e.th_stand;
-			e.th_stand = SUB_Null;
-			e.map = e.path;
-			return;
-		}
-*/
 
-	if (time < PIC_TO)
+	if (trv)
+		item_translate(e, trv);
+	else
+	if (time < PIC_TO || !trv)
 //	if (cvar("pk_place_item") != 0) // pic - just block appearance, rnd does rest - not needed
 	{
 // TDO: doom item translate if map has no wad = "q1" items
-		hide_item (e);
+			hide_item (e);
 	}
 	else // IDEA: option to turn into rnd regular pk items
+// NOTE: pk_100 or q_100 - this code should never run
 	{
 		if (e.classname == "dyn_item")
 		{
-			if (WARNING) bprint("*** Warning - dynamic items: pk_100 and dynamic made a doom - hiding\n");
+			if (WARNING)
+			{
+				bprint("*** Warning - dynamic items: pk_100 and dynamic made a ");
+				bprint(e.class_select);
+				bprint(" - hiding\n");
+			}
 		}
 		else
-		if (WARNING) bprint("*** Warning - pk_100 and code made a doom item - hiding\n");
+		if (WARNING)
+		{
+			bprint("*** Warning - pk_100 and code made a ");
+			bprint(e.class_select);
+			bprint(" - hiding\n");
+		}
 		hide_item (e);
 	}
 
@@ -196,7 +198,7 @@ void(entity e, float trv) doom_item_control =
 // allow live translate of doom items - later
 // twiddled after map load
 
-void(string tri, float trv) doom_item_control_loop =
+void(string tri, float trv) master_item_control_loop =
 {
 	local entity e, sv;
 	local string sr;
@@ -206,7 +208,7 @@ void(string tri, float trv) doom_item_control_loop =
 	e = find(world,class_select,sr);
 	while (e)
 	{
-		doom_item_control(e, trv);
+		master_item_control(e, trv);
 		e = find(e,class_select,sr);
 //		if (!e)
 //		{
@@ -271,7 +273,7 @@ void() check_translate =
 		bprint("\n");
 		}
 
-		doom_item_control_loop("wolf_item", TR_WOLF);
+		master_item_control_loop("wolf_item", TR_WOLF);
 	}
 
 	if (TR_DOOM != cvar("pk_tr_doom" ) || TR_ALL)
@@ -286,7 +288,7 @@ void() check_translate =
 		bprint("\n");
 		}
 
-		doom_item_control_loop("doom_item", TR_DOOM);
+		master_item_control_loop("doom_item", TR_DOOM);
 	}
 
 	if (TR_QUAKE != cvar("pk_tr_quake" ) || TR_ALL)
@@ -301,7 +303,7 @@ void() check_translate =
 		bprint("\n");
 		}
 
-		doom_item_control_loop("quake_item", TR_QUAKE);
+		master_item_control_loop("quake_item", TR_QUAKE);
 	}
 
 	if (TR_Q2 != cvar("pk_tr_q2" ) || TR_ALL)
@@ -316,7 +318,7 @@ void() check_translate =
 		bprint("\n");
 		}
 
-		doom_item_control_loop("q2_item", TR_Q2);
+		master_item_control_loop("q2_item", TR_Q2);
 	}
 
 	if (TR_Q3 != cvar("pk_tr_q3" ) || TR_ALL)
@@ -331,7 +333,7 @@ void() check_translate =
 		bprint("\n");
 		}
 
-		doom_item_control_loop("q3_item", TR_Q3);
+		master_item_control_loop("q3_item", TR_Q3);
 	}
 	set_translate();
 

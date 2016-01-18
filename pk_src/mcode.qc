@@ -10,7 +10,7 @@
  *
  */
 
-///float MIN_ITEM					= 100;
+//float MIN_ITEM					= 100;
 //float MAX_INVITEM			= 255;
 //float MAX_OLDQ				= 300;
 float MAX_ITEM					= 999;
@@ -827,7 +827,7 @@ void(entity e, string md, float dm, float hl, float mt) misc_explodbox_set =
 
 	if (!PK_100 && !Q_100)
 	if (self.wad == "q1")
-		doom_item_control(self, 0);
+		master_item_control(self, 0);
 };
 
 
