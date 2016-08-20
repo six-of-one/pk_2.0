@@ -713,32 +713,28 @@ void() Admin_itemmenu =
 				       "\b     Admin Items Menu:     \n"
 				       "\b+--------------------------+\n"
 							"  +------- weapons ------+  \n"
-							"  01: Double shotgun        \n" // 1
-							"  02: Nailgun               \n" // 2
-							"  03: Preforator            \n" // 4
-							"  04: Grenade launcher      \n" // 8
-							"  05: Rocket launcher       \n" // 16
-							"  06: Lightning gun         \n" // 32
-							"  07: Painkeep items        \n" // 64
+							"  01: Double shotgun        \n" 
+							"  02: Nailgun               \n" 
+							"  03: Preforator            \n" 
+							"  04: Grenade launcher      \n" 
+							"  05: Rocket launcher       \n" 
+							"  06: Lightning gun         \n" 
+							"  07: Painkeep items        \n" 
 							"  +------ artifacts -----+  \n" 
-							"  08: Quad damage           \n" // 128
-							"  09: Invulnerability       \n" // 256
-							"  10: Radiation suit        \n" // 512
-							"  11: Ring of shadows       \n" // 1024
+							"  08: Quad damage           \n" 
+							"  09: Invulnerability       \n" 
+							"  10: Radiation suit        \n" 
+							"  11: Ring of shadows       \n" 
 							"  +-------- armor -------+  \n" 
-							"  12: Green Armor           \n" // 2048
-							"  13: Yellow Armor          \n" // 4096
-							"  14: Red Armor             \n" // 8192
-//							"  +------- health -------+  \n" 
-//							"  15: 15 Health             \n" // 16384
-//							"  16: 25 Health             \n" // 32768
-//							"  17: Mega Health           \n" // 65536
+							"  12: Green Armor           \n" 
+							"  13: Yellow Armor          \n" 
+							"  14: Red Armor             \n" 
 							"  +------ controls ------+  \n" 
-							"  18: Only these items      \n" // 131072
-							"  19: None of these items   \n" // 262144
-							"  20: Substitute removed    \n" // 542288
-							"  21: Infinite ammo         \n" // 1048576
-							"  22: Cycle selected items  \n" // 2097152
+							"  18: Only these items      \n" 
+							"  19: None of these items   \n" 
+							"  20: Substitute removed    \n" 
+							"  21: Infinite ammo         \n" 
+							"  22: Cycle selected items  \n" 
 							"  30: Show item bits        \n" 
 							"  31: Update map now        \n"
 							" 666:  main menu            \n"
@@ -767,7 +763,6 @@ void() Admin_pkmenu =
 							"  04: settings list         \n"
 							"  05: PK dynamic items      \n"
 							"  06: Spike traps           \n"
-//							"  07: Extra sound           \n"
 							" 666:  main menu            \n"
 							" admin impulse: exit admin  \n"
 				       "\b+--------------------------+\n"
