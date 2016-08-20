@@ -983,7 +983,7 @@ void() pk_placeitem =
 	}
 
 // handle extra item stuff
-	if (self.pk_touch == (void()) 0) // dont swamp pointers
+	if (!self.pk_touch) // == (void()) 0) // dont swamp pointers
 	{
 		self.pk_touch = self.touch;
 	}
