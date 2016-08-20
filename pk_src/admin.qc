@@ -396,7 +396,6 @@ void() Admin_dmmapmenu2 =
 						" 666: main menu           \n"
 						"  admin impulse exits     \n"
 					 "\b+------------------------+\n"
-//					 "              * you must rename or link hub2 & hub3\n"
 					 "\b Enter code: ";
 };
 
@@ -426,8 +425,6 @@ void() Admin_dmmapmenu =
 						"    17:  e2m1   36: e4m6  \n"
 						"    18:  e2m2   37: e4m7  \n"
 						"    19:  e2m3   38: e4m8  \n"
-//						"    60:  new maps         \n"
-//						"    61:  list hub links   \n"
 						"   666:  main menu        \n"
 						"  admin impulse exits     \n"
 					 "\b+------------------------+\n"
@@ -967,32 +964,31 @@ void() Admin_itemmenu =
 				       "\b     Admin Items Menu:     \n"
 				       "\b+--------------------------+\n"
 							"  +------- \bweapons\b ------+  \n"
-							"  01: Double shotgun        \n" // 1
-							"  02: Nailgun               \n" // 2
-							"  03: Preforator            \n" // 4
-							"  04: Grenade launcher      \n" // 8
-							"  05: Rocket launcher       \n" // 16
-							"  06: Lightning gun         \n" // 32
-//							"  07: Painkeep items        \n" // 64
+							"  01: Double shotgun        \n"
+							"  02: Nailgun               \n"
+							"  03: Preforator            \n"
+							"  04: Grenade launcher      \n"
+							"  05: Rocket launcher       \n"
+							"  06: Lightning gun         \n"
 							"  +------ \bartifacts\b -----+  \n" 
-							"  08: Quad damage           \n" // 128
-							"  09: Invulnerability       \n" // 256
-							"  10: Radiation suit        \n" // 512
-							"  11: Ring of shadows       \n" // 1024
+							"  08: Quad damage           \n"
+							"  09: Invulnerability       \n"
+							"  10: Radiation suit        \n"
+							"  11: Ring of shadows       \n"
 							"  +-------- \barmor\b -------+  \n" 
-							"  12: Green Armor           \n" // 2048
-							"  13: Yellow Armor          \n" // 4096
-							"  14: Red Armor             \n" // 8192
+							"  12: Green Armor           \n"
+							"  13: Yellow Armor          \n"
+							"  14: Red Armor             \n"
 							"  +------- \bhealth\b -------+  \n" 
-							"  15: 15 Health             \n" // 16384
-							"  16: 25 Health             \n" // 32768
-							"  17: Mega Health           \n" // 65536
+							"  15: 15 Health             \n"
+							"  16: 25 Health             \n"
+							"  17: Mega Health           \n"
 							"  +------ \bcontrols\b ------+  \n" 
-							"  18: Only these items      \n" // 131072
-							"  19: None of these items   \n" // 262144
-							"  20: Substitute removed    \n" // 542288
-							"  21: Infinite ammo         \n" // 1048576
-							"  22: Cycle selected items  \n" // 2097152
+							"  18: Only these items      \n"
+							"  19: None of these items   \n"
+							"  20: Substitute removed    \n"
+							"  21: Infinite ammo         \n"
+							"  22: Cycle selected items  \n"
 							"  29: All bits off          \n" 
 							"  30: Show item bits        \n" 
 							"  31: Update map now        \n"
@@ -1007,32 +1003,32 @@ void() Admin_itemmenu =
 				       "\b     Admin Items Menu:     \n"
 				       "\b+--------------------------+\n"
 							"  +------- \bweapons\b ------+  \n"
-							"  01: Double shotgun        \n" // 1
-							"  02: Nailgun               \n" // 2
-							"  03: Preforator            \n" // 4
-							"  04: Grenade launcher      \n" // 8
-							"  05: Rocket launcher       \n" // 16
-							"  06: Lightning gun         \n" // 32
-							"  07: Painkeep items        \n" // 64
+							"  01: Double shotgun        \n"
+							"  02: Nailgun               \n"
+							"  03: Preforator            \n"
+							"  04: Grenade launcher      \n"
+							"  05: Rocket launcher       \n"
+							"  06: Lightning gun         \n"
+							"  07: Painkeep items        \n"
 							"  +------ \bartifacts\b -----+  \n" 
-							"  08: Quad damage           \n" // 128
-							"  09: Invulnerability       \n" // 256
-							"  10: Radiation suit        \n" // 512
-							"  11: Ring of shadows       \n" // 1024
+							"  08: Quad damage           \n"
+							"  09: Invulnerability       \n"
+							"  10: Radiation suit        \n"
+							"  11: Ring of shadows       \n"
 							"  +-------- \barmor\b -------+  \n" 
-							"  12: Green Armor           \n" // 2048
-							"  13: Yellow Armor          \n" // 4096
-							"  14: Red Armor             \n" // 8192
+							"  12: Green Armor           \n"
+							"  13: Yellow Armor          \n"
+							"  14: Red Armor             \n"
 							"  +------- \bhealth\b -------+  \n" 
-							"  15: 15 Health             \n" // 16384
-							"  16: 25 Health             \n" // 32768
-							"  17: Mega Health           \n" // 65536
+							"  15: 15 Health             \n"
+							"  16: 25 Health             \n"
+							"  17: Mega Health           \n"
 							"  +------ \bcontrols\b ------+  \n" 
-							"  18: Only these items      \n" // 131072
-							"  19: None of these items   \n" // 262144
-							"  20: Substitute removed    \n" // 542288
-							"  21: Infinite ammo         \n" // 1048576
-							"  22: Cycle selected items  \n" // 2097152
+							"  18: Only these items      \n"
+							"  19: None of these items   \n"
+							"  20: Substitute removed    \n"
+							"  21: Infinite ammo         \n"
+							"  22: Cycle selected items  \n"
 							"  29: All bits off          \n" 
 							"  30: Show item bits        \n" 
 							"  31: Update map now        \n"
@@ -1061,11 +1057,8 @@ void() Admin_pkmenu =
 							"  02: HUB mode toggle       \n"
 							"  03: Duty check toggle     \n"
 							"  04: settings list         \n"
-//							"  05: PK dynamic items      \n"
-//							"  06: Spike traps           \n"
 							"  07: Server map loop       \n"
 							"    : PK v1.11 Compatible   \n"
-//							"  07: Extra sound           \n"
 							" 666:  main menu            \n"
 							" admin impulse: exit admin  \n"
 				       "\b+--------------------------+\n"
@@ -1082,7 +1075,6 @@ void() Admin_pkmenu =
 							"  06: Spike traps           \n"
 							"  07: Server map loop       \n"
 							"    : PK 2.X server         \n"
-//							"  07: Extra sound           \n"
 							" 666:  main menu            \n"
 							" admin impulse: exit admin  \n"
 				       "\b+--------------------------+\n"
@@ -1118,11 +1110,8 @@ void() Admin_mainmenu =
 						"  13:  server friction     \n"
 						"  22:  map control         \n"
 						"  23:  bot control         \n"
-//						"  24:  painkeep control    \n"
 						"  25:  item control        \n"
 						"  30:  kick players        \n"
-//						"  60:  PK mode toggle      \n"
-//						"  ---  PK mode = TRUE      \n"
 						"  97:  exit menu only      \n"
 						"  98:  observer            \n"
 						"  99:  respawn (exits)     \n"
@@ -1149,9 +1138,7 @@ void() Admin_mainmenu =
 						"  22:  map control         \n"
 						"  23:  bot control         \n"
 						"  24:  painkeep control    \n"
-//						"  25:  item control        \n"
 						"  30:  kick players        \n"
-//						"  60:  PK mode toggle      \n"
 						"  ---  PK mode = TRUE      \n"
 						"  97:  exit menu only      \n"
 						"  98:  observer            \n"
