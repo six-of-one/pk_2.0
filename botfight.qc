@@ -42,7 +42,7 @@ vector (vector trg) adjustgrenade =
 	local vector tg;
 	local vector tgxy;
 	local vector selfxy;
-	local vector lead;
+//	local vector lead;
 	local float xypct;
 	tg = trg;
 	tgxy = tg;

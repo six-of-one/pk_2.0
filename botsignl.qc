@@ -28,7 +28,7 @@ entity () botmovetarget =
 
 void () t_botmovetarget =
 {
-	local vector in;
+//	local vector in;
 	local entity tmp;
 	local entity pth;
 	local float rnd;
