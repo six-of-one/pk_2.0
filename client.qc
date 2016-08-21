@@ -347,7 +347,7 @@ void () execute_changelevel =
 
 void () changelevel_touch =
 {
-	local entity pos;
+//	local entity	pos;	// fx_warning
 
 	if (other.classname != "player")
 		return ;
@@ -777,7 +777,7 @@ void () CheckRules =
 
 void () PlayerDeathThink =
 {
-	local entity old_self;
+//	local entity	old_self;	// fx_warning
 	local float forward;
 
 	if (self.flags & FL_ONGROUND)
@@ -812,7 +812,7 @@ void () PlayerDeathThink =
 
 void () PlayerJump =
 {
-	local vector start, end;
+//	local vector start, end;	// fx_warning
 
 	if (self.flags & FL_WATERJUMP)
 		return;
@@ -991,8 +991,8 @@ Called every frame before physics are run
 */
 void () PlayerPreThink =
 {
-	local	float	mspeed, aspeed;
-	local float r;
+//	local	float	mspeed, aspeed;	// fx_warning
+//	local	float	r;	// fx_warning
 	if (FRIKBOT)
 	if (BotPreFrame ())
 		return ;
@@ -1229,8 +1229,8 @@ Called every frame after physics are run
 */
 void () PlayerPostThink =
 {
-	local	float	mspeed, aspeed;
-	local float r;
+//	local	float	mspeed, aspeed;	// fx_warning
+//	local	float	r;	// fx_warning
 	if (FRIKBOT)
 	if (BotPostFrame ())
 		return ;

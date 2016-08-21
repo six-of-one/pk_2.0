@@ -15,7 +15,7 @@ float SOUND_GOT	 ;
 string normalsound;
 string reversesound;
 
-entity stemp, otemp, s, old;
+entity stemp, s;
 
 
 void () trigger_reactivate =
@@ -250,7 +250,7 @@ void () trigger_secret =
 
 void () counter_use =
 {
-	local string junk;
+//	local string junk;	// fx_warning
 
 	self.count = self.count - 1;
 	if (self.count < 0)
