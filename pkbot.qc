@@ -92,7 +92,7 @@ $frame dthrow1 dthrow2 dthrow3 dthrow4 dthrow5
 
 void () bot_start = [ $stand1, bot_walk ]
 {
- 	local string tmp;
+// 	local string tmp;
 	BotPostThink ();
 	droptofloor(0, 0);
 	self.nextthink = ((time + 0.2) + (0.2 * random ()));

@@ -283,8 +283,8 @@ float () CheckDropPath =
 	local entity upstreamPath;
 	local float rng;
 	local float lnd;
-	local float OK_HIGH;
-	local string tmp;
+//	local float OK_HIGH;
+//	local string tmp;
 // this is a fix point if overflow occurs with waypoints - fix by reducing 160
 	if (NUMPATHS > 160)
 	{
@@ -371,7 +371,7 @@ void () NewCarriedPath =
 
 void () DropBotPath =
 {
-	local string tmp;
+//	local string tmp;
 	local entity oldpath;
 	local float drop;
 	if (self.classname == OBSERVER)
