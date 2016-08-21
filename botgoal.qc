@@ -408,7 +408,7 @@ float (entity e) cacheweight =
 
 float (entity e) pathweight =
 {
-	local float OK_HIGH;
+//	local float OK_HIGH;
 	local float weight;
 	local vector org;
 	weight = DONT_WANT;
@@ -641,7 +641,7 @@ void () aibot_chooseGoal =
 	local entity e;
 	local entity current;
 	local entity botTarget;
-	local string tmp;
+//	local string tmp;
 	botTarget = self.goalentity;
 	if (self.lefty & FAR_SEEK)
 	{
@@ -865,7 +865,7 @@ entity (entity chaser, entity en) BestChaseRoute =
 	local entity tmp;
 	local float weight;
 	local float best;
-	local string ts;
+//	local string ts;
 	RouteToEnemy (en);
 	e = findradius (chaser.origin,SEARCH_RADIUS);
 	best = 1000000;

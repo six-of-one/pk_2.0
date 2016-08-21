@@ -123,7 +123,7 @@ void () CallForHelp =
 	local entity e;
 	local entity p;
 	local entity tmp;
-	local float d;
+//	local float d;
 	HELPING = 1;
 	e = find (world,classname,"pk*bot");
 	while (e)
@@ -621,7 +621,7 @@ float () BotFindTarget =
 
 	local entity client;
 	local float len;
-	local float bw;
+//	local float bw;
 	client = checkclient ();
 	if (!client)
 	{
@@ -992,7 +992,7 @@ void (float dist) ai_botcharge =
 
 void (float dist) ai_botnailcharge =
 {
-	local float rnd;
+//	local float rnd;
 	if (!enemyvisible (self.enemy))
 	{
 		self.think = self.th_run;
@@ -1012,14 +1012,14 @@ void (float dist) ai_botnailcharge =
 float (float minweight) aibot_checkforGoodies;
 void (float dist) ai_botrun =
 {
-	local vector delta;
-	local float axis;
+//	local vector delta;
+//	local float axis;
 	local float rng;
 	local float oldrng;
-	local float direct;
-	local float ang_rint;
-	local float ang_floor;
-	local float ang_ceil;
+//	local float direct;
+//	local float ang_rint;
+//	local float ang_floor;
+//	local float ang_ceil;
 	if (self.enemy.deadflag != DEAD_NO)
 	{
 		endEnemy ();
@@ -1136,7 +1136,7 @@ void () aibot_setupchase =
 void (float dist) aibot_chase =
 {
 	local entity olden;
-	local float weap;
+//	local float weap;
 	local float rnd;
 	if (self.enemy.deadflag != DEAD_NO)
 	{
@@ -1229,14 +1229,14 @@ float (float minweight) aibot_checkforGoodies =
 	local entity e;
 	local entity botTarget;
 	local float AFRAID;
-	local float steps;
+//	local float steps;
 	local float best;
 	local float weight;
-	local float goody_yaw;
-	local float lnd;
-	local float weap;
+//	local float goody_yaw;
+//	local float lnd;
+//	local float weap;
 	local float minimum;
-	local vector spot;
+//	local vector spot;
 	if (self.air_finished < (time + 9))
 	{
 		goForAir ();

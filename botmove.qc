@@ -116,7 +116,7 @@ float (float dist) teleptest =
 
 float (float dist) waterupz =
 {
-	local vector start;
+//	local vector start;
 	local vector up;
 	if (!teleptest (dist))
 	{
@@ -131,7 +131,7 @@ float (float dist) waterupz =
 float (float dist) waterdownz =
 {
 	local vector up;
-	local vector start;
+//	local vector start;
 	if (!teleptest ((-1* dist)))
 	{
 		return (0);
@@ -340,7 +340,7 @@ float (float vz, float dist, float imagine) Bot_tryjump =
 	local float NOTLAND;
 	local float lnd;
 	local float len;
-	local float depth;
+//	local float depth;
 	local float wlevel;
 	local float velz;
 	local float ht;
@@ -353,11 +353,11 @@ float (float vz, float dist, float imagine) Bot_tryjump =
 	local vector jumpv;
 	local vector newtop;
 	local vector newbottom;
-	local vector back;
-	local vector front;
+//	local vector back;
+//	local vector front;
 	local vector dir;
 	local vector start;
-	local string tmp;
+//	local string tmp;
 	local entity botTarget;
 	if (!(self.flags & (FL_ONGROUND + 2)))
 	{
@@ -596,8 +596,8 @@ float (float dist) waterupdown =
 {
 	local float wlevel;
 	local float dis;
-	local float rnd;
-	local float zbottom;
+//	local float rnd;
+//	local float zbottom;
 	dis = KINDA_WANT;
 	wlevel = CheckWaterLevel ();
 	if (wlevel < 2)
