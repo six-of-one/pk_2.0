@@ -89,7 +89,7 @@ OgreFireGrenade
 */
 void() OgreFireGrenade =
 {
-	local	entity missile, mpuff;
+	local	entity missile;//, mpuff;	// fx_warning
 
 	self.effects = self.effects | EF_MUZZLEFLASH;
 

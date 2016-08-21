@@ -192,7 +192,7 @@ void(string cls, string rep, string am, string ram) item_repm =
 
 void() item_loop =
 {
-	local float f, e, d, pko, pks, sf, lvl, lvls, msk;
+	local float f, e, pko, pks, sf, lvl, lvls, msk;
 	local string cl;
 
 	pks = 0;
@@ -364,7 +364,7 @@ entity rseu; // random spawn ent origin used
 void() dyn_spawn =
 {
 	local entity e, sv;
-	local string src;
+//	local string src;
 	float ri, sf;
 
 // get a random origin

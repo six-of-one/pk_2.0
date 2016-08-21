@@ -468,7 +468,7 @@ void() viswep_pkbot =
 
 // self - player ent
 
-float vw_frame; // once per frame
+//float vw_frame; // once per frame
 
 void() viswep_post =
 {

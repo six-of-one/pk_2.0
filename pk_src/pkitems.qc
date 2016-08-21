@@ -35,7 +35,7 @@
 void () painkeep_weapon_touch =
 // The touch func for our new items
 {
-	local	float	hadammo, best, new, oldi;
+	local	float	best, new, oldi;
 	local	entity	stm2;
 	local float leave;
 

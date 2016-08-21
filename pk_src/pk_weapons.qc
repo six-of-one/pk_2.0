@@ -1358,7 +1358,7 @@ void() PK_CheatCommand =
 
 void() PK_ImpulseCommands =
 {
-	local entity sv;
+//	local entity sv;
 
 	if (self.impulse >= 1 && self.impulse <= 8)
 		W_ChangeWeapon ();

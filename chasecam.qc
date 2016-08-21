@@ -11,7 +11,7 @@ chasecam file
 //.vector cam; // all chase cam data - moved for pre compile
 
 // darkplaces deal
-.float clientcolors; //controls coloring on scoreboard (this determines player colors exactly like the "color" command, except for using a single number that contains pants and shirt colors (pants + shirt * 16, 0-255 potentially), so be sure to set it for a bot)
+//.float clientcolors; //controls coloring on scoreboard (this determines player colors exactly like the "color" command, except for using a single number that contains pants and shirt colors (pants + shirt * 16, 0-255 potentially), so be sure to set it for a bot)
 
 // already in pk for hub view
 // string CL_BOBSET = "cl_bob 0.02\n"; // val for turning view bob back on when not in chasecam

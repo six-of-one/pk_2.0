@@ -356,7 +356,7 @@ void() bolt_findNextTarget =
 // check for target path loops...
 float(entity check, entity checkFor) bolt_checkForLoops =
 {
-	local string str;
+//	local string str;
 
 	while(check.bolt_targetNext)
 	{

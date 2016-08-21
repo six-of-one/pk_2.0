@@ -303,7 +303,7 @@ float()	CheckDogJump =
 
 float()	DogCheckAttack =
 {
-	local	vector	vec;
+//	local	vector	vec;	// fx_warning
 	
 // if close enough for slashing, go for it
 	if (CheckDogMelee ())
