@@ -294,7 +294,7 @@ float() ShamCheckAttack =
 {
 	local vector	spot1, spot2;	
 	local entity	targ;
-	local float		chance;
+//	local float		chance;
 //	local float		enemy_yaw;  // Cataboligne 9.17.3 - fixed this compiler warning
 
 	if (enemy_range == RANGE_MELEE)

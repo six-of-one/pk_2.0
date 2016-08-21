@@ -14,7 +14,7 @@ float() rand_time =
 
 void() func_thumpsound_play =
 {
-	if ( ! pk_flags & PK_TP_SPARKSFLASH)
+	if ( !(pk_flags & PK_TP_SPARKSFLASH))
 	{
 	  local float r;
 	  local string sname;
@@ -46,7 +46,7 @@ void() func_thumpsound_play =
 
 void() func_cygnussound_play =
 {
-	if ( ! pk_flags & PK_TP_SPARKSFLASH)
+	if ( !(pk_flags & PK_TP_SPARKSFLASH))
 	{
 		local float r;
 		local string sname;
@@ -73,7 +73,7 @@ void() func_cygnussound_play =
 
 void() func_birdsound_play =
 {
-	if ( ! pk_flags & PK_TP_SPARKSFLASH)
+	if ( !(pk_flags & PK_TP_SPARKSFLASH))
 	{
 		local float r;
 		local string sname;
@@ -105,7 +105,7 @@ void() func_birdsound_play =
 
 void() func_growlsound_play =
 {
-	if ( ! pk_flags & PK_TP_SPARKSFLASH)
+	if ( !(pk_flags & PK_TP_SPARKSFLASH))
 	{
 		local float r;
 		local string sname;
@@ -129,7 +129,7 @@ void() func_growlsound_play =
 
 void() func_moansound_play =
 {
-	if ( ! pk_flags & PK_TP_SPARKSFLASH)
+	if ( !(pk_flags & PK_TP_SPARKSFLASH))
 	{
 		local float r;
 		local string sname;
@@ -151,7 +151,7 @@ void() func_moansound_play =
 
 void() func_swampsound_play =
 {
-	if ( ! pk_flags & PK_TP_SPARKSFLASH)
+	if ( !(pk_flags & PK_TP_SPARKSFLASH))
 	{
 		local float r;
 		local string sname;
@@ -184,7 +184,7 @@ void() func_swampsound_play =
 
 void() func_painsound_play =
 {
-	if ( ! pk_flags & PK_TP_SPARKSFLASH)
+	if ( !(pk_flags & PK_TP_SPARKSFLASH))
 	{
 		local float r;
 		local string sname;

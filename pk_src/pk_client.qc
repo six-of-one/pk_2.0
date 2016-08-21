@@ -118,10 +118,10 @@ void(entity spot) ClearSpawnPoint =
 
 entity() PK_SelectSpawnPoint =
 {
-	local	entity spot, newspot, thing;
+	local	entity spot, thing;
 	local	float	numspots, totalspots;
-	local	float	rnum, pcount;
-	local	float	rs;
+	local	float	pcount;
+//	local	float	rs;
 	local entity spots;
 
 	numspots = 0;

@@ -63,11 +63,11 @@ float MULTIENEMY				= 2048;
 .void() th_update;
 .float istrigger;
 //.float healtype;
-.float playerkills;
-.float playerdeaths;
-.float botkills;
-.float botdeaths;
-.float suicides;
+//.float playerkills;
+//.float playerdeaths;
+//.float botkills;
+//.float botdeaths;
+//.float suicides;
 .vector lastseenpos;
 .float enemyrun;
 .float goody_time;
@@ -115,7 +115,7 @@ float INVGRENADELEVELDIST;
 float GRENADEMAXHEIGHT;
 float LEVELJUMPTIME;
 float NUMPATHS;
-float NUMGIBS;
+//float NUMGIBS;
 float NUMPATHERS;
 float SKINSMODE;
 float RECURSEDEPTH;
@@ -133,7 +133,7 @@ float XRP = 1; // if true xreap code will be used - mostly extra messages from b
 
 float c_skill; // holder - carry skill for bot spawning
 
-float last_time_left;
+//float last_time_left;
 float randombotskin;
 float nearlight;
 

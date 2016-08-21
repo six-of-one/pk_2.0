@@ -168,7 +168,7 @@ void () item_health =
 
 void () health_touch =
 {
-	local float amount;
+//	local	float amount;	// fx_warning
 	local string s;
 
 	if (other.classname != "player")
@@ -891,8 +891,8 @@ KEYS
 
 void () key_touch =
 {
-	local entity stemp;
-	local float best;
+//local entity	stemp;	// fx_warning
+//local float		best;	// fx_warning
 
 	if (other.classname != "player")
 			return;
@@ -1027,8 +1027,8 @@ END OF LEVEL RUNES
 
 void () sigil_touch =
 {
-	local entity stemp;
-	local float best;
+//local entity	stemp;	// fx_warning
+//local float		best;	// fx_warning
 
 	if (other.classname != "player")
 			return;
@@ -1097,8 +1097,8 @@ POWERUPS
 
 void () powerup_touch =
 {
-	local entity stemp;
-	local float best;
+//local entity	stemp;	// fx_warning
+//local float		best;	// fx_warning
 
 	if (other.classname != "player")
 			return;
