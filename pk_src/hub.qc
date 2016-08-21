@@ -32,8 +32,8 @@ void(entity e) WaitForVotes;
 void() hub_teleport_touch =
 {
 	local entity spot;
-	local float temp1, temp2;
-	local string str;
+//	local float temp1, temp2;
+//	local string str;
 
 	// make sure the thing is the player
 	if (other.classname != "player" && other.classname != "pk*bot")  /// && other.classname != OBSERVER) // *bot - NOTE: observer check fails - prob touch issue for jafo
@@ -199,7 +199,7 @@ float() check_custom_hub =
 void() hub_custom =
 { 
 	local entity e;
-	local vector v;
+//	local vector v;
 
 	if (PK_100 || Q_100 || Q_99) // Cataboligne - 8.15.9 - pk compat mode, q compat mode
 	{
@@ -428,7 +428,7 @@ entity() getHighestWithoutRandom =
 
 void() hub_control_use =
 {
-	local entity e;
+//	local entity e;
 	local entity highest;
 	local float r;
 	local float c; // count of highests
@@ -699,7 +699,7 @@ void() hub_control_status =
 
 void() hub_control =
 {
-	local entity timer;
+//	local entity timer;
 	local float temp1;
 
 	if (Q_100 || Q_99 || custom_hub_fail) // Cataboligne - 8.16.9 - q compat mode

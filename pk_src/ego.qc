@@ -135,7 +135,7 @@ void (entity ownerEntity) ego_remove =
 void () ego_seeker =
 {
 	local vector vec1;
-	local string hold_s;
+//	local string hold_s;
 	if (time > self.delay)
 	{
 		sprint (self.owner,"Losing One's EGO\n");

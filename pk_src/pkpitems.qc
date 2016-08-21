@@ -14,7 +14,7 @@
 
 void () pkplus_weapon_touch =
 {
-	local float hadammo;
+//	local float hadammo;
 	local float best;
 	local float new;
 	local float oldi;

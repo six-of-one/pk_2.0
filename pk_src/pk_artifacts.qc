@@ -307,7 +307,7 @@ void(entity oth)  pk_art_bound_ammo =
 
 void () pk_art_powerup_touch =
 {
-	local float best;
+//	local float best;
 
 	if (other.classname != "player")
 			return;
