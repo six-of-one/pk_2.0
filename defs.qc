@@ -401,7 +401,7 @@ float movedist;
 float	gameover;		// set when a rule exits
 
 string	string_null;	// null string, nothing should be held here
-float empty_float;
+//float	empty_float;	// fx_warning
 
 entity	newmis;			// launch_spike sets this after spawning it
 
@@ -428,7 +428,7 @@ float skill;
 //
 // quakeed fields
 //
-.float		light_lev;		// not used by game, but parsed by light util
+//.float		light_lev;		// not used by game, but parsed by light util
 .float style;
 
 
@@ -548,7 +548,7 @@ float AS_MISSILE	 = 4;
 //
 // sounds
 //
-.float		waitmin, waitmax;
+.float		waitmin;//, waitmax;
 .float distance;
 .float volume;
 

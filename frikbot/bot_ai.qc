@@ -504,7 +504,7 @@ void() bot_path =
 {
 
 	local entity jj, tele;
-	local vector org;
+//	local vector org;
 
 	bot_check_lost(self.target1_);
 	if (!self.target1_)

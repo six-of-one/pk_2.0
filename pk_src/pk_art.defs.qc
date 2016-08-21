@@ -85,8 +85,8 @@ deprecated - already in pk_bot
 .float rotate_type;
 .float duration;
 */
-.entity next_ent;
-.entity lastvictim;
+//.entity next_ent; // fx_warning
+//.entity lastvictim;
 .entity tomb_target;
 .entity tomb_touchable;
 

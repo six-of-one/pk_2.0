@@ -24,7 +24,7 @@ float Q_99						= FALSE;	// quake 1 99% compatability mode - if true pk stuff is
 float PK_100_OBJERR;						// if true objerr that would have exited game (and have since been fixed) will cause an objerr
 float Q_100_OBJERR;						// if true objerr that would have exited game (and have since been fixed) will cause an objerr
 float MAP_OBSTR;							// object errors -> warnings that remove map items should set this. so map repair (tbd) can init an emergency exit
-float MAP_REPAIR;							// if true map repairs will execute
+//float MAP_REPAIR;							// if true map repairs will execute
 void() q_startmap;						// fix start map issue for q single player
 
 
@@ -194,7 +194,7 @@ void(entity client, string s, string s1, string s2, string s3, string s4, string
 // items
 .float pk_items;	// Items used for impulse 1
 .float pk_currentitem;
-float pk_attack;		// bit 1 = can make a pk attack on any map, bit 2 = pk_artifacts attack
+//float pk_attack;		// bit 1 = can make a pk attack on any map, bit 2 = pk_artifacts attack
 void() use_pkitem; // bots using pk items
 
 // viswep
@@ -313,7 +313,7 @@ void(float firstBlast) horn_airblast;
 .entity grap_pull;
 .float grap_checkTimeout;
 .float grap_state;
-.float grap_length;
+//.float grap_length;
 .vector grep_offset;						// harpoon target offset for bringing back to owner
 .float grap_firetest;
 

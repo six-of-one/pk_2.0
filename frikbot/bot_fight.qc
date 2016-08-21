@@ -77,7 +77,7 @@ float(entity e) bot_size_player =
 void() bot_dodge_stuff =
 {
 	local entity foe;
-	local float foedist, avdist, scandist, foesz, flen, tsz;
+	local float foedist, avdist, foesz, flen, tsz;
 	local vector v;
 
 	if (waypoint_mode > WM_LOADED)
@@ -450,7 +450,7 @@ void() bot_fight_style =
 			else
 				frik_walkmove(v1);
 		}
-		else if (!self.enemy.flags & FL_MONSTER)
+		else if (!(self.enemy.flags & FL_MONSTER))
 		{
 			if (foedist + 32 <  v_x)
 				frik_walkmove(self.origin - org);

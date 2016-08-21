@@ -118,7 +118,7 @@ float FRIKBOT = TRUE; // set to true for frikbot access
 // ----- entity fields ---
 .float	wallhug, keys, oldkeys, ishuman;
 .float	b_frags, b_clientno, b_shirt, b_pants; 
-.float	priority, ai_time, b_sound, missile_speed;
+.float	ai_time, b_sound, missile_speed;
 .float	portal_time, b_skill, switch_wallhug;
 .float	b_aiflags, b_num, b_chattime;
 .float	b_menu, b_menu_time, b_menu_value;
@@ -128,7 +128,7 @@ float FRIKBOT = TRUE; // set to true for frikbot access
 .entity	target1_, target2_, target3, target4;
 .entity	_next, _last;
 .entity	current_way;
-.vector	b_angle, b_dest, mouse_emu, obs_dir;
+.vector	b_angle, mouse_emu, obs_dir;
 .vector	movevect, b_dir;
 .vector dyn_dest;
 
@@ -1055,12 +1055,12 @@ void(entity bot) BotDisconnect =
 		// must remove it's entry in the rankings
 		// Quake engine sets all fields to 0, can only do the most important here
 		self.b_frags = self.frags = 0;
-		self.netname = "";
-		self.classname = "";
+		self.netname = string_null;
+		self.classname = string_null;
 		self.health = 0;
 		self.items = 0;
 		self.armorvalue = 0;
-		self.weaponmodel = "";
+		self.weaponmodel = string_null;
 		self.b_pants = 0;
 		self.b_shirt = 0;
 		self.ammo_shells = self.ammo_nails = self.ammo_rockets = self.ammo_cells = 0;
