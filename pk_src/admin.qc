@@ -870,7 +870,7 @@ void() Admin_itembits =
 	local string adv, it, ad2;
 	local float f;
 
-	if (! pk_itemovr & CON_ANY)
+	if (! (pk_itemovr & CON_ANY))
 	{
 		bprint("\b--------------------------------\n");
 		self.wad = "\nNo bits are set in item override!";
@@ -942,13 +942,13 @@ void() Admin_itembits =
 	{
 		bprint("Infinite ammo on selected weapons\n");
 // fixes to pk 2.1 code 1/31/11
-		if (! pk_itemovr & WEP_WEPSQ) bprint("\b- no weapon bits set!\n");
+		if (! (pk_itemovr & WEP_WEPSQ)) bprint("\b- no weapon bits set!\n");
 		if (PK && (pk_itemovr & WEP_PKI)) bprint("- sub pk items for ammo boxes\n");
 	}
 	if (!f) bprint("\n\bNo control bits!\n\n");
 	else
 	{
-		if (! pk_itemovr & ITEM_ANY) bprint("\bNo items selected!\n");
+		if (! (pk_itemovr & ITEM_ANY)) bprint("\bNo items selected!\n");
 //		if (f == 3) bprint("\bItem Cha*s selected...\n");
 //		else
 		if (f > 1) bprint("\bPossible control conflict!\n");

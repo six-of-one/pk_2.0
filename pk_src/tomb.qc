@@ -125,7 +125,7 @@ void () tombtouch =
 	{
 //		if (other.classname == "player" && cvar("sv_sp_bt_noplayer")) return;
 //		else 
-		if (other.classname != "player" && ! other.flags & FL_MONSTER) return;
+		if (other.classname != "player" && ! (other.flags & FL_MONSTER)) return;
 	}
 	else
 	if (other.classname != "player" && other.classname != "pk*bot")

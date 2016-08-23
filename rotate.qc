@@ -579,6 +579,7 @@ void() rotate_train_next =
    self.path = targ.target;
    if (!self.path )
       if (Q_100 && Q_100_OBJERR) objerror ("rotate_train_next: no next target");
+		else
       {
 		if (WARNING) bprint( "\n*** warning:\nrotate_train_next: no next target - removed.\n\n" );
 	  MAP_OBSTR = TRUE;
@@ -724,7 +725,7 @@ void() rotate_train_next =
       self.dest2 = vdestdelta;  // delta
       self.dest1 = self.origin; // original position
       }
-   };
+};
 
 void() rotate_train_find =
    {

@@ -127,7 +127,7 @@ void() beartrapTouch =
 		{
 			if (cvar("sv_sp_bt_noplayer")) return;
 		}
-		else if (! other.flags & FL_MONSTER) return;
+		else if (! (other.flags & FL_MONSTER)) return;
 	}
 	else
 	if (other.classname != "pk*bot") // *bot - bots get bit

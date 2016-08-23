@@ -24,7 +24,7 @@ void() spark_die =
 
 void() light_spark_emit =
 {
-	if ( ! pk_flags & PK_TP_SPARKSFLASH)
+	if ( ! (pk_flags & PK_TP_SPARKSFLASH))
 	{
 		local float numSparks;
 		local entity spark;
