@@ -595,7 +595,7 @@ New for PainKeep, makes things a whole lot simplier
 float(float weaponnum, float pknum) CanSelect =
 {
 	// First, check that we have the weapon
-	if (!self.items & weaponnum)
+	if (!(self.items & weaponnum))
 		return FALSE;
 
 	if (weaponnum == IT_AXE && !(self.pk_items & pknum))

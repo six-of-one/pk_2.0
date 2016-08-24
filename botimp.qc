@@ -106,7 +106,7 @@ void () observer =
 
 	if (!self.admin)
 	{
-		if (! serverflags & FL_OBSERVER) // restricted, only admins can observe
+		if (! (serverflags & FL_OBSERVER)) // restricted, only admins can observe
 			return;
 		if (observer_time) // can only observe for this long
 		{

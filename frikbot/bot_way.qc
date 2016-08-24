@@ -318,7 +318,7 @@ void() DynamicWaypoint =
 
 	if (self.teleport_time > self.portal_time)
 	{
-		if (!self.flags & FL_WATERJUMP)
+		if (!(self.flags & FL_WATERJUMP))
 		{
 			self.dyn_flags = 2;
 			if (!self.ishuman)

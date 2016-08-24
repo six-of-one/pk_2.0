@@ -149,6 +149,7 @@ string(float r) BotName =
 		self.b_shirt = 10;
 		return "Hal";
 	}
+	return "Frikky";
 };
 string () PickARandomName =
 {
@@ -712,6 +713,8 @@ float (entity targ) sisible =
 		return TRUE;
 	else if (trace_fraction == 1)
 		return TRUE;
+	
+	return FALSE;
 };
 /*
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

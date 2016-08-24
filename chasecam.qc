@@ -950,7 +950,7 @@ void () dead_cam_set =
 		if (self.aiment)
 		if (self.aiment.classname == "deadcam") return; // dont make more than one - just in case
 
-		if (! self.cam_x & CHSCAM_ON)
+		if (! (self.cam_x & CHSCAM_ON))
 			cam_startdeathview();
 	}
 };
@@ -1027,11 +1027,11 @@ void() cam_waterjump =
 {
 //	if (! self.flags & FL_WATERJUMP)
 	cam_CheckWaterJump (' 0 0 -8');
-	if (! self.flags & FL_WATERJUMP)
+	if (! (self.flags & FL_WATERJUMP))
 		cam_CheckWaterJump (' 0 0 -4');
-	if (! self.flags & FL_WATERJUMP)
+	if (! (self.flags & FL_WATERJUMP))
 		cam_CheckWaterJump (' 0 0 4');
-	if (! self.flags & FL_WATERJUMP)
+	if (! (self.flags & FL_WATERJUMP))
 		cam_CheckWaterJump (' 0 0 8');
 //		if (! self.flags & FL_WATERJUMP)
 //			cam_CheckWaterJump (' 0 0 10');

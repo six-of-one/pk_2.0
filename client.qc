@@ -1022,7 +1022,7 @@ void () PlayerPreThink =
 
 //		if (!Q_100 && !PK_100)
 	if (self.waterlevel)
-	if (! self.flags & FL_WATERJUMP)
+	if (! (self.flags & FL_WATERJUMP))
 	if (self.cam_x & CHSCAM_ON)
 	{
 		cam_waterjump();  // Cataboligne 8.22.9 purify - chase cam

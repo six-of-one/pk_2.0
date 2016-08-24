@@ -454,6 +454,8 @@ string (string s) precache_sound =
 {
 	if (time < DYN_START_TIME)
 		return(precache_sound__(s));
+
+	return(string_null);
 };
 
 string (string s) precache_model =
@@ -474,6 +476,8 @@ string (string s) precache_model =
 
 	if (time < DYN_START_TIME)
 		return(precache_model__(s));
+
+	return(string_null);
 }; 
 
 // set mode based on map name

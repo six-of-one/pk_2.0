@@ -78,7 +78,7 @@ void() CL_KeyMove = // CL_BaseMove + CL_AdjustAngles
 		// 200 is the default cl_upspeed
 		self.movevect_z = self.movevect_z - (200 * CL_KeyState(KEY_MOVEDOWN)); 
 		// 200 is the default cl_upspeed
-		if (!self.b_aiflags & AI_PRECISION)
+		if (!(self.b_aiflags & AI_PRECISION))
 			self.movevect = self.movevect * 2; 
 		// 2 is the default cl_movespeedkey & bot always has +speed
 	}

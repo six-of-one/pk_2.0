@@ -372,7 +372,7 @@ void(entity e, float cd) viswep_ld =
 		else
 		if (tr.weapon != IT_AXE || !pkbits)
 		{
-			if (! tr.weapon & e.items)
+			if (! (tr.weapon & e.items))
 			{
 //				tr.mdl = "";
 //				tr.think = SUB_Remove;
@@ -389,7 +389,7 @@ void(entity e, float cd) viswep_ld =
 		}
 		else
 		{
-			if (! tr.pk_currentitem & pkbits)
+			if (! (tr.pk_currentitem & pkbits))
 			{
 //				tr.mdl = "";
 //				tr.think = SUB_Remove;
